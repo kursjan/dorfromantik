@@ -12,11 +12,11 @@ describe('Board', () => {
     board = new Board();
     testTile = new Tile({
       id: 'tile-1',
+      north: 'field',
       northEast: 'field',
-      east: 'field',
       southEast: 'field',
+      south: 'field',
       southWest: 'field',
-      west: 'field',
       northWest: 'field',
     });
     testCoord = new HexCoordinate(0, 0, 0);

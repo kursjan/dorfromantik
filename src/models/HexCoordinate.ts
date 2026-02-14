@@ -7,7 +7,7 @@ export class HexCoordinate {
     if (!Number.isInteger(q) || !Number.isInteger(r) || !Number.isInteger(s)) {
       throw new Error(`Invalid HexCoordinate: ${q},${r},${s}. Coordinates must be integers.`);
     }
-    if (Math.round(q + r + s) !== 0) {
+    if (q + r + s !== 0) {
       throw new Error(`Invalid HexCoordinate: ${q},${r},${s}. Sum must be 0.`);
     }
     this.q = q;

@@ -2,51 +2,51 @@ export type TerrainType = 'tree' | 'house' | 'water' | 'pasture' | 'rail' | 'fie
 
 export interface TileProps {
   id: string;
+  north: TerrainType;
   northEast: TerrainType;
-  east: TerrainType;
   southEast: TerrainType;
+  south: TerrainType;
   southWest: TerrainType;
-  west: TerrainType;
   northWest: TerrainType;
 }
 
 export class Tile {
   readonly type = 'tile';
   id: string;
+  north: TerrainType;
   northEast: TerrainType;
-  east: TerrainType;
   southEast: TerrainType;
+  south: TerrainType;
   southWest: TerrainType;
-  west: TerrainType;
   northWest: TerrainType;
 
   constructor(props: TileProps) {
     this.id = props.id;
+    this.north = props.north;
     this.northEast = props.northEast;
-    this.east = props.east;
     this.southEast = props.southEast;
+    this.south = props.south;
     this.southWest = props.southWest;
-    this.west = props.west;
     this.northWest = props.northWest;
   }
 
   private getTerrainChar(type: TerrainType): string {
-    return type[0];
+    return type[0].toUpperCase();
   }
 
   print(): void {
-    const nw = this.getTerrainChar(this.northWest);
+    const n = this.getTerrainChar(this.north);
     const ne = this.getTerrainChar(this.northEast);
-    const w = this.getTerrainChar(this.west);
-    const e = this.getTerrainChar(this.east);
-    const sw = this.getTerrainChar(this.southWest);
     const se = this.getTerrainChar(this.southEast);
+    const s = this.getTerrainChar(this.south);
+    const sw = this.getTerrainChar(this.southWest);
+    const nw = this.getTerrainChar(this.northWest);
 
     console.log(`Tile ${this.id}:`);
-    console.log(`   ${nw} -- ${ne}`);
-    console.log(`  /      \\`);
-    console.log(` ${w}        ${e}`);
-    console.log(`  \\      /`);
-    console.log(`   ${sw} -- ${se}`);
+    console.log(`    _ _`);
+    console.log(`  /  ${n}  \\`);
+    console.log(` /${nw}     ${ne}\\`);
+    console.log(` \\${sw}     ${se}/`);
+    console.log(`  \\ _${s}_ /`);
   }
 }
