@@ -149,4 +149,40 @@ describe('TilePrinter', () => {
     
     expect(canvas.toString()).toBe(expected);
   });
+
+  it('should print three tiles in a western triangular formation', () => {
+    const canvas = new Canvas(-7, 0, 8, 8);
+    const tile1 = new Tile({
+      id: 'tile1',
+      north: 'tree', northEast: 'house', southEast: 'water',
+      south: 'pasture', southWest: 'rail', northWest: 'field',
+    });
+    const tile2 = new Tile({
+      id: 'tile2',
+      north: 'field', northEast: 'pasture', southEast: 'water',
+      south: 'field', southWest: 'water', northWest: 'house',
+    });
+    const tile3 = new Tile({
+      id: 'tile3',
+      north: 'water', northEast: 'rail', southEast: 'field',
+      south: 'tree', southWest: 'house', northWest: 'pasture',
+    });
+
+    const printer = new TilePrinter(canvas);
+    printer.print(tile1, 0, 0);
+    printer.print(tile2, 0, 4);
+    printer.print(tile3, -7, 2);
+
+    const expected = String.raw`          _ _   
+        /  T  \ 
+   _ _ /F     H\
+ /  W  \R     W/
+/P     R\ _P_ / 
+\H     F/  F  \ 
+ \ _T_ /H     P\
+       \W     W/
+        \ _F_ / `;
+    
+    expect(canvas.toString()).toBe(expected);
+  });
 });
