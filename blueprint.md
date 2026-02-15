@@ -11,6 +11,7 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 - **Communication:** Be brief and professional. No excessive apologies or flattery.
 - **Scope:** Make small changes. Minimize file touches. 
 - **Never** do more than necessary or instructed.
+- **Never** do anything unless explicitly asked. 
 - **Update tests** remember to update tests after changing business logic.
 - **Verification Protocol:** 
   - **AUTOMATIC EXECUTION:** After *every* code change, you MUST automatically run the following commands. **Do not ask for permission. Do not announce you are going to do it. Just run them and report the results.**
@@ -36,7 +37,7 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
   - `HexCoordinate`: Enforces integer coordinates and zero-sum constraint.
   - `Tile`: Class with explicit edge properties (e.g., `north`, `northEast`). Includes `print()` for single tile ASCII art.
   - `Board`: Class encapsulating a `Map` of tiles, indexed by coordinate key. Prevents placement on occupied spots.
-- **Visualization:** ASCII-based printing for debugging (`BoardPrinter` - currently a stub).
+- **Visualization:** ASCII-based printing for debugging (`BoardPrinter`).
 
 ## 4. Implemented Features
 - [x] **Project Setup:** React, TypeScript, Tailwind, shadcn/ui (partial), Firebase (config).
@@ -47,7 +48,9 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
   - `Board` class for managing tile placement.
   - `Navigation` class implementing neighbor calculations.
 - [x] **Testing:** Comprehensive unit tests for models.
+- [x] **Board Visualization:** Implemented `BoardPrinter`, `Canvas`, and `TilePrinter` to render the full grid in ASCII.
 
 ## 5. Current Plan
-- [ ] **Board Visualization:** Implement `BoardPrinter` to render the full grid in ASCII.
 - [ ] **Frontend:** Render the grid in React (Canvas or SVG).
+- [ ] **Game Logic:** Implement tile rotation and placement validation rules.
+- [ ] **User Interaction:** Allow users to place tiles on the board via the UI.
