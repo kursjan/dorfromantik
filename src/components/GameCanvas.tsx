@@ -1,80 +1,22 @@
 import React, { useRef, useEffect } from 'react';
-import { hexToPixel } from '../utils/HexUtils';
+import { pixelToHex, HEX_SIZE } from '../utils/HexUtils';
 import { HexCoordinate } from '../models/HexCoordinate';
-import { 
-  type HexStyle, 
-  GRID_HEX_STYLE, 
-  CENTER_HEX_STYLE 
-} from '../styles/HexStyles';
+import { Camera } from '../utils/Camera';
+import { HexRenderer } from '../graphics/HexRenderer';
 
 // --- Constants ---
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 3.0;
 const ZOOM_SENSITIVITY = 0.001;
 
-// --- Helper Functions ---
-
-const drawHex = (ctx: CanvasRenderingContext2D, hex: HexCoordinate, style: HexStyle) => {
-  const { x, y } = hexToPixel(hex.q, hex.r, style.size);
-  
-  ctx.beginPath();
-  for (let i = 0; i < 6; i++) {
-    const angle = (2 * Math.PI) / 6 * i;
-    const hx = x + style.size * Math.cos(angle);
-    const hy = y + style.size * Math.sin(angle);
-    if (i === 0) ctx.moveTo(hx, hy);
-    else ctx.lineTo(hx, hy);
-  }
-  ctx.closePath();
-  
-  ctx.lineWidth = style.lineWidth;
-  ctx.strokeStyle = style.strokeColor;
-  ctx.stroke();
-  
-  if (style.fillColor !== 'transparent') {
-    ctx.fillStyle = style.fillColor;
-    ctx.fill();
-  }
-
-  // Render Cubic Coordinates (q, r, s)
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.font = style.font;
-  ctx.fillStyle = style.textColor;
-  ctx.fillText(`${hex.q},${hex.r},${hex.s}`, x, y);
-};
-
-const drawDebugGrid = (ctx: CanvasRenderingContext2D, radius: number = 5) => {
-  for (let q = -radius; q <= radius; q++) {
-    const r1 = Math.max(-radius, -q - radius);
-    const r2 = Math.min(radius, -q + radius);
-    for (let r = r1; r <= r2; r++) {
-      const s = -q - r;
-      const hex = new HexCoordinate(q, r, s);
-      
-      let style = GRID_HEX_STYLE;
-      
-      // Highlight Center
-      if (q === 0 && r === 0 && s === 0) {
-         style = CENTER_HEX_STYLE;
-      } 
-      
-      drawHex(ctx, hex, style);
-    }
-  }
-};
-
-// --- Component ---
-
 export const GameCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
-  // Camera state
-  const cameraRef = useRef({ x: 0, y: 0, zoom: 1 });
-  
-  // Interaction state
+  // State Refs (Mutable, no re-renders)
+  const cameraRef = useRef(new Camera(0, 0, 1));
   const isDraggingRef = useRef(false);
   const lastMousePosRef = useRef({ x: 0, y: 0 });
+  const hoveredHexRef = useRef<HexCoordinate | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -83,54 +25,56 @@ export const GameCanvas: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const renderer = new HexRenderer(ctx);
+
     // --- Render Loop ---
     let animationFrameId: number;
 
     const render = () => {
-      // 1. Resize canvas to fill parent
+      // 1. Resize
       if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
       }
 
-      // 2. Clear canvas
+      // 2. Clear
       ctx.fillStyle = '#f0f0f0';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // 3. Apply Camera Transform
+      // 3. Camera Transform
       ctx.save();
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.scale(cameraRef.current.zoom, cameraRef.current.zoom);
-      ctx.translate(cameraRef.current.x, cameraRef.current.y);
+      cameraRef.current.applyTransform(ctx, canvas.width, canvas.height);
 
       // 4. Draw World
-      drawDebugGrid(ctx);
+      renderer.drawDebugGrid(5);
+      renderer.drawHighlight(hoveredHexRef.current);
       
       ctx.restore();
 
-      // 5. Draw UI Overlay
+      // 5. UI Overlay
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
       ctx.fillStyle = 'black';
       ctx.font = '20px Arial';
-      ctx.fillText(`Camera: (${Math.round(cameraRef.current.x)},${Math.round(cameraRef.current.y)}) Zoom: ${cameraRef.current.zoom.toFixed(2)}`, 20, 30);
+      
+      const cam = cameraRef.current;
+      let debugText = `Camera: (${Math.round(cam.x)},${Math.round(cam.y)}) Zoom: ${cam.zoom.toFixed(2)}`;
+      if (hoveredHexRef.current) {
+          debugText += ` | Hover: (${hoveredHexRef.current.q},${hoveredHexRef.current.r},${hoveredHexRef.current.s})`;
+      }
+      ctx.fillText(debugText, 20, 30);
 
       animationFrameId = requestAnimationFrame(render);
     };
 
     render();
 
-    // --- Event Listeners ---
+    // --- Event Handlers ---
     
     const handleWheel = (e: WheelEvent) => {
         e.preventDefault();
         const zoomDelta = -e.deltaY * ZOOM_SENSITIVITY;
-        let newZoom = cameraRef.current.zoom + zoomDelta;
-        
-        // Clamp zoom
-        newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
-        
-        cameraRef.current.zoom = newZoom;
+        cameraRef.current.zoomBy(zoomDelta, MIN_ZOOM, MAX_ZOOM);
     };
 
     const handleMouseDown = (e: MouseEvent) => {
@@ -140,16 +84,26 @@ export const GameCanvas: React.FC = () => {
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isDraggingRef.current) return;
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
 
-      const dx = e.clientX - lastMousePosRef.current.x;
-      const dy = e.clientY - lastMousePosRef.current.y;
+      // 1. Handle Pan
+      if (isDraggingRef.current) {
+        const dx = e.clientX - lastMousePosRef.current.x;
+        const dy = e.clientY - lastMousePosRef.current.y;
+        lastMousePosRef.current = { x: e.clientX, y: e.clientY };
 
-      // Update last position for next frame
-      lastMousePosRef.current = { x: e.clientX, y: e.clientY };
-
-      cameraRef.current.x += dx / cameraRef.current.zoom;
-      cameraRef.current.y += dy / cameraRef.current.zoom;
+        cameraRef.current.pan(dx, dy);
+      }
+      
+      // 2. Handle Hover
+      const worldPos = cameraRef.current.screenToWorld(mouseX, mouseY, canvas.width, canvas.height);
+      const hex = pixelToHex(worldPos.x, worldPos.y, HEX_SIZE);
+      
+      if (!hoveredHexRef.current || !hoveredHexRef.current.equals(hex)) {
+        hoveredHexRef.current = hex;
+      }
     };
 
     const handleMouseUp = () => {
@@ -164,7 +118,6 @@ export const GameCanvas: React.FC = () => {
     canvas.addEventListener('mouseup', handleMouseUp);
     canvas.addEventListener('mouseleave', handleMouseUp); 
 
-    // Initialize cursor
     canvas.style.cursor = 'grab';
 
     return () => {

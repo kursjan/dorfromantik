@@ -29,3 +29,11 @@ export const CENTER_HEX_STYLE: HexStyle = {
   lineWidth: 2,
   fillColor: 'rgba(255,0,0,0.1)',
 };
+
+export const HOVER_HEX_STYLE: HexStyle = {
+  ...DEFAULT_HEX_STYLE,
+  strokeColor: '#FFD700', // Gold
+  lineWidth: 3,
+  fillColor: 'rgba(255, 215, 0, 0.2)',
+  textColor: '#000',
+};

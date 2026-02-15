@@ -55,10 +55,11 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
   - `HexStyles` configuration for centralized styling.
   - `drawDebugGrid` for visualizing the hex grid and coordinates.
   - **Interactive Camera:** Pan (drag) and Zoom (scroll) implemented.
+  - **Hex Interaction:** Mouse hover highlighting (Hex Picking) implemented.
 
 ## 5. Current Plan
 **Role:** Senior Graphics Engineer (TypeScript/Canvas).
-**Goal:** Implement a 2D Camera system with Zoom, Pan, Rotation, and "Mouse-to-Hex" picking.
+**Goal:** Integrate the Game Board data model with the interactive Canvas.
 
 ### Phase 1: Canvas & Camera Foundation
 - [x] **Step 1.1: Canvas Setup**
@@ -82,15 +83,15 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 - [x] **Step 2.1: Mouse Handling (Pan & Zoom)**
     - Implement `onMouseDown`, `onMouseMove`, `onMouseUp` for panning.
     - Implement `onWheel` for zooming.
-- [ ] **Step 2.2: Hex Picking (Hover)**
+- [x] **Step 2.2: Hex Picking (Hover)**
     - Calculate mouse position in "World Space" (accounting for Camera transform).
     - Use `pixelToHex` to determine the hovered hex coordinate.
     - Store `hoveredHex` in state.
-- [ ] **Checkpoint 2:**
+- [x] **Checkpoint 2:**
     - [x] Run app.
     - [x] Verify dragging moves the camera (Pan).
     - [x] Verify scrolling zooms the camera (Zoom).
-    - [ ] Verify hovering highlights the correct hexagon.
+    - [x] Verify hovering highlights the correct hexagon.
 
 ### Phase 3: Board Integration & Rendering
 - [ ] **Step 3.1: Connect Board Model**
