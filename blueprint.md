@@ -59,12 +59,14 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
     - Create `src/components/GameCanvas.tsx`.
     - Setup full-screen responsive canvas with `useRef`.
     - Implement basic `renderLoop` using `requestAnimationFrame`.
-- [ ] **Step 1.2: Coordinate System (Hex <-> Pixel)**
+- [x] **Step 1.2: Coordinate System (Hex <-> Pixel)**
     - Implement `hexToPixel(q, r, size)`: Convert axial coordinates to screen coordinates (Flat-Top).
     - Implement `pixelToHex(x, y, size)`: Inverse operation (including `cubeRound` for float handling).
-- [ ] **Step 1.3: Camera Implementation**
+- [ ] **Step 1.3: Camera Transform & Grid Rendering**
     - Define `Camera` state: `{ x, y, zoom }` (Rotation is optional for now).
     - Implement `transform` logic in `renderLoop` using `ctx.translate` and `ctx.scale`.
+    - Center the coordinate system (0,0) to the middle of the canvas.
+    - **Draw a visible grid of hexagons** to verify the layout immediately.
 - [ ] **Checkpoint 1:**
     - [ ] Run app.
     - [ ] Verify a grid of empty hexes is drawn.
