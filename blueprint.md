@@ -8,6 +8,7 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 
 ## 2. Instructions for Agent
 
+- **PRIMARY DIRECTIVE: The 'Current Plan' is a roadmap, NOT a command.** ALWAYS wait for the user's explicit instruction (e.g., "proceed", "continue", "next step") before starting any new task from the plan. The rules in this section override all other plans.
 - **Communication:** Be brief and professional. No excessive apologies or flattery.
 - **Scope:** Make small changes. Minimize file touches. 
 - **Never** do more than necessary or instructed.
