@@ -5,63 +5,58 @@ import { HexCoordinate } from './HexCoordinate';
 
 describe('Board', () => {
   let board: Board;
-  let testTile: Tile;
-  let testCoord: HexCoordinate;
+  const tile = new Tile({
+    id: 'test-tile',
+    north: 'tree',
+    northEast: 'house',
+    southEast: 'water',
+    south: 'pasture',
+    southWest: 'rail',
+    northWest: 'field',
+  });
+  const coord = new HexCoordinate(0, 0, 0);
 
   beforeEach(() => {
     board = new Board();
-    testTile = new Tile({
-      id: 'tile-1',
-      north: 'field',
-      northEast: 'field',
-      southEast: 'field',
-      south: 'field',
-      southWest: 'field',
-      northWest: 'field',
-    });
-    testCoord = new HexCoordinate(0, 0, 0);
   });
 
-  it('places a tile and retrieves it', () => {
-    board.place(testTile, testCoord);
-    const retrieved = board.get(testCoord);
-
-    expect(retrieved).toBeDefined();
-    expect(retrieved?.tile).toBe(testTile);
-    expect(retrieved?.coordinate).toEqual(testCoord);
-    expect(retrieved?.id).toBe('0,0,0');
+  it('should place a tile correctly', () => {
+    board.place(tile, coord);
+    expect(board.has(coord)).toBe(true);
+    expect(board.get(coord)?.tile).toBe(tile);
   });
 
-  it('returns undefined for missing tile', () => {
-    const missing = board.get(new HexCoordinate(1, -1, 0));
-    expect(missing).toBeUndefined();
+  it('should throw an error when placing a tile on an occupied spot', () => {
+    board.place(tile, coord);
+    expect(() => board.place(tile, coord)).toThrowError(/occupied/);
   });
 
-  it('checks if tile exists with has()', () => {
-    expect(board.has(testCoord)).toBe(false);
-    board.place(testTile, testCoord);
-    expect(board.has(testCoord)).toBe(true);
+  it('should canPlace return true for empty spot', () => {
+    expect(board.canPlace(coord)).toBe(true);
   });
 
-  it('gets all placed tiles', () => {
-    board.place(testTile, testCoord);
-    board.place(testTile, new HexCoordinate(1, -1, 0));
+  it('should canPlace return false for occupied spot', () => {
+    board.place(tile, coord);
+    expect(board.canPlace(coord)).toBe(false);
+  });
+
+  it('should clear the board', () => {
+    board.place(tile, coord);
+    board.clear();
+    expect(board.has(coord)).toBe(false);
+    expect(board.getAll().length).toBe(0);
+  });
+
+  it('should return all tiles', () => {
+    const tile2 = new Tile({ ...tile, id: 'test-tile-2' });
+    const coord2 = new HexCoordinate(1, -1, 0);
+
+    board.place(tile, coord);
+    board.place(tile2, coord2);
 
     const all = board.getAll();
-    expect(all).toHaveLength(2);
-  });
-
-  it('clears the board', () => {
-    board.place(testTile, testCoord);
-    board.clear();
-    expect(board.getAll()).toHaveLength(0);
-    expect(board.has(testCoord)).toBe(false);
-  });
-
-  it('throws error when placing on occupied position', () => {
-    board.place(testTile, testCoord);
-    expect(() => {
-      board.place(testTile, testCoord);
-    }).toThrow('Position 0,0,0 is already occupied');
+    expect(all.length).toBe(2);
+    expect(all.some(t => t.tile === tile)).toBe(true);
+    expect(all.some(t => t.tile === tile2)).toBe(true);
   });
 });

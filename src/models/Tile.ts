@@ -12,13 +12,13 @@ export interface TileProps {
 
 export class Tile {
   readonly type = 'tile';
-  id: string;
-  north: TerrainType;
-  northEast: TerrainType;
-  southEast: TerrainType;
-  south: TerrainType;
-  southWest: TerrainType;
-  northWest: TerrainType;
+  readonly id: string;
+  readonly north: TerrainType;
+  readonly northEast: TerrainType;
+  readonly southEast: TerrainType;
+  readonly south: TerrainType;
+  readonly southWest: TerrainType;
+  readonly northWest: TerrainType;
 
   constructor(props: TileProps) {
     this.id = props.id;

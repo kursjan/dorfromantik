@@ -29,7 +29,7 @@ describe('TilePrinter', () => {
   });
 
   it('should print two tiles touching at the SE corner', () => {
-    const canvas = new Canvas(0, 0, 16, 6);
+    const canvas = new Canvas(0, 0, 15, 6);
     const tile1 = new Tile({
       id: 'test1',
       north: 'tree',
@@ -53,13 +53,13 @@ describe('TilePrinter', () => {
     printer.print(tile1, 0, 0);
     printer.print(tile2, 7, 2);
 
-    const expected = String.raw`   _ _           
- /  T  \         
-/F     H\ _ _    
-\R     W/  F  \  
- \ _P_ /H     P\ 
-       \W     W/ 
-        \ _F_ /  `;
+    const expected = String.raw`   _ _          
+ /  T  \        
+/F     H\ _ _   
+\R     W/  F  \ 
+ \ _P_ /H     P\
+       \W     W/
+        \ _F_ / `;
 
     expect(canvas.toString()).toBe(expected);
   });

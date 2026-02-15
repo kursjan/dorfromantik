@@ -1,7 +1,29 @@
 import { Tile, TerrainType } from '../models/Tile';
 import { Canvas } from './Canvas';
 
+/**
+ * Prints a single tile to a canvas.
+ * 
+ * Visual representation of a tile (9x5 characters):
+ * 
+ *   012345678
+ * 0    _ _
+ * 1  /  N  \
+ * 2 /W     E\
+ * 3 \w     e/
+ * 4  \ _S_ /
+ * 
+ * Legend:
+ * N: North terrain
+ * E: North-East terrain
+ * e: South-East terrain
+ * S: South terrain
+ * w: South-West terrain
+ * W: North-West terrain
+ */
 export class TilePrinter {
+  static readonly WIDTH = 9;
+  static readonly HEIGHT = 5;
   private canvas: Canvas;
 
   constructor(canvas: Canvas) {

@@ -51,6 +51,30 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 - [x] **Board Visualization:** Implemented `BoardPrinter`, `Canvas`, and `TilePrinter` to render the full grid in ASCII.
 
 ## 5. Current Plan
-- [ ] **Frontend:** Render the grid in React (Canvas or SVG).
-- [ ] **Game Logic:** Implement tile rotation and placement validation rules.
-- [ ] **User Interaction:** Allow users to place tiles on the board via the UI.
+Role: You are a Senior Graphics Engineer specializing in TypeScript and High-Performance Canvas Rendering.
+Goal: Implement a 2D Camera system for a Hexagonal Grid game that supports Zoom, Pan, Rotation, and "Mouse-to-Hex" picking.
+
+1. Architectural Requirements
+Decoupled State: Maintain a strict separation between WorldSpace (Hex coordinates) and ScreenSpace (Canvas pixels).
+
+Transformation Matrix: Do not manually offset every hex. Use the Canvas context.save(), translate(), scale(), rotate(), and restore() pattern for the global camera.
+
+The Model: Use the existing Board map (Map<string, BoardTile>) where keys are q,r,s strings.
+
+The Viewport: Define a Camera type: { x: number, y: number, zoom: number, rotation: number }.
+
+2. Core Functions to Implement
+hexToWorld(q, r, size): Convert Axial/Cube to pixel (x, y) in world space.
+
+worldToHex(x, y, size): The inverse. Must include a cubeRound() helper to handle floating-point results from mouse clicks.
+
+renderLoop(): A high-performance loop using requestAnimationFrame.
+
+handleInput(): Implement "Click-to-Select" logic that uses the worldToHex function to identify which BoardTile was clicked.
+
+3. Coding Standards
+Strict Typing: Use the HexCoordinate and BoardTile interfaces already defined.
+
+Performance: Avoid object allocation inside the renderLoop.
+
+React Integration: The Canvas should be managed via a useRef<HTMLCanvasElement> and its size should be responsive to the window.
