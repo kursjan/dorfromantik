@@ -51,30 +51,52 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 - [x] **Board Visualization:** Implemented `BoardPrinter`, `Canvas`, and `TilePrinter` to render the full grid in ASCII.
 
 ## 5. Current Plan
-Role: You are a Senior Graphics Engineer specializing in TypeScript and High-Performance Canvas Rendering.
-Goal: Implement a 2D Camera system for a DorfRomantik game that supports Zoom, Pan, Rotation, and "Mouse-to-Hex" picking.
+**Role:** Senior Graphics Engineer (TypeScript/Canvas).
+**Goal:** Implement a 2D Camera system with Zoom, Pan, Rotation, and "Mouse-to-Hex" picking.
 
-1. Architectural Requirements
-Decoupled State: Maintain a strict separation between WorldSpace (Hex coordinates) and ScreenSpace (Canvas pixels).
+### Phase 1: Canvas & Camera Foundation
+- [ ] **Step 1.1: Canvas Setup**
+    - Create `src/components/GameCanvas.tsx`.
+    - Setup full-screen responsive canvas with `useRef`.
+    - Implement basic `renderLoop` using `requestAnimationFrame`.
+- [ ] **Step 1.2: Coordinate System (Hex <-> Pixel)**
+    - Implement `hexToPixel(q, r, size)`: Convert axial coordinates to screen coordinates (Flat-Top).
+    - Implement `pixelToHex(x, y, size)`: Inverse operation (including `cubeRound` for float handling).
+- [ ] **Step 1.3: Camera Implementation**
+    - Define `Camera` state: `{ x, y, zoom }` (Rotation is optional for now).
+    - Implement `transform` logic in `renderLoop` using `ctx.translate` and `ctx.scale`.
+- [ ] **Checkpoint 1:**
+    - [ ] Run app.
+    - [ ] Verify a grid of empty hexes is drawn.
+    - [ ] Verify `hexToPixel` matches the visual grid.
 
-Transformation Matrix: Do not manually offset every hex. Use the Canvas context.save(), translate(), scale(), rotate(), and restore() pattern for the global camera.
+### Phase 2: Interaction & Input Handling
+- [ ] **Step 2.1: Mouse Handling (Pan & Zoom)**
+    - Implement `onMouseDown`, `onMouseMove`, `onMouseUp` for panning.
+    - Implement `onWheel` for zooming.
+- [ ] **Step 2.2: Hex Picking (Hover)**
+    - Calculate mouse position in "World Space" (accounting for Camera transform).
+    - Use `pixelToHex` to determine the hovered hex coordinate.
+    - Store `hoveredHex` in state.
+- [ ] **Checkpoint 2:**
+    - [ ] Run app.
+    - [ ] Verify dragging moves the camera (Pan).
+    - [ ] Verify scrolling zooms the camera (Zoom).
+    - [ ] Verify hovering highlights the correct hexagon.
 
-The Model: Use the existing model: Board, Tile, HexCoordinates, Navigation ...
+### Phase 3: Board Integration & Rendering
+- [ ] **Step 3.1: Connect Board Model**
+    - Instantiate a `Board` in the parent component (`App.tsx` or `Game.tsx`).
+    - Pass `Board` to `GameCanvas`.
+- [ ] **Step 3.2: Render Tiles**
+    - Iterate through `board.getAll()` in `renderLoop`.
+    - Render specific visuals based on `Tile` terrain properties (colors for now).
+- [ ] **Checkpoint 3:**
+    - [ ] Run app.
+    - [ ] Place a few test tiles in code.
+    - [ ] Verify tiles appear at correct coordinates with correct terrain colors.
 
-The Viewport: Define a Camera type: { x: number, y: number, zoom: number, rotation: number }.
-
-2. Core Functions to Implement
-hexToWorld(q, r, size): Convert Axial/Cube to pixel (x, y) in world space.
-
-worldToHex(x, y, size): The inverse. Must include a cubeRound() helper to handle floating-point results from mouse clicks.
-
-renderLoop(): A high-performance loop using requestAnimationFrame.
-
-handleInput(): Implement "Click-to-Select" logic that uses the worldToHex function to identify which BoardTile was clicked.
-
-3. Coding Standards
-Strict Typing: Use the HexCoordinate and BoardTile interfaces already defined.
-
-Performance: Avoid object allocation inside the renderLoop.
-
-React Integration: The Canvas should be managed via a useRef<HTMLCanvasElement> and its size should be responsive to the window.
+### Phase 4: Placement Logic (UI)
+- [ ] **Step 4.1: Selection & Placement**
+    - visual cue for "valid placement" vs "invalid placement" (using `board.canPlace`).
+    - Handle click to place a tile.

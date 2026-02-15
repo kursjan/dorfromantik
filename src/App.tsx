@@ -1,7 +1,11 @@
+import { GameCanvas } from './components/GameCanvas';
+
 function App() {
+
   return (
     <div>
-      <h1>dorfromantik</h1>
+      <h1>Dorfromantik</h1>
+      <GameCanvas />
     </div>
   )
 }

@@ -10,9 +10,10 @@ export class HexCoordinate {
     if (q + r + s !== 0) {
       throw new Error(`Invalid HexCoordinate: ${q},${r},${s}. Sum must be 0.`);
     }
-    this.q = q;
-    this.r = r;
-    this.s = s;
+    // Normalize -0 to 0
+    this.q = q === 0 ? 0 : q;
+    this.r = r === 0 ? 0 : r;
+    this.s = s === 0 ? 0 : s;
   }
 
   getKey(): string {
