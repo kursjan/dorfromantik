@@ -7,6 +7,11 @@ import {
   CENTER_HEX_STYLE 
 } from '../styles/HexStyles';
 
+// --- Constants ---
+const MIN_ZOOM = 0.5;
+const MAX_ZOOM = 3.0;
+const ZOOM_SENSITIVITY = 0.001;
+
 // --- Helper Functions ---
 
 const drawHex = (ctx: CanvasRenderingContext2D, hex: HexCoordinate, style: HexStyle) => {
@@ -63,7 +68,13 @@ const drawDebugGrid = (ctx: CanvasRenderingContext2D, radius: number = 5) => {
 
 export const GameCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  
+  // Camera state
   const cameraRef = useRef({ x: 0, y: 0, zoom: 1 });
+  
+  // Interaction state
+  const isDraggingRef = useRef(false);
+  const lastMousePosRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -72,6 +83,7 @@ export const GameCanvas: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // --- Render Loop ---
     let animationFrameId: number;
 
     const render = () => {
@@ -101,15 +113,67 @@ export const GameCanvas: React.FC = () => {
       ctx.textBaseline = 'alphabetic';
       ctx.fillStyle = 'black';
       ctx.font = '20px Arial';
-      ctx.fillText('Camera Active: (0,0)', 20, 30);
+      ctx.fillText(`Camera: (${Math.round(cameraRef.current.x)},${Math.round(cameraRef.current.y)}) Zoom: ${cameraRef.current.zoom.toFixed(2)}`, 20, 30);
 
       animationFrameId = requestAnimationFrame(render);
     };
 
     render();
 
+    // --- Event Listeners ---
+    
+    const handleWheel = (e: WheelEvent) => {
+        e.preventDefault();
+        const zoomDelta = -e.deltaY * ZOOM_SENSITIVITY;
+        let newZoom = cameraRef.current.zoom + zoomDelta;
+        
+        // Clamp zoom
+        newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
+        
+        cameraRef.current.zoom = newZoom;
+    };
+
+    const handleMouseDown = (e: MouseEvent) => {
+      isDraggingRef.current = true;
+      lastMousePosRef.current = { x: e.clientX, y: e.clientY };
+      canvas.style.cursor = 'grabbing';
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDraggingRef.current) return;
+
+      const dx = e.clientX - lastMousePosRef.current.x;
+      const dy = e.clientY - lastMousePosRef.current.y;
+
+      // Update last position for next frame
+      lastMousePosRef.current = { x: e.clientX, y: e.clientY };
+
+      cameraRef.current.x += dx / cameraRef.current.zoom;
+      cameraRef.current.y += dy / cameraRef.current.zoom;
+    };
+
+    const handleMouseUp = () => {
+      isDraggingRef.current = false;
+      canvas.style.cursor = 'grab';
+    };
+
+    // Attach listeners
+    canvas.addEventListener('wheel', handleWheel, { passive: false });
+    canvas.addEventListener('mousedown', handleMouseDown);
+    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('mouseup', handleMouseUp);
+    canvas.addEventListener('mouseleave', handleMouseUp); 
+
+    // Initialize cursor
+    canvas.style.cursor = 'grab';
+
     return () => {
       cancelAnimationFrame(animationFrameId);
+      canvas.removeEventListener('wheel', handleWheel);
+      canvas.removeEventListener('mousedown', handleMouseDown);
+      canvas.removeEventListener('mousemove', handleMouseMove);
+      canvas.removeEventListener('mouseup', handleMouseUp);
+      canvas.removeEventListener('mouseleave', handleMouseUp);
     };
   }, []);
 

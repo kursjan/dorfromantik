@@ -49,6 +49,12 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
   - `Navigation` class implementing neighbor calculations.
 - [x] **Testing:** Comprehensive unit tests for models.
 - [x] **Board Visualization:** Implemented `BoardPrinter`, `Canvas`, and `TilePrinter` to render the full grid in ASCII.
+- [x] **Board Visualization (Canvas):**
+  - Basic `GameCanvas` component with a render loop.
+  - `HexUtils` updated for custom coordinate system (North is `-1, 0, 1` relative to center).
+  - `HexStyles` configuration for centralized styling.
+  - `drawDebugGrid` for visualizing the hex grid and coordinates.
+  - **Interactive Camera:** Pan (drag) and Zoom (scroll) implemented.
 
 ## 5. Current Plan
 **Role:** Senior Graphics Engineer (TypeScript/Canvas).
@@ -62,18 +68,18 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 - [x] **Step 1.2: Coordinate System (Hex <-> Pixel)**
     - Implement `hexToPixel(q, r, size)`: Convert axial coordinates to screen coordinates (Flat-Top).
     - Implement `pixelToHex(x, y, size)`: Inverse operation (including `cubeRound` for float handling).
-- [ ] **Step 1.3: Camera Transform & Grid Rendering**
+- [x] **Step 1.3: Camera Transform & Grid Rendering**
     - Define `Camera` state: `{ x, y, zoom }` (Rotation is optional for now).
     - Implement `transform` logic in `renderLoop` using `ctx.translate` and `ctx.scale`.
     - Center the coordinate system (0,0) to the middle of the canvas.
     - **Draw a visible grid of hexagons** to verify the layout immediately.
-- [ ] **Checkpoint 1:**
-    - [ ] Run app.
-    - [ ] Verify a grid of empty hexes is drawn.
-    - [ ] Verify `hexToPixel` matches the visual grid.
+- [x] **Checkpoint 1:**
+    - [x] Run app.
+    - [x] Verify a grid of empty hexes is drawn.
+    - [x] Verify `hexToPixel` matches the visual grid.
 
 ### Phase 2: Interaction & Input Handling
-- [ ] **Step 2.1: Mouse Handling (Pan & Zoom)**
+- [x] **Step 2.1: Mouse Handling (Pan & Zoom)**
     - Implement `onMouseDown`, `onMouseMove`, `onMouseUp` for panning.
     - Implement `onWheel` for zooming.
 - [ ] **Step 2.2: Hex Picking (Hover)**
@@ -81,9 +87,9 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
     - Use `pixelToHex` to determine the hovered hex coordinate.
     - Store `hoveredHex` in state.
 - [ ] **Checkpoint 2:**
-    - [ ] Run app.
-    - [ ] Verify dragging moves the camera (Pan).
-    - [ ] Verify scrolling zooms the camera (Zoom).
+    - [x] Run app.
+    - [x] Verify dragging moves the camera (Pan).
+    - [x] Verify scrolling zooms the camera (Zoom).
     - [ ] Verify hovering highlights the correct hexagon.
 
 ### Phase 3: Board Integration & Rendering
