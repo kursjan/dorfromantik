@@ -10,25 +10,41 @@ export const GameCanvas: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Simple clear to verify it works
-    ctx.fillStyle = '#f0f0f0';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.fillStyle = 'black';
-    ctx.font = '20px Arial';
-    ctx.fillText('Game Canvas Ready', 50, 50);
+    let animationFrameId: number;
 
+    const render = () => {
+      // Resize canvas to fill parent
+      if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      // Clear canvas
+      ctx.fillStyle = '#f0f0f0';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Simple debug drawing
+      ctx.fillStyle = 'black';
+      ctx.font = '20px Arial';
+      ctx.fillText('Game Canvas Active', 50, 50);
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
   }, []);
 
   return (
-    <canvas 
-        ref={canvasRef} 
-        width={800} 
-        height={600} 
-        style={{ border: '1px solid black' }}
-        data-testid="game-canvas"
-        aria-label="Game Board"
-        role="img"
+    <canvas
+      ref={canvasRef}
+      style={{ display: 'block', width: '100vw', height: '100vh', touchAction: 'none' }}
+      data-testid="game-canvas"
+      aria-label="Game Board"
+      role="img"
     />
   );
 };

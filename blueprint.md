@@ -55,7 +55,7 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 **Goal:** Implement a 2D Camera system with Zoom, Pan, Rotation, and "Mouse-to-Hex" picking.
 
 ### Phase 1: Canvas & Camera Foundation
-- [ ] **Step 1.1: Canvas Setup**
+- [x] **Step 1.1: Canvas Setup**
     - Create `src/components/GameCanvas.tsx`.
     - Setup full-screen responsive canvas with `useRef`.
     - Implement basic `renderLoop` using `requestAnimationFrame`.
