@@ -52,14 +52,14 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 
 ## 5. Current Plan
 Role: You are a Senior Graphics Engineer specializing in TypeScript and High-Performance Canvas Rendering.
-Goal: Implement a 2D Camera system for a Hexagonal Grid game that supports Zoom, Pan, Rotation, and "Mouse-to-Hex" picking.
+Goal: Implement a 2D Camera system for a DorfRomantik game that supports Zoom, Pan, Rotation, and "Mouse-to-Hex" picking.
 
 1. Architectural Requirements
 Decoupled State: Maintain a strict separation between WorldSpace (Hex coordinates) and ScreenSpace (Canvas pixels).
 
 Transformation Matrix: Do not manually offset every hex. Use the Canvas context.save(), translate(), scale(), rotate(), and restore() pattern for the global camera.
 
-The Model: Use the existing Board map (Map<string, BoardTile>) where keys are q,r,s strings.
+The Model: Use the existing model: Board, Tile, HexCoordinates, Navigation ...
 
 The Viewport: Define a Camera type: { x: number, y: number, zoom: number, rotation: number }.
 
