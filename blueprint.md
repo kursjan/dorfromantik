@@ -7,8 +7,8 @@ This document outlines the architecture, features, and development plan for a we
 The project uses a modern frontend stack with React and TypeScript. The UI is built for aesthetics and responsiveness using Tailwind CSS and the shadcn/ui component library. It includes a foundational setup for a Firebase backend to support future game logic, state management, and user data.
 
 ## 2. Instructions for Agent
+These are the most important instructions with the hightest priority. Always follow these instructions.
 
-- **PRIMARY DIRECTIVE: The 'Current Plan' is a roadmap, NOT a command.** ALWAYS wait for the user's explicit instruction (e.g., "proceed", "continue", "next step") before starting any new task from the plan. The rules in this section override all other plans.
 - **Communication:** Be brief and professional. No excessive apologies or flattery.
 - **Scope:** Make small changes. Minimize file touches. 
 - **Never** do more than necessary or instructed.
@@ -18,8 +18,8 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
   - **AUTOMATIC EXECUTION:** After *every* code change, you MUST automatically run the following commands. **Do not ask for permission. Do not announce you are going to do it. Just run them and report the results.**
   1. **Type Check:** `npx tsc` (Ensure no compilation errors)
   2. **Server Check:** `curl -I http://localhost:9002/` (Ensure server is reachable). Note: Port may vary.
-  3. **Test Check:** `npx vitest run` (Ensure all tests pass)
-  4. **Test Check:** use `npx vitest run` instead of `pnx vitest`
+  3. **Unit Test Check:** `npx vitest run` (Ensure all tests pass)
+  4. **E2E Test Check:** `npm run e2e` (Verify UI/Canvas interactions with Playwright)
 
 ## 3. Design Decisions
 - **Architecture:** Web-based React app + Firebase backend (planned).
@@ -57,6 +57,7 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
   - `drawDebugGrid` for visualizing the hex grid and coordinates.
   - **Interactive Camera:** Pan (drag) and Zoom (scroll) implemented.
   - **Hex Interaction:** Mouse hover highlighting (Hex Picking) implemented.
+- [x] **E2E Testing:** Configured Playwright for Vite + Nix environment. Added tests for Canvas rendering and zooming.
 
 ## 5. Current Plan
 **Role:** Senior Graphics Engineer (TypeScript/Canvas).

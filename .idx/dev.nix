@@ -6,9 +6,12 @@
   # Use https://search.nixos.org/packages to find packages
   packages = [
     pkgs.nodejs_20
+    pkgs.chromium
   ];
   # Sets environment variables in the workspace
-  env = {};
+  env = {
+    PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
+  };
   idx = {
     # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
     extensions = [
