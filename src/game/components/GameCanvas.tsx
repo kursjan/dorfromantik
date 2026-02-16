@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { GameController } from '../controllers/GameController';
+import { GameController } from '../engine/GameController';
 
 export const GameCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);

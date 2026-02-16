@@ -9,38 +9,9 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 ## 2. Instructions for Agent
 These are the most important instructions with the hightest priority. Always follow these instructions.
 
-- **Communication:** Be brief and professional. No excessive apologies or flattery.
-- **Scope:** Make small changes. Minimize file touches. 
-- **Never** do more than necessary or instructed.
-- **Never** do anything unless explicitly asked. 
-- **Update tests** remember to update tests after changing business logic.
-- **Verification Protocol:** 
-  - **AUTOMATIC EXECUTION:** After *every* code change, you MUST automatically run the following commands. **Do not ask for permission. Do not announce you are going to do it. Just run them and report the results.**
-  1. **Type Check:** `npx tsc` (Ensure no compilation errors)
-  2. **Server Check:** `curl -I http://localhost:9002/` (Ensure server is reachable). Note: Port may vary.
-  3. **Unit Test Check:** `npm test` (Ensure all tests pass)
-  4. **E2E Test Check:** `npm run e2e` (Verify UI/Canvas interactions with Playwright)
+**Refer to `GEMINI.md` for the complete Operational Directives (Communication, Scope, Refactoring Rules).**
 
-## 3. Design Decisions
-- **Architecture:** Web-based React app + Firebase backend (planned).
-- **Grid System:** Hexagonal Grid using **Cube Coordinates** (`q, r, s`).
-- **Orientation:** **Flat-Top** Hexagons.
-  - Neighbors: North, North-East, South-East, South, South-West, North-West.
-- **Navigation (Cube Coordinates):**
-  - **Center:** (0, 0, 0)
-  - **North:** (-1, 0, 1)
-  - **North-East:** (-1, 1, 0)
-  - **South-East:** (0, 1, -1)
-  - **South:** (1, 0, -1)
-  - **South-West:** (1, -1, 0)
-  - **North-West:** (0, -1, 1)
-- **Data Model:**
-  - `HexCoordinate`: Enforces integer coordinates and zero-sum constraint.
-  - `Tile`: Class with explicit edge properties (e.g., `north`, `northEast`). Includes `print()` for single tile ASCII art.
-  - `Board`: Class encapsulating a `Map` of tiles, indexed by coordinate key. Prevents placement on occupied spots.
-- **Visualization:** ASCII-based printing for debugging (`BoardPrinter`).
-
-## 4. Implemented Features
+## 3. Implemented Features
 - [x] **Project Setup:** React, TypeScript, Tailwind, shadcn/ui (partial), Firebase (config).
 - [x] **Verification:** CI-like checks (tsc, curl, vitest) on every change.
 - [x] **Core Data Structures:**
@@ -58,6 +29,38 @@ These are the most important instructions with the hightest priority. Always fol
   - **Interactive Camera:** Pan (drag) and Zoom (scroll) implemented.
   - **Hex Interaction:** Mouse hover highlighting (Hex Picking) implemented.
 - [x] **E2E Testing:** Configured Playwright for Vite + Nix environment. Added tests for Canvas rendering and zooming.
+- [x] **Infrastructure:**
+  - Configured Path Aliases (`@/*`) for clean imports.
+  - Set up Prettier (`npm run format`) for consistent code style.
+  - Added UI foundations (`clsx`, `tailwind-merge`) for Shadcn/UI integration.
+  - Exposed `window.game` for runtime debugging.
+
+## 4. Architecture & Documentation
+
+### 4.1. Core Data Model
+- **Grid System:** Hexagonal Grid using **Cube Coordinates** (`q, r, s`).
+- **Orientation:** **Flat-Top** Hexagons.
+  - Neighbors: North, North-East, South-East, South, South-West, North-West.
+- **Navigation (Cube Coordinates):**
+  - **Center:** (0, 0, 0)
+  - **North:** (-1, 0, 1) (Rotated system)
+  - **North-East:** (-1, 1, 0)
+  - **South-East:** (0, 1, -1)
+  - **South:** (1, 0, -1)
+  - **South-West:** (1, -1, 0)
+  - **North-West:** (0, -1, 1)
+- **Data Model:**
+  - `HexCoordinate`: Enforces integer coordinates and zero-sum constraint.
+  - `Tile`: Class with explicit edge properties (e.g., `north`, `northEast`). Includes `print()` for single tile ASCII art.
+  - `Board`: Class encapsulating a `Map` of tiles, indexed by coordinate key. Prevents placement on occupied spots.
+- **Visualization:** ASCII-based printing for debugging (`BoardPrinter`).
+
+### 4.2. System Architecture
+- **Frontend:** React (Vite) + TypeScript.
+- **Game Engine:** Custom Controller Pattern (Separated from React).
+  - **Pattern:** `React Component` -> `GameController` -> `HexRenderer` / `InputManager`.
+  - **Documentation:** See **[src/game/ARCHITECTURE.md](./src/game/ARCHITECTURE.md)** for the detailed breakdown of the Canvas architecture.
+- **Backend:** Firebase (Hosting, Firestore, Auth - *Planned*).
 
 ## 5. Current Plan
 **Role:** Senior Graphics Engineer (TypeScript/Canvas).

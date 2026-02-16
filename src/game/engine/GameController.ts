@@ -1,7 +1,7 @@
-import { Camera } from '../utils/Camera';
+import { Camera } from './Camera';
+import { InputManager } from './InputManager';
 import { HexRenderer } from '../graphics/HexRenderer';
-import { InputManager } from '../input/InputManager';
-import { HexCoordinate } from '../models/HexCoordinate';
+import { HexCoordinate } from '../../models/HexCoordinate';
 import { pixelToHex, HEX_SIZE } from '../utils/HexUtils';
 
 export class GameController {
@@ -22,10 +22,15 @@ export class GameController {
     this.camera = new Camera(0, 0, 1);
     this.renderer = new HexRenderer(ctx);
     this.inputManager = new InputManager(canvas, {
-      onPan: (dx, dy) => this.handlePan(dx, dy),
+      onPan: (dx, dy) => this.camera.pan(dx, dy),
       onZoom: (delta) => this.handleZoom(delta),
       onHover: (x, y) => this.handleHover(x, y),
     });
+
+    // Debug access
+    if (import.meta.env.DEV) {
+      (window as any).game = this;
+    }
 
     this.start();
   }
@@ -93,10 +98,6 @@ export class GameController {
   }
 
   // --- Input Handlers ---
-
-  private handlePan(dx: number, dy: number) {
-    this.camera.pan(dx, dy);
-  }
 
   private handleZoom(delta: number) {
     const ZOOM_SENSITIVITY = 0.001;

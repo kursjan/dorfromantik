@@ -1,4 +1,4 @@
-import { HexCoordinate } from '../models/HexCoordinate';
+import { HexCoordinate } from '../../models/HexCoordinate';
 
 export const HEX_SIZE = 40; // Pixel radius of the hex
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { hexToPixel, pixelToHex, HEX_SIZE } from './HexUtils';
-import { HexCoordinate } from '../models/HexCoordinate';
+import { HexCoordinate } from '../../models/HexCoordinate';
 
 describe('HexUtils', () => {
   describe('hexToPixel', () => {

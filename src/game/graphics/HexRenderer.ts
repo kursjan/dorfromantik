@@ -1,6 +1,6 @@
-import { HexCoordinate } from '../models/HexCoordinate';
+import { HexCoordinate } from '../../models/HexCoordinate';
 import { hexToPixel } from '../utils/HexUtils';
-import { type HexStyle, DEFAULT_HEX_STYLE, GRID_HEX_STYLE, CENTER_HEX_STYLE, HOVER_HEX_STYLE } from '../styles/HexStyles';
+import { type HexStyle, DEFAULT_HEX_STYLE, GRID_HEX_STYLE, CENTER_HEX_STYLE, HOVER_HEX_STYLE } from './HexStyles';
 
 export class HexRenderer {
   private ctx: CanvasRenderingContext2D;
