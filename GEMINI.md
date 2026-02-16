@@ -10,6 +10,7 @@ These instructions must be followed above all else.
 *   **Communication:** Be brief and professional. No excessive apologies or flattery.
 *   **Scope:** Make small changes. Minimize file touches. Never do more than necessary or instructed.
 *   **Refactoring Rule:** **Never** change business logic when refactoring. If tests start to fail, it is a signal that we changed the business logic.
+*   **Contextual Refactoring Rule:** When reviewing or refactoring a class or module, **always** check its usage across the entire project. Do not analyze files in isolation. This ensures that the public API of the class is still valid and that the refactoring does not break other parts of the application.
 *   **Verification Protocol:** After *every* code change, automatically run the following checks without asking:
     1.  **Type Check:** `npx tsc`
     2.  **Unit Test Check:** `npm test` (Ensure all unit tests pass)
@@ -233,6 +234,17 @@ When requested, the AI will facilitate the creation and execution of tests, ensu
 *   **Automated Test Execution:**
     *   After generating or modifying tests, and after any significant code change, the AI will automatically execute the relevant tests using `npm test` in the terminal.
     *   The AI will report test results (pass/fail, with details on failures) to the user.
+
+## **Code Review Process**
+
+The AI is capable of performing a professional code review upon request. This process is designed to be collaborative and transparent, focusing on improving the overall quality of the codebase.
+
+*   **Structured Plan:** The code review process will follow a structured plan, which will be created and updated in `blueprint.md`. This plan will outline the specific files and areas of focus for the review.
+*   **Best Practices:** The AI will review the code for adherence to best practices, including SOLID principles, clean code, and design patterns.
+*   **Context-Aware Analysis:** The AI will not review files in isolation. It will analyze how a class or function is used throughout the application to understand its context and dependencies. This prevents suggesting changes that would break other parts of the code.
+*   **Test Coverage Verification:** For every class under review, the AI will verify that **each public method** has a corresponding unit test. The test must not only exist but also adequately cover the method's logic, arguments, and edge cases.
+*   **Actionable Suggestions:** The AI will provide clear, actionable suggestions for improvement. When a refactoring is proposed, it will explain the benefits of the change.
+*   **Iterative Refactoring:** The AI will perform refactoring in small, verifiable steps. After each change, the full verification protocol (`tsc`, `npm test`, `npm run e2e`) will be executed to ensure no regressions have been introduced.
 
 ## **Iterative Development & User Interaction**
 

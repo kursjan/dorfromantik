@@ -5,7 +5,7 @@ import { execSync } from 'child_process';
 const findChromium = () => {
   try {
     return execSync('which chromium').toString().trim();
-  } catch (e) {
+  } catch {
     return undefined;
   }
 };

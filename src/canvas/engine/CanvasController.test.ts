@@ -1,0 +1,82 @@
+
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { CanvasController } from './CanvasController';
+import { HexRenderer } from '../graphics/HexRenderer';
+import { InputManager } from './InputManager';
+
+// Mock dependencies
+vi.mock('../graphics/HexRenderer');
+vi.mock('./InputManager');
+vi.mock('./Camera', () => {
+  const Camera = vi.fn();
+  Camera.prototype.applyTransform = vi.fn();
+  Camera.prototype.screenToWorld = vi.fn(coords => coords);
+  Camera.prototype.x = 0;
+  Camera.prototype.y = 0;
+  Camera.prototype.zoom = 1;
+  return { Camera };
+});
+
+describe('CanvasController', () => {
+  let canvas: HTMLCanvasElement;
+  let controller: CanvasController;
+
+  beforeEach(() => {
+    // Set up a basic DOM environment for the canvas element
+    const canvasElement = document.createElement('canvas');
+    canvasElement.getContext = vi.fn().mockReturnValue({
+      save: vi.fn(),
+      restore: vi.fn(),
+      translate: vi.fn(),
+      scale: vi.fn(),
+      clearRect: vi.fn(),
+      fillRect: vi.fn(),
+      fillText: vi.fn(),
+    }) as any;
+    document.body.appendChild(canvasElement);
+    canvas = canvasElement;
+
+    vi.clearAllMocks();
+  });
+
+  it('should initialize successfully', () => {
+    controller = new CanvasController(canvas);
+    expect((controller as any).ctx).toBeDefined();
+    expect((controller as any).renderer).toBeInstanceOf(HexRenderer);
+    expect((controller as any).inputManager).toBeInstanceOf(InputManager);
+  });
+
+  it('should start the render loop on construction', () => {
+    const requestAnimationFrameSpy = vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => {
+      // a more robust mock that doesn't cause an infinite loop
+      return 0;
+    });
+    
+    controller = new CanvasController(canvas);
+
+    expect(requestAnimationFrameSpy).toHaveBeenCalled();
+    const renderer = (controller as any).renderer as any;
+    expect(renderer.drawDebugGrid).toHaveBeenCalled();
+
+    requestAnimationFrameSpy.mockRestore();
+  });
+
+  it('should clean up all resources on destroy', () => {
+    // Spies for all cleanup actions
+    const cancelAnimationFrameSpy = vi.spyOn(window, 'cancelAnimationFrame');
+    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+
+    controller = new CanvasController(canvas);
+    const inputManager = (controller as any).inputManager as any;
+    const inputManagerDetachSpy = vi.fn();
+    inputManager.detachListeners = inputManagerDetachSpy;
+
+    // Call destroy
+    controller.destroy();
+
+    // Assert all cleanup actions were called
+    expect(cancelAnimationFrameSpy).toHaveBeenCalledOnce();
+    expect(inputManagerDetachSpy).toHaveBeenCalledOnce();
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', (controller as any).handleResize);
+  });
+});

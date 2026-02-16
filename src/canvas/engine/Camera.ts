@@ -1,12 +1,18 @@
+export interface CameraConfig {
+  x?: number;
+  y?: number;
+  zoom?: number;
+}
+
 export class Camera {
   x: number = 0;
   y: number = 0;
   zoom: number = 1;
 
-  constructor(x: number = 0, y: number = 0, zoom: number = 1) {
-    this.x = x;
-    this.y = y;
-    this.zoom = zoom;
+  constructor(config: CameraConfig = {}) {
+    this.x = config.x ?? 0;
+    this.y = config.y ?? 0;
+    this.zoom = config.zoom ?? 1;
   }
 
   /**

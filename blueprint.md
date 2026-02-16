@@ -6,12 +6,7 @@ This document outlines the architecture, features, and development plan for a we
 
 The project uses a modern frontend stack with React and TypeScript. The UI is built for aesthetics and responsiveness using Tailwind CSS and the shadcn/ui component library. It includes a foundational setup for a Firebase backend to support future game logic, state management, and user data.
 
-## 2. Instructions for Agent
-These are the most important instructions with the hightest priority. Always follow these instructions.
-
-**Refer to `GEMINI.md` for the complete Operational Directives (Communication, Scope, Refactoring Rules).**
-
-## 3. Implemented Features
+## 2. Implemented Features
 - [x] **Project Setup:** React, TypeScript, Tailwind, shadcn/ui (partial), Firebase (config).
 - [x] **Verification:** CI-like checks (tsc, curl, vitest) on every change.
 - [x] **Core Data Structures:**
@@ -35,9 +30,9 @@ These are the most important instructions with the hightest priority. Always fol
   - Added UI foundations (`clsx`, `tailwind-merge`) for Shadcn/UI integration.
   - Exposed `window.canvas` for runtime debugging.
 
-## 4. Architecture & Documentation
+## 3. Architecture & Documentation
 
-### 4.1. Core Data Model
+### 3.1. Core Data Model
 - **Grid System:** Hexagonal Grid using **Cube Coordinates** (`q, r, s`).
 - **Orientation:** **Flat-Top** Hexagons.
   - Neighbors: North, North-East, South-East, South, South-West, North-West.
@@ -55,14 +50,43 @@ These are the most important instructions with the hightest priority. Always fol
   - `Board`: Class encapsulating a `Map` of tiles, indexed by coordinate key. Prevents placement on occupied spots.
 - **Visualization:** ASCII-based printing for debugging (`BoardPrinter`).
 
-### 4.2. System Architecture
+### 3.2. System Architecture
 - **Frontend:** React (Vite) + TypeScript.
 - **Canvas Engine:** Custom Controller Pattern (Separated from React).
   - **Pattern:** `React Component` -> `CanvasController` -> `HexRenderer` / `InputManager`.
   - **Documentation:** See **[src/canvas/ARCHITECTURE.md](./src/canvas/ARCHITECTURE.md)** for the detailed breakdown of the Canvas architecture.
 - **Backend:** Firebase (Hosting, Firestore, Auth - *Planned*).
 
-## 5. Current Plan
+## 4. Current Plan
+**Role:** Senior Graphics Engineer (TypeScript/Canvas).
+**Goal:** Professional Code Review & Refinement.
+
+- [x] **Step 1: Static Analysis & Tooling**
+    - Run `eslint` and `tsc` to verify strict compliance.
+    - Check for circular dependencies (manual review of imports).
+- [ ] **Step 2: Class & Method Structure Review (Best Practices)**
+    - [ ] `src/canvas/engine/CanvasController.ts` (Responsibility separation, lifecycle management)
+    - [ ] `src/canvas/engine/Camera.ts` (Transform logic encapsulation, immutability)
+    - [ ] `src/canvas/engine/InputManager.ts` (Event handling, cleanup, platform independence)
+    - [ ] `src/canvas/graphics/HexRenderer.ts` (Drawing efficiency, context management)
+    - [ ] `src/canvas/utils/HexUtils.ts` (Pure functions, math correctness)
+    - [ ] `src/models/HexCoordinate.ts` (Value object pattern, validation)
+    - [ ] `src/models/Board.ts` (State management, encapsulation)
+    - [ ] `src/canvas/components/CanvasView.tsx` (React integration, performance)
+- [ ] **Step 3: Architecture Check**
+    - Verify strict separation: `CanvasView` (UI) vs `CanvasController` (Logic).
+    - Review `InputManager` event listener hygiene (attach/detach).
+- [ ] **Step 4: Performance Audit**
+    - Inspect `renderLoop` for object allocations (GC pressure).
+    - Check for magic numbers in `HexRenderer`.
+- [ ] **Step 5: Test Gap Analysis**
+    - Identify missing unit test cases for edge scenarios.
+    - Review E2E test robustness.
+- [ ] **Step 6: Refactoring Execution**
+    - Implement fixes based on findings.
+    - Update documentation if architecture drifted.
+
+## 5. Future Plans
 **Role:** Senior Graphics Engineer (TypeScript/Canvas).
 **Goal:** Integrate the Board data model with the interactive Canvas.
 

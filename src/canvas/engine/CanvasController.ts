@@ -5,11 +5,15 @@ import { HexCoordinate } from '../../models/HexCoordinate';
 import { pixelToHex, HEX_SIZE } from '../utils/HexUtils';
 
 export class CanvasController {
-  private canvas: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
-  private camera: Camera;
-  private renderer: HexRenderer;
-  private inputManager: InputManager;
+  private static readonly ZOOM_SENSITIVITY = 0.001;
+  private static readonly MIN_ZOOM = 0.5;
+  private static readonly MAX_ZOOM = 3.0;
+
+  private readonly canvas: HTMLCanvasElement;
+  private readonly ctx: CanvasRenderingContext2D;
+  private readonly camera: Camera;
+  private readonly renderer: HexRenderer;
+  private readonly inputManager: InputManager;
   private animationFrameId: number;
   private hoveredHex: HexCoordinate | null = null;
 
@@ -19,7 +23,7 @@ export class CanvasController {
     if (!ctx) throw new Error('Could not get 2d context');
     this.ctx = ctx;
 
-    this.camera = new Camera(0, 0, 1);
+    this.camera = new Camera({ x: 0, y: 0, zoom: 1 });
     this.renderer = new HexRenderer(ctx);
     this.inputManager = new InputManager(canvas, {
       onPan: (dx, dy) => this.camera.pan(dx, dy),
@@ -33,24 +37,16 @@ export class CanvasController {
 
     // Debug access
     if (import.meta.env.DEV) {
-      (window as any).canvasCtrl = this;
+      window.canvasCtrl = this;
     }
 
-    this.start();
-  }
-
-  public destroy() {
-    this.stop();
-    this.inputManager.detachListeners();
-    window.removeEventListener('resize', this.handleResize);
-  }
-
-  public start() {
     this.loop();
   }
 
-  public stop() {
+  public destroy() {
     cancelAnimationFrame(this.animationFrameId);
+    this.inputManager.detachListeners();
+    window.removeEventListener('resize', this.handleResize);
   }
 
   private handleResize = () => {
@@ -81,7 +77,6 @@ export class CanvasController {
 
     // 3. Draw World
     this.renderer.drawDebugGrid(5);
-    
     this.renderer.drawHighlight(this.hoveredHex);
     
     this.ctx.restore();
@@ -106,11 +101,7 @@ export class CanvasController {
   // --- Input Handlers ---
 
   private handleZoom(delta: number) {
-    const ZOOM_SENSITIVITY = 0.001;
-    const MIN_ZOOM = 0.5;
-    const MAX_ZOOM = 3.0;
-    
-    this.camera.zoomBy(-delta * ZOOM_SENSITIVITY, MIN_ZOOM, MAX_ZOOM);
+    this.camera.zoomBy(-delta * CanvasController.ZOOM_SENSITIVITY, CanvasController.MIN_ZOOM, CanvasController.MAX_ZOOM);
   }
 
   private handleHover(mouseX: number, mouseY: number) {

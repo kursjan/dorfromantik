@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 import { vi } from 'vitest';
 
 // Mock Canvas getContext
-// @ts-ignore
+// @ts-expect-error We are mocking the getContext method for testing purposes.
 HTMLCanvasElement.prototype.getContext = vi.fn((contextId: string) => {
   if (contextId === '2d') {
     return {
@@ -29,7 +29,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn((contextId: string) => {
 });
 
 // Mock requestAnimationFrame
-// @ts-ignore
+// @ts-expect-error We are mocking requestAnimationFrame for testing purposes.
 global.requestAnimationFrame = vi.fn((callback) => setTimeout(callback, 0));
-// @ts-ignore
+// @ts-expect-error We are mocking cancelAnimationFrame for testing purposes.
 global.cancelAnimationFrame = vi.fn((id) => clearTimeout(id));
