@@ -1,21 +1,21 @@
-# Game Engine Architecture
+# Canvas Engine Architecture
 
-The game visualization logic is separated from the React component tree to ensure performance, testability, and clean separation of concerns. This directory structure implements a "Controller Pattern".
+The canvas visualization logic is separated from the React component tree to ensure performance, testability, and clean separation of concerns. This directory structure implements a "Controller Pattern".
 
 ## 1. Design Philosophy
 
 *   **React for UI:** React manages the DOM overlay (HUD, menus) and the `<canvas>` lifecycle.
-*   **Pure TS for Game Loop:** The game simulation and rendering loop run in a pure TypeScript class (`GameController`) outside of React's render cycle. This prevents React overhead from affecting 60fps rendering and avoids complex `useEffect` chains for game state.
+*   **Pure TS for Game Loop:** The game simulation and rendering loop run in a pure TypeScript class (`CanvasController`) outside of React's render cycle. This prevents React overhead from affecting 60fps rendering and avoids complex `useEffect` chains for game state.
 *   **Input Decoupling:** DOM events are captured and normalized before reaching the game logic.
 
 ## 2. Directory Structure
 
 ```
-src/game/
+src/canvas/
 ├── components/        # React Components
-│   └── GameCanvas.tsx   # Entry point (thin wrapper)
+│   └── CanvasView.tsx   # Entry point (thin wrapper)
 ├── engine/            # Core Game Loop & State
-│   ├── GameController.ts # The "Main Loop" & State Holder
+│   ├── CanvasController.ts # The "Main Loop" & State Holder
 │   ├── Camera.ts        # Math for World <-> Screen transforms
 │   └── InputManager.ts  # DOM Event Listeners
 ├── graphics/          # Rendering Logic
@@ -50,11 +50,11 @@ Understanding the coordinate spaces is critical for this engine:
 
 ## 4. Core Modules
 
-### GameController (`engine/GameController.ts`)
+### CanvasController (`engine/CanvasController.ts`)
 The central hub. It:
 *   **Owns State:** Camera, Hovered Hex, (Future: Board).
 *   **Runs Loop:** Manages `requestAnimationFrame`.
-*   **Orchestrates:** Calls `InputManager` callbacks -> updates State -> calls `HexRenderer`.
+*   **Orchestrates:** `InputManager` callbacks -> updates State -> calls `HexRenderer`.
 
 ### Camera (`engine/Camera.ts`)
 Manages the view transform.
@@ -77,7 +77,7 @@ DOM abstraction layer.
 
 1.  **Browser:** User moves mouse to pixel `(500, 300)`.
 2.  **InputManager:** Catches `mousemove`, calls `controller.onHover(500, 300)`.
-3.  **GameController:**
+3.  **CanvasController:**
     *   Calls `camera.screenToWorld(500, 300)` -> gets World `(120.5, -40.2)`.
     *   Calls `pixelToHex(120.5, -40.2)` -> gets Hex `(2, -1, -1)`.
     *   Updates `this.hoveredHex`.

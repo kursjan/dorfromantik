@@ -1,16 +1,16 @@
 import React, { useRef, useEffect } from 'react';
-import { GameController } from '../engine/GameController';
+import { CanvasController } from '../engine/CanvasController';
 
-export const GameCanvas: React.FC = () => {
+export const CanvasView: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const controllerRef = useRef<GameController | null>(null);
+  const controllerRef = useRef<CanvasController | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     // Initialize Controller
-    const controller = new GameController(canvas);
+    const controller = new CanvasController(canvas);
     controllerRef.current = controller;
 
     // Cleanup on unmount

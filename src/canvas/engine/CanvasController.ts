@@ -4,7 +4,7 @@ import { HexRenderer } from '../graphics/HexRenderer';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { pixelToHex, HEX_SIZE } from '../utils/HexUtils';
 
-export class GameController {
+export class CanvasController {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private camera: Camera;
@@ -27,9 +27,13 @@ export class GameController {
       onHover: (x, y) => this.handleHover(x, y),
     });
 
+    // Handle Resize
+    this.handleResize();
+    window.addEventListener('resize', this.handleResize);
+
     // Debug access
     if (import.meta.env.DEV) {
-      (window as any).game = this;
+      (window as any).canvasCtrl = this;
     }
 
     this.start();
@@ -38,6 +42,7 @@ export class GameController {
   public destroy() {
     this.stop();
     this.inputManager.detachListeners();
+    window.removeEventListener('resize', this.handleResize);
   }
 
   public start() {
@@ -47,6 +52,13 @@ export class GameController {
   public stop() {
     cancelAnimationFrame(this.animationFrameId);
   }
+
+  private handleResize = () => {
+    if (this.canvas.width !== window.innerWidth || this.canvas.height !== window.innerHeight) {
+      this.canvas.width = window.innerWidth;
+      this.canvas.height = window.innerHeight;
+    }
+  };
 
   private loop() {
     this.update();
@@ -59,28 +71,22 @@ export class GameController {
   }
 
   private render() {
-    // 1. Resize
-    if (this.canvas.width !== window.innerWidth || this.canvas.height !== window.innerHeight) {
-      this.canvas.width = window.innerWidth;
-      this.canvas.height = window.innerHeight;
-    }
-
-    // 2. Clear
+    // 1. Clear
     this.ctx.fillStyle = '#f0f0f0';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // 3. Camera Transform
+    // 2. Camera Transform
     this.ctx.save();
     this.camera.applyTransform(this.ctx, this.canvas.width, this.canvas.height);
 
-    // 4. Draw World
+    // 3. Draw World
     this.renderer.drawDebugGrid(5);
     
     this.renderer.drawHighlight(this.hoveredHex);
     
     this.ctx.restore();
 
-    // 5. UI Overlay
+    // 4. UI Overlay
     this.renderOverlay();
   }
 

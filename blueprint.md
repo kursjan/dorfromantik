@@ -22,7 +22,7 @@ These are the most important instructions with the hightest priority. Always fol
 - [x] **Testing:** Comprehensive unit tests for models.
 - [x] **Board Visualization:** Implemented `BoardPrinter`, `Canvas`, and `TilePrinter` to render the full grid in ASCII.
 - [x] **Board Visualization (Canvas):**
-  - Basic `GameCanvas` component with a render loop.
+  - Basic `CanvasView` component with a render loop.
   - `HexUtils` updated for custom coordinate system (North is `-1, 0, 1` relative to center).
   - `HexStyles` configuration for centralized styling.
   - `drawDebugGrid` for visualizing the hex grid and coordinates.
@@ -33,7 +33,7 @@ These are the most important instructions with the hightest priority. Always fol
   - Configured Path Aliases (`@/*`) for clean imports.
   - Set up Prettier (`npm run format`) for consistent code style.
   - Added UI foundations (`clsx`, `tailwind-merge`) for Shadcn/UI integration.
-  - Exposed `window.game` for runtime debugging.
+  - Exposed `window.canvas` for runtime debugging.
 
 ## 4. Architecture & Documentation
 
@@ -57,18 +57,18 @@ These are the most important instructions with the hightest priority. Always fol
 
 ### 4.2. System Architecture
 - **Frontend:** React (Vite) + TypeScript.
-- **Game Engine:** Custom Controller Pattern (Separated from React).
-  - **Pattern:** `React Component` -> `GameController` -> `HexRenderer` / `InputManager`.
-  - **Documentation:** See **[src/game/ARCHITECTURE.md](./src/game/ARCHITECTURE.md)** for the detailed breakdown of the Canvas architecture.
+- **Canvas Engine:** Custom Controller Pattern (Separated from React).
+  - **Pattern:** `React Component` -> `CanvasController` -> `HexRenderer` / `InputManager`.
+  - **Documentation:** See **[src/canvas/ARCHITECTURE.md](./src/canvas/ARCHITECTURE.md)** for the detailed breakdown of the Canvas architecture.
 - **Backend:** Firebase (Hosting, Firestore, Auth - *Planned*).
 
 ## 5. Current Plan
 **Role:** Senior Graphics Engineer (TypeScript/Canvas).
-**Goal:** Integrate the Game Board data model with the interactive Canvas.
+**Goal:** Integrate the Board data model with the interactive Canvas.
 
 ### Phase 1: Canvas & Camera Foundation
 - [x] **Step 1.1: Canvas Setup**
-    - Create `src/components/GameCanvas.tsx`.
+    - Create `src/canvas/components/CanvasView.tsx`.
     - Setup full-screen responsive canvas with `useRef`.
     - Implement basic `renderLoop` using `requestAnimationFrame`.
 - [x] **Step 1.2: Coordinate System (Hex <-> Pixel)**
@@ -100,8 +100,8 @@ These are the most important instructions with the hightest priority. Always fol
 
 ### Phase 3: Board Integration & Rendering
 - [ ] **Step 3.1: Connect Board Model**
-    - Instantiate a `Board` in the parent component (`App.tsx` or `Game.tsx`).
-    - Pass `Board` to `GameCanvas`.
+    - Instantiate a `Board` in the parent component (`App.tsx`).
+    - Pass `Board` to `CanvasView`.
 - [ ] **Step 3.2: Render Tiles**
     - Iterate through `board.getAll()` in `renderLoop`.
     - Render specific visuals based on `Tile` terrain properties (colors for now).
