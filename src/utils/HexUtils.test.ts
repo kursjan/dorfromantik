@@ -8,10 +8,15 @@ describe('HexUtils', () => {
       expect(hexToPixel(0, 0, HEX_SIZE)).toEqual({ x: 0, y: 0 });
     });
 
-    it('should calculate coordinates for neighbor (1, 0, -1)', () => {
+    it('should calculate coordinates for SOUTH neighbor (1, 0, -1)', () => {
+      // With our rotated coordinate system (North at -1, 0, 1)
+      // q=1, r=0. 
+      // effectiveQ=0, effectiveR=1.
+      
       const { x, y } = hexToPixel(1, 0, HEX_SIZE);
-      const expectedX = HEX_SIZE * 1.5;
-      const expectedY = HEX_SIZE * Math.sqrt(3) * 0.5;
+      const expectedX = 0;
+      const expectedY = HEX_SIZE * Math.sqrt(3);
+      
       expect(x).toBeCloseTo(expectedX);
       expect(y).toBeCloseTo(expectedY);
     });

@@ -18,7 +18,7 @@ These are the most important instructions with the hightest priority. Always fol
   - **AUTOMATIC EXECUTION:** After *every* code change, you MUST automatically run the following commands. **Do not ask for permission. Do not announce you are going to do it. Just run them and report the results.**
   1. **Type Check:** `npx tsc` (Ensure no compilation errors)
   2. **Server Check:** `curl -I http://localhost:9002/` (Ensure server is reachable). Note: Port may vary.
-  3. **Unit Test Check:** `npx vitest run` (Ensure all tests pass)
+  3. **Unit Test Check:** `npm test` (Ensure all tests pass)
   4. **E2E Test Check:** `npm run e2e` (Verify UI/Canvas interactions with Playwright)
 
 ## 3. Design Decisions
