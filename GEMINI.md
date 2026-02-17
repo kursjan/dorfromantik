@@ -12,6 +12,7 @@ These instructions must be followed above all else.
     *   **Checkbox Protocol:** **NEVER** mark a task as complete (check a box) in `blueprint.md` without explicit user confirmation. Wait for the user to approve the work before updating the plan.
 *   **Communication:** Be brief and professional. No excessive apologies or flattery.
 *   **Scope:** Make small changes. Minimize file touches. Never do more than necessary or instructed.
+*   **Preservation of User Content:** When asked to "correct" or "improve" a user-authored document (like a `README.md` or a journal), **your primary goal is to preserve the user's original content and voice.** Do not delete sections, headings, or raw notes (e.g., the "Graveyard" section) unless explicitly instructed to do so. Corrections and suggestions should be additive or minor edits, not complete rewrites that remove the user's personal tracking and observations.
 *   **Refactoring Rule:** **Never** change business logic when refactoring. If tests start to fail, it is a signal that we changed the business logic.
 *   **Contextual Refactoring Rule:** When reviewing or refactoring a class or module, **always** check its usage across the entire project. Do not analyze files in isolation. This ensures that the public API of the class is still valid and that the refactoring does not break other parts of the application.
 *   **Verification Protocol:** After *every* code change, automatically run the following checks without asking:
