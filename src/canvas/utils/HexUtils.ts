@@ -1,38 +1,43 @@
 import { HexCoordinate } from '../../models/HexCoordinate';
 
-export const HEX_SIZE = 40; // Pixel radius of the hex
-
-export function hexToPixel(q: number, r: number, size: number = HEX_SIZE): { x: number; y: number } {
+export function hexToPixel(hex: HexCoordinate, size: number): { x: number; y: number } {
   // Flat-topped hex conversion
   // Adjusted for user coordinate system where (-1, 0, 1) is North.
   // We swap q and r in the standard flat-topped formula.
-  // Standard (q, r) -> x depends on q.
-  // Here x depends on r.
   
-  const effectiveQ = r;
-  const effectiveR = q;
+  const effectiveQ = hex.r;
+  const effectiveR = hex.q;
 
   const x = size * (3.0 / 2.0) * effectiveQ;
   const y = size * (Math.sqrt(3.0) / 2.0 * effectiveQ + Math.sqrt(3.0) * effectiveR);
   return { x, y };
 }
 
-export function pixelToHex(x: number, y: number, size: number = HEX_SIZE): HexCoordinate {
+export function pixelToHex(x: number, y: number, size: number): HexCoordinate {
   // Inverse flat-topped hex conversion
   // Adjusted for user coordinate system where (-1, 0, 1) is North.
-  // We swap the result assignments compared to standard formula.
-
-  // Standard: q = (2/3 x) / size
-  // Standard: r = (-1/3 x + sqrt(3)/3 y) / size
-  
-  // Here:
-  // effectiveQ = r_new = (2/3 x) / size
-  // effectiveR = q_new = (-1/3 x + sqrt(3)/3 y) / size
 
   const r = (2.0 / 3.0 * x) / size;
   const q = (-1.0 / 3.0 * x + Math.sqrt(3.0) / 3.0 * y) / size;
   const s = -q - r;
   return cubeRound(q, r, s);
+}
+
+/**
+ * Returns the 6 corner points of a hex relative to its center (x, y).
+ * For Flat-Top orientation, corners are at 0°, 60°, 120°, 180°, 240°, 300°.
+ */
+export function getHexCorners(x: number, y: number, size: number): { x: number, y: number }[] {
+  const corners: { x: number, y: number }[] = [];
+  for (let i = 0; i < 6; i++) {
+    const angle_deg = 60 * i;
+    const angle_rad = Math.PI / 180 * angle_deg;
+    corners.push({
+      x: x + size * Math.cos(angle_rad),
+      y: y + size * Math.sin(angle_rad)
+    });
+  }
+  return corners;
 }
 
 function cubeRound(fracQ: number, fracR: number, fracS: number): HexCoordinate {

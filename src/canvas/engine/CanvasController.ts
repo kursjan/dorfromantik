@@ -4,7 +4,8 @@ import { HexRenderer } from '../graphics/HexRenderer';
 import { DebugRenderer } from '../graphics/DebugRenderer';
 import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexCoordinate } from '../../models/HexCoordinate';
-import { pixelToHex, HEX_SIZE } from '../utils/HexUtils';
+import { pixelToHex } from '../utils/HexUtils';
+import { HEX_SIZE } from '../graphics/HexStyles';
 
 export class CanvasController {
   private static readonly ZOOM_SENSITIVITY = 0.001;

@@ -1,5 +1,5 @@
 import { HexCoordinate } from '../../models/HexCoordinate';
-import { hexToPixel } from '../utils/HexUtils';
+import { hexToPixel, getHexCorners } from '../utils/HexUtils';
 import { type HexStyle, DEFAULT_HEX_STYLE, GRID_HEX_STYLE, CENTER_HEX_STYLE, HOVER_HEX_STYLE } from './HexStyles';
 
 export class HexRenderer {
@@ -13,16 +13,14 @@ export class HexRenderer {
    * Draws a single hex with the given style.
    */
   drawHex(hex: HexCoordinate, style: HexStyle = DEFAULT_HEX_STYLE, label?: string) {
-    const { x, y } = hexToPixel(hex.q, hex.r, style.size);
+    const { x, y } = hexToPixel(hex, style.size);
+    const corners = getHexCorners(x, y, style.size);
     const ctx = this.ctx;
 
     ctx.beginPath();
-    for (let i = 0; i < 6; i++) {
-      const angle = (2 * Math.PI) / 6 * i;
-      const hx = x + style.size * Math.cos(angle);
-      const hy = y + style.size * Math.sin(angle);
-      if (i === 0) ctx.moveTo(hx, hy);
-      else ctx.lineTo(hx, hy);
+    ctx.moveTo(corners[0].x, corners[0].y);
+    for (let i = 1; i < 6; i++) {
+      ctx.lineTo(corners[i].x, corners[i].y);
     }
     ctx.closePath();
 
