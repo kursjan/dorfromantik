@@ -7,6 +7,7 @@ This is an Agent assisted project. I was guiding Gemini agent and I myself didn'
 # Where did I start from
 
 # Journal
+Also AI-edited, I don't write like that. When reading, tone down all superlatives.
 
 ## Day 1: Project Setup and Foundations
 
