@@ -7,8 +7,10 @@ export interface HexStyle {
   lineWidth: number;
 }
 
+export const HEX_SIZE = 40;
+
 export const DEFAULT_HEX_STYLE: HexStyle = {
-  size: 40,
+  size: HEX_SIZE,
   strokeColor: '#000000',
   fillColor: '#FFFFFF',
   font: '12px Arial',

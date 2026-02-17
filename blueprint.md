@@ -23,6 +23,7 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
   - `drawDebugGrid` for visualizing the hex grid and coordinates.
   - **Interactive Camera:** Pan (drag) and Zoom (scroll) implemented.
   - **Hex Interaction:** Mouse hover highlighting (Hex Picking) implemented.
+  - **Refactored Rendering:** Separated rendering logic into specialized renderers (`BackgroundRenderer`, `HexRenderer`, `DebugRenderer`) orchestrated by `CanvasController`.
 - [x] **E2E Testing:** Configured Playwright for Vite + Nix environment. Added tests for Canvas rendering and zooming.
 - [x] **Infrastructure:**
   - Configured Path Aliases (`@/*`) for clean imports.
@@ -53,7 +54,7 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 ### 3.2. System Architecture
 - **Frontend:** React (Vite) + TypeScript.
 - **Canvas Engine:** Custom Controller Pattern (Separated from React).
-  - **Pattern:** `React Component` -> `CanvasController` -> `HexRenderer` / `InputManager`.
+  - **Pattern:** `React Component` -> `CanvasController` -> `Renderers` (`Hex`, `Background`, `Debug`) / `InputManager`.
   - **Documentation:** See **[src/canvas/ARCHITECTURE.md](./src/canvas/ARCHITECTURE.md)** for the detailed breakdown of the Canvas architecture.
 - **Backend:** Firebase (Hosting, Firestore, Auth - *Planned*).
 
@@ -67,7 +68,7 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 - [ ] **Step 2: Class & Method Structure Review (Best Practices)**
     - [ ] `src/canvas/engine/CanvasController.ts` (Responsibility separation, lifecycle management)
     - [ ] `src/canvas/engine/Camera.ts` (Transform logic encapsulation, immutability)
-    - [ ] `src/canvas/engine/InputManager.ts` (Event handling, cleanup, platform independence)
+    - [ ] `src/canvas/engine/InputManager.ts` (Event handling, cleanup, platform independence, `mouseleave` robustness)
     - [ ] `src/canvas/graphics/HexRenderer.ts` (Drawing efficiency, context management)
     - [ ] `src/canvas/utils/HexUtils.ts` (Pure functions, math correctness)
     - [ ] `src/models/HexCoordinate.ts` (Value object pattern, validation)
@@ -79,6 +80,9 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 - [ ] **Step 4: Performance Audit**
     - Inspect `renderLoop` for object allocations (GC pressure).
     - Check for magic numbers in `HexRenderer`.
+    - **Concerns:**
+        - `HexUtils.ts`: Redundant `HEX_SIZE` definition (exists in `HexStyles` too).
+        - `HexUtils.ts`: `pixelToHex` implementation is complex and verbose; potential for simplification.
 - [ ] **Step 5: Test Gap Analysis**
     - Identify missing unit test cases for edge scenarios.
     - Review E2E test robustness.

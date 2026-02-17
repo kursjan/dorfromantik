@@ -2,10 +2,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CanvasController } from './CanvasController';
 import { HexRenderer } from '../graphics/HexRenderer';
+import { DebugRenderer } from '../graphics/DebugRenderer';
 import { InputManager } from './InputManager';
 
 // Mock dependencies
 vi.mock('../graphics/HexRenderer');
+vi.mock('../graphics/DebugRenderer');
 vi.mock('./InputManager');
 vi.mock('./Camera', () => {
   const Camera = vi.fn();
@@ -43,6 +45,7 @@ describe('CanvasController', () => {
     controller = new CanvasController(canvas);
     expect((controller as any).ctx).toBeDefined();
     expect((controller as any).renderer).toBeInstanceOf(HexRenderer);
+    expect((controller as any).debugRenderer).toBeInstanceOf(DebugRenderer);
     expect((controller as any).inputManager).toBeInstanceOf(InputManager);
   });
 
@@ -56,7 +59,9 @@ describe('CanvasController', () => {
 
     expect(requestAnimationFrameSpy).toHaveBeenCalled();
     const renderer = (controller as any).renderer as any;
+    const debugRenderer = (controller as any).debugRenderer as any;
     expect(renderer.drawDebugGrid).toHaveBeenCalled();
+    expect(debugRenderer.drawOverlay).toHaveBeenCalled();
 
     requestAnimationFrameSpy.mockRestore();
   });

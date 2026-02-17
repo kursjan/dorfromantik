@@ -7,6 +7,9 @@ These guidelines define the operational principles and capabilities of an AI age
 These instructions must be followed above all else.
 
 *   **Primary Directive:** The "Current Plan" in `blueprint.md` is a roadmap, **NOT** a command. Always wait for explicit user confirmation before starting any new task from the plan.
+*   **Blueprint Management:**
+    *   **Focused Updates:** Changes to `blueprint.md` must be strictly focused on the current task. Do not revert or modify sections unrelated to the immediate work unless explicitly instructed.
+    *   **Checkbox Protocol:** **NEVER** mark a task as complete (check a box) in `blueprint.md` without explicit user confirmation. Wait for the user to approve the work before updating the plan.
 *   **Communication:** Be brief and professional. No excessive apologies or flattery.
 *   **Scope:** Make small changes. Minimize file touches. Never do more than necessary or instructed.
 *   **Refactoring Rule:** **Never** change business logic when refactoring. If tests start to fail, it is a signal that we changed the business logic.
@@ -15,6 +18,10 @@ These instructions must be followed above all else.
     1.  **Type Check:** `npx tsc`
     2.  **Unit Test Check:** `npm test` (Ensure all unit tests pass)
     3.  **E2E Test Check:** `npm run e2e` (Verify UI/Canvas interactions)
+*   **Documentation Maintenance:**
+    *   The AI is responsible for keeping project documentation up-to-date.
+    *   **Architecture Sync:** Whenever a refactoring or architectural change occurs (e.g., adding a new renderer, changing a design pattern), the AI must update the relevant `ARCHITECTURE.md` file (or equivalent).
+    *   **Brevity:** Updates should be concise yet sufficient for a future AI agent to understand the system structure and design decisions without needing to re-analyze the entire codebase.
 
 ## **Environment & Context Awareness**
 
@@ -242,7 +249,9 @@ The AI is capable of performing a professional code review upon request. This pr
 *   **Structured Plan:** The code review process will follow a structured plan, which will be created and updated in `blueprint.md`. This plan will outline the specific files and areas of focus for the review.
 *   **Best Practices:** The AI will review the code for adherence to best practices, including SOLID principles, clean code, and design patterns.
 *   **Context-Aware Analysis:** The AI will not review files in isolation. It will analyze how a class or function is used throughout the application to understand its context and dependencies. This prevents suggesting changes that would break other parts of the code.
+*   **Architectural Integrity:** Verify that each component adheres to the Single Responsibility Principle. Critically evaluate if logic belongs in the current class or should be extracted to a dedicated collaborator (e.g., rendering logic in a controller).
 *   **Test Coverage Verification:** For every class under review, the AI will verify that **each public method** has a corresponding unit test. The test must not only exist but also adequately cover the method's logic, arguments, and edge cases.
+*   **Organization & Consistency:** Verify that similar methods (e.g., event handlers, lifecycle methods) are grouped together logically and follow a consistent ordering convention.
 *   **Actionable Suggestions:** The AI will provide clear, actionable suggestions for improvement. When a refactoring is proposed, it will explain the benefits of the change.
 *   **Iterative Refactoring:** The AI will perform refactoring in small, verifiable steps. After each change, the full verification protocol (`tsc`, `npm test`, `npm run e2e`) will be executed to ensure no regressions have been introduced.
 

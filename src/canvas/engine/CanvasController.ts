@@ -1,6 +1,8 @@
 import { Camera } from './Camera';
 import { InputManager } from './InputManager';
 import { HexRenderer } from '../graphics/HexRenderer';
+import { DebugRenderer } from '../graphics/DebugRenderer';
+import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { pixelToHex, HEX_SIZE } from '../utils/HexUtils';
 
@@ -13,7 +15,11 @@ export class CanvasController {
   private readonly ctx: CanvasRenderingContext2D;
   private readonly camera: Camera;
   private readonly renderer: HexRenderer;
+  private readonly debugRenderer: DebugRenderer;
+  private readonly backgroundRenderer: BackgroundRenderer;
   private readonly inputManager: InputManager;
+
+  // State
   private animationFrameId: number;
   private hoveredHex: HexCoordinate | null = null;
 
@@ -24,7 +30,9 @@ export class CanvasController {
     this.ctx = ctx;
 
     this.camera = new Camera({ x: 0, y: 0, zoom: 1 });
+    this.backgroundRenderer = new BackgroundRenderer(ctx);
     this.renderer = new HexRenderer(ctx);
+    this.debugRenderer = new DebugRenderer(ctx);
     this.inputManager = new InputManager(canvas, {
       onPan: (dx, dy) => this.camera.pan(dx, dy),
       onZoom: (delta) => this.handleZoom(delta),
@@ -49,13 +57,6 @@ export class CanvasController {
     window.removeEventListener('resize', this.handleResize);
   }
 
-  private handleResize = () => {
-    if (this.canvas.width !== window.innerWidth || this.canvas.height !== window.innerHeight) {
-      this.canvas.width = window.innerWidth;
-      this.canvas.height = window.innerHeight;
-    }
-  };
-
   private loop() {
     this.update();
     this.render();
@@ -68,8 +69,7 @@ export class CanvasController {
 
   private render() {
     // 1. Clear
-    this.ctx.fillStyle = '#f0f0f0';
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.backgroundRenderer.draw(this.canvas.width, this.canvas.height);
 
     // 2. Camera Transform
     this.ctx.save();
@@ -82,23 +82,17 @@ export class CanvasController {
     this.ctx.restore();
 
     // 4. UI Overlay
-    this.renderOverlay();
-  }
-
-  private renderOverlay() {
-    this.ctx.textAlign = 'left';
-    this.ctx.textBaseline = 'alphabetic';
-    this.ctx.fillStyle = 'black';
-    this.ctx.font = '20px Arial';
-    
-    let debugText = `Camera: (${Math.round(this.camera.x)},${Math.round(this.camera.y)}) Zoom: ${this.camera.zoom.toFixed(2)}`;
-    if (this.hoveredHex) {
-        debugText += ` | Hover: (${this.hoveredHex.q},${this.hoveredHex.r},${this.hoveredHex.s})`;
-    }
-    this.ctx.fillText(debugText, 20, 30);
+    this.debugRenderer.drawOverlay(this.camera, this.hoveredHex);
   }
 
   // --- Input Handlers ---
+
+  private handleResize = () => {
+    if (this.canvas.width !== window.innerWidth || this.canvas.height !== window.innerHeight) {
+      this.canvas.width = window.innerWidth;
+      this.canvas.height = window.innerHeight;
+    }
+  };
 
   private handleZoom(delta: number) {
     this.camera.zoomBy(-delta * CanvasController.ZOOM_SENSITIVITY, CanvasController.MIN_ZOOM, CanvasController.MAX_ZOOM);

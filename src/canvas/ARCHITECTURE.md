@@ -7,6 +7,7 @@ The canvas visualization logic is separated from the React component tree to ens
 *   **React for UI:** React manages the DOM overlay (HUD, menus) and the `<canvas>` lifecycle.
 *   **Pure TS for Game Loop:** The game simulation and rendering loop run in a pure TypeScript class (`CanvasController`) outside of React's render cycle. This prevents React overhead from affecting 60fps rendering and avoids complex `useEffect` chains for game state.
 *   **Input Decoupling:** DOM events are captured and normalized before reaching the game logic.
+*   **Specialized Renderers:** Rendering logic is split into specialized classes (Hex, Background, Debug), each with its own style configuration. This keeps the Controller clean and focused on orchestration.
 
 ## 2. Directory Structure
 
@@ -19,8 +20,12 @@ src/canvas/
 │   ├── Camera.ts        # Math for World <-> Screen transforms
 │   └── InputManager.ts  # DOM Event Listeners
 ├── graphics/          # Rendering Logic
-│   ├── HexRenderer.ts   # Canvas API drawing calls
-│   └── HexStyles.ts     # Visual configuration
+│   ├── BackgroundRenderer.ts # Clears and draws background
+│   ├── BackgroundStyles.ts   # Background configuration
+│   ├── DebugRenderer.ts      # Draws debug overlay (HUD)
+│   ├── DebugStyles.ts        # Debug overlay configuration
+│   ├── HexRenderer.ts        # Main game world rendering (Hexes, Grid)
+│   └── HexStyles.ts          # Hex visual configuration
 └── ARCHITECTURE.md    # This file
 ```
 
@@ -54,7 +59,8 @@ Understanding the coordinate spaces is critical for this engine:
 The central hub. It:
 *   **Owns State:** Camera, Hovered Hex, (Future: Board).
 *   **Runs Loop:** Manages `requestAnimationFrame`.
-*   **Orchestrates:** `InputManager` callbacks -> updates State -> calls `HexRenderer`.
+*   **Orchestrates:** `InputManager` callbacks -> updates State -> delegates drawing to Renderers.
+*   **Does NOT Render:** It strictly delegates actual canvas API calls to the specialized renderers.
 
 ### Camera (`engine/Camera.ts`)
 Manages the view transform.
@@ -62,10 +68,16 @@ Manages the view transform.
 *   **Zoom:** Scalar value (clamped).
 *   **Methods:** `screenToWorld()`, `applyTransform()`.
 
-### HexRenderer (`graphics/HexRenderer.ts`)
-Stateless rendering utility.
-*   Receives: `Context2D`, `HexCoordinate`, `Style`.
-*   Action: Draws lines and fills. It does **not** know about game rules or camera state.
+### Renderers (`graphics/*Renderer.ts`)
+Stateless rendering utilities. They receive the `Context2D` and necessary data to draw.
+*   **BackgroundRenderer:** Handles clearing the screen and drawing the background color.
+*   **HexRenderer:** Draws the game grid, tiles, and highlights.
+*   **DebugRenderer:** Draws technical info (camera pos, zoom, etc.) on top of the scene.
+
+### Styles (`graphics/*Styles.ts`)
+Configuration files for their respective renderers.
+*   Defines colors, line widths, fonts, and constants.
+*   **Rule:** Every renderer must have a corresponding styles file.
 
 ### InputManager (`engine/InputManager.ts`)
 DOM abstraction layer.
@@ -82,7 +94,7 @@ DOM abstraction layer.
     *   Calls `pixelToHex(120.5, -40.2)` -> gets Hex `(2, -1, -1)`.
     *   Updates `this.hoveredHex`.
 4.  **Render Loop:**
-    *   Clears canvas.
-    *   Draws Board.
-    *   Calls `renderer.drawHighlight(this.hoveredHex)`.
+    *   Calls `backgroundRenderer.draw()`.
+    *   Calls `hexRenderer.drawHighlight(this.hoveredHex)`.
+    *   Calls `debugRenderer.drawOverlay(...)`.
 5.  **Screen:** Hex at `(2, -1, -1)` glows yellow.
