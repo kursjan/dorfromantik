@@ -1,3 +1,7 @@
+# Welcome
+
+This is an AI generated project. I will share my experiences with developing this project here.
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
