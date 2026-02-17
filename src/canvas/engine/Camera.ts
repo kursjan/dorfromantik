@@ -4,6 +4,16 @@ export interface CameraConfig {
   zoom?: number;
 }
 
+/**
+ * Manages the 2D view transformation (Pan & Zoom).
+ * 
+ * Coordinate Spaces:
+ * 1. Screen Space: Pixels, Origin top-left.
+ * 2. World Space: Logical units, Origin (0,0) is the center of the world.
+ * 
+ * Transform Chain:
+ * Screen = ScreenCenter + (WorldPosition + CameraOffset) * Zoom
+ */
 export class Camera {
   x: number = 0;
   y: number = 0;
@@ -17,7 +27,10 @@ export class Camera {
 
   /**
    * Applies the current camera transform to the canvas context.
-   * Order: Center Screen -> Scale -> Translate Camera
+   * Logic: 
+   * 1. Move origin to center of canvas.
+   * 2. Scale world by zoom level.
+   * 3. Move world by camera position (panning).
    */
   applyTransform(ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number) {
     ctx.translate(canvasWidth / 2, canvasHeight / 2);
@@ -27,14 +40,16 @@ export class Camera {
 
   /**
    * Converts a screen pixel coordinate (e.g. mouse event) to World Space.
+   * Inverts the transformation chain of applyTransform.
    */
   screenToWorld(screenX: number, screenY: number, canvasWidth: number, canvasHeight: number): { x: number, y: number } {
     const centerX = canvasWidth / 2;
     const centerY = canvasHeight / 2;
     
-    // Reverse the render transform:
-    // Screen = Center + (World + Cam) * Zoom
-    // World = (Screen - Center) / Zoom - Cam
+    // Reverse logic:
+    // 1. Subtract Center (undo translate 1)
+    // 2. Divide by Zoom (undo scale)
+    // 3. Subtract Camera Position (undo translate 2)
     
     const worldX = (screenX - centerX) / this.zoom - this.x;
     const worldY = (screenY - centerY) / this.zoom - this.y;
@@ -43,8 +58,8 @@ export class Camera {
   }
 
   /**
-   * Pans the camera.
-   * Note: We divide by zoom so dragging 100px moves the view 100px visually.
+   * Pans the camera by the given delta in screen pixels.
+   * We divide by zoom to ensure the world moves in sync with the mouse cursor ("Drag the map" feel).
    */
   pan(dx: number, dy: number) {
     this.x += dx / this.zoom;
@@ -53,6 +68,7 @@ export class Camera {
 
   /**
    * Zooms the camera, clamping to min/max values.
+   * Currently performs a center-screen zoom.
    */
   zoomBy(delta: number, min: number, max: number) {
     const newZoom = this.zoom + delta;

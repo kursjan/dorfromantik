@@ -37,11 +37,11 @@ export class CanvasController {
       onPan: (dx, dy) => this.camera.pan(dx, dy),
       onZoom: (delta) => this.handleZoom(delta),
       onHover: (x, y) => this.handleHover(x, y),
+      onResize: () => this.handleResize(),
     });
 
-    // Handle Resize
+    // Handle Resize (Initial)
     this.handleResize();
-    window.addEventListener('resize', this.handleResize);
 
     // Debug access
     if (import.meta.env.DEV) {
@@ -53,8 +53,7 @@ export class CanvasController {
 
   public destroy() {
     cancelAnimationFrame(this.animationFrameId);
-    this.inputManager.detachListeners();
-    window.removeEventListener('resize', this.handleResize);
+    this.inputManager.destroy();
   }
 
   private loop() {

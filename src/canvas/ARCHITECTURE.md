@@ -68,6 +68,12 @@ Manages the view transform.
 *   **Zoom:** Scalar value (clamped).
 *   **Methods:** `screenToWorld()`, `applyTransform()`.
 
+### InputManager (`engine/InputManager.ts`)
+DOM abstraction layer.
+*   **Role:** Translates raw DOM events (`mousedown`, `wheel`, etc.) into abstract Game Actions (`onPan`, `onZoom`, `onHover`).
+*   **Hygiene:** Explicitly attaches and detaches listeners to prevent memory leaks.
+*   **Normalization:** Handles cross-browser differences (e.g., wheel delta).
+
 ### Renderers (`graphics/*Renderer.ts`)
 Stateless rendering utilities. They receive the `Context2D` and necessary data to draw.
 *   **BackgroundRenderer:** Handles clearing the screen and drawing the background color.
@@ -79,16 +85,10 @@ Configuration files for their respective renderers.
 *   Defines colors, line widths, fonts, and constants.
 *   **Rule:** Every renderer must have a corresponding styles file.
 
-### InputManager (`engine/InputManager.ts`)
-DOM abstraction layer.
-*   Attaches `wheel`, `mousedown`, `mousemove` to the canvas.
-*   Calculates deltas (e.g., `dx, dy` for panning).
-*   Emits abstract events (`onPan`, `onZoom`, `onHover`) to the Controller.
-
 ## 5. Data Flow Example: Hovering
 
 1.  **Browser:** User moves mouse to pixel `(500, 300)`.
-2.  **InputManager:** Catches `mousemove`, calls `controller.onHover(500, 300)`.
+2.  **InputManager:** Catches `mousemove`, calculates local coordinates relative to canvas, calls `callbacks.onHover(500, 300)`.
 3.  **CanvasController:**
     *   Calls `camera.screenToWorld(500, 300)` -> gets World `(120.5, -40.2)`.
     *   Calls `pixelToHex(120.5, -40.2)` -> gets Hex `(2, -1, -1)`.

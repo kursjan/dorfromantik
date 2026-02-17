@@ -66,9 +66,9 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
     - Run `eslint` and `tsc` to verify strict compliance.
     - Check for circular dependencies (manual review of imports).
 - [ ] **Step 2: Class & Method Structure Review (Best Practices)**
-    - [ ] `src/canvas/engine/CanvasController.ts` (Responsibility separation, lifecycle management)
-    - [ ] `src/canvas/engine/Camera.ts` (Transform logic encapsulation, immutability)
-    - [ ] `src/canvas/engine/InputManager.ts` (Event handling, cleanup, platform independence, `mouseleave` robustness)
+    - [x] `src/canvas/engine/CanvasController.ts` (Responsibility separation, lifecycle management)
+    - [x] `src/canvas/engine/Camera.ts` (Transform logic encapsulation, immutability)
+    - [x] `src/canvas/engine/InputManager.ts` (Event handling, cleanup, platform independence, `mouseleave` robustness)
     - [ ] `src/canvas/graphics/HexRenderer.ts` (Drawing efficiency, context management)
     - [ ] `src/canvas/utils/HexUtils.ts` (Pure functions, math correctness)
     - [ ] `src/models/HexCoordinate.ts` (Value object pattern, validation)

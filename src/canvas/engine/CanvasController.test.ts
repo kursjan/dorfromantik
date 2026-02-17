@@ -1,13 +1,14 @@
-
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CanvasController } from './CanvasController';
 import { HexRenderer } from '../graphics/HexRenderer';
 import { DebugRenderer } from '../graphics/DebugRenderer';
+import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { InputManager } from './InputManager';
 
 // Mock dependencies
 vi.mock('../graphics/HexRenderer');
 vi.mock('../graphics/DebugRenderer');
+vi.mock('../graphics/BackgroundRenderer');
 vi.mock('./InputManager');
 vi.mock('./Camera', () => {
   const Camera = vi.fn();
@@ -46,6 +47,7 @@ describe('CanvasController', () => {
     expect((controller as any).ctx).toBeDefined();
     expect((controller as any).renderer).toBeInstanceOf(HexRenderer);
     expect((controller as any).debugRenderer).toBeInstanceOf(DebugRenderer);
+    expect((controller as any).backgroundRenderer).toBeInstanceOf(BackgroundRenderer);
     expect((controller as any).inputManager).toBeInstanceOf(InputManager);
   });
 
@@ -69,19 +71,17 @@ describe('CanvasController', () => {
   it('should clean up all resources on destroy', () => {
     // Spies for all cleanup actions
     const cancelAnimationFrameSpy = vi.spyOn(window, 'cancelAnimationFrame');
-    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
-
+    
     controller = new CanvasController(canvas);
     const inputManager = (controller as any).inputManager as any;
-    const inputManagerDetachSpy = vi.fn();
-    inputManager.detachListeners = inputManagerDetachSpy;
+    const inputManagerDestroySpy = vi.fn();
+    inputManager.destroy = inputManagerDestroySpy;
 
     // Call destroy
     controller.destroy();
 
     // Assert all cleanup actions were called
     expect(cancelAnimationFrameSpy).toHaveBeenCalledOnce();
-    expect(inputManagerDetachSpy).toHaveBeenCalledOnce();
-    expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', (controller as any).handleResize);
+    expect(inputManagerDestroySpy).toHaveBeenCalledOnce();
   });
 });

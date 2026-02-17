@@ -21,6 +21,7 @@ These instructions must be followed above all else.
 *   **Documentation Maintenance:**
     *   The AI is responsible for keeping project documentation up-to-date.
     *   **Architecture Sync:** Whenever a refactoring or architectural change occurs (e.g., adding a new renderer, changing a design pattern), the AI must update the relevant `ARCHITECTURE.md` file (or equivalent).
+    *   **Code Comments:** Maintain clear, concise JSDoc (or equivalent) for all public classes and methods. Ensure comments explain *intent* and *parameters*, especially after refactoring.
     *   **Brevity:** Updates should be concise yet sufficient for a future AI agent to understand the system structure and design decisions without needing to re-analyze the entire codebase.
 
 ## **Environment & Context Awareness**
