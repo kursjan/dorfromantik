@@ -44,7 +44,7 @@ describe('Board', () => {
     board.place(tile, coord);
     board.clear();
     expect(board.has(coord)).toBe(false);
-    expect(board.getAll().length).toBe(0);
+    expect(Array.from(board.getAll()).length).toBe(0);
   });
 
   it('should return all tiles', () => {
@@ -54,7 +54,7 @@ describe('Board', () => {
     board.place(tile, coord);
     board.place(tile2, coord2);
 
-    const all = board.getAll();
+    const all = Array.from(board.getAll());
     expect(all.length).toBe(2);
     expect(all.some(t => t.tile === tile)).toBe(true);
     expect(all.some(t => t.tile === tile2)).toBe(true);

@@ -35,8 +35,8 @@ export class Board {
     return this.tiles.has(coord.getKey());
   }
 
-  getAll(): BoardTile[] {
-    return Array.from(this.tiles.values());
+  getAll(): IterableIterator<BoardTile> {
+    return this.tiles.values();
   }
 
   clear(): void {

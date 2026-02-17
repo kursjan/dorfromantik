@@ -65,15 +65,15 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 - [x] **Step 1: Static Analysis & Tooling**
     - Run `eslint` and `tsc` to verify strict compliance.
     - Check for circular dependencies (manual review of imports).
-- [ ] **Step 2: Class & Method Structure Review (Best Practices)**
+- [x] **Step 2: Class & Method Structure Review (Best Practices)**
     - [x] `src/canvas/engine/CanvasController.ts` (Responsibility separation, lifecycle management)
     - [x] `src/canvas/engine/Camera.ts` (Transform logic encapsulation, immutability)
     - [x] `src/canvas/engine/InputManager.ts` (Event handling, cleanup, platform independence, `mouseleave` robustness)
     - [x] `src/canvas/graphics/HexRenderer.ts` (Drawing efficiency, context management)
     - [x] `src/canvas/utils/HexUtils.ts` (Pure functions, math correctness)
-    - [ ] `src/models/HexCoordinate.ts` (Value object pattern, validation)
-    - [ ] `src/models/Board.ts` (State management, encapsulation)
-    - [ ] `src/canvas/components/CanvasView.tsx` (React integration, performance)
+    - [x] `src/models/HexCoordinate.ts` (Value object pattern, validation)
+    - [x] `src/models/Board.ts` (State management, encapsulation)
+    - [x] `src/canvas/components/CanvasView.tsx` (React integration, performance)
 - [ ] **Step 3: Architecture Check**
     - Verify strict separation: `CanvasView` (UI) vs `CanvasController` (Logic).
     - Review `InputManager` event listener hygiene (attach/detach).

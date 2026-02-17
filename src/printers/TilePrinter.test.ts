@@ -5,7 +5,7 @@ import { Tile } from '../models/Tile';
 
 describe('TilePrinter', () => {
   it('should print a tile correctly onto the canvas', () => {
-    const canvas = new Canvas(0, 0, 8, 4);
+    const canvas = new Canvas({ topLeft: { x: 0, y: 0 }, bottomRight: { x: 8, y: 4 } });
     const tile = new Tile({
       id: 'test',
       north: 'tree',
@@ -29,7 +29,7 @@ describe('TilePrinter', () => {
   });
 
   it('should print two tiles touching at the SE corner', () => {
-    const canvas = new Canvas(0, 0, 15, 6);
+    const canvas = new Canvas({ topLeft: { x: 0, y: 0 }, bottomRight: { x: 15, y: 6 } });
     const tile1 = new Tile({
       id: 'test1',
       north: 'tree',
@@ -65,7 +65,7 @@ describe('TilePrinter', () => {
   });
 
   it('should print two tiles vertically, sharing the N/S edge', () => {
-    const canvas = new Canvas(0, 0, 8, 8);
+    const canvas = new Canvas({ topLeft: { x: 0, y: 0 }, bottomRight: { x: 8, y: 8 } });
     const tile1 = new Tile({ 
       id: 'tile1',
       north: 'tree',
@@ -103,7 +103,7 @@ describe('TilePrinter', () => {
   });
 
   it('should print three tiles in a triangular formation', () => {
-    const canvas = new Canvas(0, 0, 15, 8);
+    const canvas = new Canvas({ topLeft: { x: 0, y: 0 }, bottomRight: { x: 15, y: 8 } });
     const tile1 = new Tile({
       id: 'tile1',
       north: 'tree',
@@ -151,7 +151,7 @@ describe('TilePrinter', () => {
   });
 
   it('should print three tiles in a western triangular formation', () => {
-    const canvas = new Canvas(-7, 0, 8, 8);
+    const canvas = new Canvas({ topLeft: { x: -7, y: 0 }, bottomRight: { x: 8, y: 8 } });
     const tile1 = new Tile({
       id: 'tile1',
       north: 'tree', northEast: 'house', southEast: 'water',

@@ -1,18 +1,22 @@
+export interface Point {
+  x: number;
+  y: number;
+}
+
+export interface CanvasBounds {
+  topLeft: Point;
+  bottomRight: Point;
+}
+
 export class Canvas {
   private grid = new Map<string, string>();
-  private minX: number;
-  private maxX: number;
-  private minY: number;
-  private maxY: number;
+  private bounds: CanvasBounds;
 
-  constructor(minX: number, minY: number, maxX: number, maxY: number) {
-    if (![minX, minY, maxX, maxY].every(Number.isInteger)) {
+  constructor(bounds: CanvasBounds) {
+    if (![bounds.topLeft.x, bounds.topLeft.y, bounds.bottomRight.x, bounds.bottomRight.y].every(Number.isInteger)) {
       throw new Error('Canvas bounds must be integers.');
     }
-    this.minX = minX;
-    this.minY = minY;
-    this.maxX = maxX;
-    this.maxY = maxY;
+    this.bounds = bounds;
   }
 
   set(x: number, y: number, char: string): void {
@@ -20,8 +24,8 @@ export class Canvas {
       throw new Error(`Coordinates must be integers. Received (${x}, ${y}).`);
     }
 
-    if (x < this.minX || x > this.maxX || y < this.minY || y > this.maxY) {
-      throw new Error(`Coordinates (${x}, ${y}) are out of bounds. Bounds are [${this.minX}, ${this.minY}] to [${this.maxX}, ${this.maxY}].`);
+    if (x < this.bounds.topLeft.x || x > this.bounds.bottomRight.x || y < this.bounds.topLeft.y || y > this.bounds.bottomRight.y) {
+      throw new Error(`Coordinates (${x}, ${y}) are out of bounds. Bounds are [${this.bounds.topLeft.x}, ${this.bounds.topLeft.y}] to [${this.bounds.bottomRight.x}, ${this.bounds.bottomRight.y}].`);
     }
 
     const key = `${x},${y}`;
@@ -47,9 +51,9 @@ export class Canvas {
     }
 
     const lines: string[] = [];
-    for (let y = this.minY; y <= this.maxY; y++) {
+    for (let y = this.bounds.topLeft.y; y <= this.bounds.bottomRight.y; y++) {
       let line = '';
-      for (let x = this.minX; x <= this.maxX; x++) {
+      for (let x = this.bounds.topLeft.x; x <= this.bounds.bottomRight.x; x++) {
         const char = this.grid.get(`${x},${y}`);
         line += char || ' ';
       }

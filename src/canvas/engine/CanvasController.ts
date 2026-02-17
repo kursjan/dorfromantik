@@ -21,7 +21,7 @@ export class CanvasController {
   private readonly inputManager: InputManager;
 
   // State
-  private animationFrameId: number;
+  private animationFrameId: number = 0;
   private hoveredHex: HexCoordinate | null = null;
 
   constructor(canvas: HTMLCanvasElement) {

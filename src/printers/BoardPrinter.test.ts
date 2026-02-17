@@ -39,6 +39,58 @@ describe('BoardPrinter', () => {
       expect(output).toBe(expected);
     });
 
+    it('should print a single tile at far positive coordinates correctly', () => {
+      const board = new Board();
+      const tile = new Tile({
+        id: 'test',
+        north: 'tree',
+        northEast: 'house',
+        southEast: 'water',
+        south: 'pasture',
+        southWest: 'rail',
+        northWest: 'field',
+      });
+      const coord = new HexCoordinate(10, 10, -20);
+      board.place(tile, coord);
+
+      const printer = new BoardPrinter();
+      const output = printer.print(board);
+
+      const expected = String.raw`   _ _   
+ /  T  \ 
+/F     H\
+\R     W/
+ \ _P_ / `;
+
+      expect(output).toBe(expected);
+    });
+
+    it('should print a single tile at far negative coordinates correctly', () => {
+      const board = new Board();
+      const tile = new Tile({
+        id: 'test',
+        north: 'tree',
+        northEast: 'house',
+        southEast: 'water',
+        south: 'pasture',
+        southWest: 'rail',
+        northWest: 'field',
+      });
+      const coord = new HexCoordinate(-10, -10, 20);
+      board.place(tile, coord);
+
+      const printer = new BoardPrinter();
+      const output = printer.print(board);
+
+      const expected = String.raw`   _ _   
+ /  T  \ 
+/F     H\
+\R     W/
+ \ _P_ / `;
+
+      expect(output).toBe(expected);
+    });
+
     it('should print two tiles vertically (South neighbor)', () => {
       const board = new Board();
       const tile1 = new Tile({
@@ -100,6 +152,32 @@ describe('BoardPrinter', () => {
        \W     W/
         \ _F_ / `;
       
+      expect(output).toBe(expected);
+    });
+
+    it('should print a tile in negative coordinates correctly', () => {
+      const board = new Board();
+      const tile = new Tile({
+        id: 'test',
+        north: 'tree',
+        northEast: 'house',
+        southEast: 'water',
+        south: 'pasture',
+        southWest: 'rail',
+        northWest: 'field',
+      });
+      const coord = new HexCoordinate(-1, -1, 2);
+      board.place(tile, coord);
+
+      const printer = new BoardPrinter();
+      const output = printer.print(board);
+
+      const expected = String.raw`   _ _   
+ /  T  \ 
+/F     H\
+\R     W/
+ \ _P_ / `;
+
       expect(output).toBe(expected);
     });
   });

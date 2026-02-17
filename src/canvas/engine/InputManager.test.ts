@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { InputManager, InputCallbacks } from './InputManager';
+import { InputManager, type InputCallbacks } from './InputManager';
 
 describe('InputManager', () => {
   let canvas: HTMLCanvasElement;
@@ -12,6 +12,7 @@ describe('InputManager', () => {
       onPan: vi.fn(),
       onZoom: vi.fn(),
       onHover: vi.fn(),
+      onResize: vi.fn(),
     };
     inputManager = new InputManager(canvas, callbacks);
   });
@@ -80,7 +81,7 @@ describe('InputManager', () => {
 
   it('detaches listeners on destroy', () => {
     const removeSpy = vi.spyOn(canvas, 'removeEventListener');
-    inputManager.detachListeners();
+    inputManager.destroy();
     
     expect(removeSpy).toHaveBeenCalledWith('wheel', expect.any(Function));
     expect(removeSpy).toHaveBeenCalledWith('mousedown', expect.any(Function));
