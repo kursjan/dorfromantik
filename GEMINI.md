@@ -8,14 +8,14 @@ These instructions must be followed above all else.
 
 *   **Primary Directive:** The "Current Plan" in `blueprint.md` is a roadmap, **NOT** a command. Always wait for explicit user confirmation before starting any new task from the plan.
 *   **Blueprint Management:**
-    *   **Focused Updates:** Changes to `blueprint.md` must be strictly focused on the current task. Do not revert or modify sections unrelated to the immediate work unless explicitly instructed.
-    *   **Checkbox Protocol:** **NEVER** mark a task as complete (check a box) in `blueprint.md` without explicit user confirmation. Wait for the user to approve the work before updating the plan.
-*   **Communication:** Be brief and professional. No excessive apologies or flattery.
-*   **Scope:** Make small changes. Minimize file touches. Never do more than necessary or instructed.
-*   **Preservation of User Content:** When asked to "correct" or "improve" a user-authored document (like a `README.md` or a journal), **your primary goal is to preserve the user's original content and voice.** Do not delete sections, headings, or raw notes (e.g., the "Graveyard" section) unless explicitly instructed to do so. Corrections and suggestions should be additive or minor edits, not complete rewrites that remove the user's personal tracking and observations.
-*   **Refactoring Rule:** **Never** change business logic when refactoring. If tests start to fail, it is a signal that we changed the business logic.
-*   **Contextual Refactoring Rule:** When reviewing or refactoring a class or module, **always** check its usage across the entire project. Do not analyze files in isolation. This ensures that the public API of the class is still valid and that the refactoring does not break other parts of the application.
-*   **Verification Protocol:** After *every* code change, automatically run the following checks without asking:
+    *   **Focused Updates:** When updating `blueprint.md`, modify only the sections directly related to the current task.
+    *   **Checkbox Protocol:** Always wait for the user's explicit confirmation before marking a task as complete in `blueprint.md`.
+*   **Communication:** Communicate in a brief and professional manner.
+*   **Scope:** Adhere strictly to the scope of the assigned task and instructions. Make small changes and minimize file touches.
+*   **Preservation of User Content:** When asked to "correct" or "improve" a user-authored document, your primary goal is to preserve the user's original content and voice. Corrections and suggestions should be additive or minor edits to the existing text.
+*   **Refactoring Rule:** When refactoring, your goal is to improve code structure while preserving all existing business logic. Use the test suite to verify that the logic remains unchanged.
+*   **Contextual Refactoring Rule:** Always analyze files in the context of the entire project. Check all usages of a class or module to ensure its public API remains valid after refactoring.
+*   **Verification Protocol:** After *every* code change, automatically run the following checks:
     1.  **Type Check:** `npx tsc`
     2.  **Unit Test Check:** `npm test` (Ensure all unit tests pass)
     3.  **E2E Test Check:** `npm run e2e` (Verify UI/Canvas interactions)
@@ -250,7 +250,7 @@ The AI is capable of performing a professional code review upon request. This pr
 
 *   **Structured Plan:** The code review process will follow a structured plan, which will be created and updated in `blueprint.md`. This plan will outline the specific files and areas of focus for the review.
 *   **Best Practices:** The AI will review the code for adherence to best practices, including SOLID principles, clean code, and design patterns.
-*   **Context-Aware Analysis:** The AI will not review files in isolation. It will analyze how a class or function is used throughout the application to understand its context and dependencies. This prevents suggesting changes that would break other parts of the code.
+*   **Context-Aware Analysis:** The AI will review files by analyzing how a class or function is used throughout the application to understand its context and dependencies. This prevents suggesting changes that would break other parts of the code.
 *   **Architectural Integrity:** Verify that each component adheres to the Single Responsibility Principle. Critically evaluate if logic belongs in the current class or should be extracted to a dedicated collaborator (e.g., rendering logic in a controller).
 *   **Test Coverage Verification:** For every class under review, the AI will verify that **each public method** has a corresponding unit test. The test must not only exist but also adequately cover the method's logic, arguments, and edge cases.
 *   **Organization & Consistency:** Verify that similar methods (e.g., event handlers, lifecycle methods) are grouped together logically and follow a consistent ordering convention.
