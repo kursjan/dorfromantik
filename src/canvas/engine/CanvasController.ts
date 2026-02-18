@@ -59,6 +59,10 @@ export class CanvasController {
     this.inputManager.destroy();
   }
 
+  public resetCamera() {
+    this.camera.reset();
+  }
+
   private loop() {
     this.update();
     this.render();

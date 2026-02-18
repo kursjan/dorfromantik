@@ -17,8 +17,8 @@ src/canvas/
 │   └── CanvasView.tsx   # Entry point (thin wrapper)
 ├── engine/            # Core Game Loop & State
 │   ├── CanvasController.ts # The "Main Loop" & State Holder
-│   ├── Camera.ts        # Math for World <-> Screen transforms
-│   └── InputManager.ts  # DOM Event Listeners
+│   ├── Camera.ts        # Math for World <-> Screen transforms (Pan, Zoom, Rotate)
+│   └── InputManager.ts  # DOM Event Listeners (Mouse, Keyboard)
 ├── graphics/          # Rendering Logic
 │   ├── BackgroundRenderer.ts # Clears and draws background
 │   ├── BackgroundStyles.ts   # Background configuration
@@ -42,7 +42,8 @@ Understanding the coordinate spaces is critical for this engine:
     *   Infinite 2D plane.
     *   Origin `(0, 0)` is the center of the initial view.
     *   Used for camera positioning.
-    *   *Transformation:* `Screen = Center + (World + CameraPos) * Zoom`
+    *   **Transformation:** `Screen = Center + Rotate((World + CameraPos) * Zoom)`
+        *   Note the rotation step, which complicates `screenToWorld` mapping.
 
 3.  **Hex Space (Cube Coordinates):**
     *   Integer coordinates `(q, r, s)` where `q + r + s = 0`.
@@ -66,19 +67,21 @@ The central hub. It:
 Manages the view transform.
 *   **Pan:** `x, y` (World Units).
 *   **Zoom:** Scalar value (clamped).
-*   **Methods:** `screenToWorld()`, `applyTransform()`.
+*   **Rotation:** Radians (for rotating the view).
+*   **Methods:** `screenToWorld()`, `applyTransform()`, `pan()`, `rotateBy()`.
 
 ### InputManager (`engine/InputManager.ts`)
 DOM abstraction layer.
-*   **Role:** Translates raw DOM events (`mousedown`, `wheel`, etc.) into abstract Game Actions (`onPan`, `onZoom`, `onHover`).
+*   **Role:** Translates raw DOM events (`mousedown`, `wheel`, `keydown`, etc.) into abstract Game Actions (`onPan`, `onZoom`, `onHover`, `getRotationDirection`).
 *   **Hygiene:** Explicitly attaches and detaches listeners to prevent memory leaks.
 *   **Normalization:** Handles cross-browser differences (e.g., wheel delta).
+*   **Keyboard Tracking:** Maintains a Set of active keys for continuous actions like rotation.
 
 ### Renderers (`graphics/*Renderer.ts`)
 Stateless rendering utilities. They receive the `Context2D` and necessary data to draw.
 *   **BackgroundRenderer:** Handles clearing the screen and drawing the background color.
 *   **HexRenderer:** Draws the game grid, tiles, and highlights. It uses `HexStyles.ts` for configuration.
-*   **DebugRenderer:** Draws technical info (camera pos, zoom, etc.) on top of the scene.
+*   **DebugRenderer:** Draws technical info (camera pos, zoom, rotation, etc.) on top of the scene.
 
 ### Styles (`graphics/*Styles.ts`)
 Configuration files for their respective renderers.
@@ -88,13 +91,15 @@ Configuration files for their respective renderers.
 ## 5. Data Flow Example: Hovering
 
 1.  **Browser:** User moves mouse to pixel `(500, 300)`.
-2.  **InputManager:** Catches `mousemove`, calculates local coordinates relative to canvas, calls `callbacks.onHover(500, 300)`.
+2.  **InputManager:** Catches `mousemove`, calls `callbacks.onHover(500, 300)`.
 3.  **CanvasController:**
-    *   Calls `camera.screenToWorld(500, 300)` -> gets World `(120.5, -40.2)`.
+    *   Calls `camera.screenToWorld(500, 300)` -> applies Inverse Rotate, Inverse Scale, Inverse Translate -> gets World `(120.5, -40.2)`.
     *   Calls `pixelToHex(120.5, -40.2)` -> gets Hex `(2, -1, -1)`.
     *   Updates `this.hoveredHex`.
 4.  **Render Loop:**
     *   Calls `backgroundRenderer.draw()`.
+    *   Calls `camera.applyTransform()` (Translate Center -> Rotate -> Scale -> Translate Camera).
     *   Calls `hexRenderer.drawHighlight(this.hoveredHex)`.
+    *   Calls `ctx.restore()` (Reverts transform).
     *   Calls `debugRenderer.drawOverlay(...)`.
-5.  **Screen:** Hex at `(2, -1, -1)` glows yellow.
+5.  **Screen:** Hex at `(2, -1, -1)` glows yellow, correctly positioned even if rotated.

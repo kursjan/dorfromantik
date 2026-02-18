@@ -21,11 +21,23 @@ export class Camera {
   zoom: number = 1;
   rotation: number = 0; // Radians
 
+  // Default values
+  private readonly defaultX: number;
+  private readonly defaultY: number;
+  private readonly defaultZoom: number;
+  private readonly defaultRotation: number;
+
   constructor(config: CameraConfig = {}) {
     this.x = config.x ?? 0;
     this.y = config.y ?? 0;
     this.zoom = config.zoom ?? 1;
     this.rotation = config.rotation ?? 0;
+
+    // Store defaults for reset
+    this.defaultX = this.x;
+    this.defaultY = this.y;
+    this.defaultZoom = this.zoom;
+    this.defaultRotation = this.rotation;
   }
 
   /**
@@ -111,5 +123,15 @@ export class Camera {
    */
   rotateBy(deltaRadians: number) {
       this.rotation += deltaRadians;
+  }
+
+  /**
+   * Resets the camera to its initial state.
+   */
+  reset() {
+      this.x = this.defaultX;
+      this.y = this.defaultY;
+      this.zoom = this.defaultZoom;
+      this.rotation = this.defaultRotation;
   }
 }

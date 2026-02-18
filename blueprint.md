@@ -84,6 +84,10 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
     - [x] **InputManager:** Implement `keydown`/`keyup` listeners to track rotation state. Expose `getRotationDirection()`.
     - [x] **Camera:** Add `rotation` state (radians). Update `applyTransform` (rotate) and `screenToWorld` (inverse rotate). Update `pan` to be screen-relative (rotate vector).
     - [x] **Controller:** Update `update()` loop to check input state and apply rotation to camera.
+- [ ] **Step 2.4: Reset Camera Button** 
+    - [x] **Camera:** Implement `reset()` method to restore default x, y, zoom, and rotation.
+    - [x] **CanvasController API:** Expose a `resetCamera()` method in `CanvasController`.
+    - [ ] **UI:** Add a "Reset View" button (HTML overlay) in `CanvasView.tsx`.
 
 ### Phase 3: Board Integration & Rendering
 - [ ] **Step 3.1: Connect Board Model**

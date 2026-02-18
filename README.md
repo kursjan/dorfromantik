@@ -90,3 +90,4 @@ Notes to add somewhere
 - One day we do X, next day AI suggests to undo this
   - this is hard to capture/remember, if the decision is a single method scope, that is way to granular to keep in architecture files
 - Sometimes agent doesn't talk to me at all
+- It is easy to make it do things, it is harder to make it do things your way???
