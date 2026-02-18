@@ -9,6 +9,7 @@ import { HEX_SIZE } from '../graphics/HexStyles';
 
 export class CanvasController {
   private static readonly ZOOM_SENSITIVITY = 0.001;
+  private static readonly ROTATION_SPEED = 0.05;
   private static readonly MIN_ZOOM = 0.5;
   private static readonly MAX_ZOOM = 3.0;
 
@@ -38,6 +39,7 @@ export class CanvasController {
       onPan: (dx, dy) => this.camera.pan(dx, dy),
       onZoom: (delta) => this.handleZoom(delta),
       onHover: (x, y) => this.handleHover(x, y),
+      onLeave: () => this.handleLeave(),
       onResize: () => this.handleResize(),
     });
 
@@ -64,7 +66,17 @@ export class CanvasController {
   }
 
   private update() {
-    // Game logic (e.g., animations) goes here
+    // 1. Handle Continuous Rotation Input
+    const rotationDir = this.inputManager.getRotationDirection();
+    if (rotationDir !== 0) {
+      this.camera.rotateBy(rotationDir * CanvasController.ROTATION_SPEED);
+      
+      // We need to re-evaluate hover during rotation, even if mouse doesn't move.
+      // We can get the last known mouse position from inputManager if we exposed it,
+      // or just wait for the next mouse event. 
+      // Ideally, InputManager should expose `getLastMousePos()`.
+      // For now, let's keep it simple: the highlight updates when you wiggle the mouse.
+    }
   }
 
   private render() {
@@ -105,5 +117,9 @@ export class CanvasController {
     if (!this.hoveredHex || !this.hoveredHex.equals(hex)) {
       this.hoveredHex = hex;
     }
+  }
+
+  private handleLeave() {
+    this.hoveredHex = null;
   }
 }

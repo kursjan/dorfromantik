@@ -12,6 +12,7 @@ describe('InputManager', () => {
       onPan: vi.fn(),
       onZoom: vi.fn(),
       onHover: vi.fn(),
+      onLeave: vi.fn(),
       onResize: vi.fn(),
     };
     inputManager = new InputManager(canvas, callbacks);
@@ -24,7 +25,7 @@ describe('InputManager', () => {
 
   it('handles mouse drag for panning', () => {
     // 1. Mouse Down
-    canvas.dispatchEvent(new MouseEvent('mousedown', { clientX: 100, clientY: 100 }));
+    canvas.dispatchEvent(new MouseEvent('mousedown', { clientX: 100, clientY: 100, button: 0 }));
     
     // 2. Mouse Move (Drag)
     canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: 110, clientY: 105 }));
@@ -62,7 +63,7 @@ describe('InputManager', () => {
       bottom: 110,
       right: 110,
       toJSON: () => {}
-    });
+    } as DOMRect);
 
     canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: 60, clientY: 60 }));
     
@@ -71,8 +72,10 @@ describe('InputManager', () => {
   });
 
   it('stops dragging on mouse leave', () => {
-    canvas.dispatchEvent(new MouseEvent('mousedown', { clientX: 100, clientY: 100 }));
+    canvas.dispatchEvent(new MouseEvent('mousedown', { clientX: 100, clientY: 100, button: 0 }));
     canvas.dispatchEvent(new MouseEvent('mouseleave'));
+    
+    expect(callbacks.onLeave).toHaveBeenCalled();
     
     canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: 110, clientY: 110 }));
     

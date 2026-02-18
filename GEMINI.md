@@ -7,9 +7,13 @@ These guidelines define the operational principles and capabilities of an AI age
 These instructions must be followed above all else.
 
 *   **Primary Directive:** The "Current Plan" in `blueprint.md` is a roadmap, **NOT** a command. Always wait for explicit user confirmation before starting any new task from the plan.
+    *   Agent performs only one task at a time.
 *   **Blueprint Management:**
     *   **Focused Updates:** When updating `blueprint.md`, modify only the sections directly related to the current task.
     *   **Checkbox Protocol:** Always wait for the user's explicit confirmation before marking a task as complete in `blueprint.md`.
+    *   **Analysis tasks:** Output of analysis is suggested update in the Bluperint file, if there is work to be done, so that user can verify the tasks, organize them and ask AI to execute them later.
+    *   **Number tasks:** Each task has checkbox and unique number to be easily referenced.
+    *   **Check updates:** User and AI can modify blueprint file at the same time. AI always reads the bluperint file content and preserves any changes made by user.
 *   **Communication:** Communicate in a brief and professional manner.
 *   **Scope:** Adhere strictly to the scope of the assigned task and instructions. Make small changes and minimize file touches.
 *   **Preservation of User Content:** When asked to "correct" or "improve" a user-authored document, your primary goal is to preserve the user's original content and voice. Corrections and suggestions should be additive or minor edits to the existing text.
@@ -42,6 +46,7 @@ The AI operates within the Firebase Studio development environment, which provid
     *   The `web` preview is configured to run `npm run dev -- --port $PORT --host 0.0.0.0`, meaning the Vite dev server is already running and available on a specific port.
     *   The AI will continuously monitor the output of the preview server for real-time feedback on changes.
 *   **Firebase Integration:** The AI recognizes standard Firebase integration patterns in React, including the use of a `firebase.js` or `firebase.ts` configuration file and interactions with various Firebase SDKs.
+*   **Architecture:** The AI can read about architecture of a given folder from an Architecture.md file.
 
 ## **Code Modification & Dependency Management**
 
@@ -243,6 +248,8 @@ When requested, the AI will facilitate the creation and execution of tests, ensu
 *   **Automated Test Execution:**
     *   After generating or modifying tests, and after any significant code change, the AI will automatically execute the relevant tests using `npm test` in the terminal.
     *   The AI will report test results (pass/fail, with details on failures) to the user.
+*   **Test Updates**
+    *   AI will udpate only tests and cases related to the current task and stick strictly to the task at hand.
 
 ## **Code Review Process**
 

@@ -5,7 +5,7 @@ The canvas visualization logic is separated from the React component tree to ens
 ## 1. Design Philosophy
 
 *   **React for UI:** React manages the DOM overlay (HUD, menus) and the `<canvas>` lifecycle.
-*   **Pure TS for Game Loop:** The game simulation and rendering loop run in a pure TypeScript class (`CanvasController`) outside of React's render cycle. This prevents React overhead from affecting 60fps rendering and avoids complex `useEffect` chains for game state.
+*   **Pure TS for Game Loop:** The game simulation and rendering loop run in a pure TypeScript class (`CanvasController`) outside of the React render cycle. This prevents React overhead from affecting 60fps rendering and avoids complex `useEffect` chains for game state.
 *   **Input Decoupling:** DOM events are captured and normalized before reaching the game logic.
 *   **Specialized Renderers:** Rendering logic is split into specialized classes (Hex, Background, Debug), each with its own style configuration. This keeps the Controller clean and focused on orchestration.
 
@@ -77,7 +77,7 @@ DOM abstraction layer.
 ### Renderers (`graphics/*Renderer.ts`)
 Stateless rendering utilities. They receive the `Context2D` and necessary data to draw.
 *   **BackgroundRenderer:** Handles clearing the screen and drawing the background color.
-*   **HexRenderer:** Draws the game grid, tiles, and highlights.
+*   **HexRenderer:** Draws the game grid, tiles, and highlights. It uses `HexStyles.ts` for configuration.
 *   **DebugRenderer:** Draws technical info (camera pos, zoom, etc.) on top of the scene.
 
 ### Styles (`graphics/*Styles.ts`)

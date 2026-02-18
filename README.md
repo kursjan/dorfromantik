@@ -57,6 +57,8 @@ Notes to add somewhere
 
 - Agent tends to run wild and do much more
   - I have to keep it reminded to do only work I ask it to do
+  - Non coding example, fresh start, fresh context: update readme file, journal entries to fix my englis
+    - results in updates in the whole file. One has to ask several times to keep the scope minimal, not to reorganize stuff
 - The more "nested" work, the worse is the Agent
   - e.g. when implementing something and within that task refactoring something and within refactoring writing tests is much worse than just refactoring and writing tests.
 - There is a nice tooling progress
@@ -83,3 +85,8 @@ Notes to add somewhere
   - the problem is it is terribly inconsistent in recognizing or following some of my directives
     - e.g. don't modify other parts etc
 - IMO it is bad with following negatives
+- Performance is still a a bit too slow, better, but still wastes time
+- Working "together" in blueprint file results in constant rewrites from AI, keeping promting it to "preserve" my changes
+- One day we do X, next day AI suggests to undo this
+  - this is hard to capture/remember, if the decision is a single method scope, that is way to granular to keep in architecture files
+- Sometimes agent doesn't talk to me at all

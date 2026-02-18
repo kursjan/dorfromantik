@@ -59,60 +59,14 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 - **Backend:** Firebase (Hosting, Firestore, Auth - *Planned*).
 
 ## 4. Current Plan
-**Role:** Senior Graphics Engineer (TypeScript/Canvas).
-**Goal:** Professional Code Review & Refinement.
+### Phase 1: Canvas and Camera Foundation [DONE]
 
-- [x] **Step 1: Static Analysis & Tooling**
-    - Run `eslint` and `tsc` to verify strict compliance.
-    - Check for circular dependencies (manual review of imports).
-- [x] **Step 2: Class & Method Structure Review (Best Practices)**
-    - [x] `src/canvas/engine/CanvasController.ts` (Responsibility separation, lifecycle management)
-    - [x] `src/canvas/engine/Camera.ts` (Transform logic encapsulation, immutability)
-    - [x] `src/canvas/engine/InputManager.ts` (Event handling, cleanup, platform independence, `mouseleave` robustness)
-    - [x] `src/canvas/graphics/HexRenderer.ts` (Drawing efficiency, context management)
-    - [x] `src/canvas/utils/HexUtils.ts` (Pure functions, math correctness)
-    - [x] `src/models/HexCoordinate.ts` (Value object pattern, validation)
-    - [x] `src/models/Board.ts` (State management, encapsulation)
-    - [x] `src/canvas/components/CanvasView.tsx` (React integration, performance)
-- [ ] **Step 3: Architecture Check**
-    - Verify strict separation: `CanvasView` (UI) vs `CanvasController` (Logic).
-    - Review `InputManager` event listener hygiene (attach/detach).
-- [ ] **Step 4: Performance Audit**
-    - Inspect `renderLoop` for object allocations (GC pressure).
-    - Check for magic numbers in `HexRenderer`.
-    - **Concerns:**
-        - `HexUtils.ts`: Redundant `HEX_SIZE` definition (exists in `HexStyles` too).
-        - `HexUtils.ts`: `pixelToHex` implementation is complex and verbose; potential for simplification.
-- [ ] **Step 5: Test Gap Analysis**
-    - Identify missing unit test cases for edge scenarios.
-    - Review E2E test robustness.
-- [ ] **Step 6: Refactoring Execution**
-    - Implement fixes based on findings.
-    - Update documentation if architecture drifted.
+### Phase 1a: Code Review: [DONE]
 
-## 5. Future Plans
+### Phase 2: Interaction & Input Handling
 **Role:** Senior Graphics Engineer (TypeScript/Canvas).
 **Goal:** Integrate the Board data model with the interactive Canvas.
 
-### Phase 1: Canvas & Camera Foundation
-- [x] **Step 1.1: Canvas Setup**
-    - Create `src/canvas/components/CanvasView.tsx`.
-    - Setup full-screen responsive canvas with `useRef`.
-    - Implement basic `renderLoop` using `requestAnimationFrame`.
-- [x] **Step 1.2: Coordinate System (Hex <-> Pixel)**
-    - Implement `hexToPixel(q, r, size)`: Convert axial coordinates to screen coordinates (Flat-Top).
-    - Implement `pixelToHex(x, y, size)`: Inverse operation (including `cubeRound` for float handling).
-- [x] **Step 1.3: Camera Transform & Grid Rendering**
-    - Define `Camera` state: `{ x, y, zoom }` (Rotation is optional for now).
-    - Implement `transform` logic in `renderLoop` using `ctx.translate` and `ctx.scale`.
-    - Center the coordinate system (0,0) to the middle of the canvas.
-    - **Draw a visible grid of hexagons** to verify the layout immediately.
-- [x] **Checkpoint 1:**
-    - [x] Run app.
-    - [x] Verify a grid of empty hexes is drawn.
-    - [x] Verify `hexToPixel` matches the visual grid.
-
-### Phase 2: Interaction & Input Handling
 - [x] **Step 2.1: Mouse Handling (Pan & Zoom)**
     - Implement `onMouseDown`, `onMouseMove`, `onMouseUp` for panning.
     - Implement `onWheel` for zooming.
@@ -125,6 +79,11 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
     - [x] Verify dragging moves the camera (Pan).
     - [x] Verify scrolling zooms the camera (Zoom).
     - [x] Verify hovering highlights the correct hexagon.
+- [x] **Step 2.3: Rotation**
+    - [x] **Input Decision:** Use **Q** (Left) and **E** (Right) keys to rotate.
+    - [x] **InputManager:** Implement `keydown`/`keyup` listeners to track rotation state. Expose `getRotationDirection()`.
+    - [x] **Camera:** Add `rotation` state (radians). Update `applyTransform` (rotate) and `screenToWorld` (inverse rotate). Update `pan` to be screen-relative (rotate vector).
+    - [x] **Controller:** Update `update()` loop to check input state and apply rotation to camera.
 
 ### Phase 3: Board Integration & Rendering
 - [ ] **Step 3.1: Connect Board Model**
@@ -142,3 +101,13 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 - [ ] **Step 4.1: Selection & Placement**
     - visual cue for "valid placement" vs "invalid placement" (using `board.canPlace`).
     - Handle click to place a tile.
+
+
+## Backlog (Low Priority)
+The following tasks were not implemented because of their low-priority.
+
+- [ ] 1. **Optimization:** Memoize grid coordinates in `CanvasController` to reduce GC pressure (Finding 1).
+- [ ] 2. **Test Coverage:** Create `src/canvas/graphics/BackgroundRenderer.test.ts` to verify basic draw calls.
+- [ ] 3. **Test Coverage:** Create `src/canvas/graphics/DebugRenderer.test.ts` to verify text output.
+
+## Decision Log
