@@ -14,10 +14,12 @@ The canvas visualization logic is separated from the React component tree to ens
 ```
 src/canvas/
 ├── components/        # React Components
-│   └── CanvasView.tsx   # Entry point (thin wrapper)
+│   ├── CanvasView.tsx      # Entry point (Main container)
+│   ├── ResetViewButton.tsx # UI Overlay for camera control
+│   └── ResetViewButton.css # Button styling
 ├── engine/            # Core Game Loop & State
 │   ├── CanvasController.ts # The "Main Loop" & State Holder
-│   ├── Camera.ts        # Math for World <-> Screen transforms (Pan, Zoom, Rotate)
+│   ├── Camera.ts        # Math for World <-> Screen transforms (Pan, Zoom, Rotate, Reset)
 │   └── InputManager.ts  # DOM Event Listeners (Mouse, Keyboard)
 ├── graphics/          # Rendering Logic
 │   ├── BackgroundRenderer.ts # Clears and draws background

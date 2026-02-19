@@ -129,6 +129,25 @@ For projects using a framework that supports RSC (like Next.js), the AI will ado
 *   **Client-Side Interactivity:** Components that require user interaction or client-side state will be marked with the `"use client"` directive.
 *   **Data Fetching:** The AI will use `async/await` directly within Server Components for clean and efficient data fetching.
 
+## **Architectural Learnings & Patterns**
+
+### **Canvas Controller Pattern**
+For high-performance 2D rendering, we use a **Controller Pattern** that decouples React from the Canvas API.
+- **React's Role:** Manage the high-level lifecycle of the `<canvas>` element and host DOM-based UI overlays (HUD, buttons).
+- **Controller's Role:** A pure TypeScript class (`CanvasController`) that owns the game state, handles the `requestAnimationFrame` loop, and orchestrates specialized renderers.
+- **Why:** This avoids React's reconciliation overhead and "effect hell" when dealing with 60fps rendering logic.
+
+### **Rotated Hexagonal Coordinate System**
+This project uses a custom orientation for "Flat-Top" hexagons:
+- **North is (-1, 0, 1)** instead of the standard `(0, -1, 1)`.
+- This requires careful mapping in `HexUtils.ts` (specifically swapping/negating `q` and `r` in pixel-to-hex conversions).
+- **Future AI Warning:** Always check `HexUtils.test.ts` to verify neighbor calculations before extending the grid logic.
+
+### **E2E Stability (Canvas)**
+When writing Playwright tests for a canvas:
+- **UI Overlays:** Prefer taking screenshots of the `canvas` locator specifically (e.g., `expect(canvas).toHaveScreenshot()`) rather than the full page to avoid flaky failures caused by UI buttons or overlays.
+- **MaxDiff:** Use a small `maxDiffPixels` (e.g., 150) to account for minor anti-aliasing variations between headless environments.
+
 ## **Styling**
 
 The AI will use a consistent styling approach, preferring modern solutions like Tailwind CSS or CSS-in-JS libraries (e.g., styled-components, Emotion) if they are already present in the project. If no styling solution is present, the AI will default to using CSS Modules.

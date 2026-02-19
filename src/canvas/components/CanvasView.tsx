@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { CanvasController } from '../engine/CanvasController';
+import { ResetViewButton } from './ResetViewButton';
 
 export const CanvasView: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -22,12 +23,7 @@ export const CanvasView: React.FC = () => {
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
-      <button
-        onClick={() => controllerRef.current?.resetCamera()}
-        style={{ position: 'absolute', top: '20px', left: '20px', zIndex: 10 }}
-      >
-        Reset Camera
-      </button>
+      <ResetViewButton onClick={() => controllerRef.current?.resetCamera()} />
       <canvas
         ref={canvasRef}
         style={{ display: 'block', width: '100%', height: '100%', touchAction: 'none' }}

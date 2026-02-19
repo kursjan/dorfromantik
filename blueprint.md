@@ -21,15 +21,17 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
   - `HexUtils` updated for custom coordinate system (North is `-1, 0, 1` relative to center).
   - `HexStyles` configuration for centralized styling.
   - `drawDebugGrid` for visualizing the hex grid and coordinates.
-  - **Interactive Camera:** Pan (drag) and Zoom (scroll) implemented.
+  - **Interactive Camera:** Pan (drag), Zoom (scroll), and Rotation (Q/E) implemented.
   - **Hex Interaction:** Mouse hover highlighting (Hex Picking) implemented.
   - **Refactored Rendering:** Separated rendering logic into specialized renderers (`BackgroundRenderer`, `HexRenderer`, `DebugRenderer`) orchestrated by `CanvasController`.
-- [x] **E2E Testing:** Configured Playwright for Vite + Nix environment. Added tests for Canvas rendering and zooming.
+  - **Reset Camera Button:** Added a polished UI component with Storybook stories and E2E verification.
+- [x] **E2E Testing:** Configured Playwright for Vite + Nix environment. Added tests for Canvas rendering, zooming, and camera reset.
 - [x] **Infrastructure:**
   - Configured Path Aliases (`@/*`) for clean imports.
   - Set up Prettier (`npm run format`) for consistent code style.
   - Added UI foundations (`clsx`, `tailwind-merge`) for Shadcn/UI integration.
   - Exposed `window.canvas` for runtime debugging.
+  - Set up Storybook for UI component isolation.
 
 ## 3. Architecture & Documentation
 
@@ -59,52 +61,5 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 - **Backend:** Firebase (Hosting, Firestore, Auth - *Planned*).
 
 ## 4. Current Plan
-### Phase 1: Canvas and Camera Foundation [DONE]
-
-### Phase 1a: Code Review: [DONE]
-
-### Phase 2: Interaction & Input Handling
-**Role:** Senior Graphics Engineer (TypeScript/Canvas).
-**Goal:** Integrate the Board data model with the interactive Canvas.
-
-- [x] **Step 2.1: Mouse Handling (Pan & Zoom)**
-    - Implement `onMouseDown`, `onMouseMove`, `onMouseUp` for panning.
-    - Implement `onWheel` for zooming.
-- [x] **Step 2.2: Hex Picking (Hover)**
-    - Calculate mouse position in "World Space" (accounting for Camera transform).
-    - Use `pixelToHex` to determine the hovered hex coordinate.
-    - Store `hoveredHex` in state.
-- [x] **Checkpoint 2:**
-    - [x] Run app.
-    - [x] Verify dragging moves the camera (Pan).
-    - [x] Verify scrolling zooms the camera (Zoom).
-    - [x] Verify hovering highlights the correct hexagon.
-- [x] **Step 2.3: Rotation**
-    - [x] **Input Decision:** Use **Q** (Left) and **E** (Right) keys to rotate.
-    - [x] **InputManager:** Implement `keydown`/`keyup` listeners to track rotation state. Expose `getRotationDirection()`.
-    - [x] **Camera:** Add `rotation` state (radians). Update `applyTransform` (rotate) and `screenToWorld` (inverse rotate). Update `pan` to be screen-relative (rotate vector).
-    - [x] **Controller:** Update `update()` loop to check input state and apply rotation to camera.
-- [ ] **Step 2.4: Reset Camera Button** 
-    - [x] **Camera:** Implement `reset()` method to restore default x, y, zoom, and rotation.
-    - [x] **CanvasController API:** Expose a `resetCamera()` method in `CanvasController`.
-    - [x] **UI Infrastructure (Storybook):**
-        - [x] Initialize Storybook: `npx storybook@latest init --yes`.
-        - [x] Verify Storybook runs: `npm run storybook`.
-    - [x] **UI Implementation (Minimal Prototype):**
-        - [x] Add a basic, unstyled reset button to `CanvasView.tsx` to verify visibility and basic connectivity.
-    - [ ] **UI Implementation (Isolated):**
-        - [ ] Create `src/canvas/components/ResetViewButton.tsx` as a standalone, styled component.
-        - [ ] Create `src/canvas/components/ResetViewButton.stories.tsx` to develop and refine the button's look and feel in isolation.
-    - [ ] **UI Integration:**
-        - [ ] Create `src/canvas/components/ControlsOverlay.tsx` to house UI elements over the canvas.
-        - [ ] Integrate `ResetViewButton` into `ControlsOverlay`.
-        - [ ] Use `absolute` positioning to overlay controls on the canvas.
-        - [ ] Integrate `ControlsOverlay` into `CanvasView.tsx`.
-        - [ ] Connect the button to `controller.resetCamera()`.
-    - [ ] **Verification:**
-        - [ ] **E2E Test:** Create `e2e/reset-view.spec.ts` to verify:
-            - Button is visible on initial load.
-            - Panning/Zooming changes the view.
-            - Clicking the button restores the initial camera state.
 
 ## Decision Log
