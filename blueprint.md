@@ -105,29 +105,4 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
             - Panning/Zooming changes the view.
             - Clicking the button restores the initial camera state.
 
-### Phase 3: Board Integration & Rendering
-- [ ] **Step 3.1: Connect Board Model**
-    - Instantiate a `Board` in the parent component (`App.tsx`).
-    - Pass `Board` to `CanvasView`.
-- [ ] **Step 3.2: Render Tiles**
-    - Iterate through `board.getAll()` in `renderLoop`.
-    - Render specific visuals based on `Tile` terrain properties (colors for now).
-- [ ] **Checkpoint 3:**
-    - [ ] Run app.
-    - [ ] Place a few test tiles in code.
-    - [ ] Verify tiles appear at correct coordinates with correct terrain colors.
-
-### Phase 4: Placement Logic (UI)
-- [ ] **Step 4.1: Selection & Placement**
-    - visual cue for "valid placement" vs "invalid placement" (using `board.canPlace`).
-    - Handle click to place a tile.
-
-
-## Backlog (Low Priority)
-The following tasks were not implemented because of their low-priority.
-
-- [ ] 1. **Optimization:** Memoize grid coordinates in `CanvasController` to reduce GC pressure (Finding 1).
-- [ ] 2. **Test Coverage:** Create `src/canvas/graphics/BackgroundRenderer.test.ts` to verify basic draw calls.
-- [ ] 3. **Test Coverage:** Create `src/canvas/graphics/DebugRenderer.test.ts` to verify text output.
-
 ## Decision Log

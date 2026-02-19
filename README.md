@@ -52,6 +52,10 @@ This day was dedicated entirely to a thorough code review and refactoring proces
 
 While no new features were implemented, the intensive refactoring and code review were crucial for the long-term health of the project.
 
+## Day 5:
+
+I didn't manage to achieve much, and I felt I am fighting AI too much. I started watching videos and tips and tricks.
+
 # Graveyard
 Notes to add somewhere
 

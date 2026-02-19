@@ -7,6 +7,13 @@
         "firebase-tools@latest",
         "experimental:mcp"
       ]
+    },
+    "checkpoint": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "checkpoint-mcp-server@latest"
+      ]
     }
   }
 }
