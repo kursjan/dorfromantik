@@ -14,6 +14,10 @@ These instructions must be followed above all else.
     *   **Analysis tasks:** Output of analysis is suggested update in the Bluperint file, if there is work to be done, so that user can verify the tasks, organize them and ask AI to execute them later.
     *   **Number tasks:** Each task has checkbox and unique number to be easily referenced.
     *   **Check updates:** User and AI can modify blueprint file at the same time. AI always reads the bluperint file content and preserves any changes made by user.
+*   **Task Management (GitHub Integration):**
+    *   **Issues:** Use GitHub Issues to track significant tasks, bugs, and backlog items.
+    *   **Backlog:** Maintain a `low priority` label on GitHub for non-critical backlog items (e.g., optimizations, future test coverage).
+    *   **Tooling:** Use the `gh` CLI for creating and managing issues.
 *   **Communication:** Communicate in a brief and professional manner.
 *   **Scope:** Adhere strictly to the scope of the assigned task and instructions. Make small changes and minimize file touches.
 *   **Preservation of User Content:** When asked to "correct" or "improve" a user-authored document, your primary goal is to preserve the user's original content and voice. Corrections and suggestions should be additive or minor edits to the existing text.
@@ -29,11 +33,43 @@ These instructions must be followed above all else.
     *   **Code Comments:** Maintain clear, concise JSDoc (or equivalent) for all public classes and methods. Ensure comments explain *intent* and *parameters*, especially after refactoring.
     *   **Brevity:** Updates should be concise yet sufficient for a future AI agent to understand the system structure and design decisions without needing to re-analyze the entire codebase.
 
+## **Iterative Development & User Interaction**
+
+The AI's workflow is iterative, transparent, and responsive to user input.
+
+*   **Plan Generation & Blueprint Management:** Each time the user requests a change, the AI will first generate a clear plan overview and a list of actionable steps. This plan will then be used to **create or update a blueprint.md file** in the project's root directory.
+*   **Prompt Understanding:** The AI will interpret user prompts to understand the desired changes, new features, bug fixes, or questions. It will ask clarifying questions if the prompt is ambiguous.
+*   **Contextual Responses:** The AI will provide conversational and contextual responses, explaining its actions, progress, and any issues encountered. It will summarize changes made.
+*   **Error Checking Flow:**
+    1.  **Code Change:** AI applies a code modification.
+    2.  **Lint/Format:** AI runs `eslint . --fix`.
+    3.  **Dependency Check:** If `package.json` was modified, AI runs `npm install`.
+    4.  **Compile & Analyze:** AI monitors the terminal for Vite and linter errors.
+    5.  **Test Execution:** The AI runs **ALL** verification checks:
+        * Unit Tests: `npm test`
+        * E2E Tests: `npm run e2e`
+    6.  **Preview Check:** AI observes the browser preview for visual and runtime errors.
+    7.  **Remediation/Report:** If errors are found, AI attempts automatic fixes. If unsuccessful, it reports details to the user.
+
+## **Code Review Process**
+
+The AI is capable of performing a professional code review upon request. This process is designed to be collaborative and transparent, focusing on improving the overall quality of the codebase.
+
+*   **Structured Plan:** The code review process will follow a structured plan, which will be created and updated in `blueprint.md`. This plan will outline the specific files and areas of focus for the review.
+*   **Best Practices:** The AI will review the code for adherence to best practices, including SOLID principles, clean code, and design patterns.
+*   **Context-Aware Analysis:** The AI will review files by analyzing how a class or function is used throughout the application to understand its context and dependencies. This prevents suggesting changes that would break other parts of the code.
+*   **Architectural Integrity:** Verify that each component adheres to the Single Responsibility Principle. Critically evaluate if logic belongs in the current class or should be extracted to a dedicated collaborator (e.g., rendering logic in a controller).
+*   **Test Coverage Verification:** For every class under review, the AI will verify that **each public method** has a corresponding unit test. The test must not only exist but also adequately cover the method's logic, arguments, and edge cases.
+*   **Organization & Consistency:** Verify that similar methods (e.g., event handlers, lifecycle methods) are grouped together logically and follow a consistent ordering convention.
+*   **Actionable Suggestions:** The AI will provide clear, actionable suggestions for improvement. When a refactoring is proposed, it will explain the benefits of the change.
+*   **Iterative Refactoring:** The AI will perform refactoring in small, verifiable steps. After each change, the full verification protocol (`tsc`, `npm test`, `npm run e2e`) will be executed to ensure no regressions have been introduced.
+
+
 ## **Environment & Context Awareness**
 
 The AI operates within the Firebase Studio development environment, which provides a Code OSS-based IDE with deep integration for React and Firebase services.
 
-*   **Project Structure:** The AI assumes a standard React project structure, likely initialized with Vite. The primary application entry point is typically `src/main.jsx` or `src/main.tsx`.
+*   **Project Structure:** The AI assumes a standard React project structure, initialized with Vite. The primary application entry point is typically `src/main.jsx` or `src/main.tsx`.
 *   **`dev.nix` Configuration:**
     *   The `.idx/dev.nix` file is the declarative source of truth for the workspace environment. The AI understands its role in defining:
         *   Required system tools (e.g., `pkgs.nodejs_20`).
@@ -50,7 +86,7 @@ The AI operates within the Firebase Studio development environment, which provid
 
 ## **Code Modification & Dependency Management**
 
-The AI is empowered to modify the React codebase and manage its dependencies autonomously based on user requests and detected issues. The AI is creative and anticipates features that the user might need even if not explicitly requested.
+The AI is empowered to modify the React codebase and manage its dependencies autonomously based on user requests and detected issues. 
 
 *   **Core Code Assumption:** When a user requests a change (e.g., "Add a button to navigate to a new page"), the AI will primarily focus on modifying the JSX/TSX code. `src/App.jsx` (or `tsx`) is assumed to be the main component, and the AI will infer other relevant files (e.g., creating new component files, updating `package.json`).
 *   **Package Management:** If a new feature requires an external package, the AI will identify the most suitable and stable package from npm.
@@ -250,38 +286,6 @@ When requested, the AI will facilitate the creation and execution of tests, ensu
     *   The AI will report test results (pass/fail, with details on failures) to the user.
 *   **Test Updates**
     *   AI will udpate only tests and cases related to the current task and stick strictly to the task at hand.
-
-## **Code Review Process**
-
-The AI is capable of performing a professional code review upon request. This process is designed to be collaborative and transparent, focusing on improving the overall quality of the codebase.
-
-*   **Structured Plan:** The code review process will follow a structured plan, which will be created and updated in `blueprint.md`. This plan will outline the specific files and areas of focus for the review.
-*   **Best Practices:** The AI will review the code for adherence to best practices, including SOLID principles, clean code, and design patterns.
-*   **Context-Aware Analysis:** The AI will review files by analyzing how a class or function is used throughout the application to understand its context and dependencies. This prevents suggesting changes that would break other parts of the code.
-*   **Architectural Integrity:** Verify that each component adheres to the Single Responsibility Principle. Critically evaluate if logic belongs in the current class or should be extracted to a dedicated collaborator (e.g., rendering logic in a controller).
-*   **Test Coverage Verification:** For every class under review, the AI will verify that **each public method** has a corresponding unit test. The test must not only exist but also adequately cover the method's logic, arguments, and edge cases.
-*   **Organization & Consistency:** Verify that similar methods (e.g., event handlers, lifecycle methods) are grouped together logically and follow a consistent ordering convention.
-*   **Actionable Suggestions:** The AI will provide clear, actionable suggestions for improvement. When a refactoring is proposed, it will explain the benefits of the change.
-*   **Iterative Refactoring:** The AI will perform refactoring in small, verifiable steps. After each change, the full verification protocol (`tsc`, `npm test`, `npm run e2e`) will be executed to ensure no regressions have been introduced.
-
-## **Iterative Development & User Interaction**
-
-The AI's workflow is iterative, transparent, and responsive to user input.
-
-*   **Plan Generation & Blueprint Management:** Each time the user requests a change, the AI will first generate a clear plan overview and a list of actionable steps. This plan will then be used to **create or update a blueprint.md file** in the project's root directory.
-*   **Prompt Understanding:** The AI will interpret user prompts to understand the desired changes, new features, bug fixes, or questions. It will ask clarifying questions if the prompt is ambiguous.
-*   **Contextual Responses:** The AI will provide conversational and contextual responses, explaining its actions, progress, and any issues encountered. It will summarize changes made.
-*   **Error Checking Flow:**
-    1.  **Code Change:** AI applies a code modification.
-    2.  **Lint/Format:** AI runs `eslint . --fix`.
-    3.  **Dependency Check:** If `package.json` was modified, AI runs `npm install`.
-    4.  **Compile & Analyze:** AI monitors the terminal for Vite and linter errors.
-    5.  **Test Execution:** The AI runs **ALL** verification checks:
-        * Unit Tests: `npm test`
-        * E2E Tests: `npm run e2e`
-    6.  **Preview Check:** AI observes the browser preview for visual and runtime errors.
-    7.  **Remediation/Report:** If errors are found, AI attempts automatic fixes. If unsuccessful, it reports details to the user.
-
 
 # Firebase MCP
 

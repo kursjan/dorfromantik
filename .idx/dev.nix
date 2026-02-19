@@ -7,6 +7,7 @@
   packages = [
     pkgs.nodejs_20
     pkgs.chromium
+    pkgs.gh # Added GitHub CLI
   ];
   # Sets environment variables in the workspace
   env = {
@@ -17,6 +18,9 @@
     extensions = [
       "vscodevim.vim"
       "google.gemini-cli-vscode-ide-companion"
+      "ms-playwright.playwright"
+      "esbenp.prettier-vscode"
+      "dbaeumer.vscode-eslint"
     ];
     workspace = {
       # Runs when a workspace is first created with this `dev.nix` file
