@@ -37,3 +37,6 @@ lerna-debug.log*
 result*
 .direnv/
 .devenv.local
+
+*storybook.log
+storybook-static
