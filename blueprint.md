@@ -87,7 +87,23 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 - [ ] **Step 2.4: Reset Camera Button** 
     - [x] **Camera:** Implement `reset()` method to restore default x, y, zoom, and rotation.
     - [x] **CanvasController API:** Expose a `resetCamera()` method in `CanvasController`.
-    - [ ] **UI:** Add a "Reset View" button (HTML overlay) in `CanvasView.tsx`.
+    - [ ] **UI Infrastructure (Storybook):**
+        - [ ] Initialize Storybook: `npx storybook@latest init --yes`.
+        - [ ] Verify Storybook runs: `npm run storybook`.
+    - [ ] **UI Implementation (Isolated):**
+        - [ ] Create `src/canvas/components/ResetViewButton.tsx` as a standalone, styled component.
+        - [ ] Create `src/canvas/components/ResetViewButton.stories.tsx` to develop and refine the button's look and feel in isolation.
+    - [ ] **UI Integration:**
+        - [ ] Create `src/canvas/components/ControlsOverlay.tsx` to house UI elements over the canvas.
+        - [ ] Integrate `ResetViewButton` into `ControlsOverlay`.
+        - [ ] Use `absolute` positioning to overlay controls on the canvas.
+        - [ ] Integrate `ControlsOverlay` into `CanvasView.tsx`.
+        - [ ] Connect the button to `controller.resetCamera()`.
+    - [ ] **Verification:**
+        - [ ] **E2E Test:** Create `e2e/reset-view.spec.ts` to verify:
+            - Button is visible on initial load.
+            - Panning/Zooming changes the view.
+            - Clicking the button restores the initial camera state.
 
 ### Phase 3: Board Integration & Rendering
 - [ ] **Step 3.1: Connect Board Model**

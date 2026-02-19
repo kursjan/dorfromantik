@@ -303,3 +303,13 @@ When requested for Firebase add the following the server configurations to .idx/
         }
     }
 }
+
+## Component Visualizer
+Task: Whenever I ask for a new component, first output a Component Contract:
+
+Props Interface: (Exactly what goes in)
+
+State Ownership: (Who "owns" the data?)
+
+Visual Hierarchy: (Where does this sit in the tree?)
+
