@@ -9,10 +9,9 @@ test.describe('Debug Grid', () => {
     const canvas = page.locator('canvas[data-testid="game-canvas"]');
     await expect(canvas).toBeVisible();
 
-    // Take a screenshot of the entire page or just the canvas
-    // Since canvas fills screen, page screenshot is fine.
+    // Take a screenshot of just the canvas to ignore UI overlays.
     // We name it specifically to keep it stable.
-    await expect(page).toHaveScreenshot('debug-grid-initial.png', {
+    await expect(canvas).toHaveScreenshot('debug-grid-initial.png', {
       maxDiffPixels: 100, // Allow tiny rendering differences if any
     });
   });

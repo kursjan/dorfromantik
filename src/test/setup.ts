@@ -31,6 +31,6 @@ HTMLCanvasElement.prototype.getContext = vi.fn((contextId: string) => {
 
 // Mock requestAnimationFrame
 // @ts-expect-error We are mocking requestAnimationFrame for testing purposes.
-global.requestAnimationFrame = vi.fn((callback) => setTimeout(callback, 0));
+globalThis.requestAnimationFrame = vi.fn((callback) => setTimeout(callback, 0));
 // @ts-expect-error We are mocking cancelAnimationFrame for testing purposes.
-global.cancelAnimationFrame = vi.fn((id) => clearTimeout(id));
+globalThis.cancelAnimationFrame = vi.fn((id) => clearTimeout(id));

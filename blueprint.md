@@ -87,9 +87,11 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 - [ ] **Step 2.4: Reset Camera Button** 
     - [x] **Camera:** Implement `reset()` method to restore default x, y, zoom, and rotation.
     - [x] **CanvasController API:** Expose a `resetCamera()` method in `CanvasController`.
-    - [ ] **UI Infrastructure (Storybook):**
-        - [ ] Initialize Storybook: `npx storybook@latest init --yes`.
-        - [ ] Verify Storybook runs: `npm run storybook`.
+    - [x] **UI Infrastructure (Storybook):**
+        - [x] Initialize Storybook: `npx storybook@latest init --yes`.
+        - [x] Verify Storybook runs: `npm run storybook`.
+    - [x] **UI Implementation (Minimal Prototype):**
+        - [x] Add a basic, unstyled reset button to `CanvasView.tsx` to verify visibility and basic connectivity.
     - [ ] **UI Implementation (Isolated):**
         - [ ] Create `src/canvas/components/ResetViewButton.tsx` as a standalone, styled component.
         - [ ] Create `src/canvas/components/ResetViewButton.stories.tsx` to develop and refine the button's look and feel in isolation.

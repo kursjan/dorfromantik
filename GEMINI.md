@@ -27,7 +27,7 @@ These instructions must be followed above all else.
     1.  **Code Quality Check:** `npx putout <changed_files>` (Ensure React 19 patterns and clean code)
     2.  **Type Check:** `npx tsc`
     3.  **Unit Test Check:** `npm test` (Ensure all unit tests pass)
-    4.  **E2E Test Check:** `npm run e2e` (Verify UI/Canvas interactions)
+    4.  **E2E Test Check:** `npx playwright test --reporter=list` (Verify UI/Canvas interactions)
 *   **Documentation Maintenance:**
     *   The AI is responsible for keeping project documentation up-to-date.
     *   **Architecture Sync:** Whenever a refactoring or architectural change occurs (e.g., adding a new renderer, changing a design pattern), the AI must update the relevant `ARCHITECTURE.md` file (or equivalent).
@@ -48,7 +48,7 @@ The AI's workflow is iterative, transparent, and responsive to user input.
     4.  **Compile & Analyze:** AI monitors the terminal for Vite and linter errors.
     5.  **Test Execution:** The AI runs **ALL** verification checks:
         * Unit Tests: `npm test`
-        * E2E Tests: `npm run e2e`
+        * E2E Tests: `npx playwright test --reporter=list`
     6.  **Preview Check:** AI observes the browser preview for visual and runtime errors.
     7.  **Remediation/Report:** If errors are found, AI attempts automatic fixes. If unsuccessful, it reports details to the user.
 
