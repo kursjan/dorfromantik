@@ -37,6 +37,18 @@ describe('Game', () => {
     expect(game.remainingTurns).toBe(1);
   });
 
+  it('should peek the top of the queue without removing it', () => {
+    const tile = new Tile({
+      id: 't1',
+      north: 'tree', northEast: 'tree', southEast: 'tree',
+      south: 'tree', southWest: 'tree', northWest: 'tree'
+    });
+    const game = new Game({ board, rules, tileQueue: [tile] });
+    
+    expect(game.peek()).toBe(tile);
+    expect(game.remainingTurns).toBe(1);
+  });
+
   it('should throw error if score is negative', () => {
     expect(() => new Game({ board, rules, score: -10 })).toThrow('score must be non-negative');
   });

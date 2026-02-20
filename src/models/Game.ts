@@ -51,6 +51,13 @@ export class Game {
   }
 
   /**
+   * Returns the next tile to be placed without removing it from the queue.
+   */
+  peek(): Tile | undefined {
+    return this.tileQueue[0];
+  }
+
+  /**
    * Places the next tile from the queue at the given coordinate.
    * Updates score and board state.
    * @returns Results of the placement (e.g., score added).
