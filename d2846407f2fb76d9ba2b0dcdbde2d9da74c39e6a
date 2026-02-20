@@ -1,0 +1,6 @@
+Task: #5.3: Define Game Model Contract
+Summary: Created Game model that aggregates board, rules, score, turns, and tile queue.
+Files:
+- src/models/Game.ts
+- src/models/Game.test.ts
+Why: Necessary for tracking the state of an active game session.
