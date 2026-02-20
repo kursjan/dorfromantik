@@ -1,0 +1,8 @@
+Task: #5.4: Implement placeTile & Scoring Logic
+Summary: Added placeTile method to Game class with neighbor-matching scoring logic. Refactored Navigation and Tile classes to support this.
+Files:
+- src/models/Game.ts
+- src/models/Navigation.ts
+- src/models/Tile.ts
+- src/models/GameIntegration.test.ts
+Why: Core game mechanic for turn-based tile placement and matching-based scoring.
