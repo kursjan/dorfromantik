@@ -11,6 +11,10 @@ export interface GameProps {
   tileQueue?: Tile[];
 }
 
+export interface PlacementResult {
+  scoreAdded: number;
+}
+
 /**
  * Represents the state of an active game session.
  */
@@ -49,14 +53,17 @@ export class Game {
   /**
    * Places the next tile from the queue at the given coordinate.
    * Updates score and board state.
+   * @returns Results of the placement (e.g., score added).
    */
-  placeTile(coord: HexCoordinate): void {
+  placeTile(coord: HexCoordinate): PlacementResult {
     const tile = this.tileQueue.shift();
     if (!tile) {
       throw new Error('No tiles remaining in the queue');
     }
 
     this.board.place(tile, coord);
+
+    let scoreAdded = 0;
 
     // Scoring: matching terrain on adjacent tiles
     this.navigation.getNeighbors(coord).forEach(({ direction, coordinate }) => {
@@ -68,10 +75,13 @@ export class Game {
         const neighborTerrain = neighbor.tile.getTerrain(oppositeSide);
 
         if (myTerrain === neighborTerrain) {
-          this.score += this.rules.pointsPerMatch;
+          scoreAdded += this.rules.pointsPerMatch;
         }
       }
     });
+
+    this.score += scoreAdded;
+    return { scoreAdded };
   }
 
   private generateInitialQueue(count: number): Tile[] {

@@ -36,12 +36,13 @@ describe('Game Integration (placeTile & Scoring)', () => {
     const game = new Game({ board, rules, tileQueue });
     const coord = new HexCoordinate(0, 0, 0);
 
-    game.placeTile(coord);
+    const result = game.placeTile(coord);
 
     expect(board.has(coord)).toBe(true);
     expect(game.remainingTurns).toBe(9);
     expect(game.tileQueue.length).toBe(9);
     expect(game.score).toBe(0); // No neighbors yet
+    expect(result.scoreAdded).toBe(0);
   });
 
   it('should score points when placing a matching tile next to another', () => {
@@ -50,14 +51,17 @@ describe('Game Integration (placeTile & Scoring)', () => {
     
     // Place tile1 at (0,0,0)
     const coord1 = new HexCoordinate(0, 0, 0);
-    game.placeTile(coord1);
+    const result1 = game.placeTile(coord1);
+    expect(result1.scoreAdded).toBe(0);
+    expect(game.score).toBe(0);
 
     // Place tile2 at (1,0,-1) which is SOUTH of (0,0,0)
     // So tile2's NORTH should match tile1's SOUTH.
     // tile1.south is 'tree', tile2.north is 'tree' -> MATCH!
     const coord2 = new HexCoordinate(1, 0, -1);
-    game.placeTile(coord2);
+    const result2 = game.placeTile(coord2);
 
+    expect(result2.scoreAdded).toBe(10);
     expect(game.score).toBe(10);
     expect(game.remainingTurns).toBe(0);
   });
@@ -71,9 +75,12 @@ describe('Game Integration (placeTile & Scoring)', () => {
 
     const game = new Game({ board, rules, tileQueue: [tile1, mismatchTile] });
     
-    game.placeTile(new HexCoordinate(0, 0, 0));
-    game.placeTile(new HexCoordinate(1, 0, -1));
+    const result1 = game.placeTile(new HexCoordinate(0, 0, 0));
+    expect(result1.scoreAdded).toBe(0);
+    expect(game.score).toBe(0);
 
+    const result2 = game.placeTile(new HexCoordinate(1, 0, -1));
+    expect(result2.scoreAdded).toBe(0);
     expect(game.score).toBe(0);
   });
 
