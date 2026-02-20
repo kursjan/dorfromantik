@@ -6,11 +6,11 @@
 - [x] Task: #5.2: Define `GameRules` Model Contract and write tests in `src/models/GameRules.test.ts`. 22f056c
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Foundation Models' (Protocol in workflow.md)
 
-## Phase 2: Core Game Logic
+## Phase 2: Core Game Logic [checkpoint: 511a7d0]
 
 - [x] Task: #5.3: Define `Game` Model Contract (board, score, turns, tileQueue) and write tests in `src/models/Game.test.ts`. d284640
 - [x] Task: #5.4: Implement `placeTile` & Scoring Logic (neighbor matching, score/turns update) and verify with integration tests. 028942f
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Core Game Logic' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Core Game Logic' (Protocol in workflow.md)
 
 ## Phase 3: Session & Persistence Foundation
 
