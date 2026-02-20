@@ -71,7 +71,11 @@ All tasks follow a strict lifecycle:
 
 1.  **Announce Protocol Start:** Inform the user that the phase is complete and the verification and checkpointing protocol has begun.
 
-2.  **Ensure Test Coverage for Phase Changes:**
+2.  **Synchronize Architecture Documentation:**
+    -   **Action:** Update or create `ARCHITECTURE.md` files in relevant directories affected by the phase's changes.
+    -   **Action:** Ensure that the documentation accurately reflects the new models, patterns, and architectural decisions made during the phase.
+
+3.  **Ensure Test Coverage for Phase Changes:**
     -   **Step 2.1: Determine Phase Scope:** To identify the files changed in this phase, you must first find the starting point. Read `plan.md` to find the Git commit SHA of the *previous* phase's checkpoint. If no previous checkpoint exists, the scope is all changes since the first commit.
     -   **Step 2.2: List Changed Files:** Execute `git diff --name-only <previous_checkpoint_sha> HEAD` to get a precise list of all files modified during this phase.
     -   **Step 2.3: Verify and Create Tests:** For each file in the list:
