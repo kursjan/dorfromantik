@@ -1,0 +1,6 @@
+Task: #5.2: Define GameRules Model Contract
+Summary: Created GameRules model with default values (40 turns, 10 pts) and validation.
+Files:
+- src/models/GameRules.ts
+- src/models/GameRules.test.ts
+Why: Provides flexible game configuration for scoring and turn management.
