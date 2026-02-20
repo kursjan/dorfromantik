@@ -2,7 +2,7 @@
 
 ## Phase 1: Foundation Models (Independent)
 
-- [ ] Task: #5.1: Define `User` Model Contract and write tests in `src/models/User.test.ts`.
+- [x] Task: #5.1: Define `User` Model Contract and write tests in `src/models/User.test.ts`. 47692b1
 - [ ] Task: #5.2: Define `GameRules` Model Contract and write tests in `src/models/GameRules.test.ts`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Foundation Models' (Protocol in workflow.md)
 
