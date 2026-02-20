@@ -1,10 +1,10 @@
 # Implementation Plan: Expand Data Model (Session & Game)
 
-## Phase 1: Foundation Models (Independent)
+## Phase 1: Foundation Models (Independent) [checkpoint: 8582288]
 
 - [x] Task: #5.1: Define `User` Model Contract and write tests in `src/models/User.test.ts`. 47692b1
 - [x] Task: #5.2: Define `GameRules` Model Contract and write tests in `src/models/GameRules.test.ts`. 22f056c
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Foundation Models' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Foundation Models' (Protocol in workflow.md)
 
 ## Phase 2: Core Game Logic
 
