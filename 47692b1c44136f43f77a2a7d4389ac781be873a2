@@ -1,0 +1,6 @@
+Task: #5.1: Define User Model Contract
+Summary: Created User model with ID validation and corresponding unit tests.
+Files:
+- src/models/User.ts
+- src/models/User.test.ts
+Why: Necessary for tracking users in persistent game sessions and compatible with Firebase UID.
