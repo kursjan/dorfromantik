@@ -1,6 +1,6 @@
 import { Board } from './Board';
 import { GameRules } from './GameRules';
-import { Tile } from './Tile';
+import { Tile, TerrainType } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
 import { Navigation } from './Navigation';
 
@@ -8,7 +8,6 @@ export interface GameProps {
   board: Board;
   rules: GameRules;
   score?: number;
-  remainingTurns?: number;
   tileQueue?: Tile[];
 }
 
@@ -19,7 +18,6 @@ export class Game {
   readonly board: Board;
   readonly rules: GameRules;
   score: number;
-  remainingTurns: number;
   tileQueue: Tile[];
 
   private navigation = new Navigation();
@@ -32,20 +30,25 @@ export class Game {
     this.board = props.board;
     this.rules = props.rules;
     this.score = props.score ?? 0;
-    this.remainingTurns = props.remainingTurns ?? props.rules.initialTurns;
-    this.tileQueue = props.tileQueue ?? [];
+    
+    // If no queue is provided, initialize with random tiles based on rules
+    this.tileQueue = props.tileQueue ?? this.generateInitialQueue(props.rules.initialTurns);
 
     if (this.score < 0) {
       throw new Error('score must be non-negative');
     }
-    if (this.remainingTurns < 0) {
-      throw new Error('remainingTurns must be non-negative');
-    }
+  }
+
+  /**
+   * Single source of truth for turns: the number of tiles remaining.
+   */
+  get remainingTurns(): number {
+    return this.tileQueue.length;
   }
 
   /**
    * Places the next tile from the queue at the given coordinate.
-   * Updates score, turns, and board state.
+   * Updates score and board state.
    */
   placeTile(coord: HexCoordinate): void {
     const tile = this.tileQueue.shift();
@@ -54,7 +57,6 @@ export class Game {
     }
 
     this.board.place(tile, coord);
-    this.remainingTurns -= 1;
 
     // Scoring: matching terrain on adjacent tiles
     this.navigation.getNeighbors(coord).forEach(({ direction, coordinate }) => {
@@ -69,6 +71,29 @@ export class Game {
           this.score += this.rules.pointsPerMatch;
         }
       }
+    });
+  }
+
+  private generateInitialQueue(count: number): Tile[] {
+    const queue: Tile[] = [];
+    for (let i = 0; i < count; i++) {
+      queue.push(this.createRandomTile(`init-${i}`));
+    }
+    return queue;
+  }
+
+  private createRandomTile(id: string): Tile {
+    const terrains: TerrainType[] = ['tree', 'house', 'water', 'pasture', 'rail', 'field'];
+    const getRandom = () => terrains[Math.floor(Math.random() * terrains.length)];
+
+    return new Tile({
+      id,
+      north: getRandom(),
+      northEast: getRandom(),
+      southEast: getRandom(),
+      south: getRandom(),
+      southWest: getRandom(),
+      northWest: getRandom(),
     });
   }
 }

@@ -31,19 +31,22 @@ describe('Game Integration (placeTile & Scoring)', () => {
   });
 
   it('should place a tile, consume a turn, and remove it from the queue', () => {
-    const game = new Game({ board, rules, tileQueue: [tile1] });
+    // Provide 10 tiles manually to match rules.initialTurns
+    const tileQueue = Array(10).fill(tile1);
+    const game = new Game({ board, rules, tileQueue });
     const coord = new HexCoordinate(0, 0, 0);
 
     game.placeTile(coord);
 
     expect(board.has(coord)).toBe(true);
     expect(game.remainingTurns).toBe(9);
-    expect(game.tileQueue.length).toBe(0);
+    expect(game.tileQueue.length).toBe(9);
     expect(game.score).toBe(0); // No neighbors yet
   });
 
   it('should score points when placing a matching tile next to another', () => {
-    const game = new Game({ board, rules, tileQueue: [tile1, tile2] });
+    const tileQueue = [tile1, tile2];
+    const game = new Game({ board, rules, tileQueue });
     
     // Place tile1 at (0,0,0)
     const coord1 = new HexCoordinate(0, 0, 0);
@@ -56,7 +59,7 @@ describe('Game Integration (placeTile & Scoring)', () => {
     game.placeTile(coord2);
 
     expect(game.score).toBe(10);
-    expect(game.remainingTurns).toBe(8);
+    expect(game.remainingTurns).toBe(0);
   });
 
   it('should NOT score points if terrains do not match', () => {

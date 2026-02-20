@@ -13,16 +13,16 @@ describe('Game', () => {
     rules = new GameRules({ initialTurns: 30 });
   });
 
-  it('should initialize with correct default values', () => {
+  it('should initialize with correct default values and random tiles', () => {
     const game = new Game({ board, rules });
     expect(game.board).toBe(board);
     expect(game.rules).toBe(rules);
     expect(game.score).toBe(0);
     expect(game.remainingTurns).toBe(30);
-    expect(game.tileQueue).toEqual([]);
+    expect(game.tileQueue.length).toBe(30);
   });
 
-  it('should allow setting an initial tile queue', () => {
+  it('should allow setting a custom initial tile queue', () => {
     const tile = new Tile({
       id: 't1',
       north: 'tree',
@@ -34,13 +34,10 @@ describe('Game', () => {
     });
     const game = new Game({ board, rules, tileQueue: [tile] });
     expect(game.tileQueue).toEqual([tile]);
+    expect(game.remainingTurns).toBe(1);
   });
 
   it('should throw error if score is negative', () => {
     expect(() => new Game({ board, rules, score: -10 })).toThrow('score must be non-negative');
-  });
-
-  it('should throw error if remainingTurns is negative', () => {
-    expect(() => new Game({ board, rules, remainingTurns: -5 })).toThrow('remainingTurns must be non-negative');
   });
 });
