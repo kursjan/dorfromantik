@@ -1,0 +1,7 @@
+Task: #5.3/#5.4 Refactor: Unify turns with tileQueue
+Summary: Removed remainingTurns field, replaced with getter returning tileQueue.length. Added random tile generation in Game constructor if no queue provided.
+Files:
+- src/models/Game.ts
+- src/models/Game.test.ts
+- src/models/GameIntegration.test.ts
+Why: Prevents state sync issues and provides a natural turn-based mechanic where tiles ARE turns.
