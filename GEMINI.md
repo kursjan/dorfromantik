@@ -23,10 +23,11 @@ These instructions must be followed above all else.
 - **Refactoring Rule:** When refactoring, your goal is to improve code structure while preserving all existing business logic. Use the test suite to verify that the logic remains unchanged.
 - **Contextual Refactoring Rule:** Always analyze files in the context of the entire project. Check all usages of a class or function to ensure its public API remains valid after refactoring.
 - **Verification Protocol:** After _every_ code change, automatically run the following checks:
-  1.  **Code Quality Check:** `npx putout <changed_files>` (Ensure React 19 patterns and clean code)
-  2.  **Type Check:** `npx tsc`
-  3.  **Unit Test Check:** `npm test` (Ensure all unit tests pass)
-  4.  **E2E Test Check:** `npx playwright test --reporter=list` (Verify UI/Canvas interactions)
+  1.  **Architecture Sync:** Update or create `ARCHITECTURE.md` files in relevant directories to reflect new models, patterns, and architectural decisions.
+  2.  **Code Quality Check:** `npx putout <changed_files>` (Ensure React 19 patterns and clean code)
+  3.  **Type Check:** `npx tsc`
+  4.  **Unit Test Check:** `npm test` (Ensure all unit tests pass)
+  5.  **E2E Test Check:** `npx playwright test --reporter=list` (Verify UI/Canvas interactions)
 - **Documentation Maintenance:**
   - The AI is responsible for keeping project documentation up-to-date.
   - **Architecture Sync:** Whenever a refactoring or architectural change occurs (e.g., adding a new renderer, changing a design pattern), the AI must update the relevant `ARCHITECTURE.md` file (or equivalent) and ensure `conductor/product.md` remains consistent.
@@ -151,6 +152,22 @@ When writing Playwright tests for a canvas:
 
 - **UI Overlays:** Prefer taking screenshots of the `canvas` locator specifically (e.g., `expect(canvas).toHaveScreenshot()`) rather than the full page to avoid flaky failures caused by UI buttons or overlays.
 - **MaxDiff:** Use a small `maxDiffPixels` (e.g., 150) to account for minor anti-aliasing variations between headless environments.
+
+### **"Tiles are Turns" Philosophy**
+
+To ensure state synchronization and a clean game loop, the game follows a "Tiles are Turns" philosophy.
+- **Single Source of Truth:** `remainingTurns` must be a derived property (getter) of `tileQueue.length`.
+- **Benefit:** This prevents synchronization errors between the turn counter and the actual resources available to the player.
+
+### **Explicit Domain Accessors**
+
+Prefer explicit methods like `Tile.getTerrain(direction)` over direct property access (e.g., `tile[direction]`).
+- **Reason:** This improves readability for non-TypeScript developers and ensures that internal property naming can change without affecting the public API of core entities.
+
+### **Geometric Logic Centralization**
+
+All geometric and directional logic (finding neighbors, determining opposite sides) must reside in the `Navigation` class.
+- **Service Pattern:** Treat `Navigation` as a geometric service that other models (`Game`, `Board`) use to query the world's structure, rather than embedding coordinates math directly into business logic.
 
 ## **Styling**
 
