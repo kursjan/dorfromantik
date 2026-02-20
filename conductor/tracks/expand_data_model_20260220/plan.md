@@ -9,7 +9,7 @@
 ## Phase 2: Core Game Logic
 
 - [x] Task: #5.3: Define `Game` Model Contract (board, score, turns, tileQueue) and write tests in `src/models/Game.test.ts`. d284640
-- [ ] Task: #5.4: Implement `placeTile` & Scoring Logic (neighbor matching, score/turns update) and verify with integration tests.
+- [x] Task: #5.4: Implement `placeTile` & Scoring Logic (neighbor matching, score/turns update) and verify with integration tests. 028942f
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Core Game Logic' (Protocol in workflow.md)
 
 ## Phase 3: Session & Persistence Foundation
