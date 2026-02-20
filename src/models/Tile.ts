@@ -1,3 +1,5 @@
+import { Direction } from './Navigation';
+
 export type TerrainType = 'tree' | 'house' | 'water' | 'pasture' | 'rail' | 'field';
 
 export interface TileProps {
@@ -28,6 +30,28 @@ export class Tile {
     this.south = props.south;
     this.southWest = props.southWest;
     this.northWest = props.northWest;
+  }
+
+  /**
+   * Returns the terrain type for a specific direction on this tile.
+   */
+  getTerrain(direction: Direction): TerrainType {
+    switch (direction) {
+      case 'north':
+        return this.north;
+      case 'northEast':
+        return this.northEast;
+      case 'southEast':
+        return this.southEast;
+      case 'south':
+        return this.south;
+      case 'southWest':
+        return this.southWest;
+      case 'northWest':
+        return this.northWest;
+      default:
+        throw new Error(`Invalid direction: ${direction}`);
+    }
   }
 
   private getTerrainChar(type: TerrainType): string {
