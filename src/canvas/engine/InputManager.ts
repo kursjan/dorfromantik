@@ -10,7 +10,7 @@ export interface InputCallbacks {
  * Manages DOM event listeners for the canvas.
  * Translates raw mouse/touch events into abstract Game Actions (Pan, Zoom, Hover, Resize).
  * Tracks Keyboard state for continuous actions (Rotation).
- * 
+ *
  * Responsibilities:
  * - Attach/Detach listeners to prevent memory leaks.
  * - Normalize browser events (e.g. wheel delta).
@@ -22,7 +22,7 @@ export class InputManager {
   private isDragging: boolean = false;
   private lastMousePos: { x: number; y: number } = { x: 0, y: 0 };
   private callbacks: InputCallbacks;
-  
+
   // Keyboard State
   private keys: Set<string> = new Set();
 
@@ -38,12 +38,12 @@ export class InputManager {
     this.canvas.addEventListener('mousemove', this.handleMouseMove);
     this.canvas.addEventListener('mouseup', this.handleMouseUp);
     this.canvas.addEventListener('mouseleave', this.handleMouseLeave);
-    
+
     // Add resize listener to window to handle layout changes
     window.addEventListener('resize', this.handleResize);
     window.addEventListener('keydown', this.handleKeyDown);
     window.addEventListener('keyup', this.handleKeyUp);
-    
+
     // Set initial cursor
     this.canvas.style.cursor = 'grab';
   }
@@ -54,7 +54,7 @@ export class InputManager {
     this.canvas.removeEventListener('mousemove', this.handleMouseMove);
     this.canvas.removeEventListener('mouseup', this.handleMouseUp);
     this.canvas.removeEventListener('mouseleave', this.handleMouseLeave);
-    
+
     window.removeEventListener('resize', this.handleResize);
     window.removeEventListener('keydown', this.handleKeyDown);
     window.removeEventListener('keyup', this.handleKeyUp);
@@ -108,7 +108,7 @@ export class InputManager {
       const dx = e.clientX - this.lastMousePos.x;
       const dy = e.clientY - this.lastMousePos.y;
       this.lastMousePos = { x: e.clientX, y: e.clientY };
-      
+
       this.callbacks.onPan(dx, dy);
     }
   };

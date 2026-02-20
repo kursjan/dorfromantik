@@ -5,7 +5,6 @@ import { HexCoordinate } from '../models/HexCoordinate';
 import { BoardPrinter } from './BoardPrinter';
 
 describe('BoardPrinter', () => {
-
   describe('print', () => {
     it('should print an empty board as an empty string', () => {
       const board = new Board();
@@ -95,15 +94,23 @@ describe('BoardPrinter', () => {
       const board = new Board();
       const tile1 = new Tile({
         id: 't1',
-        north: 'tree', northEast: 'house', southEast: 'water',
-        south: 'pasture', southWest: 'rail', northWest: 'field',
+        north: 'tree',
+        northEast: 'house',
+        southEast: 'water',
+        south: 'pasture',
+        southWest: 'rail',
+        northWest: 'field',
       });
       const tile2 = new Tile({
         id: 't2',
-        north: 'field', northEast: 'pasture', southEast: 'water',
-        south: 'field', southWest: 'water', northWest: 'house',
+        north: 'field',
+        northEast: 'pasture',
+        southEast: 'water',
+        south: 'field',
+        southWest: 'water',
+        northWest: 'house',
       });
-      
+
       board.place(tile1, new HexCoordinate(0, 0, 0));
       board.place(tile2, new HexCoordinate(1, 0, -1));
 
@@ -127,15 +134,23 @@ describe('BoardPrinter', () => {
       const board = new Board();
       const tile1 = new Tile({
         id: 't1',
-        north: 'tree', northEast: 'house', southEast: 'water',
-        south: 'pasture', southWest: 'rail', northWest: 'field',
+        north: 'tree',
+        northEast: 'house',
+        southEast: 'water',
+        south: 'pasture',
+        southWest: 'rail',
+        northWest: 'field',
       });
       const tile2 = new Tile({
         id: 't2',
-        north: 'field', northEast: 'pasture', southEast: 'water',
-        south: 'field', southWest: 'water', northWest: 'house',
+        north: 'field',
+        northEast: 'pasture',
+        southEast: 'water',
+        south: 'field',
+        southWest: 'water',
+        northWest: 'house',
       });
-      
+
       board.place(tile1, new HexCoordinate(0, 0, 0));
       board.place(tile2, new HexCoordinate(0, 1, -1));
 
@@ -151,7 +166,7 @@ describe('BoardPrinter', () => {
  \ _P_ /H     P\
        \W     W/
         \ _F_ / `;
-      
+
       expect(output).toBe(expected);
     });
 

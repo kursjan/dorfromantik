@@ -13,7 +13,7 @@ vi.mock('./InputManager');
 vi.mock('./Camera', () => {
   const Camera = vi.fn();
   Camera.prototype.applyTransform = vi.fn();
-  Camera.prototype.screenToWorld = vi.fn(coords => coords);
+  Camera.prototype.screenToWorld = vi.fn((coords) => coords);
   Camera.prototype.pan = vi.fn();
   Camera.prototype.zoomBy = vi.fn();
   Camera.prototype.rotateBy = vi.fn(); // Added rotateBy
@@ -57,11 +57,13 @@ describe('CanvasController', () => {
   });
 
   it('should start the render loop on construction', () => {
-    const requestAnimationFrameSpy = vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => {
-      // a more robust mock that doesn't cause an infinite loop
-      return 0;
-    });
-    
+    const requestAnimationFrameSpy = vi
+      .spyOn(window, 'requestAnimationFrame')
+      .mockImplementation(() => {
+        // a more robust mock that doesn't cause an infinite loop
+        return 0;
+      });
+
     controller = new CanvasController(canvas);
 
     expect(requestAnimationFrameSpy).toHaveBeenCalled();
@@ -76,10 +78,10 @@ describe('CanvasController', () => {
   it('should clean up all resources on destroy', () => {
     // Spies for all cleanup actions
     const cancelAnimationFrameSpy = vi.spyOn(window, 'cancelAnimationFrame');
-    
+
     controller = new CanvasController(canvas);
     const inputManager = (controller as any).inputManager as any;
-    
+
     // We need to ensure inputManager.destroy is a spy
     // Since we mocked InputManager constructor, instances are auto-mocked,
     // so .destroy should already be a spy-like mock function if vitest auto-mocking works standardly.

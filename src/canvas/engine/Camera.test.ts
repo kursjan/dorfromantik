@@ -23,10 +23,10 @@ describe('Camera', () => {
   it('zooms the camera within limits', () => {
     camera.zoomBy(0.5, 0.5, 3.0);
     expect(camera.zoom).toBe(1.5);
-    
+
     camera.zoomBy(2.0, 0.5, 3.0);
     expect(camera.zoom).toBe(3.0); // Max cap
-    
+
     camera.zoomBy(-5.0, 0.5, 3.0);
     expect(camera.zoom).toBe(0.5); // Min cap
   });

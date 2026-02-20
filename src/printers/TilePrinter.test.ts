@@ -66,7 +66,7 @@ describe('TilePrinter', () => {
 
   it('should print two tiles vertically, sharing the N/S edge', () => {
     const canvas = new Canvas({ topLeft: { x: 0, y: 0 }, bottomRight: { x: 8, y: 8 } });
-    const tile1 = new Tile({ 
+    const tile1 = new Tile({
       id: 'tile1',
       north: 'tree',
       northEast: 'house',
@@ -146,7 +146,7 @@ describe('TilePrinter', () => {
 /H     P\ _T_ / 
 \W     W/       
  \ _F_ /        `;
-    
+
     expect(canvas.toString()).toBe(expected);
   });
 
@@ -154,18 +154,30 @@ describe('TilePrinter', () => {
     const canvas = new Canvas({ topLeft: { x: -7, y: 0 }, bottomRight: { x: 8, y: 8 } });
     const tile1 = new Tile({
       id: 'tile1',
-      north: 'tree', northEast: 'house', southEast: 'water',
-      south: 'pasture', southWest: 'rail', northWest: 'field',
+      north: 'tree',
+      northEast: 'house',
+      southEast: 'water',
+      south: 'pasture',
+      southWest: 'rail',
+      northWest: 'field',
     });
     const tile2 = new Tile({
       id: 'tile2',
-      north: 'field', northEast: 'pasture', southEast: 'water',
-      south: 'field', southWest: 'water', northWest: 'house',
+      north: 'field',
+      northEast: 'pasture',
+      southEast: 'water',
+      south: 'field',
+      southWest: 'water',
+      northWest: 'house',
     });
     const tile3 = new Tile({
       id: 'tile3',
-      north: 'water', northEast: 'rail', southEast: 'field',
-      south: 'tree', southWest: 'house', northWest: 'pasture',
+      north: 'water',
+      northEast: 'rail',
+      southEast: 'field',
+      south: 'tree',
+      southWest: 'house',
+      northWest: 'pasture',
     });
 
     const printer = new TilePrinter(canvas);
@@ -182,7 +194,7 @@ describe('TilePrinter', () => {
  \ _T_ /H     P\
        \W     W/
         \ _F_ / `;
-    
+
     expect(canvas.toString()).toBe(expected);
   });
 });

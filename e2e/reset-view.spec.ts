@@ -27,15 +27,15 @@ test.describe('Reset View Button', () => {
 
     // 3. Take a screenshot of the panned state
     // We don't compare this yet, just ensuring we moved.
-    
+
     // 4. Click reset button
     await resetBtn.click();
 
     // 5. Verify canvas is back to initial state using a stable snapshot
     // This snapshot will be generated on the first run.
     await expect(canvas).toHaveScreenshot('reset-view-restored.png', {
-       maxDiffPixels: 150, // Small threshold for rendering variances
-       animations: 'disabled'
+      maxDiffPixels: 150, // Small threshold for rendering variances
+      animations: 'disabled',
     });
   });
 });

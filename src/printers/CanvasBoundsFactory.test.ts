@@ -1,11 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { UninitializedCanvasBoundsFactory, InitializedCanvasBoundsFactory } from './CanvasBoundsFactory';
+import {
+  UninitializedCanvasBoundsFactory,
+  InitializedCanvasBoundsFactory,
+} from './CanvasBoundsFactory';
 import { Board } from '../models/Board';
 import { Tile } from '../models/Tile';
 import { HexCoordinate } from '../models/HexCoordinate';
 
 describe('CanvasBoundsFactory', () => {
-
   describe('UninitializedCanvasBoundsFactory', () => {
     it('should return zero bounds from getCanvasBounds', () => {
       const factory = new UninitializedCanvasBoundsFactory();

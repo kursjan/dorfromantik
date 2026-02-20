@@ -26,27 +26,27 @@ describe('InputManager', () => {
   it('handles mouse drag for panning', () => {
     // 1. Mouse Down
     canvas.dispatchEvent(new MouseEvent('mousedown', { clientX: 100, clientY: 100, button: 0 }));
-    
+
     // 2. Mouse Move (Drag)
     canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: 110, clientY: 105 }));
-    
+
     expect(callbacks.onPan).toHaveBeenCalledWith(10, 5); // 110-100, 105-100
-    
+
     // 3. Mouse Up
     canvas.dispatchEvent(new MouseEvent('mouseup'));
-    
+
     // 4. Mouse Move (No Drag)
     canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: 120, clientY: 120 }));
-    
+
     expect(callbacks.onPan).toHaveBeenCalledTimes(1); // Should not have been called again
   });
 
   it('handles wheel for zooming', () => {
     const wheelEvent = new WheelEvent('wheel', { deltaY: -100 });
     vi.spyOn(wheelEvent, 'preventDefault');
-    
+
     canvas.dispatchEvent(wheelEvent);
-    
+
     expect(callbacks.onZoom).toHaveBeenCalledWith(-100);
     expect(wheelEvent.preventDefault).toHaveBeenCalled();
   });
@@ -62,11 +62,11 @@ describe('InputManager', () => {
       y: 10,
       bottom: 110,
       right: 110,
-      toJSON: () => {}
+      toJSON: () => {},
     } as DOMRect);
 
     canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: 60, clientY: 60 }));
-    
+
     // 60 - 10 = 50
     expect(callbacks.onHover).toHaveBeenCalledWith(50, 50);
   });
@@ -74,18 +74,18 @@ describe('InputManager', () => {
   it('stops dragging on mouse leave', () => {
     canvas.dispatchEvent(new MouseEvent('mousedown', { clientX: 100, clientY: 100, button: 0 }));
     canvas.dispatchEvent(new MouseEvent('mouseleave'));
-    
+
     expect(callbacks.onLeave).toHaveBeenCalled();
-    
+
     canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: 110, clientY: 110 }));
-    
+
     expect(callbacks.onPan).not.toHaveBeenCalled();
   });
 
   it('detaches listeners on destroy', () => {
     const removeSpy = vi.spyOn(canvas, 'removeEventListener');
     inputManager.destroy();
-    
+
     expect(removeSpy).toHaveBeenCalledWith('wheel', expect.any(Function));
     expect(removeSpy).toHaveBeenCalledWith('mousedown', expect.any(Function));
     expect(removeSpy).toHaveBeenCalledWith('mousemove', expect.any(Function));

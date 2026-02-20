@@ -1,6 +1,12 @@
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { hexToPixel, getHexCorners } from '../utils/HexUtils';
-import { type HexStyle, DEFAULT_HEX_STYLE, GRID_HEX_STYLE, CENTER_HEX_STYLE, HOVER_HEX_STYLE } from './HexStyles';
+import {
+  type HexStyle,
+  DEFAULT_HEX_STYLE,
+  GRID_HEX_STYLE,
+  CENTER_HEX_STYLE,
+  HOVER_HEX_STYLE,
+} from './HexStyles';
 
 export class HexRenderer {
   private ctx: CanvasRenderingContext2D;
@@ -51,13 +57,13 @@ export class HexRenderer {
       for (let r = r1; r <= r2; r++) {
         const s = -q - r;
         const hex = new HexCoordinate(q, r, s);
-        
+
         let style = GRID_HEX_STYLE;
-        
+
         if (q === 0 && r === 0 && s === 0) {
-           style = CENTER_HEX_STYLE;
-        } 
-        
+          style = CENTER_HEX_STYLE;
+        }
+
         this.drawHex(hex, style);
       }
     }

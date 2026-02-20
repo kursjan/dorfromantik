@@ -74,10 +74,10 @@ export class CanvasController {
     const rotationDir = this.inputManager.getRotationDirection();
     if (rotationDir !== 0) {
       this.camera.rotateBy(rotationDir * CanvasController.ROTATION_SPEED);
-      
+
       // We need to re-evaluate hover during rotation, even if mouse doesn't move.
       // We can get the last known mouse position from inputManager if we exposed it,
-      // or just wait for the next mouse event. 
+      // or just wait for the next mouse event.
       // Ideally, InputManager should expose `getLastMousePos()`.
       // For now, let's keep it simple: the highlight updates when you wiggle the mouse.
     }
@@ -94,7 +94,7 @@ export class CanvasController {
     // 3. Draw World
     this.renderer.drawDebugGrid(5);
     this.renderer.drawHighlight(this.hoveredHex);
-    
+
     this.ctx.restore();
 
     // 4. UI Overlay
@@ -111,13 +111,22 @@ export class CanvasController {
   };
 
   private handleZoom(delta: number) {
-    this.camera.zoomBy(-delta * CanvasController.ZOOM_SENSITIVITY, CanvasController.MIN_ZOOM, CanvasController.MAX_ZOOM);
+    this.camera.zoomBy(
+      -delta * CanvasController.ZOOM_SENSITIVITY,
+      CanvasController.MIN_ZOOM,
+      CanvasController.MAX_ZOOM
+    );
   }
 
   private handleHover(mouseX: number, mouseY: number) {
-    const worldPos = this.camera.screenToWorld(mouseX, mouseY, this.canvas.width, this.canvas.height);
+    const worldPos = this.camera.screenToWorld(
+      mouseX,
+      mouseY,
+      this.canvas.width,
+      this.canvas.height
+    );
     const hex = pixelToHex(worldPos.x, worldPos.y, HEX_SIZE);
-    
+
     if (!this.hoveredHex || !this.hoveredHex.equals(hex)) {
       this.hoveredHex = hex;
     }

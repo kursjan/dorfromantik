@@ -20,7 +20,7 @@ describe('HexRenderer', () => {
       save: vi.fn(),
       restore: vi.fn(),
     } as unknown as CanvasRenderingContext2D;
-    
+
     renderer = new HexRenderer(ctx);
   });
 
@@ -35,7 +35,7 @@ describe('HexRenderer', () => {
     expect(ctx.lineTo).toHaveBeenCalledTimes(5);
     expect(ctx.closePath).toHaveBeenCalled();
     expect(ctx.stroke).toHaveBeenCalled();
-    
+
     // Check style application
     expect(ctx.lineWidth).toBe(DEFAULT_HEX_STYLE.lineWidth);
     expect(ctx.strokeStyle).toBe(DEFAULT_HEX_STYLE.strokeColor);
@@ -53,7 +53,7 @@ describe('HexRenderer', () => {
 
   it('handles highlight drawing', () => {
     const drawHexSpy = vi.spyOn(renderer, 'drawHex');
-    
+
     // 1. Null hex -> no draw
     renderer.drawHighlight(null);
     expect(drawHexSpy).not.toHaveBeenCalled();
@@ -61,6 +61,9 @@ describe('HexRenderer', () => {
     // 2. Valid hex -> draw
     const hex = new HexCoordinate(1, -1, 0);
     renderer.drawHighlight(hex);
-    expect(drawHexSpy).toHaveBeenCalledWith(hex, expect.objectContaining({ strokeColor: '#FFD700' }));
+    expect(drawHexSpy).toHaveBeenCalledWith(
+      hex,
+      expect.objectContaining({ strokeColor: '#FFD700' })
+    );
   });
 });

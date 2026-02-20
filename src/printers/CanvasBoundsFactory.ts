@@ -1,7 +1,7 @@
-import { BoardTile } from "../models/Board";
-import { CanvasCoordinates } from "./CanvasCoordinates";
-import { Point } from "./Canvas";
-import { TilePrinter } from "./TilePrinter";
+import { BoardTile } from '../models/Board';
+import { CanvasCoordinates } from './CanvasCoordinates';
+import { Point } from './Canvas';
+import { TilePrinter } from './TilePrinter';
 
 export interface CanvasBounds {
   readonly topLeft: Point;

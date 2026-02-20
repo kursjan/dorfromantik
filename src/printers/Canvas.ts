@@ -13,7 +13,11 @@ export class Canvas {
   private bounds: CanvasBounds;
 
   constructor(bounds: CanvasBounds) {
-    if (![bounds.topLeft.x, bounds.topLeft.y, bounds.bottomRight.x, bounds.bottomRight.y].every(Number.isInteger)) {
+    if (
+      ![bounds.topLeft.x, bounds.topLeft.y, bounds.bottomRight.x, bounds.bottomRight.y].every(
+        Number.isInteger
+      )
+    ) {
       throw new Error('Canvas bounds must be integers.');
     }
     this.bounds = bounds;
@@ -24,15 +28,24 @@ export class Canvas {
       throw new Error(`Coordinates must be integers. Received (${x}, ${y}).`);
     }
 
-    if (x < this.bounds.topLeft.x || x > this.bounds.bottomRight.x || y < this.bounds.topLeft.y || y > this.bounds.bottomRight.y) {
-      throw new Error(`Coordinates (${x}, ${y}) are out of bounds. Bounds are [${this.bounds.topLeft.x}, ${this.bounds.topLeft.y}] to [${this.bounds.bottomRight.x}, ${this.bounds.bottomRight.y}].`);
+    if (
+      x < this.bounds.topLeft.x ||
+      x > this.bounds.bottomRight.x ||
+      y < this.bounds.topLeft.y ||
+      y > this.bounds.bottomRight.y
+    ) {
+      throw new Error(
+        `Coordinates (${x}, ${y}) are out of bounds. Bounds are [${this.bounds.topLeft.x}, ${this.bounds.topLeft.y}] to [${this.bounds.bottomRight.x}, ${this.bounds.bottomRight.y}].`
+      );
     }
 
     const key = `${x},${y}`;
     const existingChar = this.grid.get(key);
 
     if (existingChar && existingChar !== ' ' && existingChar !== char) {
-      throw new Error(`Cannot overwrite character "${existingChar}" with "${char}" at (${x}, ${y}).`);
+      throw new Error(
+        `Cannot overwrite character "${existingChar}" with "${char}" at (${x}, ${y}).`
+      );
     }
 
     this.grid.set(key, char);

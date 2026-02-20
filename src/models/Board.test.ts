@@ -56,7 +56,7 @@ describe('Board', () => {
 
     const all = Array.from(board.getAll());
     expect(all.length).toBe(2);
-    expect(all.some(t => t.tile === tile)).toBe(true);
-    expect(all.some(t => t.tile === tile2)).toBe(true);
+    expect(all.some((t) => t.tile === tile)).toBe(true);
+    expect(all.some((t) => t.tile === tile2)).toBe(true);
   });
 });

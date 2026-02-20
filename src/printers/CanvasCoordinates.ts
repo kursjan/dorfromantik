@@ -2,7 +2,7 @@ import { HexCoordinate } from '../models/HexCoordinate';
 import { TilePrinter } from './TilePrinter';
 
 export class CanvasCoordinates {
-  static getTileCoordinates(coord: HexCoordinate): { x: number, y: number } {
+  static getTileCoordinates(coord: HexCoordinate): { x: number; y: number } {
     const { q, r } = coord;
     // q increases South (visually y increases by HEIGHT - 1)
     // r increases South-East (visually x increases by WIDTH - 2, y increases by (HEIGHT - 1) / 2)

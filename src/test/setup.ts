@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
 // Mock Canvas getContext
@@ -12,7 +12,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn((contextId: string) => {
       restore: vi.fn(),
       translate: vi.fn(),
       scale: vi.fn(),
-      rotate: vi.fn(), 
+      rotate: vi.fn(),
       beginPath: vi.fn(),
       moveTo: vi.fn(),
       lineTo: vi.fn(),

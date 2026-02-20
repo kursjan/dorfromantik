@@ -7,18 +7,19 @@ This is an Agent assisted project. I was guiding Gemini agent and I myself didn'
 # Where did I start from
 
 # Journal
-Also AI-edited, I don't write like that. When reading, tone down all superlatives.<   >
+
+Also AI-edited, I don't write like that. When reading, tone down all superlatives.< >
 
 ## Day 1: Project Setup and Foundations
 
 The first day was focused on setting up the project and establishing a baseline for the core game mechanics.
 
-*   **Technology Selection:** I consulted the Agent to choose the appropriate technologies. We settled on React with TypeScript for the frontend and Firebase Studio for the development environment.
-*   **Initial Scaffolding:** The Agent set up the React project, configured the testing frameworks, and created an initial development plan.
-*   **Core Models:** We successfully implemented the foundational models for `Tile`, `HexCoordinate`, and `Board`, along with their corresponding tests.
-*   **Early Observations:** I quickly noticed the Agent's tendency to work too far ahead without verification. This led to the creation of an "interaction protocol" to ensure a more disciplined, test-driven approach:
-    *   No flattery, no apologies, be brief.
-    *   Write tests and run them before committing.
+- **Technology Selection:** I consulted the Agent to choose the appropriate technologies. We settled on React with TypeScript for the frontend and Firebase Studio for the development environment.
+- **Initial Scaffolding:** The Agent set up the React project, configured the testing frameworks, and created an initial development plan.
+- **Core Models:** We successfully implemented the foundational models for `Tile`, `HexCoordinate`, and `Board`, along with their corresponding tests.
+- **Early Observations:** I quickly noticed the Agent's tendency to work too far ahead without verification. This led to the creation of an "interaction protocol" to ensure a more disciplined, test-driven approach:
+  - No flattery, no apologies, be brief.
+  - Write tests and run them before committing.
 
 By the end of the day, I had a running application with a solid set of basic tests, all without writing a single line of code myself.
 
@@ -26,12 +27,12 @@ By the end of the day, I had a running application with a solid set of basic tes
 
 Day two presented the first significant challenge: visualizing the hexagonal grid.
 
-*   **ASCII Printer:** The initial attempt to create an ASCII representation of the board was problematic. The Agent struggled with the flat-top, cube coordinate system we had chosen, leading to overly complex and incorrect logic. I had to intervene and break the problem down into smaller, more manageable tasks:
-    1.  An `AsciiCanvas` for basic character placement.
-    2.  A `TilePrinter` to render a single tile.
-    3.  A `BoardPrinter` to orchestrate the rendering of all tiles.
-*   **UI Rendering:** The Agent made significant progress on the canvas-based UI. However, it initially went off-track by implementing new logic before the basic rendering was functional, and it failed to catch a JavaScript error.
-*   **Canvas Success:** After some course correction, the Agent did an excellent job of implementing the canvas rendering, including features like grid visualization, hex highlighting, zoom, and pan.
+- **ASCII Printer:** The initial attempt to create an ASCII representation of the board was problematic. The Agent struggled with the flat-top, cube coordinate system we had chosen, leading to overly complex and incorrect logic. I had to intervene and break the problem down into smaller, more manageable tasks:
+  1.  An `AsciiCanvas` for basic character placement.
+  2.  A `TilePrinter` to render a single tile.
+  3.  A `BoardPrinter` to orchestrate the rendering of all tiles.
+- **UI Rendering:** The Agent made significant progress on the canvas-based UI. However, it initially went off-track by implementing new logic before the basic rendering was functional, and it failed to catch a JavaScript error.
+- **Canvas Success:** After some course correction, the Agent did an excellent job of implementing the canvas rendering, including features like grid visualization, hex highlighting, zoom, and pan.
 
 Despite some initial frustration, day two was a success. The ASCII and UI rendering implementations were of good quality, and the generated tests were decent.
 
@@ -39,16 +40,16 @@ Despite some initial frustration, day two was a success. The ASCII and UI render
 
 With the core rendering in place, the focus shifted to testing and improving the quality of the existing code.
 
-*   **Advanced Testing:** We implemented Playwright tests for image comparison and used mocks and spies to test the canvas implementation.
-*   **Initial Code Review:** I asked the Agent to perform a code review, as the codebase was becoming disorganized and difficult to understand in certain areas. The initial review was superficial, which prompted me to request a more detailed, file-by-file analysis.
+- **Advanced Testing:** We implemented Playwright tests for image comparison and used mocks and spies to test the canvas implementation.
+- **Initial Code Review:** I asked the Agent to perform a code review, as the codebase was becoming disorganized and difficult to understand in certain areas. The initial review was superficial, which prompted me to request a more detailed, file-by-file analysis.
 
 ## Day 4: Deep Dive into Code Quality
 
 This day was dedicated entirely to a thorough code review and refactoring process.
 
-*   **Establishing a Protocol:** The file-by-file review was still not yielding the desired results, so I established a more rigorous code review protocol. This included documenting all design decisions to ensure the Agent would adhere to them in future changes.
-*   **Refactoring Challenges:** A seemingly minor optimization—changing `board.getAllTiles` from returning an array to an iterator—led to a significant amount of friction. The Agent struggled to work with the iterator and insisted on a stateful, `if`-based solution for the ASCII rendering. After a great deal of effort, I was able to guide the Agent to a more elegant, polymorphic solution.
-*   **End Result:** By the end of the day, the codebase was in a much better state: more readable, consistent, and with a clear separation of concerns.
+- **Establishing a Protocol:** The file-by-file review was still not yielding the desired results, so I established a more rigorous code review protocol. This included documenting all design decisions to ensure the Agent would adhere to them in future changes.
+- **Refactoring Challenges:** A seemingly minor optimization—changing `board.getAllTiles` from returning an array to an iterator—led to a significant amount of friction. The Agent struggled to work with the iterator and insisted on a stateful, `if`-based solution for the ASCII rendering. After a great deal of effort, I was able to guide the Agent to a more elegant, polymorphic solution.
+- **End Result:** By the end of the day, the codebase was in a much better state: more readable, consistent, and with a clear separation of concerns.
 
 While no new features were implemented, the intensive refactoring and code review were crucial for the long-term health of the project.
 
@@ -57,6 +58,7 @@ While no new features were implemented, the intensive refactoring and code revie
 I didn't manage to achieve much, and I felt I am fighting AI too much. I started watching videos and tips and tricks.
 
 # Graveyard
+
 Notes to add somewhere
 
 - Agent tends to run wild and do much more

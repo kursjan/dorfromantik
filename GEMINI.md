@@ -6,114 +6,113 @@ These guidelines define the operational principles and capabilities of an AI age
 
 These instructions must be followed above all else.
 
-*   **Primary Directive:** The "Current Plan" in `blueprint.md` is a roadmap, **NOT** a command. Always wait for explicit user confirmation before starting any new task from the plan.
-    *   Agent performs only one task at a time.
-*   **Blueprint Management:**
-    *   **Focused Updates:** When updating `blueprint.md`, modify only the sections directly related to the current task.
-    *   **Checkbox Protocol:** Always wait for the user's explicit confirmation before marking a task as complete in `blueprint.md`.
-    *   **Analysis tasks:** Output of analysis is suggested update in the Bluperint file, if there is work to be done, so that user can verify the tasks, organize them and ask AI to execute them later.
-    *   **Number tasks:** Each task has checkbox and unique number to be easily referenced.
-    *   **Check updates:** User and AI can modify blueprint file at the same time. AI always reads the bluperint file content and preserves any changes made by user.
-*   **Task Management (GitHub Integration):**
-    *   **Issues:** Use GitHub Issues to track significant tasks, bugs, and backlog items.
-    *   **Backlog:** Maintain a `low priority` label on GitHub for non-critical backlog items (e.g., optimizations, future test coverage).
-    *   **Tooling:** Use the `gh` CLI for creating and managing issues.
-*   **Communication:** Communicate in a brief and professional manner.
-*   **Scope:** Adhere strictly to the scope of the assigned task and instructions. Make small changes and minimize file touches.
-*   **Preservation of User Content:** When asked to "correct" or "improve" a user-authored document, your primary goal is to preserve the user's original content and voice. Corrections and suggestions should be additive or minor edits to the existing text.
-*   **Refactoring Rule:** When refactoring, your goal is to improve code structure while preserving all existing business logic. Use the test suite to verify that the logic remains unchanged.
-*   **Contextual Refactoring Rule:** Always analyze files in the context of the entire project. Check all usages of a class or module to ensure its public API remains valid after refactoring.
-*   **Verification Protocol:** After *every* code change, automatically run the following checks:
-    1.  **Code Quality Check:** `npx putout <changed_files>` (Ensure React 19 patterns and clean code)
-    2.  **Type Check:** `npx tsc`
-    3.  **Unit Test Check:** `npm test` (Ensure all unit tests pass)
-    4.  **E2E Test Check:** `npx playwright test --reporter=list` (Verify UI/Canvas interactions)
-*   **Documentation Maintenance:**
-    *   The AI is responsible for keeping project documentation up-to-date.
-    *   **Architecture Sync:** Whenever a refactoring or architectural change occurs (e.g., adding a new renderer, changing a design pattern), the AI must update the relevant `ARCHITECTURE.md` file (or equivalent).
-    *   **Code Comments:** Maintain clear, concise JSDoc (or equivalent) for all public classes and methods. Ensure comments explain *intent* and *parameters*, especially after refactoring.
-    *   **Brevity:** Updates should be concise yet sufficient for a future AI agent to understand the system structure and design decisions without needing to re-analyze the entire codebase.
+- **Primary Directive:** The "Current Plan" in `blueprint.md` is a roadmap, **NOT** a command. Always wait for explicit user confirmation before starting any new task from the plan.
+  - Agent performs only one task at a time.
+- **Blueprint Management:**
+  - **Focused Updates:** When updating `blueprint.md`, modify only the sections directly related to the current task.
+  - **Checkbox Protocol:** Always wait for the user's explicit confirmation before marking a task as complete in `blueprint.md`.
+  - **Analysis tasks:** Output of analysis is suggested update in the Bluperint file, if there is work to be done, so that user can verify the tasks, organize them and ask AI to execute them later.
+  - **Number tasks:** Each task has checkbox and unique number to be easily referenced.
+  - **Check updates:** User and AI can modify blueprint file at the same time. AI always reads the bluperint file content and preserves any changes made by user.
+- **Task Management (GitHub Integration):**
+  - **Issues:** Use GitHub Issues to track significant tasks, bugs, and backlog items.
+  - **Backlog:** Maintain a `low priority` label on GitHub for non-critical backlog items (e.g., optimizations, future test coverage).
+  - **Tooling:** Use the `gh` CLI for creating and managing issues.
+- **Communication:** Communicate in a brief and professional manner.
+- **Scope:** Adhere strictly to the scope of the assigned task and instructions. Make small changes and minimize file touches.
+- **Preservation of User Content:** When asked to "correct" or "improve" a user-authored document, your primary goal is to preserve the user's original content and voice. Corrections and suggestions should be additive or minor edits to the existing text.
+- **Refactoring Rule:** When refactoring, your goal is to improve code structure while preserving all existing business logic. Use the test suite to verify that the logic remains unchanged.
+- **Contextual Refactoring Rule:** Always analyze files in the context of the entire project. Check all usages of a class or module to ensure its public API remains valid after refactoring.
+- **Verification Protocol:** After _every_ code change, automatically run the following checks:
+  1.  **Code Quality Check:** `npx putout <changed_files>` (Ensure React 19 patterns and clean code)
+  2.  **Type Check:** `npx tsc`
+  3.  **Unit Test Check:** `npm test` (Ensure all unit tests pass)
+  4.  **E2E Test Check:** `npx playwright test --reporter=list` (Verify UI/Canvas interactions)
+- **Documentation Maintenance:**
+  - The AI is responsible for keeping project documentation up-to-date.
+  - **Architecture Sync:** Whenever a refactoring or architectural change occurs (e.g., adding a new renderer, changing a design pattern), the AI must update the relevant `ARCHITECTURE.md` file (or equivalent).
+  - **Code Comments:** Maintain clear, concise JSDoc (or equivalent) for all public classes and methods. Ensure comments explain _intent_ and _parameters_, especially after refactoring.
+  - **Brevity:** Updates should be concise yet sufficient for a future AI agent to understand the system structure and design decisions without needing to re-analyze the entire codebase.
 
 ## **Iterative Development & User Interaction**
 
 The AI's workflow is iterative, transparent, and responsive to user input.
 
-*   **Plan Generation & Blueprint Management:** Each time the user requests a change, the AI will first generate a clear plan overview and a list of actionable steps. This plan will then be used to **create or update a blueprint.md file** in the project's root directory.
-*   **Prompt Understanding:** The AI will interpret user prompts to understand the desired changes, new features, bug fixes, or questions. It will ask clarifying questions if the prompt is ambiguous.
-*   **Contextual Responses:** The AI will provide conversational and contextual responses, explaining its actions, progress, and any issues encountered. It will summarize changes made.
-*   **Error Checking Flow:**
-    1.  **Code Change:** AI applies a code modification.
-    2.  **Lint/Format:** AI runs `eslint . --fix`.
-    3.  **Dependency Check:** If `package.json` was modified, AI runs `npm install`.
-    4.  **Compile & Analyze:** AI monitors the terminal for Vite and linter errors.
-    5.  **Test Execution:** The AI runs **ALL** verification checks:
-        * Unit Tests: `npm test`
-        * E2E Tests: `npx playwright test --reporter=list`
-    6.  **Preview Check:** AI observes the browser preview for visual and runtime errors.
-    7.  **Remediation/Report:** If errors are found, AI attempts automatic fixes. If unsuccessful, it reports details to the user.
+- **Plan Generation & Blueprint Management:** Each time the user requests a change, the AI will first generate a clear plan overview and a list of actionable steps. This plan will then be used to **create or update a blueprint.md file** in the project's root directory.
+- **Prompt Understanding:** The AI will interpret user prompts to understand the desired changes, new features, bug fixes, or questions. It will ask clarifying questions if the prompt is ambiguous.
+- **Contextual Responses:** The AI will provide conversational and contextual responses, explaining its actions, progress, and any issues encountered. It will summarize changes made.
+- **Error Checking Flow:**
+  1.  **Code Change:** AI applies a code modification.
+  2.  **Lint/Format:** AI runs `eslint . --fix`.
+  3.  **Dependency Check:** If `package.json` was modified, AI runs `npm install`.
+  4.  **Compile & Analyze:** AI monitors the terminal for Vite and linter errors.
+  5.  **Test Execution:** The AI runs **ALL** verification checks:
+      - Unit Tests: `npm test`
+      - E2E Tests: `npx playwright test --reporter=list`
+  6.  **Preview Check:** AI observes the browser preview for visual and runtime errors.
+  7.  **Remediation/Report:** If errors are found, AI attempts automatic fixes. If unsuccessful, it reports details to the user.
 
 ## **Code Review Process**
 
 The AI is capable of performing a professional code review upon request. This process is designed to be collaborative and transparent, focusing on improving the overall quality of the codebase.
 
-*   **Structured Plan:** The code review process will follow a structured plan, which will be created and updated in `blueprint.md`. This plan will outline the specific files and areas of focus for the review.
-*   **Best Practices:** The AI will review the code for adherence to best practices, including SOLID principles, clean code, and design patterns.
-*   **Context-Aware Analysis:** The AI will review files by analyzing how a class or function is used throughout the application to understand its context and dependencies. This prevents suggesting changes that would break other parts of the code.
-*   **Architectural Integrity:** Verify that each component adheres to the Single Responsibility Principle. Critically evaluate if logic belongs in the current class or should be extracted to a dedicated collaborator (e.g., rendering logic in a controller).
-*   **Test Coverage Verification:** For every class under review, the AI will verify that **each public method** has a corresponding unit test. The test must not only exist but also adequately cover the method's logic, arguments, and edge cases.
-*   **Organization & Consistency:** Verify that similar methods (e.g., event handlers, lifecycle methods) are grouped together logically and follow a consistent ordering convention.
-*   **Actionable Suggestions:** The AI will provide clear, actionable suggestions for improvement. When a refactoring is proposed, it will explain the benefits of the change.
-*   **Iterative Refactoring:** The AI will perform refactoring in small, verifiable steps. After each change, the full verification protocol (`tsc`, `npm test`, `npm run e2e`) will be executed to ensure no regressions have been introduced.
-
+- **Structured Plan:** The code review process will follow a structured plan, which will be created and updated in `blueprint.md`. This plan will outline the specific files and areas of focus for the review.
+- **Best Practices:** The AI will review the code for adherence to best practices, including SOLID principles, clean code, and design patterns.
+- **Context-Aware Analysis:** The AI will review files by analyzing how a class or function is used throughout the application to understand its context and dependencies. This prevents suggesting changes that would break other parts of the code.
+- **Architectural Integrity:** Verify that each component adheres to the Single Responsibility Principle. Critically evaluate if logic belongs in the current class or should be extracted to a dedicated collaborator (e.g., rendering logic in a controller).
+- **Test Coverage Verification:** For every class under review, the AI will verify that **each public method** has a corresponding unit test. The test must not only exist but also adequately cover the method's logic, arguments, and edge cases.
+- **Organization & Consistency:** Verify that similar methods (e.g., event handlers, lifecycle methods) are grouped together logically and follow a consistent ordering convention.
+- **Actionable Suggestions:** The AI will provide clear, actionable suggestions for improvement. When a refactoring is proposed, it will explain the benefits of the change.
+- **Iterative Refactoring:** The AI will perform refactoring in small, verifiable steps. After each change, the full verification protocol (`tsc`, `npm test`, `npm run e2e`) will be executed to ensure no regressions have been introduced.
 
 ## **Environment & Context Awareness**
 
 The AI operates within the Firebase Studio development environment, which provides a Code OSS-based IDE with deep integration for React and Firebase services.
 
-*   **Project Structure:** The AI assumes a standard React project structure, initialized with Vite. The primary application entry point is typically `src/main.jsx` or `src/main.tsx`.
-*   **`dev.nix` Configuration:**
-    *   The `.idx/dev.nix` file is the declarative source of truth for the workspace environment. The AI understands its role in defining:
-        *   Required system tools (e.g., `pkgs.nodejs_20`).
-        *   IDE extensions.
-        *   Environment variables.
-        *   Startup commands (`idx.workspace.onStart`).
-    *   The AI should leverage `dev.nix` to ensure environment consistency and to automatically configure necessary tools or verify their presence.
-*   **Preview Server:**
-    *   Firebase Studio provides a running preview server for the web, configured in `dev.nix`.
-    *   The `web` preview is configured to run `npm run dev -- --port $PORT --host 0.0.0.0`, meaning the Vite dev server is already running and available on a specific port.
-    *   The AI will continuously monitor the output of the preview server for real-time feedback on changes.
-*   **Firebase Integration:** The AI recognizes standard Firebase integration patterns in React, including the use of a `firebase.js` or `firebase.ts` configuration file and interactions with various Firebase SDKs.
-*   **Architecture:** The AI can read about architecture of a given folder from an Architecture.md file.
+- **Project Structure:** The AI assumes a standard React project structure, initialized with Vite. The primary application entry point is typically `src/main.jsx` or `src/main.tsx`.
+- **`dev.nix` Configuration:**
+  - The `.idx/dev.nix` file is the declarative source of truth for the workspace environment. The AI understands its role in defining:
+    - Required system tools (e.g., `pkgs.nodejs_20`).
+    - IDE extensions.
+    - Environment variables.
+    - Startup commands (`idx.workspace.onStart`).
+  - The AI should leverage `dev.nix` to ensure environment consistency and to automatically configure necessary tools or verify their presence.
+- **Preview Server:**
+  - Firebase Studio provides a running preview server for the web, configured in `dev.nix`.
+  - The `web` preview is configured to run `npm run dev -- --port $PORT --host 0.0.0.0`, meaning the Vite dev server is already running and available on a specific port.
+  - The AI will continuously monitor the output of the preview server for real-time feedback on changes.
+- **Firebase Integration:** The AI recognizes standard Firebase integration patterns in React, including the use of a `firebase.js` or `firebase.ts` configuration file and interactions with various Firebase SDKs.
+- **Architecture:** The AI can read about architecture of a given folder from an Architecture.md file.
 
 ## **Code Modification & Dependency Management**
 
-The AI is empowered to modify the React codebase and manage its dependencies autonomously based on user requests and detected issues. 
+The AI is empowered to modify the React codebase and manage its dependencies autonomously based on user requests and detected issues.
 
-*   **Core Code Assumption:** When a user requests a change (e.g., "Add a button to navigate to a new page"), the AI will primarily focus on modifying the JSX/TSX code. `src/App.jsx` (or `tsx`) is assumed to be the main component, and the AI will infer other relevant files (e.g., creating new component files, updating `package.json`).
-*   **Package Management:** If a new feature requires an external package, the AI will identify the most suitable and stable package from npm.
-    *   To add a regular dependency, it will execute `npm install <package_name>`.
-    *   To add a development dependency (e.g., for testing or linting), it will execute `npm install -D <package_name>`.
-*   **Code Quality:** The AI aims to adhere to React best practices, including:
-    *   Clean code structure and separation of concerns (e.g., UI logic separate from business logic).
-    *   Meaningful and consistent naming conventions.
-    *   Effective use of functional components and hooks.
-    *   Appropriate state management solutions (e.g., component state, context, or a dedicated library like Zustand or Redux Toolkit).
-    *   Proper use of `async/await` for asynchronous operations with robust error handling.
+- **Core Code Assumption:** When a user requests a change (e.g., "Add a button to navigate to a new page"), the AI will primarily focus on modifying the JSX/TSX code. `src/App.jsx` (or `tsx`) is assumed to be the main component, and the AI will infer other relevant files (e.g., creating new component files, updating `package.json`).
+- **Package Management:** If a new feature requires an external package, the AI will identify the most suitable and stable package from npm.
+  - To add a regular dependency, it will execute `npm install <package_name>`.
+  - To add a development dependency (e.g., for testing or linting), it will execute `npm install -D <package_name>`.
+- **Code Quality:** The AI aims to adhere to React best practices, including:
+  - Clean code structure and separation of concerns (e.g., UI logic separate from business logic).
+  - Meaningful and consistent naming conventions.
+  - Effective use of functional components and hooks.
+  - Appropriate state management solutions (e.g., component state, context, or a dedicated library like Zustand or Redux Toolkit).
+  - Proper use of `async/await` for asynchronous operations with robust error handling.
 
 ## **Automated Error Detection & Remediation**
 
 A critical function of the AI is to continuously monitor for and automatically resolve errors to maintain a runnable and correct application state.
 
-*   **Post-Modification Checks:** After *every* code modification (including adding packages, or modifying existing files), the AI will:
-    1.  Monitor the IDE's diagnostics (problem pane) and the terminal output for compilation errors, linting warnings, and runtime exceptions.
-    2.  Check the Vite dev server's output for rendering issues, application crashes, or unexpected behavior.
-*   **Automatic Error Correction:** The AI will attempt to automatically fix detected errors. This includes, but is not limited to:
-    *   Syntax errors in JSX/TSX code.
-    *   Type mismatches (if using TypeScript).
-    *   Unresolved imports or missing package references.
-    *   Linting rule violations (the AI will automatically run `eslint . --fix`).
-    *   Common React-specific issues such as incorrect hook usage, or invalid component returns.
-*   **Problem Reporting:** If an error cannot be automatically resolved (e.g., a logic error requiring user clarification, or an environment issue), the AI will clearly report the specific error message, its location, and a concise explanation with a suggested manual intervention or alternative approach to the user.
+- **Post-Modification Checks:** After _every_ code modification (including adding packages, or modifying existing files), the AI will:
+  1.  Monitor the IDE's diagnostics (problem pane) and the terminal output for compilation errors, linting warnings, and runtime exceptions.
+  2.  Check the Vite dev server's output for rendering issues, application crashes, or unexpected behavior.
+- **Automatic Error Correction:** The AI will attempt to automatically fix detected errors. This includes, but is not limited to:
+  - Syntax errors in JSX/TSX code.
+  - Type mismatches (if using TypeScript).
+  - Unresolved imports or missing package references.
+  - Linting rule violations (the AI will automatically run `eslint . --fix`).
+  - Common React-specific issues such as incorrect hook usage, or invalid component returns.
+- **Problem Reporting:** If an error cannot be automatically resolved (e.g., a logic error requiring user clarification, or an environment issue), the AI will clearly report the specific error message, its location, and a concise explanation with a suggested manual intervention or alternative approach to the user.
 
 ## **Modern React Practices**
 
@@ -125,26 +124,32 @@ The AI will leverage the React Compiler for automatic memoization, reducing the 
 
 For projects using a framework that supports RSC (like Next.js), the AI will adopt the following principles:
 
-*   **Server-Side Logic:** Components that fetch data or perform server-side logic will be implemented as Server Components.
-*   **Client-Side Interactivity:** Components that require user interaction or client-side state will be marked with the `"use client"` directive.
-*   **Data Fetching:** The AI will use `async/await` directly within Server Components for clean and efficient data fetching.
+- **Server-Side Logic:** Components that fetch data or perform server-side logic will be implemented as Server Components.
+- **Client-Side Interactivity:** Components that require user interaction or client-side state will be marked with the `"use client"` directive.
+- **Data Fetching:** The AI will use `async/await` directly within Server Components for clean and efficient data fetching.
 
 ## **Architectural Learnings & Patterns**
 
 ### **Canvas Controller Pattern**
+
 For high-performance 2D rendering, we use a **Controller Pattern** that decouples React from the Canvas API.
+
 - **React's Role:** Manage the high-level lifecycle of the `<canvas>` element and host DOM-based UI overlays (HUD, buttons).
 - **Controller's Role:** A pure TypeScript class (`CanvasController`) that owns the game state, handles the `requestAnimationFrame` loop, and orchestrates specialized renderers.
 - **Why:** This avoids React's reconciliation overhead and "effect hell" when dealing with 60fps rendering logic.
 
 ### **Rotated Hexagonal Coordinate System**
+
 This project uses a custom orientation for "Flat-Top" hexagons:
+
 - **North is (-1, 0, 1)** instead of the standard `(0, -1, 1)`.
 - This requires careful mapping in `HexUtils.ts` (specifically swapping/negating `q` and `r` in pixel-to-hex conversions).
 - **Future AI Warning:** Always check `HexUtils.test.ts` to verify neighbor calculations before extending the grid logic.
 
 ### **E2E Stability (Canvas)**
+
 When writing Playwright tests for a canvas:
+
 - **UI Overlays:** Prefer taking screenshots of the `canvas` locator specifically (e.g., `expect(canvas).toHaveScreenshot()`) rather than the full page to avoid flaky failures caused by UI buttons or overlays.
 - **MaxDiff:** Use a small `maxDiffPixels` (e.g., 150) to account for minor anti-aliasing variations between headless environments.
 
@@ -177,7 +182,7 @@ The AI will use a consistent styling approach, preferring modern solutions like 
 
 For routing, the AI will use `react-router-dom` as the default.
 
-*   **Basic Routing:**
+- **Basic Routing:**
 
 ```
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -196,7 +201,7 @@ function App() {
 }
 ```
 
-*   **Navigation:**
+- **Navigation:**
 
 ```
 import { Link, useNavigate } from "react-router-dom";
@@ -217,24 +222,24 @@ function MyComponent() {
 
 The AI will assist in selecting and integrating a component library that best fits the project's needs. The following are popular choices that the AI is familiar with:
 
-*   **MUI (formerly Material-UI):** A comprehensive suite of components that implement Google's Material Design. Ideal for a wide range of projects, from simple websites to complex enterprise applications.
-*   **Ant Design:** A top-tier library for enterprise-level applications, with a focus on a consistent design language and internationalization support.
-*   **React-Bootstrap:** A great choice for quickly building responsive and familiar-looking interfaces, especially if the team is already familiar with Bootstrap.
-*   **Chakra UI:** Known for its focus on accessibility and developer experience, providing a set of composable and accessible components that are easy to theme and customize.
-*   **Shadcn/ui:** A collection of reusable components that you can copy and paste into your project, built on top of Tailwind CSS and Radix UI. This provides maximum control over the code and avoids adding another dependency to your project.
-*   **Mantine:** A comprehensive library with over 100 customizable components and 50 hooks, known for its ease of use and extensive feature set.
+- **MUI (formerly Material-UI):** A comprehensive suite of components that implement Google's Material Design. Ideal for a wide range of projects, from simple websites to complex enterprise applications.
+- **Ant Design:** A top-tier library for enterprise-level applications, with a focus on a consistent design language and internationalization support.
+- **React-Bootstrap:** A great choice for quickly building responsive and familiar-looking interfaces, especially if the team is already familiar with Bootstrap.
+- **Chakra UI:** Known for its focus on accessibility and developer experience, providing a set of composable and accessible components that are easy to theme and customize.
+- **Shadcn/ui:** A collection of reusable components that you can copy and paste into your project, built on top of Tailwind CSS and Radix UI. This provides maximum control over the code and avoids adding another dependency to your project.
+- **Mantine:** A comprehensive library with over 100 customizable components and 50 hooks, known for its ease of use and extensive feature set.
 
 ## **Best Practices for Implementation**
 
 ### **Theming and Customization**
 
-*   **Favor Theming:** Instead of directly overriding component styles with CSS, the AI will leverage the library's built-in theming capabilities. This leads to more maintainable and consistent styling.
-*   **Wrapper Components:** The AI will create wrapper components around the library's components to enforce project-specific logic and styles. This also simplifies potential future migrations to a different library.
+- **Favor Theming:** Instead of directly overriding component styles with CSS, the AI will leverage the library's built-in theming capabilities. This leads to more maintainable and consistent styling.
+- **Wrapper Components:** The AI will create wrapper components around the library's components to enforce project-specific logic and styles. This also simplifies potential future migrations to a different library.
 
 ### **Performance Optimization**
 
-*   **Tree Shaking:** The AI will import only the components that are needed to reduce the application's bundle size.
-*   **Lazy Loading:** The AI will use `React.lazy` and `Suspense` to lazy load components, improving the initial load time of the application.
+- **Tree Shaking:** The AI will import only the components that are needed to reduce the application's bundle size.
+- **Lazy Loading:** The AI will use `React.lazy` and `Suspense` to lazy load components, improving the initial load time of the application.
 
 ### **Accessibility**
 
@@ -289,42 +294,43 @@ function MyComponent() {
 
 The AI will use the simplest appropriate state management solution for the job.
 
-*   **Component State (`useState`, `useReducer`):** For local state that is not shared with other components.
-*   **Context API (`useContext`):** For state that needs to be shared with a few components, but not globally.
-*   **Zustand or Redux Toolkit:** For complex, global state that is shared across many components. The AI will recommend and use one of these libraries if the application's state management needs become complex.
+- **Component State (`useState`, `useReducer`):** For local state that is not shared with other components.
+- **Context API (`useContext`):** For state that needs to be shared with a few components, but not globally.
+- **Zustand or Redux Toolkit:** For complex, global state that is shared across many components. The AI will recommend and use one of these libraries if the application's state management needs become complex.
 
 ## **Test Generation & Execution**
 
 When requested, the AI will facilitate the creation and execution of tests, ensuring code reliability and validating functionality.
 
-*   **Test Writing:**
-    *   Upon user request for tests (e.g., "Write tests for this new feature"), the AI will generate appropriate test files (e.g., `src/components/MyComponent.test.jsx`).
-    *   The AI will use Vitest as the testing framework and React Testing Library for rendering and interacting with components.
-    *   Tests will be designed to cover different component states, user interactions, and edge cases.
-*   **Automated Test Execution:**
-    *   After generating or modifying tests, and after any significant code change, the AI will automatically execute the relevant tests using `npm test` in the terminal.
-    *   The AI will report test results (pass/fail, with details on failures) to the user.
-*   **Test Updates**
-    *   AI will udpate only tests and cases related to the current task and stick strictly to the task at hand.
+- **Test Writing:**
+  - Upon user request for tests (e.g., "Write tests for this new feature"), the AI will generate appropriate test files (e.g., `src/components/MyComponent.test.jsx`).
+  - The AI will use Vitest as the testing framework and React Testing Library for rendering and interacting with components.
+  - Tests will be designed to cover different component states, user interactions, and edge cases.
+- **Automated Test Execution:**
+  - After generating or modifying tests, and after any significant code change, the AI will automatically execute the relevant tests using `npm test` in the terminal.
+  - The AI will report test results (pass/fail, with details on failures) to the user.
+- **Test Updates**
+  - AI will udpate only tests and cases related to the current task and stick strictly to the task at hand.
 
 # Firebase MCP
 
 When requested for Firebase add the following the server configurations to .idx/mcp.json. Just add the following and don't add anything else.
 
 {
-    "mcpServers": {
-        "firebase": {
-            "command": "npx",
-            "args": [
-                "-y",
-                "firebase-tools@latest",
-                "experimental:mcp"
-            ]
-        }
-    }
+"mcpServers": {
+"firebase": {
+"command": "npx",
+"args": [
+"-y",
+"firebase-tools@latest",
+"experimental:mcp"
+]
+}
+}
 }
 
 ## Component Visualizer
+
 Task: Whenever I ask for a new component, first output a Component Contract:
 
 Props Interface: (Exactly what goes in)
@@ -332,4 +338,3 @@ Props Interface: (Exactly what goes in)
 State Ownership: (Who "owns" the data?)
 
 Visual Hierarchy: (Where does this sit in the tree?)
-

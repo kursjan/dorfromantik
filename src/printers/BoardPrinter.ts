@@ -5,7 +5,6 @@ import { CanvasCoordinates } from './CanvasCoordinates';
 import { UninitializedCanvasBoundsFactory, ICanvasBoundsFactory } from './CanvasBoundsFactory';
 
 export class BoardPrinter {
-  
   print(board: Board): string {
     let boundsFactory: ICanvasBoundsFactory = new UninitializedCanvasBoundsFactory();
 

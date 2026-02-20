@@ -7,6 +7,7 @@ This document outlines the architecture, features, and development plan for a we
 The project uses a modern frontend stack with React and TypeScript. The UI is built for aesthetics and responsiveness using Tailwind CSS and the shadcn/ui component library. It includes a foundational setup for a Firebase backend to support future game logic, state management, and user data.
 
 ## 2. Implemented Features
+
 - [x] **Project Setup:** React, TypeScript, Tailwind, shadcn/ui (partial), Firebase (config).
 - [x] **Verification:** CI-like checks (tsc, curl, vitest) on every change.
 - [x] **Core Data Structures:**
@@ -36,6 +37,7 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 ## 3. Architecture & Documentation
 
 ### 3.1. Core Data Model
+
 - **Grid System:** Hexagonal Grid using **Cube Coordinates** (`q, r, s`).
 - **Orientation:** **Flat-Top** Hexagons.
   - Neighbors: North, North-East, South-East, South, South-West, North-West.
@@ -54,11 +56,12 @@ The project uses a modern frontend stack with React and TypeScript. The UI is bu
 - **Visualization:** ASCII-based printing for debugging (`BoardPrinter`).
 
 ### 3.2. System Architecture
+
 - **Frontend:** React (Vite) + TypeScript.
 - **Canvas Engine:** Custom Controller Pattern (Separated from React).
   - **Pattern:** `React Component` -> `CanvasController` -> `Renderers` (`Hex`, `Background`, `Debug`) / `InputManager`.
   - **Documentation:** See **[src/canvas/ARCHITECTURE.md](./src/canvas/ARCHITECTURE.md)** for the detailed breakdown of the Canvas architecture.
-- **Backend:** Firebase (Hosting, Firestore, Auth - *Planned*).
+- **Backend:** Firebase (Hosting, Firestore, Auth - _Planned_).
 
 ## 4. Current Plan
 

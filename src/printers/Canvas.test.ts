@@ -38,8 +38,7 @@ describe('Canvas', () => {
     const canvas = new Canvas({ topLeft: { x: 0, y: 0 }, bottomRight: { x: 4, y: 2 } });
     canvas.set(1, 1, 'A');
     canvas.set(3, 1, 'B');
-    const expected = 
-`     
+    const expected = `     
  A B 
      `;
     expect(canvas.toString()).toBe(expected);

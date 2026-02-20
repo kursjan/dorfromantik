@@ -4,5 +4,31 @@
       "disableLoadingPhrases": true,
       "enableLoadingPhrases": false
     }
+  },
+  "hooks": {
+    "AfterTool": [
+      {
+        "matcher": "write_file|replace",
+        "hooks": [
+          {
+            "name": "auto-prettier",
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/run-prettier.sh"
+          }
+        ]
+      }
+    ],
+    "AfterAgent": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "name": "doc-reminder",
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/remind-docs.sh"
+          }
+        ]
+      }
+    ]
   }
 }

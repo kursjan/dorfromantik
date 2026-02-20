@@ -7,11 +7,11 @@ export interface CameraConfig {
 
 /**
  * Manages the 2D view transformation (Pan, Zoom, & Rotation).
- * 
+ *
  * Coordinate Spaces:
  * 1. Screen Space: Pixels, Origin top-left.
  * 2. World Space: Logical units, Origin (0,0) is the center of the world.
- * 
+ *
  * Transform Chain:
  * Screen = ScreenCenter + Rotate((WorldPosition + CameraOffset) * Zoom)
  */
@@ -42,7 +42,7 @@ export class Camera {
 
   /**
    * Applies the current camera transform to the canvas context.
-   * Logic: 
+   * Logic:
    * 1. Move origin to center of canvas.
    * 2. Rotate.
    * 3. Scale world by zoom level.
@@ -59,10 +59,15 @@ export class Camera {
    * Converts a screen pixel coordinate (e.g. mouse event) to World Space.
    * Inverts the transformation chain of applyTransform.
    */
-  screenToWorld(screenX: number, screenY: number, canvasWidth: number, canvasHeight: number): { x: number, y: number } {
+  screenToWorld(
+    screenX: number,
+    screenY: number,
+    canvasWidth: number,
+    canvasHeight: number
+  ): { x: number; y: number } {
     const centerX = canvasWidth / 2;
     const centerY = canvasHeight / 2;
-    
+
     // 1. Translate relative to center
     const relX = screenX - centerX;
     const relY = screenY - centerY;
@@ -99,7 +104,7 @@ export class Camera {
 
     const cos = Math.cos(-this.rotation);
     const sin = Math.sin(-this.rotation);
-    
+
     // Rotate the delta vector
     const rotDx = dx * cos - dy * sin;
     const rotDy = dx * sin + dy * cos;
@@ -122,16 +127,16 @@ export class Camera {
    * Rotates the camera.
    */
   rotateBy(deltaRadians: number) {
-      this.rotation += deltaRadians;
+    this.rotation += deltaRadians;
   }
 
   /**
    * Resets the camera to its initial state.
    */
   reset() {
-      this.x = this.defaultX;
-      this.y = this.defaultY;
-      this.zoom = this.defaultZoom;
-      this.rotation = this.defaultRotation;
+    this.x = this.defaultX;
+    this.y = this.defaultY;
+    this.zoom = this.defaultZoom;
+    this.rotation = this.defaultRotation;
   }
 }
