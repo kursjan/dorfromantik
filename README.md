@@ -53,9 +53,21 @@ This day was dedicated entirely to a thorough code review and refactoring proces
 
 While no new features were implemented, the intensive refactoring and code review were crucial for the long-term health of the project.
 
-## Day 5:
+## Day 5 and 6: Reconciliation
 
-I didn't manage to achieve much, and I felt I am fighting AI too much. I started watching videos and tips and tricks.
+I had a feeling I don't have enough progress. I was fighting AI too much and everything took more and more time. I started looking around, how others use AI. It seems there is a gap between my capabilities and what others do. After watching some videos, I realized two crutial topics:
+- Context management
+- Plan management
+
+Also Firebase had an outage (WTH, I thought this is Google!), so I moved to a local stack. It is actually much more responsive, so I will likely keep using crostini (chromebook), VSCODE and gemini-cli. It also helped me to better understand what is Firebase, Gemini, VSCODE and React.
+
+I discovered gemini-cli and tooling around, like `/ask`, `/hooks`.
+
+I managed to implement reset button. Original prompt (along the lines): `add a reset button to reset view of the camera` went super bad and I hat to restore from git. Next time, I created plan with:
+- create reset logi in controller
+- create simple button (to verify integration)
+- style the button
+The more detailed prompt and more `/clear` worked like a charm.
 
 # Graveyard
 

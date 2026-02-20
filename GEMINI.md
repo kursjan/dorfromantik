@@ -6,14 +6,13 @@ These guidelines define the operational principles and capabilities of an AI age
 
 These instructions must be followed above all else.
 
-- **Primary Directive:** The "Current Plan" in `blueprint.md` is a roadmap, **NOT** a command. Always wait for explicit user confirmation before starting any new task from the plan.
+- **Primary Directive:** The implementation plans in `conductor/tracks/<track_id>/plan.md` are roadmaps, **NOT** commands. Always wait for explicit user confirmation before starting any new task from a plan.
   - Agent performs only one task at a time.
-- **Blueprint Management:**
-  - **Focused Updates:** When updating `blueprint.md`, modify only the sections directly related to the current task.
-  - **Checkbox Protocol:** Always wait for the user's explicit confirmation before marking a task as complete in `blueprint.md`.
-  - **Analysis tasks:** Output of analysis is suggested update in the Bluperint file, if there is work to be done, so that user can verify the tasks, organize them and ask AI to execute them later.
-  - **Number tasks:** Each task has checkbox and unique number to be easily referenced.
-  - **Check updates:** User and AI can modify blueprint file at the same time. AI always reads the bluperint file content and preserves any changes made by user.
+- **Conductor & Plan Management:**
+  - **Focused Updates:** When updating a track's `plan.md` or `spec.md`, modify only the sections directly related to the current task.
+  - **Checkbox Protocol:** Always wait for the user's explicit confirmation before marking a task as complete in the track's `plan.md`.
+  - **Analysis tasks:** Output of analysis is a suggested update in the track's plan or specification, so that the user can verify the tasks and ask the AI to execute them later.
+  - **Check updates:** Both user and AI can modify Conductor files. The AI always reads the file content and preserves any changes made by the user.
 - **Task Management (GitHub Integration):**
   - **Issues:** Use GitHub Issues to track significant tasks, bugs, and backlog items.
   - **Backlog:** Maintain a `low priority` label on GitHub for non-critical backlog items (e.g., optimizations, future test coverage).
@@ -22,7 +21,7 @@ These instructions must be followed above all else.
 - **Scope:** Adhere strictly to the scope of the assigned task and instructions. Make small changes and minimize file touches.
 - **Preservation of User Content:** When asked to "correct" or "improve" a user-authored document, your primary goal is to preserve the user's original content and voice. Corrections and suggestions should be additive or minor edits to the existing text.
 - **Refactoring Rule:** When refactoring, your goal is to improve code structure while preserving all existing business logic. Use the test suite to verify that the logic remains unchanged.
-- **Contextual Refactoring Rule:** Always analyze files in the context of the entire project. Check all usages of a class or module to ensure its public API remains valid after refactoring.
+- **Contextual Refactoring Rule:** Always analyze files in the context of the entire project. Check all usages of a class or function to ensure its public API remains valid after refactoring.
 - **Verification Protocol:** After _every_ code change, automatically run the following checks:
   1.  **Code Quality Check:** `npx putout <changed_files>` (Ensure React 19 patterns and clean code)
   2.  **Type Check:** `npx tsc`
@@ -30,7 +29,7 @@ These instructions must be followed above all else.
   4.  **E2E Test Check:** `npx playwright test --reporter=list` (Verify UI/Canvas interactions)
 - **Documentation Maintenance:**
   - The AI is responsible for keeping project documentation up-to-date.
-  - **Architecture Sync:** Whenever a refactoring or architectural change occurs (e.g., adding a new renderer, changing a design pattern), the AI must update the relevant `ARCHITECTURE.md` file (or equivalent).
+  - **Architecture Sync:** Whenever a refactoring or architectural change occurs (e.g., adding a new renderer, changing a design pattern), the AI must update the relevant `ARCHITECTURE.md` file (or equivalent) and ensure `conductor/product.md` remains consistent.
   - **Code Comments:** Maintain clear, concise JSDoc (or equivalent) for all public classes and methods. Ensure comments explain _intent_ and _parameters_, especially after refactoring.
   - **Brevity:** Updates should be concise yet sufficient for a future AI agent to understand the system structure and design decisions without needing to re-analyze the entire codebase.
 
@@ -38,7 +37,7 @@ These instructions must be followed above all else.
 
 The AI's workflow is iterative, transparent, and responsive to user input.
 
-- **Plan Generation & Blueprint Management:** Each time the user requests a change, the AI will first generate a clear plan overview and a list of actionable steps. This plan will then be used to **create or update a blueprint.md file** in the project's root directory.
+- **Track Generation & Plan Management:** Each time the user requests a significant change or feature, the AI will propose a new **Track** or update an existing one. This involves creating or updating the track's `spec.md` and `plan.md` within the `conductor/tracks/` directory.
 - **Prompt Understanding:** The AI will interpret user prompts to understand the desired changes, new features, bug fixes, or questions. It will ask clarifying questions if the prompt is ambiguous.
 - **Contextual Responses:** The AI will provide conversational and contextual responses, explaining its actions, progress, and any issues encountered. It will summarize changes made.
 - **Error Checking Flow:**
@@ -56,7 +55,7 @@ The AI's workflow is iterative, transparent, and responsive to user input.
 
 The AI is capable of performing a professional code review upon request. This process is designed to be collaborative and transparent, focusing on improving the overall quality of the codebase.
 
-- **Structured Plan:** The code review process will follow a structured plan, which will be created and updated in `blueprint.md`. This plan will outline the specific files and areas of focus for the review.
+- **Structured Plan:** The code review process will follow a structured plan, which will be created as a new track in `conductor/tracks.md`. This plan will outline the specific files and areas of focus for the review.
 - **Best Practices:** The AI will review the code for adherence to best practices, including SOLID principles, clean code, and design patterns.
 - **Context-Aware Analysis:** The AI will review files by analyzing how a class or function is used throughout the application to understand its context and dependencies. This prevents suggesting changes that would break other parts of the code.
 - **Architectural Integrity:** Verify that each component adheres to the Single Responsibility Principle. Critically evaluate if logic belongs in the current class or should be extracted to a dedicated collaborator (e.g., rendering logic in a controller).

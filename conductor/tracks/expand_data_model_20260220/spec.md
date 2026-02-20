@@ -32,6 +32,7 @@ Expand the project's data model to support persistent game sessions, comprehensi
 - `tileQueue`: `Tile[]`.
 
 ### Session
+- `sessionId`: Unique identifier (String/UUID).
 - `user`: `User` instance.
 - `games`: `Game[]` (history).
 - `activeGame`: (Optional) Current `Game` instance.
