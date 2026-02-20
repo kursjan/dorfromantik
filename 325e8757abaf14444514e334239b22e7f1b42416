@@ -1,0 +1,6 @@
+Task: #5.4 Update: Add peek method to Game class
+Summary: Added peek() method to return top of the tileQueue without removing it.
+Files:
+- src/models/Game.ts
+- src/models/Game.test.ts
+Why: Allows the UI to preview the current tile that the player is about to place.
