@@ -1,12 +1,12 @@
 # Implementation Plan: Board Integration & Basic Tile Rendering
 
-## Phase 1: Data Binding & React HUD
+## Phase 1: Data Binding & React HUD [checkpoint: 9179454]
 
 - [x] Task: #4.1: Update `CanvasController` constructor to accept and store a `Session` instance. (dc633d8)
 - [x] Task: #4.2: Create a `GameHUD` React component (`src/canvas/components/GameHUD.tsx`) to display score and remaining turns. (dc633d8)
 - [x] Task: #4.3: Add `GameHUD.stories.tsx` to verify the HUD's visual representation for various game states. (dc633d8)
-- [ ] Task: #4.4: Integrate `GameHUD` as an overlay in `CanvasView.tsx`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Data Binding & HUD' (Protocol in workflow.md)
+- [x] Task: #4.4: Integrate `GameHUD` as an overlay in `CanvasView.tsx`. (9179454)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Data Binding & HUD' (Protocol in workflow.md) (9179454)
 
 ## Phase 2: Canvas Tile Visualization
 
