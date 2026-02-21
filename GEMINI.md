@@ -176,6 +176,19 @@ To ensure state synchronization and a clean game loop, the game follows a "Tiles
 - **Single Source of Truth:** `remainingTurns` must be a derived property (getter) of `tileQueue.length`.
 - **Benefit:** This prevents synchronization errors between the turn counter and the actual resources available to the player.
 
+### Canvas -> React State Synchronization
+
+For the Controller Pattern to work with React-based UI (HUD), we use a synchronization callback:
+- **Pattern:** `CanvasView` (React) passes a callback or attaches a listener to `CanvasController` (Plain TS).
+- **Update:** When the game state changes (score, turns), the Controller invokes the callback, triggering a `useState` update in React.
+- **Why:** This keeps the heavy rendering loop out of React while allowing the UI to remain reactive to state changes.
+
+### Vitest & requestAnimationFrame
+
+In a JSDOM environment, `requestAnimationFrame` is not natively supported.
+- **Gotcha:** Recursive `setTimeout` mocks for `requestAnimationFrame` can lead to "leaking" timeouts that cause `ReferenceError` or infinite loops in subsequent tests.
+- **Best Practice:** Use a static mock `vi.fn().mockReturnValue(1)` in `setup.ts`. This allows the first frame of a Controller (triggered in the constructor) to run while preventing the background loop from interfering with other tests.
+
 ### **Explicit Domain Accessors**
 
 Prefer explicit methods like `Tile.getTerrain(direction)` over direct property access (e.g., `tile[direction]`).
