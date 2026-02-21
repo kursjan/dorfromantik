@@ -94,23 +94,8 @@ export class Game {
   private generateInitialQueue(count: number): Tile[] {
     const queue: Tile[] = [];
     for (let i = 0; i < count; i++) {
-      queue.push(this.createRandomTile(`init-${i}`));
+      queue.push(Tile.createRandom(`init-${i}`));
     }
     return queue;
-  }
-
-  private createRandomTile(id: string): Tile {
-    const terrains: TerrainType[] = ['tree', 'house', 'water', 'pasture', 'rail', 'field'];
-    const getRandom = () => terrains[Math.floor(Math.random() * terrains.length)];
-
-    return new Tile({
-      id,
-      north: getRandom(),
-      northEast: getRandom(),
-      southEast: getRandom(),
-      south: getRandom(),
-      southWest: getRandom(),
-      northWest: getRandom(),
-    });
   }
 }

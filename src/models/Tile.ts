@@ -1,6 +1,7 @@
 import { Direction } from './Navigation';
 
-export type TerrainType = 'tree' | 'house' | 'water' | 'pasture' | 'rail' | 'field';
+export const TERRAIN_TYPES = ['tree', 'house', 'water', 'pasture', 'rail', 'field'] as const;
+export type TerrainType = (typeof TERRAIN_TYPES)[number];
 
 export interface TileProps {
   id: string;
@@ -30,6 +31,25 @@ export class Tile {
     this.south = props.south;
     this.southWest = props.southWest;
     this.northWest = props.northWest;
+  }
+
+  /**
+   * Creates a new Tile with random terrains for each side.
+   * @param id - Unique identifier for the tile.
+   * @returns A new Tile instance.
+   */
+  static createRandom(id: string): Tile {
+    const getRandom = () => TERRAIN_TYPES[Math.floor(Math.random() * TERRAIN_TYPES.length)];
+
+    return new Tile({
+      id,
+      north: getRandom(),
+      northEast: getRandom(),
+      southEast: getRandom(),
+      south: getRandom(),
+      southWest: getRandom(),
+      northWest: getRandom(),
+    });
   }
 
   /**
