@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { ResetViewButton } from './ResetViewButton';
 
 const meta = {
-  title: 'Canvas/Components/ResetViewButton',
+  title: 'UI/Components/ResetViewButton',
   component: ResetViewButton,
   parameters: {
     layout: 'centered',
