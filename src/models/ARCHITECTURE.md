@@ -14,9 +14,10 @@ This directory contains the core data structures and business logic for the Dorf
 - **`Tile`**: Represents a single hexagonal tile with 6 sides of specific terrain types.
 - **`Board`**: A collection of placed tiles mapped to their coordinates. It handles spatial queries and placement validation.
 
-### 3. Session & Rules (`User.ts`, `GameRules.ts`)
+### 3. Session & Rules (`User.ts`, `GameRules.ts`, `Session.ts`)
 - **`User`**: Basic user identity, compatible with Firebase UID.
 - **`GameRules`**: Configurable settings for a game (initial turns, points per match).
+- **`Session`**: Manages a user's game lifecycle, including their current `activeGame` and a history of finished `games`.
 
 ### 4. Game Engine (`Game.ts`)
 The `Game` class is the central orchestrator of an active session.

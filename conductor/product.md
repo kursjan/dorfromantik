@@ -29,6 +29,9 @@ To create a relaxing, puzzle-like experience for casual gamers where they can bu
   - `HexCoordinate`: Enforces integer coordinates and zero-sum constraint.
   - `Tile`: Class with explicit edge properties (e.g., `north`, `northEast`).
   - `Board`: Class encapsulating a `Map` of tiles, indexed by coordinate key. Prevents placement on occupied spots.
+  - `User`: Basic user identity, compatible with Firebase UID.
+  - `Game`: Central orchestrator of an active game, tracking board state, score, and the tile queue.
+  - `Session`: Manages a user's game lifecycle, including their current active game and a history of finished games.
 
 ### System Architecture
 - **Frontend:** React (Vite) + TypeScript.

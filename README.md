@@ -110,3 +110,4 @@ Notes to add somewhere
 - Sometimes agent doesn't talk to me at all
 - It is easy to make it do things, it is harder to make it do things your way???
 - Crazy, I just use AI to help me with git rebase/rename/conent divergent hell... and it worked :shocked:
+- Can't make two Gemini CLI work in the same workspace, which is a bit frustrating.

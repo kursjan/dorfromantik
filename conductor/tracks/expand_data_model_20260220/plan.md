@@ -14,6 +14,13 @@
 
 ## Phase 3: Session & Persistence Foundation
 
-- [ ] Task: #5.5: Define `Session` Model Contract (user, game history, active game) and write tests in `src/models/Session.test.ts`.
-- [ ] Task: Verify that `Session` can correctly transition games from active to history.
+- [x] Task: #5.5: Define `Session` Model Contract (user, game history, active game) and write tests in `src/models/Session.test.ts`.
+- [x] Task: Verify that `Session` can correctly transition games from active to history.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Session & Persistence Foundation' (Protocol in workflow.md)
+
+## Phase 4: Code Review & Refinement
+
+- [ ] Task: #5.6: Perform a comprehensive code review of the newly implemented models (`User`, `GameRules`, `Game`, `Session`).
+- [ ] Task: Present review findings and architectural suggestions to the user.
+- [ ] Task: Implement approved refinements and refactorings.
+- [ ] Task: Conductor - User Manual Verification 'Phase 4: Code Review & Refinement' (Protocol in workflow.md)

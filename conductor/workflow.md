@@ -18,16 +18,17 @@ All tasks follow a strict lifecycle:
 
 2. **Mark In Progress:** Before beginning work, edit `plan.md` and change the task from `[ ]` to `[~]`
 
-3. **Write Failing Tests (Red Phase):**
+3. **Draft Implementation**: 
+   - Write the functional code/logic first based on the Spec.
+   - Present the code to the user for logic verification.
+   - Only after implementation is stable, move to writing tests
+
+4. **Write Failing Tests (Red Phase):**
    - Create a new test file for the feature or bug fix.
    - Write one or more unit tests that clearly define the expected behavior and acceptance criteria for the task.
-   - **CRITICAL:** Run the tests and confirm that they fail as expected. This is the "Red" phase of TDD. Do not proceed until you have failing tests.
-
-4. **Implement to Pass Tests (Green Phase):**
-   - Write the minimum amount of application code necessary to make the failing tests pass.
    - Run the test suite again and confirm that all tests now pass. This is the "Green" phase.
 
-5. **Refactor (Optional but Recommended):**
+5. **Refactor (Compulsory):**
    - With the safety of passing tests, refactor the implementation code and the test code to improve clarity, remove duplication, and enhance performance without changing the external behavior.
    - Rerun tests to ensure they still pass after refactoring.
 
