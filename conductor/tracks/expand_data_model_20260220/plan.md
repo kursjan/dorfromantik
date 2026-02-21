@@ -12,11 +12,11 @@
 - [x] Task: #5.4: Implement `placeTile` & Scoring Logic (neighbor matching, score/turns update) and verify with integration tests. 028942f
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Core Game Logic' (Protocol in workflow.md)
 
-## Phase 3: Session & Persistence Foundation
+## Phase 3: Session & Persistence Foundation [checkpoint: fe75f0f]
 
 - [x] Task: #5.5: Define `Session` Model Contract (user, game history, active game) and write tests in `src/models/Session.test.ts`.
 - [x] Task: Verify that `Session` can correctly transition games from active to history.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Session & Persistence Foundation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Session & Persistence Foundation' (Protocol in workflow.md)
 
 ## Phase 4: Code Review & Refinement
 
