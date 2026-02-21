@@ -10,17 +10,21 @@ export interface NeighborInfo {
 export class Navigation {
   readonly directions: Direction[] = ['north', 'northEast', 'southEast', 'south', 'southWest', 'northWest'];
 
-  private readonly opposites: Record<Direction, Direction> = {
-    north: 'south',
-    northEast: 'southWest',
-    southEast: 'northWest',
-    south: 'north',
-    southWest: 'northEast',
-    northWest: 'southEast',
-  };
-
   getOpposite(direction: Direction): Direction {
-    return this.opposites[direction];
+    switch (direction) {
+      case 'north':
+        return 'south';
+      case 'northEast':
+        return 'southWest';
+      case 'southEast':
+        return 'northWest';
+      case 'south':
+        return 'north';
+      case 'southWest':
+        return 'northEast';
+      case 'northWest':
+        return 'southEast';
+    }
   }
 
   getNeighbor(coord: HexCoordinate, direction: Direction): HexCoordinate {
