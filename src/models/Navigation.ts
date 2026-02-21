@@ -23,10 +23,27 @@ export class Navigation {
     return this.opposites[direction];
   }
 
+  getNeighbor(coord: HexCoordinate, direction: Direction): HexCoordinate {
+    switch (direction) {
+      case 'north':
+        return this.north(coord);
+      case 'northEast':
+        return this.northEast(coord);
+      case 'southEast':
+        return this.southEast(coord);
+      case 'south':
+        return this.south(coord);
+      case 'southWest':
+        return this.southWest(coord);
+      case 'northWest':
+        return this.northWest(coord);
+    }
+  }
+
   getNeighbors(coord: HexCoordinate): NeighborInfo[] {
     return this.directions.map((direction) => ({
       direction,
-      coordinate: this[direction](coord),
+      coordinate: this.getNeighbor(coord, direction),
     }));
   }
 
