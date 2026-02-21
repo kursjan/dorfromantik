@@ -6,6 +6,7 @@ import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { pixelToHex } from '../utils/HexUtils';
 import { HEX_SIZE } from '../graphics/HexStyles';
+import { Session } from '../../models/Session';
 
 export class CanvasController {
   private static readonly ZOOM_SENSITIVITY = 0.001;
@@ -20,13 +21,15 @@ export class CanvasController {
   private readonly debugRenderer: DebugRenderer;
   private readonly backgroundRenderer: BackgroundRenderer;
   private readonly inputManager: InputManager;
+  private readonly session: Session;
 
   // State
   private animationFrameId: number = 0;
   private hoveredHex: HexCoordinate | null = null;
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, session: Session) {
     this.canvas = canvas;
+    this.session = session;
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Could not get 2d context');
     this.ctx = ctx;

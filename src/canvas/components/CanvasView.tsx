@@ -1,8 +1,13 @@
 import React, { useRef, useEffect } from 'react';
 import { CanvasController } from '../engine/CanvasController';
 import { ResetViewButton } from './ResetViewButton';
+import { Session } from '../../models/Session';
 
-export const CanvasView: React.FC = () => {
+interface CanvasViewProps {
+  session: Session;
+}
+
+export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const controllerRef = useRef<CanvasController | null>(null);
 
@@ -11,7 +16,7 @@ export const CanvasView: React.FC = () => {
     if (!canvas) return;
 
     // Initialize Controller
-    const controller = new CanvasController(canvas);
+    const controller = new CanvasController(canvas, session);
     controllerRef.current = controller;
 
     // Cleanup on unmount
@@ -19,7 +24,7 @@ export const CanvasView: React.FC = () => {
       controller.destroy();
       controllerRef.current = null;
     };
-  }, []);
+  }, [session]);
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>

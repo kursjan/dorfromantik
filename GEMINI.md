@@ -8,6 +8,20 @@ These instructions must be followed above all else.
 
 - **Primary Directive:** The implementation plans in `conductor/tracks/<track_id>/plan.md` are roadmaps, **NOT** commands. Always wait for explicit user confirmation before starting any new task from a plan.
   - Agent performs only one task at a time.
+- **THE CONDUCTOR EXECUTION ENGINE (MANDATORY):**
+  - **Single-Task Loop:** You MUST NOT perform more than one task from `plan.md` in a single response.
+  - **The "Done" Definition:** A task is only "Done" when:
+    1. Code is implemented.
+    2. Verification Protocol (tsc, tests, e2e) passes 100%.
+    3. A commit is made referencing the GitHub Issue.
+    4. The `plan.md` is updated with the status [x] and the commit SHA.
+  - **The "Wait" State:** After a task is "Done," you MUST STOP and present a Task Summary. Do not proceed to the next task without explicit user permission.
+- **THE "TASK GATE" PROTOCOL:**
+  - Every task is a discrete unit of work. Do not bundle tasks.
+  - Before asking to proceed, you must report:
+    - **Files Modified:** List of paths.
+    - **Verification Results:** "Linting PASSED, Type Check PASSED, Tests PASSED."
+    - **Commit SHA:** The 7-character hash of the task commit.
 - **Conductor & Plan Management:**
   - **Focused Updates:** When updating a track's `plan.md` or `spec.md`, modify only the sections directly related to the current task.
   - **Checkbox Protocol:** Always wait for the user's explicit confirmation before marking a task as complete in the track's `plan.md`.

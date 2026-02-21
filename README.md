@@ -111,3 +111,4 @@ Notes to add somewhere
 - It is easy to make it do things, it is harder to make it do things your way???
 - Crazy, I just use AI to help me with git rebase/rename/conent divergent hell... and it worked :shocked:
 - Can't make two Gemini CLI work in the same workspace, which is a bit frustrating.
+- Gemin CLI actually saves PRO quota, because it is smart to which model it delegates to (contrary to Firebase studio)

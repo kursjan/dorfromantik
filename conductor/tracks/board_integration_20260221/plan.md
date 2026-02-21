@@ -2,7 +2,7 @@
 
 ## Phase 1: Data Binding & React HUD
 
-- [ ] Task: #4.1: Update `CanvasController` constructor to accept and store a `Session` instance.
+- [x] Task: #4.1: Update `CanvasController` constructor to accept and store a `Session` instance.
 - [ ] Task: #4.2: Create a `GameHUD` React component (`src/canvas/components/GameHUD.tsx`) to display score and remaining turns.
 - [ ] Task: #4.3: Add `GameHUD.stories.tsx` to verify the HUD's visual representation for various game states.
 - [ ] Task: #4.4: Integrate `GameHUD` as an overlay in `CanvasView.tsx`.

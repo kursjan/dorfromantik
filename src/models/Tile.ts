@@ -1,4 +1,4 @@
-import { Direction } from './Navigation';
+import type { Direction } from './Navigation';
 
 export const TERRAIN_TYPES = ['tree', 'house', 'water', 'pasture', 'rail', 'field'] as const;
 export type TerrainType = (typeof TERRAIN_TYPES)[number];

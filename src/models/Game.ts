@@ -1,6 +1,6 @@
 import { Board } from './Board';
 import { GameRules } from './GameRules';
-import { Tile, TerrainType } from './Tile';
+import { Tile, type TerrainType } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
 import { Navigation } from './Navigation';
 
