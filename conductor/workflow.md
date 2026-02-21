@@ -14,9 +14,9 @@ All tasks follow a strict lifecycle:
 
 ### Standard Task Workflow
 
-1. **Select Task:** Choose the next available task from `plan.md` in sequential order
-
-2. **Mark In Progress:** Before beginning work, edit `plan.md` and change the task from `[ ]` to `[~]`
+1. **Select Task:** Choose the next available task from `plan.md` in sequential order.
+2. **Sync with GitHub:** Before beginning, ensure there is a corresponding GitHub issue for this task. If one does not exist, create it with `gh issue create`.
+3. **Mark In Progress:** Before beginning work, edit `plan.md` and change the task from `[ ]` to `[~]`. Include the GitHub Issue number in the `plan.md` (e.g., `Task: #123: ...`).
 
 3. **Draft Implementation**: 
    - Write the functional code/logic first based on the Spec.

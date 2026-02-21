@@ -14,9 +14,10 @@ These instructions must be followed above all else.
   - **Analysis tasks:** Output of analysis is a suggested update in the track's plan or specification, so that the user can verify the tasks and ask the AI to execute them later.
   - **Check updates:** Both user and AI can modify Conductor files. The AI always reads the file content and preserves any changes made by the user.
 - **Task Management (GitHub Integration):**
-  - **Issues:** Use GitHub Issues to track significant tasks, bugs, and backlog items.
-  - **Backlog:** Maintain a `low priority` label on GitHub for non-critical backlog items (e.g., optimizations, future test coverage).
-  - **Tooling:** Use the `gh` CLI for creating and managing issues.
+  - **Issues:** Use GitHub Issues to track every task, bug, and feature. No work should be done without an associated issue number.
+  - **Issue Linkage:** Every implementation commit MUST reference its GitHub Issue number in the message (e.g., `feat: login logic (fixes #123)` or `refactor: types (refs #45)`).
+  - **Backlog:** Maintain a `low priority` label on GitHub for non-critical backlog items.
+  - **Tooling:** Use the `gh` CLI for creating, listing, and managing issues.
 - **Communication:** Communicate in a brief and professional manner.
 - **Scope:** Adhere strictly to the scope of the assigned task and instructions. Make small changes and minimize file touches.
 - **Preservation of User Content:** When asked to "correct" or "improve" a user-authored document, your primary goal is to preserve the user's original content and voice. Corrections and suggestions should be additive or minor edits to the existing text.
@@ -354,3 +355,6 @@ Props Interface: (Exactly what goes in)
 State Ownership: (Who "owns" the data?)
 
 Visual Hierarchy: (Where does this sit in the tree?)
+
+## Misc
+SGTM means sounds good to me, like LGTM Looks good to me.
