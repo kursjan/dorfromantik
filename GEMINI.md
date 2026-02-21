@@ -29,7 +29,9 @@ These instructions must be followed above all else.
   - **Check updates:** Both user and AI can modify Conductor files. The AI always reads the file content and preserves any changes made by the user.
 - **Task Management (GitHub Integration):**
   - **Issues:** Use GitHub Issues to track every task, bug, and feature. No work should be done without an associated issue number.
-  - **Issue Linkage:** Every implementation commit MUST reference its GitHub Issue number in the message (e.g., `feat: login logic (fixes #123)` or `refactor: types (refs #45)`).
+  - **Issue Linkage:**
+    - **Development Commits:** Use `refs #123` to link a task to an issue without closing it (e.g., `feat: add hex logic (refs #123)`).
+    - **Closing Commits:** ONLY use `fixes #123` or `closes #123` in the final commit of a Track or when the entire feature/bug is verified as complete.
   - **Backlog:** Maintain a `low priority` label on GitHub for non-critical backlog items.
   - **Tooling:** Use the `gh` CLI for creating, listing, and managing issues.
 - **Communication:** Communicate in a brief and professional manner.

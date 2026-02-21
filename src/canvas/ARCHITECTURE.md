@@ -14,7 +14,9 @@ The canvas visualization logic is separated from the React component tree to ens
 ```
 src/canvas/
 ├── components/        # React Components
-│   ├── CanvasView.tsx      # Entry point (Main container)
+│   ├── CanvasView.tsx      # Entry point (Main container, manages HUD/Canvas sync)
+│   ├── GameHUD.tsx         # Score and Turn counter overlay
+│   ├── GameHUD.css         # HUD styling
 │   ├── ResetViewButton.tsx # UI Overlay for camera control
 │   └── ResetViewButton.css # Button styling
 ├── engine/            # Core Game Loop & State
