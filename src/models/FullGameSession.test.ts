@@ -14,7 +14,7 @@ describe('Full Game Session Integration', () => {
 
   beforeEach(() => {
     user = new User('player-1');
-    rules = new GameRules({ initialTurns: 10, pointsPerMatch: 10 });
+    rules = new GameRules({ initialTurns: 3, pointsPerMatch: 10 });
     session = new Session('session-1', user);
   });
 

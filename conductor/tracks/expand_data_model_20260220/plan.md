@@ -18,11 +18,11 @@
 - [x] Task: Verify that `Session` can correctly transition games from active to history. f89154f
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Session & Persistence Foundation' (Protocol in workflow.md)
 
-## Phase 4: Code Review & Refinement
+## Phase 4: Code Review & Refinement [checkpoint: f530f56]
 
 - [x] Task: #5.6: Perform a comprehensive code review of the newly implemented models (`User`, `GameRules`, `Game`, `Session`). ebca26e
 - [x] Task: Present review findings and architectural suggestions to the user. ebca26e
 - [x] Task: Verify models with a "Full Game Session" integration test. ebca26e
-- [ ] Task: Implement approved refinements and refactorings.
+- [x] Task: Implement approved refinements and refactorings. 6b1dd8f
 - [x] Task: #5.7: Centralize terrain logic in `Tile.ts` and use `Tile.createRandom` in `Game.ts`. 0b71d8d
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Code Review & Refinement' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Code Review & Refinement' (Protocol in workflow.md)
