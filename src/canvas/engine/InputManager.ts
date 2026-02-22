@@ -19,8 +19,12 @@ export interface InputCallbacks {
  * - Track active keys.
  */
 export class InputManager {
+  private static readonly DRAG_THRESHOLD = 5; // pixels
+
   private canvas: HTMLCanvasElement;
-  private isDragging: boolean = false;
+  private isMouseDown: boolean = false;
+  private isPanning: boolean = false;
+  private mouseDownPos: { x: number; y: number } = { x: 0, y: 0 };
   private lastMousePos: { x: number; y: number } = { x: 0, y: 0 };
   private callbacks: InputCallbacks;
 
@@ -89,12 +93,14 @@ export class InputManager {
   };
 
   private handleMouseDown = (e: MouseEvent) => {
-    // Only left click drags
+    // Only left click
     if (e.button !== 0) return;
 
-    this.isDragging = true;
+    this.isMouseDown = true;
+    this.isPanning = false;
+    this.mouseDownPos = { x: e.clientX, y: e.clientY };
     this.lastMousePos = { x: e.clientX, y: e.clientY };
-    this.canvas.style.cursor = 'grabbing';
+    // Don't set grabbing cursor yet
   };
 
   private handleMouseMove = (e: MouseEvent) => {
@@ -104,23 +110,47 @@ export class InputManager {
     const mouseY = e.clientY - rect.top;
     this.callbacks.onHover(mouseX, mouseY);
 
-    // 2. Handle Dragging (Pan)
-    if (this.isDragging) {
-      const dx = e.clientX - this.lastMousePos.x;
-      const dy = e.clientY - this.lastMousePos.y;
-      this.lastMousePos = { x: e.clientX, y: e.clientY };
+    // 2. Handle Potential Panning
+    if (this.isMouseDown) {
+      if (!this.isPanning) {
+        // Calculate distance from start
+        const dx = Math.abs(e.clientX - this.mouseDownPos.x);
+        const dy = Math.abs(e.clientY - this.mouseDownPos.y);
 
-      this.callbacks.onPan(dx, dy);
+        if (dx > InputManager.DRAG_THRESHOLD || dy > InputManager.DRAG_THRESHOLD) {
+          this.isPanning = true;
+          this.canvas.style.cursor = 'grabbing';
+          // Start the first pan from the threshold crossing
+          this.lastMousePos = { x: e.clientX, y: e.clientY };
+        }
+      } else {
+        // Continuous Panning
+        const dx = e.clientX - this.lastMousePos.x;
+        const dy = e.clientY - this.lastMousePos.y;
+        this.lastMousePos = { x: e.clientX, y: e.clientY };
+
+        this.callbacks.onPan(dx, dy);
+      }
     }
   };
 
-  private handleMouseUp = () => {
-    this.isDragging = false;
+  private handleMouseUp = (e: MouseEvent) => {
+    if (this.isMouseDown) {
+      if (!this.isPanning) {
+        // It was a click!
+        const rect = this.canvas.getBoundingClientRect();
+        this.callbacks.onClick(e.clientX - rect.left, e.clientY - rect.top);
+      }
+    }
+
+    this.isMouseDown = false;
+    this.isPanning = false;
     this.canvas.style.cursor = 'grab';
   };
 
   private handleMouseLeave = () => {
-    this.isDragging = false;
+    this.isMouseDown = false;
+    this.isPanning = false;
     this.canvas.style.cursor = 'grab';
     this.callbacks.onLeave();
   };
