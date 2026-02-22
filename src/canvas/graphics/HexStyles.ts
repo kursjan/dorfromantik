@@ -1,3 +1,5 @@
+import { TerrainType } from '../../models/Tile';
+
 export interface HexStyle {
   size: number;
   strokeColor: string;
@@ -38,4 +40,13 @@ export const HOVER_HEX_STYLE: HexStyle = {
   lineWidth: 3,
   fillColor: 'rgba(255, 215, 0, 0.2)',
   textColor: '#000',
+};
+
+export const TERRAIN_COLORS: Record<TerrainType, string> = {
+  tree: '#228B22', // ForestGreen
+  house: '#8B4513', // SaddleBrown
+  water: '#00BFFF', // DeepSkyBlue
+  pasture: '#7CFC00', // LawnGreen
+  rail: '#708090', // SlateGray
+  field: '#FFD700', // Gold
 };

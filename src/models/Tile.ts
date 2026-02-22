@@ -53,25 +53,24 @@ export class Tile {
   }
 
   /**
+   * Returns a map of all directions to their terrain types.
+   */
+  getTerrains(): Record<Direction, TerrainType> {
+    return {
+      north: this.north,
+      northEast: this.northEast,
+      southEast: this.southEast,
+      south: this.south,
+      southWest: this.southWest,
+      northWest: this.northWest,
+    };
+  }
+
+  /**
    * Returns the terrain type for a specific direction on this tile.
    */
   getTerrain(direction: Direction): TerrainType {
-    switch (direction) {
-      case 'north':
-        return this.north;
-      case 'northEast':
-        return this.northEast;
-      case 'southEast':
-        return this.southEast;
-      case 'south':
-        return this.south;
-      case 'southWest':
-        return this.southWest;
-      case 'northWest':
-        return this.northWest;
-      default:
-        throw new Error(`Invalid direction: ${direction}`);
-    }
+    return this.getTerrains()[direction];
   }
 
   private getTerrainChar(type: TerrainType): string {
@@ -79,12 +78,13 @@ export class Tile {
   }
 
   print(): void {
-    const n = this.getTerrainChar(this.north);
-    const ne = this.getTerrainChar(this.northEast);
-    const se = this.getTerrainChar(this.southEast);
-    const s = this.getTerrainChar(this.south);
-    const sw = this.getTerrainChar(this.southWest);
-    const nw = this.getTerrainChar(this.northWest);
+    const terrains = this.getTerrains();
+    const n = this.getTerrainChar(terrains.north);
+    const ne = this.getTerrainChar(terrains.northEast);
+    const se = this.getTerrainChar(terrains.southEast);
+    const s = this.getTerrainChar(terrains.south);
+    const sw = this.getTerrainChar(terrains.southWest);
+    const nw = this.getTerrainChar(terrains.northWest);
 
     console.log(`Tile ${this.id}:`);
     console.log(`    _ _`);

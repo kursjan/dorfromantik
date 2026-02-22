@@ -113,3 +113,4 @@ Notes to add somewhere
 - Can't make two Gemini CLI work in the same workspace, which is a bit frustrating.
 - Gemin CLI actually saves quota, because it is smart enough to which model it delegates to (contrary to Firebase studio)
 - Even with conductor, AI forgets to follow the protocol, especially when you have a bit of back and forth in a session.
+- Currently, I am working with two agents, one is working on the main track (conductor), the other is doing other stuff, small fixes, updates, tooling, ...
