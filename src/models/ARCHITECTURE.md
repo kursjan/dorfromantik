@@ -32,6 +32,15 @@ The `Game` class is the central orchestrator of an active session.
     - **`placeTile(coord)`**: The primary game action. It pops a tile from the queue, places it on the board, and calculates matching terrain scores with all neighbors.
     - **`rotateQueuedTileClockwise()` / `rotateQueuedTileCounterClockwise()`**: Rotates the tile currently at the head of the queue.
     - **`peek()`**: Allows the UI to preview the next tile in the queue.
+    - **`isPerfect(coord)`**: Checks if a tile at the given coordinate has 6 matching neighbors.
+
+### 5. Perfect Placement Scoring
+The game implements the "Perfect Placement" bonus (Steam rules):
+- **Definition**: A tile is "Perfect" if all 6 of its neighbors exist and their touching terrains match exactly.
+- **Bonus**: Each placement that results in a tile *becoming* perfect awards:
+  - **+60 points** (in addition to standard edge-matching points).
+  - **+1 extra tile** added to the `tileQueue` (extending the game's duration).
+- **Cascades**: A single placement can trigger up to 7 perfect bonuses (the newly placed tile + its 6 neighbors).
 
 ## Interactions
 

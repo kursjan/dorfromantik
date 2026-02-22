@@ -14,3 +14,7 @@ This file tracks all major tracks for the project. Each track has its own detail
   *Link: [./tracks/input_manager_refactor_20260222/](./tracks/input_manager_refactor_20260222/)*
 - [ ] **Track: Tile Rotation Logic (Keyboard & Mouse)**
   *Link: [./tracks/tile_rotation_20260222/](./tracks/tile_rotation_20260222/)*
+- [ ] **Track: Always-on Ghost Preview (#18)**
+  *Link: [./tracks/always_on_ghost_preview_20260222/](./tracks/always_on_ghost_preview_20260222/)*
+- [x] **Track: Perfect Placement Scoring (#16)**
+  *Link: [./tracks/perfect_placement_scoring_20260222/](./tracks/perfect_placement_scoring_20260222/)*

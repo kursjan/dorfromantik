@@ -1,0 +1,9 @@
+{
+  "id": "always_on_ghost_preview_20260222",
+  "issue": 18,
+  "title": "Always-on Ghost Preview",
+  "description": "Ensure the 'next tile' is always visible on the hex grid while hovering, using visual cues for placement validity.",
+  "status": "planned",
+  "priority": "medium",
+  "tags": ["ui", "ux", "canvas", "preview"]
+}

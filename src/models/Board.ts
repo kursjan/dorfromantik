@@ -1,5 +1,6 @@
 import { HexCoordinate } from './HexCoordinate';
 import { Tile } from './Tile';
+import type { Navigation, NeighborInfo } from './Navigation';
 
 export interface BoardTile {
   id: string; // "q,r,s"
@@ -9,6 +10,13 @@ export interface BoardTile {
 
 export class Board {
   private tiles = new Map<string, BoardTile>();
+
+  /**
+   * Returns a list of coordinates adjacent to the given coordinate that already have tiles.
+   */
+  getNeighbors(coord: HexCoordinate, navigation: Navigation): NeighborInfo[] {
+    return navigation.getNeighbors(coord).filter((n) => this.has(n.coordinate));
+  }
 
   place(tile: Tile, coord: HexCoordinate): void {
     if (!this.canPlace(coord)) {
