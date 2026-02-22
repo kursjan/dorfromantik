@@ -12,6 +12,7 @@ This directory contains the core data structures and business logic for the Dorf
 
 ### 2. Game Entities (`Tile.ts`, `Board.ts`)
 - **`Tile`**: Represents a single hexagonal tile with 6 sides of specific terrain types.
+  - **`getTerrains()`**: Returns a `Record<Direction, TerrainType>` mapping all directions to their respective terrain types.
 - **`Board`**: A collection of placed tiles mapped to their coordinates. It handles spatial queries and placement validation.
 
 ### 3. Session & Rules (`User.ts`, `GameRules.ts`, `Session.ts`)

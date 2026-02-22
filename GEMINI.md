@@ -208,6 +208,18 @@ Prefer explicit methods like `Tile.getTerrain(direction)` over direct property a
 All geometric and directional logic (finding neighbors, determining opposite sides) must reside in the `Navigation` class.
 - **Service Pattern:** Treat `Navigation` as a geometric service that other models (`Game`, `Board`) use to query the world's structure, rather than embedding coordinates math directly into business logic.
 
+### **Graphics Type Safety (Browser Imports)**
+
+When importing types from models into graphics/renderer files (e.g., `TerrainType`):
+- **Requirement:** Use `import type { ... }` to ensure the type is stripped during compilation.
+- **Why:** Importing a type as a value can lead to a `SyntaxError` in the browser if the underlying model file does not provide a corresponding runtime export for that specific name.
+
+### **Fail-Fast Session State**
+
+The `CanvasController` requires a valid `Session` with an `activeGame` to function.
+- **Pattern:** Throw an explicit `Error` in the constructor or `render` loop if `session.activeGame` is missing.
+- **Why:** This ensures that synchronization issues between React and the Controller are caught immediately during development rather than failing silently with blank screens.
+
 ## **Styling**
 
 The AI will use a consistent styling approach, preferring modern solutions like Tailwind CSS or CSS-in-JS libraries (e.g., styled-components, Emotion) if they are already present in the project. If no styling solution is present, the AI will default to using CSS Modules.

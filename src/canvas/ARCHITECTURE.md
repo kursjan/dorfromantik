@@ -28,7 +28,9 @@ src/canvas/
 │   ├── BackgroundStyles.ts   # Background configuration
 │   ├── DebugRenderer.ts      # Draws debug overlay (HUD)
 │   ├── DebugStyles.ts        # Debug overlay configuration
-│   ├── HexRenderer.ts        # Main game world rendering (Hexes, Grid)
+│   ├── HexRenderer.ts        # Main game world rendering (Grid, Highlights)
+│   ├── HexStyles.ts          # Hex visual configuration
+│   ├── TileRenderer.ts       # Specialized renderer for 6-sided tiles
 │   └── HexStyles.ts          # Hex visual configuration
 └── ARCHITECTURE.md    # This file
 ```
@@ -92,7 +94,8 @@ DOM abstraction layer.
 Stateless rendering utilities. They receive the `Context2D` and necessary data to draw.
 
 - **BackgroundRenderer:** Handles clearing the screen and drawing the background color.
-- **HexRenderer:** Draws the game grid, tiles, and highlights. It uses `HexStyles.ts` for configuration.
+- **HexRenderer:** Draws the game grid and debug highlights. It uses `HexStyles.ts` for configuration.
+- **TileRenderer:** Draws the 6-sided terrain wedges for placed tiles. It aligns the model's terrain mapping with the canvas orientation.
 - **DebugRenderer:** Draws technical info (camera pos, zoom, rotation, etc.) on top of the scene.
 
 ### Styles (`graphics/*Styles.ts`)
@@ -102,7 +105,16 @@ Configuration files for their respective renderers.
 - Defines colors, line widths, fonts, and constants.
 - **Rule:** Every renderer must have a corresponding styles file.
 
-## 5. Data Flow Example: Hovering
+## 5. React & Controller Synchronization
+
+While the Controller runs independently for performance, the React-based HUD needs to reflect the current game state (score, turns).
+
+- **Pattern:** `CanvasController` exposes an `onStatsChange` callback.
+- **Registration:** `CanvasView` (React) registers a listener in its `useEffect` hook.
+- **Execution:** When the game state changes (e.g., tile placed), the Controller invokes the callback, triggering a `useState` update in React.
+- **Why:** This maintains the "Pure TS for Game Loop" principle while keeping the UI reactive.
+
+## 6. Data Flow Example: Hovering
 
 1.  **Browser:** User moves mouse to pixel `(500, 300)`.
 2.  **InputManager:** Catches `mousemove`, calls `callbacks.onHover(500, 300)`.
