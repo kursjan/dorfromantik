@@ -7,6 +7,8 @@ export interface InputCallbacks {
   onResize: () => void;
 }
 
+type InputState = 'IDLE' | 'MOUSE_DOWN_POTENTIAL_CLICK' | 'PANNING';
+
 /**
  * Manages DOM event listeners for the canvas.
  * Translates raw mouse/touch events into abstract Game Actions (Pan, Zoom, Hover, Resize).
@@ -22,8 +24,7 @@ export class InputManager {
   private static readonly DRAG_THRESHOLD = 5; // pixels
 
   private canvas: HTMLCanvasElement;
-  private isMouseDown: boolean = false;
-  private isPanning: boolean = false;
+  private state: InputState = 'IDLE';
   private mouseDownPos: { x: number; y: number } = { x: 0, y: 0 };
   private lastMousePos: { x: number; y: number } = { x: 0, y: 0 };
   private callbacks: InputCallbacks;
@@ -69,6 +70,21 @@ export class InputManager {
     this.detachListeners();
   }
 
+  private transition(newState: InputState) {
+    this.state = newState;
+
+    // Side effects of state changes
+    switch (newState) {
+      case 'IDLE':
+      case 'MOUSE_DOWN_POTENTIAL_CLICK':
+        this.canvas.style.cursor = 'grab';
+        break;
+      case 'PANNING':
+        this.canvas.style.cursor = 'grabbing';
+        break;
+    }
+  }
+
   /**
    * Returns -1 for Left (Q), 1 for Right (E), 0 for None.
    */
@@ -96,11 +112,9 @@ export class InputManager {
     // Only left click
     if (e.button !== 0) return;
 
-    this.isMouseDown = true;
-    this.isPanning = false;
+    this.transition('MOUSE_DOWN_POTENTIAL_CLICK');
     this.mouseDownPos = { x: e.clientX, y: e.clientY };
     this.lastMousePos = { x: e.clientX, y: e.clientY };
-    // Don't set grabbing cursor yet
   };
 
   private handleMouseMove = (e: MouseEvent) => {
@@ -110,50 +124,53 @@ export class InputManager {
     const mouseY = e.clientY - rect.top;
     this.callbacks.onHover(mouseX, mouseY);
 
-    // 2. Handle Potential Panning
-    if (this.isMouseDown) {
-      if (!this.isPanning) {
-        // Calculate distance from start
+    // 2. Handle State Transitions
+    switch (this.state) {
+      case 'MOUSE_DOWN_POTENTIAL_CLICK': {
         const dx = Math.abs(e.clientX - this.mouseDownPos.x);
         const dy = Math.abs(e.clientY - this.mouseDownPos.y);
 
         if (dx > InputManager.DRAG_THRESHOLD || dy > InputManager.DRAG_THRESHOLD) {
-          this.isPanning = true;
-          this.canvas.style.cursor = 'grabbing';
-          // Start the first pan from the threshold crossing
+          this.transition('PANNING');
           this.lastMousePos = { x: e.clientX, y: e.clientY };
         }
-      } else {
-        // Continuous Panning
+        break;
+      }
+
+      case 'PANNING': {
         const dx = e.clientX - this.lastMousePos.x;
         const dy = e.clientY - this.lastMousePos.y;
         this.lastMousePos = { x: e.clientX, y: e.clientY };
-
         this.callbacks.onPan(dx, dy);
+        break;
       }
+
+      case 'IDLE':
+      default:
+        break;
     }
   };
 
   private handleMouseUp = (e: MouseEvent) => {
-    if (this.isMouseDown) {
-      if (!this.isPanning) {
-        // It was a click!
-        const rect = this.canvas.getBoundingClientRect();
-        this.callbacks.onClick(e.clientX - rect.left, e.clientY - rect.top);
-      }
-    }
-
-    this.isMouseDown = false;
-    this.isPanning = false;
-    this.canvas.style.cursor = 'grab';
+    const rect = this.canvas.getBoundingClientRect();
+    this.finishInteraction(e.clientX - rect.left, e.clientY - rect.top);
   };
 
   private handleMouseLeave = () => {
-    this.isMouseDown = false;
-    this.isPanning = false;
-    this.canvas.style.cursor = 'grab';
+    this.finishInteraction();
     this.callbacks.onLeave();
   };
+
+  /**
+   * Finalizes the current interaction (e.g. on mouseup or mouseleave).
+   */
+  private finishInteraction(mouseX?: number, mouseY?: number) {
+    if (this.state === 'MOUSE_DOWN_POTENTIAL_CLICK' && mouseX !== undefined && mouseY !== undefined) {
+      this.callbacks.onClick(mouseX, mouseY);
+    }
+
+    this.transition('IDLE');
+  }
 
   private handleResize = () => {
     this.callbacks.onResize();

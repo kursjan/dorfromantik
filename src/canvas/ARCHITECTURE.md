@@ -87,6 +87,7 @@ Manages the view transform.
 DOM abstraction layer.
 
 - **Role:** Translates raw DOM events (`mousedown`, `wheel`, `keydown`, etc.) into abstract Game Actions (`onPan`, `onZoom`, `onHover`, `getRotationDirection`).
+- **State Machine:** Uses an explicit state machine (`IDLE`, `MOUSE_DOWN_POTENTIAL_CLICK`, `PANNING`) to distinguish between clicks and pans. This centralizes transition logic and cursor management.
 - **Hygiene:** Explicitly attaches and detaches listeners to prevent memory leaks.
 - **Normalization:** Handles cross-browser differences (e.g., wheel delta).
 - **Keyboard Tracking:** Maintains a Set of active keys for continuous actions like rotation.
