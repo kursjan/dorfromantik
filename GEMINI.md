@@ -38,6 +38,15 @@ These instructions must be followed above all else.
 - **Scope:** Adhere strictly to the scope of the assigned task and instructions. Make small changes and minimize file touches.
 - **Preservation of User Content:** When asked to "correct" or "improve" a user-authored document, your primary goal is to preserve the user's original content and voice. Corrections and suggestions should be additive or minor edits to the existing text.
 - **Refactoring Rule:** When refactoring, your goal is to improve code structure while preserving all existing business logic. Use the test suite to verify that the logic remains unchanged.
+
+## **MULTI-WORKTREE & HEADLESS WORKSPACE PROTOCOL (High Priority)**
+
+This project often operates in a multi-worktree environment where the `main` branch is checked out in a primary directory.
+
+- **Main Branch Protection:** NEVER attempt to `git checkout main` or perform local merges into `main` within this workspace.
+- **Remote-First Synchronization:** All changes intended for `main` MUST be pushed to a feature branch on `origin` and merged via a Pull Request (`gh pr create` and `gh pr merge --merge`).
+- **Explicit Task Gating:** When a Track or significant Phase is completed, the agent MUST STOP. Even if the user issues a broad "proceed" or "yes" directive, the agent must not transition to a new, unrelated Track without a specific directive naming the target Track.
+
 - **Contextual Refactoring Rule:** Always analyze files in the context of the entire project. Check all usages of a class or function to ensure its public API remains valid after refactoring.
 - **Verification Protocol:** After _every_ code change, automatically run the following checks:
   1.  **Architecture Sync:** Update or create `ARCHITECTURE.md` files in relevant directories to reflect new models, patterns, and architectural decisions.
