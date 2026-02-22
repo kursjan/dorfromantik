@@ -200,8 +200,13 @@ In a JSDOM environment, `requestAnimationFrame` is not natively supported.
 
 ### **Explicit Domain Accessors**
 
-Prefer explicit methods like `Tile.getTerrain(direction)` over direct property access (e.g., `tile[direction]`).
-- **Reason:** This improves readability for non-TypeScript developers and ensures that internal property naming can change without affecting the public API of core entities.
+Prefer explicit methods like `Tile.getTerrain(direction)` or `Game.rotateQueuedTileClockwise()` over direct property access or boolean-flagged methods (e.g., `rotate(true)`).
+- **Reason:** This improves readability for non-TypeScript developers, ensures clearer intent, and prevents "boolean blindness" in API usage.
+
+### **Fail Fast in Game Logic**
+
+Avoid wrapping core game logic (like placement or rotation) in `try/catch` blocks that merely log errors.
+- **Reason:** Domain errors (e.g., rotating an empty queue) represent logic bugs or UI state desyncs. Silent catching masks these issues; allowing them to throw ensures they are visible and fixed early.
 
 ### **Geometric Logic Centralization**
 

@@ -69,6 +69,10 @@ I managed to implement reset button. Original prompt (along the lines): `add a r
 - style the button
 The more detailed prompt and more `/clear` worked like a charm.
 
+# 2026-02-22
+
+Today was a hard session, with multiple AI agents running at the same time, switching worktrees, branches, AI code review. I am thinking about a good workflow which can help me to gate the code. The model keeps beeing "busy" so I spend quite some time with retries.
+
 # Graveyard
 
 Notes to add somewhere
@@ -115,3 +119,8 @@ Notes to add somewhere
 - Even with conductor, AI forgets to follow the protocol, especially when you have a bit of back and forth in a session.
 - Currently, I am working with two agents, one is working on the main track (conductor), the other is doing other stuff, small fixes, updates, tooling, ...
 - I just wanted to ask AI to chop an onion for me while preparing lunch... :-o
+- I am contemplating using git branch per track and forced code review PR to main
+  - I have better experience with code review in github than during development, running 2 agents at the same time
+  - I wonder if I can setup conductor to gemini.md or workflow.md to capture this
+  - Lets see tommorrow
+- I hope using GEMINI_API_KEY will improve model availability
