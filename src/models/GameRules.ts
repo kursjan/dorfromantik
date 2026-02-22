@@ -12,6 +12,8 @@ export interface InitialTileSpec {
 export interface GameRulesOptions {
   initialTurns?: number;
   pointsPerMatch?: number;
+  pointsPerPerfect?: number;
+  turnsPerPerfect?: number;
   initialTile?: InitialTileSpec;
 }
 
@@ -21,6 +23,8 @@ export interface GameRulesOptions {
 export class GameRules {
   readonly initialTurns: number;
   readonly pointsPerMatch: number;
+  readonly pointsPerPerfect: number;
+  readonly turnsPerPerfect: number;
   readonly initialTile?: InitialTileSpec;
 
   /**
@@ -30,6 +34,8 @@ export class GameRules {
   constructor(options: GameRulesOptions = {}) {
     this.initialTurns = options.initialTurns ?? 40;
     this.pointsPerMatch = options.pointsPerMatch ?? 10;
+    this.pointsPerPerfect = options.pointsPerPerfect ?? 60;
+    this.turnsPerPerfect = options.turnsPerPerfect ?? 1;
     this.initialTile = options.initialTile;
 
     if (this.initialTurns < 0) {
@@ -37,6 +43,12 @@ export class GameRules {
     }
     if (this.pointsPerMatch < 0) {
       throw new Error('pointsPerMatch must be non-negative');
+    }
+    if (this.pointsPerPerfect < 0) {
+      throw new Error('pointsPerPerfect must be non-negative');
+    }
+    if (this.turnsPerPerfect < 0) {
+      throw new Error('turnsPerPerfect must be non-negative');
     }
   }
 
@@ -47,6 +59,8 @@ export class GameRules {
     return new GameRules({
       initialTurns: 30,
       pointsPerMatch: 10,
+      pointsPerPerfect: 60,
+      turnsPerPerfect: 1,
       initialTile: {
         north: 'pasture',
         northEast: 'pasture',

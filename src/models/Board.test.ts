@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { Board } from './Board';
 import { Tile } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
+import { Navigation } from './Navigation';
 
 describe('Board', () => {
   let board: Board;
@@ -58,5 +59,20 @@ describe('Board', () => {
     expect(all.length).toBe(2);
     expect(all.some((t) => t.tile === tile)).toBe(true);
     expect(all.some((t) => t.tile === tile2)).toBe(true);
+  });
+
+  it('should return existing neighbors correctly', () => {
+    const nav = new Navigation();
+    const neighborCoord = new HexCoordinate(-1, 0, 1);
+    const nonNeighborCoord = new HexCoordinate(2, 0, -2);
+
+    board.place(tile, coord); // Origin
+    board.place(tile, neighborCoord); // North of origin
+    board.place(tile, nonNeighborCoord); // Far away
+
+    const neighbors = board.getNeighbors(coord, nav);
+    expect(neighbors.length).toBe(1);
+    expect(neighbors[0].coordinate.getKey()).toBe(neighborCoord.getKey());
+    expect(neighbors[0].direction).toBe('north');
   });
 });

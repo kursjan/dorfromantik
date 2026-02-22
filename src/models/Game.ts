@@ -13,6 +13,7 @@ export interface GameProps {
 
 export interface PlacementResult {
   scoreAdded: number;
+  perfectCount: number;
 }
 
 /**
@@ -125,6 +126,39 @@ export class Game {
   }
 
   /**
+   * Checks if a tile at the given coordinate is "Perfect".
+   * A tile is perfect if it has 6 neighbors and all 6 edges match.
+   */
+  isPerfect(coord: HexCoordinate): boolean {
+    const boardTile = this.board.get(coord);
+    if (!boardTile) {
+      return false;
+    }
+
+    const neighbors = this.navigation.getNeighbors(coord);
+    if (neighbors.length !== 6) {
+      throw new Error(`Expected 6 neighbors, but found ${neighbors.length}`);
+    }
+
+    for (const { direction, coordinate } of neighbors) {
+      const neighbor = this.board.get(coordinate);
+      if (!neighbor) {
+        return false; // Must have all 6 neighbors
+      }
+
+      const myTerrain = boardTile.tile.getTerrain(direction);
+      const oppositeSide = this.navigation.getOpposite(direction);
+      const neighborTerrain = neighbor.tile.getTerrain(oppositeSide);
+
+      if (myTerrain !== neighborTerrain) {
+        return false; // All must match
+      }
+    }
+
+    return true;
+  }
+
+  /**
    * Places the next tile from the queue at the given coordinate.
    * Updates score and board state.
    * @returns Results of the placement (e.g., score added).
@@ -135,12 +169,21 @@ export class Game {
       throw new Error('No tiles remaining in the queue');
     }
 
+    // 1. Identify neighbors that exist before placing the tile.
+    // They are all candidates to become perfect because this placement
+    // might be their 6th neighbor.
+    const neighbors = this.navigation.getNeighbors(coord);
+    const existingNeighborCoords = this.board
+      .getNeighbors(coord, this.navigation)
+      .map((n) => n.coordinate);
+
     this.board.place(tile, coord);
 
     let scoreAdded = 0;
+    let perfectCount = 0;
 
-    // Scoring: matching terrain on adjacent tiles
-    this.navigation.getNeighbors(coord).forEach(({ direction, coordinate }) => {
+    // 2. Standard Scoring: matching terrain on adjacent tiles
+    for (const { direction, coordinate } of neighbors) {
       const neighbor = this.board.get(coordinate);
 
       if (neighbor) {
@@ -152,10 +195,31 @@ export class Game {
           scoreAdded += this.rules.pointsPerMatch;
         }
       }
-    });
+    }
+
+    // 3. Perfect Bonuses: Check the newly placed tile
+    if (this.isPerfect(coord)) {
+      perfectCount++;
+    }
+
+    // 4. Perfect Bonuses: Check neighbors that JUST became perfect
+    for (const neighborCoord of existingNeighborCoords) {
+      if (this.isPerfect(neighborCoord)) {
+        perfectCount++;
+      }
+    }
+
+    // 5. Apply Perfect Bonuses
+    scoreAdded += perfectCount * this.rules.pointsPerPerfect;
+
+    // Add extra tiles to the queue
+    const extraTilesCount = perfectCount * this.rules.turnsPerPerfect;
+    for (let i = 0; i < extraTilesCount; i++) {
+      this.tileQueue.push(Tile.createRandom(`bonus-${Date.now()}-${i}`));
+    }
 
     this.score += scoreAdded;
-    return { scoreAdded };
+    return { scoreAdded, perfectCount };
   }
 
   private generateInitialQueue(count: number): Tile[] {
