@@ -10,18 +10,18 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "lint:fix": "putout . --fix && eslint . --fix",
     "format": "prettier --write .",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "e2e": "playwright test",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "clsx": "^2.1.1",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "tailwind-merge": "^3.5.0"
+    "react-dom": "^19.2.4"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.0.1",
