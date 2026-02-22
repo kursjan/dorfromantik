@@ -1,11 +1,12 @@
 import { Camera } from './Camera';
 import { InputManager } from './InputManager';
 import { HexRenderer } from '../graphics/HexRenderer';
+import { TileRenderer } from '../graphics/TileRenderer';
 import { DebugRenderer } from '../graphics/DebugRenderer';
 import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { pixelToHex } from '../utils/HexUtils';
-import { HEX_SIZE } from '../graphics/HexStyles';
+import { HEX_SIZE, DEFAULT_HEX_STYLE } from '../graphics/HexStyles';
 import { Session } from '../../models/Session';
 
 export class CanvasController {
@@ -18,10 +19,14 @@ export class CanvasController {
   private readonly ctx: CanvasRenderingContext2D;
   private readonly camera: Camera;
   private readonly renderer: HexRenderer;
+  private readonly tileRenderer: TileRenderer;
   private readonly debugRenderer: DebugRenderer;
   private readonly backgroundRenderer: BackgroundRenderer;
   private readonly inputManager: InputManager;
   private readonly session: Session;
+
+  // Callback for React HUD synchronization
+  public onStatsChange?: (score: number, remainingTurns: number) => void;
 
   // State
   private animationFrameId: number = 0;
@@ -37,6 +42,7 @@ export class CanvasController {
     this.camera = new Camera({ x: 0, y: 0, zoom: 1 });
     this.backgroundRenderer = new BackgroundRenderer(ctx);
     this.renderer = new HexRenderer(ctx);
+    this.tileRenderer = new TileRenderer(ctx);
     this.debugRenderer = new DebugRenderer(ctx);
     this.inputManager = new InputManager(canvas, {
       onPan: (dx, dy) => this.camera.pan(dx, dy),
@@ -77,16 +83,15 @@ export class CanvasController {
     const rotationDir = this.inputManager.getRotationDirection();
     if (rotationDir !== 0) {
       this.camera.rotateBy(rotationDir * CanvasController.ROTATION_SPEED);
-
-      // We need to re-evaluate hover during rotation, even if mouse doesn't move.
-      // We can get the last known mouse position from inputManager if we exposed it,
-      // or just wait for the next mouse event.
-      // Ideally, InputManager should expose `getLastMousePos()`.
-      // For now, let's keep it simple: the highlight updates when you wiggle the mouse.
     }
   }
 
   private render() {
+    const activeGame = this.session.activeGame;
+    if (!activeGame) {
+      throw new Error('No active game found in session');
+    }
+
     // 1. Clear
     this.backgroundRenderer.draw(this.canvas.width, this.canvas.height);
 
@@ -95,7 +100,15 @@ export class CanvasController {
     this.camera.applyTransform(this.ctx, this.canvas.width, this.canvas.height);
 
     // 3. Draw World
+    // Draw base grid (debug)
     this.renderer.drawDebugGrid(5);
+
+    // Draw placed tiles from the board
+    for (const boardTile of activeGame.board.getAll()) {
+      this.tileRenderer.drawTileAtHex(boardTile.tile, boardTile.coordinate, DEFAULT_HEX_STYLE);
+    }
+
+    // Draw highlight for current mouse position
     this.renderer.drawHighlight(this.hoveredHex);
 
     this.ctx.restore();

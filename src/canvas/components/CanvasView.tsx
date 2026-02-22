@@ -23,9 +23,8 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
     // Initialize Controller
     const controller = new CanvasController(canvas, session);
 
-    // We'll expose a way to sync stats when the game state changes
-    // This will be used in future tasks when interaction is implemented
-    (controller as any).onStatsChange = (newScore: number, newTurns: number) => {
+    // Sync stats when the game state changes
+    controller.onStatsChange = (newScore: number, newTurns: number) => {
       setScore(newScore);
       setRemainingTurns(newTurns);
     };
