@@ -1,20 +1,26 @@
 #!/usr/bin/env bash
 
-# 1. Get status of files
+# 1. Read the input from Gemini CLI
+INPUT=$(cat)
+
+# 2. Extract the AI's response text and check for keywords
+# We use 'tr' to make it case-insensitive
+RESPONSE=$(echo "$INPUT" | grep -oP '"prompt_response":\s*"\K[^"]+')
+EXPLANATION_GIVEN=$(echo "$RESPONSE" | tr '[:upper:]' '[:lower:]' | grep -E "no update needed|docs are current|no changes required")
+
+# 3. Get git status
 MODIFIED=$(git status --porcelain)
 CODE_CHANGED=$(echo "$MODIFIED" | grep -E "\.(ts|tsx|js|jsx)$")
+DOCS_CHANGED=$(echo "$MODIFIED" | grep -E "(CHANGELOG\.md|GEMINI\.md|architecture\.md)$")
 
-# 2. Check for docs
-CHAN_MISSING=$(echo "$MODIFIED" | grep -q "CHANGELOG.md" || echo "missing")
-GEMI_MISSING=$(echo "$MODIFIED" | grep -q "GEMINI.md" || echo "missing")
-
-# 3. If code changed but any doc is missing, send a proactive nudge
-if [ -n "$CODE_CHANGED" ] && [ "$CHAN_MISSING" == "missing" || "$GEMI_MISSING" == "missing" ]]; then
-    # We use 'allow' so it doesn't block, but we provide a 'reason' for the AI to read
+# 4. Decision Logic
+if [ -n "$CODE_CHANGED" ] && [ -z "$DOCS_CHANGED" ] && [ -z "$EXPLANATION_GIVEN" ]; then
+    # BLOCK if code changed, no docs changed, and no explanation was typed
     echo "{"
-    echo "  \"decision\": \"allow\","
-    echo "  \"reason\": \"NUDGE: You've updated the code. Don't forget to update architecture.md in a given directory, CHANGELOG.md, and GEMINI.md before you finish. Update the file only if you got a new and relevant information. E.g. implemented a new class, architecture decision, feature or you got a new rule for interaction with user.\""
+    echo "  \"decision\": \"block\","
+    echo "  \"reason\": \"You updated code but skipped documentation. Update architecture.md, CHANGELOG.md, or GEMINI.md. If no update is needed, you MUST state 'no update needed' to proceed.\""
     echo "}"
 else
-    echo '{"decision": "allow"}'
+    # ALLOW if docs were updated OR if the AI gave the 'magic' explanation
+    echo "{\"decision\": \"allow\"}"
 fi
