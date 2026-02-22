@@ -48,6 +48,7 @@ export class CanvasController {
       onPan: (dx, dy) => this.camera.pan(dx, dy),
       onZoom: (delta) => this.handleZoom(delta),
       onHover: (x, y) => this.handleHover(x, y),
+      onClick: (x, y) => this.handleMouseClick(x, y),
       onLeave: () => this.handleLeave(),
       onResize: () => this.handleResize(),
     });
@@ -108,16 +109,55 @@ export class CanvasController {
       this.tileRenderer.drawTileAtHex(boardTile.tile, boardTile.coordinate, DEFAULT_HEX_STYLE);
     }
 
+    // 4. Ghost Preview for valid placement
+    if (this.hoveredHex && this.isValidPlacement(this.hoveredHex)) {
+      const nextTile = activeGame.peek();
+      if (!nextTile) {
+        throw new Error('No tiles remaining in the queue for preview');
+      }
+      this.tileRenderer.drawTileAtHex(nextTile, this.hoveredHex, {
+        ...DEFAULT_HEX_STYLE,
+        fillOpacity: 0.5,
+        strokeOpacity: 0.5,
+      });
+    }
+
     // Draw highlight for current mouse position
     this.renderer.drawHighlight(this.hoveredHex);
 
     this.ctx.restore();
 
-    // 4. UI Overlay
+    // 5. UI Overlay
     this.debugRenderer.drawOverlay(this.camera, this.hoveredHex);
   }
 
   // --- Input Handlers ---
+
+  private isValidPlacement(coord: HexCoordinate): boolean {
+    return this.session.activeGame?.isValidPlacement(coord) ?? false;
+  }
+
+  private handleMouseClick(mouseX: number, mouseY: number) {
+    const activeGame = this.session.activeGame;
+    if (!activeGame) return;
+
+    const worldPos = this.camera.screenToWorld(
+      mouseX,
+      mouseY,
+      this.canvas.width,
+      this.canvas.height
+    );
+    const hex = pixelToHex(worldPos.x, worldPos.y, HEX_SIZE);
+
+    if (this.isValidPlacement(hex)) {
+      activeGame.placeTile(hex);
+
+      // Notify React HUD
+      if (this.onStatsChange) {
+        this.onStatsChange(activeGame.score, activeGame.remainingTurns);
+      }
+    }
+  }
 
   private handleResize = () => {
     if (this.canvas.width !== window.innerWidth || this.canvas.height !== window.innerHeight) {

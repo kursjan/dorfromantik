@@ -84,6 +84,21 @@ export class Game {
   }
 
   /**
+   * Checks if a tile can be placed at the given coordinate.
+   * A placement is valid if the hex is empty and adjacent to at least one existing tile.
+   */
+  isValidPlacement(coord: HexCoordinate): boolean {
+    // 1. Position must be empty
+    if (this.board.has(coord)) {
+      return false;
+    }
+
+    // 2. Position must be adjacent to an existing tile
+    const neighbors = this.navigation.getNeighbors(coord);
+    return neighbors.some((neighbor) => this.board.has(neighbor.coordinate));
+  }
+
+  /**
    * Places the next tile from the queue at the given coordinate.
    * Updates score and board state.
    * @returns Results of the placement (e.g., score added).

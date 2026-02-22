@@ -8,12 +8,12 @@
 - [x] Task: #4.4: Integrate `GameHUD` as an overlay in `CanvasView.tsx`. (9179454)
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Data Binding & HUD' (Protocol in workflow.md) (9179454)
 
-## Phase 2: Canvas Tile Visualization
+## Phase 2: Canvas Tile Visualization [checkpoint: 8af7c96]
 
 - [x] Task: #4.5: Add `TerrainStyles` (colors for each `TerrainType`) to `src/canvas/graphics/HexStyles.ts`. (7b604f1)
 - [x] Task: #4.6: Implement `TileRenderer.ts` in `src/canvas/graphics/` to draw 6-sided terrains. (c94bf21)
 - [x] Task: #4.7: Update `CanvasController.render()` to iterate through the `Board` and render all placed tiles. (ac1202b)
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Canvas Tile Visualization' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Canvas Tile Visualization' (Protocol in workflow.md) (8af7c96)
 
 ## Phase 3: Interaction & Preview
 

@@ -95,6 +95,36 @@ describe('Game', () => {
     expect(game.remainingTurns).toBe(1);
   });
 
+  describe('isValidPlacement', () => {
+    it('should return false if the position is already occupied', () => {
+      const coord = new HexCoordinate(0, 0, 0);
+      board.place(Tile.createRandom('t1'), coord);
+      const game = new Game({ board, rules });
+
+      expect(game.isValidPlacement(coord)).toBe(false);
+    });
+
+    it('should return false if the position is not adjacent to any existing tile', () => {
+      const origin = new HexCoordinate(0, 0, 0);
+      board.place(Tile.createRandom('t1'), origin);
+      const game = new Game({ board, rules });
+
+      // (2, 0, -2) is not adjacent to (0, 0, 0)
+      const farCoord = new HexCoordinate(2, 0, -2);
+      expect(game.isValidPlacement(farCoord)).toBe(false);
+    });
+
+    it('should return true if the position is empty and adjacent to an existing tile', () => {
+      const origin = new HexCoordinate(0, 0, 0);
+      board.place(Tile.createRandom('t1'), origin);
+      const game = new Game({ board, rules });
+
+      // (1, 0, -1) is adjacent to (0, 0, 0)
+      const adjCoord = new HexCoordinate(1, 0, -1);
+      expect(game.isValidPlacement(adjCoord)).toBe(true);
+    });
+  });
+
   it('should throw error if score is negative', () => {
     expect(() => new Game({ board, rules, score: -10 })).toThrow('score must be non-negative');
   });

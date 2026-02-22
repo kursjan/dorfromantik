@@ -2,6 +2,7 @@ export interface InputCallbacks {
   onPan: (dx: number, dy: number) => void;
   onZoom: (delta: number) => void;
   onHover: (x: number, y: number) => void;
+  onClick: (x: number, y: number) => void;
   onLeave: () => void;
   onResize: () => void;
 }
