@@ -1,4 +1,4 @@
-import { TerrainType } from '../../models/Tile';
+import type { TerrainType } from '../../models/Tile';
 
 export interface HexStyle {
   size: number;
