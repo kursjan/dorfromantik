@@ -3,6 +3,7 @@ import { Game } from './Game';
 import { Board } from './Board';
 import { GameRules } from './GameRules';
 import { Tile } from './Tile';
+import { HexCoordinate } from './HexCoordinate';
 
 describe('Game', () => {
   let board: Board;
@@ -11,6 +12,51 @@ describe('Game', () => {
   beforeEach(() => {
     board = new Board();
     rules = new GameRules({ initialTurns: 30 });
+  });
+
+  describe('Factory Methods', () => {
+    it('should create a game with an initial tile placed at origin', () => {
+      const customRules = new GameRules({
+        initialTurns: 10,
+        initialTile: {
+          north: 'pasture',
+          northEast: 'pasture',
+          southEast: 'pasture',
+          south: 'pasture',
+          southWest: 'pasture',
+          northWest: 'pasture'
+        }
+      });
+
+      const game = Game.create(customRules);
+
+      expect(game.rules).toBe(customRules);
+      expect(game.remainingTurns).toBe(10);
+      
+      // Verify initial tile is placed at origin
+      const origin = new HexCoordinate(0, 0, 0);
+      const placedTile = game.board.get(origin);
+      expect(placedTile).toBeDefined();
+      expect(placedTile?.tile.north).toBe('pasture');
+    });
+
+    it('should create a standard game with a pasture starter tile', () => {
+      const game = Game.createStandard();
+      
+      expect(game.remainingTurns).toBe(30);
+      
+      const origin = new HexCoordinate(0, 0, 0);
+      const placedTile = game.board.get(origin);
+      
+      expect(placedTile).toBeDefined();
+      const tile = placedTile!.tile;
+      expect(tile.north).toBe('pasture');
+      expect(tile.northEast).toBe('pasture');
+      expect(tile.southEast).toBe('pasture');
+      expect(tile.south).toBe('pasture');
+      expect(tile.southWest).toBe('pasture');
+      expect(tile.northWest).toBe('pasture');
+    });
   });
 
   it('should initialize with correct default values and random tiles', () => {
