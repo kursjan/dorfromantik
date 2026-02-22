@@ -11,8 +11,8 @@
 ## Phase 2: Canvas Tile Visualization
 
 - [x] Task: #4.5: Add `TerrainStyles` (colors for each `TerrainType`) to `src/canvas/graphics/HexStyles.ts`. (7b604f1)
-- [~] Task: #4.6: Implement `TileRenderer.ts` in `src/canvas/graphics/` to draw 6-sided terrains. (refs #4)
-- [ ] Task: #4.7: Update `CanvasController.render()` to iterate through the `Board` and render all placed tiles.
+- [x] Task: #4.6: Implement `TileRenderer.ts` in `src/canvas/graphics/` to draw 6-sided terrains. (c94bf21)
+- [~] Task: #4.7: Update `CanvasController.render()` to iterate through the `Board` and render all placed tiles. (refs #4)
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Canvas Tile Visualization' (Protocol in workflow.md)
 
 ## Phase 3: Interaction & Preview
