@@ -12,3 +12,5 @@ This file tracks all major tracks for the project. Each track has its own detail
   *Link: [./tracks/board_integration_20260221/](./tracks/board_integration_20260221/)*
 - [x] **Track: InputManager Refactor (State Machine)**
   *Link: [./tracks/input_manager_refactor_20260222/](./tracks/input_manager_refactor_20260222/)*
+- [ ] **Track: Tile Rotation Logic (Keyboard & Mouse)**
+  *Link: [./tracks/tile_rotation_20260222/](./tracks/tile_rotation_20260222/)*
