@@ -49,6 +49,8 @@ export class CanvasController {
       onZoom: (delta) => this.handleZoom(delta),
       onHover: (x, y) => this.handleHover(x, y),
       onClick: (x, y) => this.handleMouseClick(x, y),
+      onRotateClockwise: () => this.handleRotateClockwise(),
+      onRotateCounterClockwise: () => this.handleRotateCounterClockwise(),
       onLeave: () => this.handleLeave(),
       onResize: () => this.handleResize(),
     });
@@ -157,6 +159,14 @@ export class CanvasController {
         this.onStatsChange(activeGame.score, activeGame.remainingTurns);
       }
     }
+  }
+
+  private handleRotateClockwise() {
+    this.session.activeGame?.rotateQueuedTileClockwise();
+  }
+
+  private handleRotateCounterClockwise() {
+    this.session.activeGame?.rotateQueuedTileCounterClockwise();
   }
 
   private handleResize = () => {

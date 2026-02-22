@@ -7,22 +7,22 @@
 
 ## Tasks
 
-- [ ] **Task 1: Model Implementation**
+- [x] **Task 1: Model Implementation**
   - Add `rotateClockwise(): Tile` and `rotateCounterClockwise(): Tile` to `src/models/Tile.ts`.
-  - Add `rotateQueuedTile(clockwise: boolean): void` to `src/models/Game.ts`.
+  - Add `rotateQueuedTileClockwise(): void` and `rotateQueuedTileCounterClockwise(): void` to `src/models/Game.ts`.
   - **Verification:**
     - Unit test for `Tile` rotation logic.
     - Unit test for `Game.rotateQueuedTile` behavior.
 
-- [ ] **Task 2: Input & Controller Integration**
-  - Add `onRotate(clockwise: boolean)` to `InputCallbacks` in `src/canvas/engine/InputManager.ts`.
+- [x] **Task 2: Input & Controller Integration**
+  - Add `onRotateClockwise()` and `onRotateCounterClockwise()` to `InputCallbacks` in `src/canvas/engine/InputManager.ts`.
   - Handle `R`, `F`, and right-click combinations in `InputManager`.
-  - Implement `handleRotate` in `src/canvas/engine/CanvasController.ts`.
+  - Implement `handleRotateClockwise` and `handleRotateCounterClockwise` in `src/canvas/engine/CanvasController.ts`.
   - **Verification:**
     - `npm run test` for all unit tests.
     - Manual verification of rotation and preview in the browser.
 
-- [ ] **Task 3: Final Verification & Sync**
+- [x] **Task 3: Final Verification & Sync**
   - Run full test suite (`npm test`, `npx playwright test`).
   - Update `ARCHITECTURE.md` if necessary.
   - Final commit with `fixes #<issue_number>`.

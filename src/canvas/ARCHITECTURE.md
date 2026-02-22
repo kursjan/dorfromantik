@@ -70,6 +70,7 @@ The central hub. It:
 - **Runs Loop:** Manages `requestAnimationFrame`.
 - **Orchestrates:** `InputManager` callbacks -> updates State -> delegates drawing to Renderers.
 - **Validation:** Provides `isValidPlacement(coord)` by delegating to the `Game` model, ensuring the UI only allows valid actions.
+- **Tile Rotation:** Responds to `onRotateClockwise` and `onRotateCounterClockwise` callbacks by delegating to the `Game` model's rotation logic for the active tile.
 - **Ghost Preview:** In the render loop, if the hovered hex is valid, it draws a semi-transparent "ghost" of the next tile from the game queue.
 - **Does NOT Render:** It strictly delegates actual canvas API calls to the specialized renderers.
 
@@ -86,11 +87,12 @@ Manages the view transform.
 
 DOM abstraction layer.
 
-- **Role:** Translates raw DOM events (`mousedown`, `wheel`, `keydown`, etc.) into abstract Game Actions (`onPan`, `onZoom`, `onHover`, `getRotationDirection`).
+- **Role:** Translates raw DOM events (`mousedown`, `wheel`, `keydown`, etc.) into abstract Game Actions (`onPan`, `onZoom`, `onHover`, `getRotationDirection`, `onRotateClockwise`, `onRotateCounterClockwise`).
 - **State Machine:** Uses an explicit state machine (`IDLE`, `MOUSE_DOWN_POTENTIAL_CLICK`, `PANNING`) to distinguish between clicks and pans. This centralizes transition logic and cursor management.
+- **Context Menu:** The browser's default context menu is disabled to support right-click-based tile rotation.
 - **Hygiene:** Explicitly attaches and detaches listeners to prevent memory leaks.
 - **Normalization:** Handles cross-browser differences (e.g., wheel delta).
-- **Keyboard Tracking:** Maintains a Set of active keys for continuous actions like rotation.
+- **Keyboard Tracking:** Maintains a Set of active keys for continuous actions like camera rotation.
 
 ### Renderers (`graphics/*Renderer.ts`)
 

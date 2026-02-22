@@ -3,6 +3,8 @@ export interface InputCallbacks {
   onZoom: (delta: number) => void;
   onHover: (x: number, y: number) => void;
   onClick: (x: number, y: number) => void;
+  onRotateClockwise: () => void;
+  onRotateCounterClockwise: () => void;
   onLeave: () => void;
   onResize: () => void;
 }
@@ -44,6 +46,7 @@ export class InputManager {
     this.canvas.addEventListener('mousemove', this.handleMouseMove);
     this.canvas.addEventListener('mouseup', this.handleMouseUp);
     this.canvas.addEventListener('mouseleave', this.handleMouseLeave);
+    this.canvas.addEventListener('contextmenu', this.handleContextMenu);
 
     // Add resize listener to window to handle layout changes
     window.addEventListener('resize', this.handleResize);
@@ -60,6 +63,7 @@ export class InputManager {
     this.canvas.removeEventListener('mousemove', this.handleMouseMove);
     this.canvas.removeEventListener('mouseup', this.handleMouseUp);
     this.canvas.removeEventListener('mouseleave', this.handleMouseLeave);
+    this.canvas.removeEventListener('contextmenu', this.handleContextMenu);
 
     window.removeEventListener('resize', this.handleResize);
     window.removeEventListener('keydown', this.handleKeyDown);
@@ -97,6 +101,13 @@ export class InputManager {
 
   private handleKeyDown = (e: KeyboardEvent) => {
     this.keys.add(e.key);
+
+    // Tile Rotation (R/F)
+    if (e.key === 'r' || e.key === 'R') {
+      this.callbacks.onRotateClockwise();
+    } else if (e.key === 'f' || e.key === 'F') {
+      this.callbacks.onRotateCounterClockwise();
+    }
   };
 
   private handleKeyUp = (e: KeyboardEvent) => {
@@ -108,8 +119,22 @@ export class InputManager {
     this.callbacks.onZoom(e.deltaY);
   };
 
+  private handleContextMenu = (e: MouseEvent) => {
+    e.preventDefault();
+  };
+
   private handleMouseDown = (e: MouseEvent) => {
-    // Only left click
+    // 1. Right Click for rotation
+    if (e.button === 2) {
+      if (e.shiftKey) {
+        this.callbacks.onRotateCounterClockwise();
+      } else {
+        this.callbacks.onRotateClockwise();
+      }
+      return;
+    }
+
+    // 2. Only left click for Panning/Clicking
     if (e.button !== 0) return;
 
     this.transition('MOUSE_DOWN_POTENTIAL_CLICK');

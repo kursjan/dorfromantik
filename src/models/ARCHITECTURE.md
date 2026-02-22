@@ -13,7 +13,7 @@ This directory contains the core data structures and business logic for the Dorf
 ### 2. Game Entities (`Tile.ts`, `Board.ts`)
 - **`Tile`**: Represents a single hexagonal tile with 6 sides of specific terrain types.
   - **`getTerrains()`**: Returns a `Record<Direction, TerrainType>` mapping all directions to their respective terrain types.
-- **`Board`**: A collection of placed tiles mapped to their coordinates. It handles spatial queries and placement validation.
+  - **`rotateClockwise()` / `rotateCounterClockwise()`**: Returns a *new* Tile instance with shifted terrain properties.
 
 ### 3. Session & Rules (`User.ts`, `GameRules.ts`, `Session.ts`)
 - **`User`**: Basic user identity, compatible with Firebase UID.
@@ -30,6 +30,7 @@ The `Game` class is the central orchestrator of an active session.
   - **Logic**:
     - **`isValidPlacement(coord)`**: Checks if a hex is empty and adjacent to at least one existing tile. Used for UI validation and Ghost Preview.
     - **`placeTile(coord)`**: The primary game action. It pops a tile from the queue, places it on the board, and calculates matching terrain scores with all neighbors.
+    - **`rotateQueuedTileClockwise()` / `rotateQueuedTileCounterClockwise()`**: Rotates the tile currently at the head of the queue.
     - **`peek()`**: Allows the UI to preview the next tile in the queue.
 
 ## Interactions

@@ -84,6 +84,32 @@ export class Game {
   }
 
   /**
+   * Rotates the tile currently at the head of the queue clockwise.
+   * @throws Error if the queue is empty.
+   */
+  rotateQueuedTileClockwise(): void {
+    const tile = this.tileQueue[0];
+    if (!tile) {
+      throw new Error('No tiles remaining in the queue');
+    }
+
+    this.tileQueue[0] = tile.rotateClockwise();
+  }
+
+  /**
+   * Rotates the tile currently at the head of the queue counter-clockwise.
+   * @throws Error if the queue is empty.
+   */
+  rotateQueuedTileCounterClockwise(): void {
+    const tile = this.tileQueue[0];
+    if (!tile) {
+      throw new Error('No tiles remaining in the queue');
+    }
+
+    this.tileQueue[0] = tile.rotateCounterClockwise();
+  }
+
+  /**
    * Checks if a tile can be placed at the given coordinate.
    * A placement is valid if the hex is empty and adjacent to at least one existing tile.
    */

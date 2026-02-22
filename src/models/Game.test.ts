@@ -128,4 +128,39 @@ describe('Game', () => {
   it('should throw error if score is negative', () => {
     expect(() => new Game({ board, rules, score: -10 })).toThrow('score must be non-negative');
   });
+
+  describe('rotateQueuedTile', () => {
+    it('should rotate the next tile in the queue clockwise', () => {
+      const tile = new Tile({
+        id: 't1',
+        north: 'tree', northEast: 'house', southEast: 'water',
+        south: 'pasture', southWest: 'rail', northWest: 'field'
+      });
+      const game = new Game({ board, rules, tileQueue: [tile] });
+      
+      game.rotateQueuedTileClockwise();
+      
+      const rotated = game.peek()!;
+      expect(rotated.north).toBe('house');
+    });
+
+    it('should rotate the next tile in the queue counter-clockwise', () => {
+      const tile = new Tile({
+        id: 't1',
+        north: 'tree', northEast: 'house', southEast: 'water',
+        south: 'pasture', southWest: 'rail', northWest: 'field'
+      });
+      const game = new Game({ board, rules, tileQueue: [tile] });
+      
+      game.rotateQueuedTileCounterClockwise();
+      
+      const rotated = game.peek()!;
+      expect(rotated.north).toBe('field');
+    });
+
+    it('should throw error if queue is empty', () => {
+      const game = new Game({ board, rules, tileQueue: [] });
+      expect(() => game.rotateQueuedTileClockwise()).toThrow('No tiles remaining in the queue');
+    });
+  });
 });

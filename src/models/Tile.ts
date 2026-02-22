@@ -73,6 +73,38 @@ export class Tile {
     return this.getTerrains()[direction];
   }
 
+  /**
+   * Returns a new Tile rotated 60 degrees clockwise.
+   * According to spec: North -> NorthWest, NorthEast -> North, etc.
+   */
+  rotateClockwise(): Tile {
+    return new Tile({
+      id: this.id,
+      north: this.northEast,
+      northEast: this.southEast,
+      southEast: this.south,
+      south: this.southWest,
+      southWest: this.northWest,
+      northWest: this.north,
+    });
+  }
+
+  /**
+   * Returns a new Tile rotated 60 degrees counter-clockwise.
+   * According to spec: North -> NorthEast, NorthEast -> SouthEast, etc.
+   */
+  rotateCounterClockwise(): Tile {
+    return new Tile({
+      id: this.id,
+      north: this.northWest,
+      northEast: this.north,
+      southEast: this.northEast,
+      south: this.southEast,
+      southWest: this.south,
+      northWest: this.southWest,
+    });
+  }
+
   private getTerrainChar(type: TerrainType): string {
     return type[0].toUpperCase();
   }
