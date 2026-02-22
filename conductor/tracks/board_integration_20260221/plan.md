@@ -27,8 +27,8 @@
 - [x] Task: #4.12: Ensure `onClick` triggers correctly on `mouseup` if the drag threshold was never exceeded. (dddfd75)
 - [x] Task: Conductor - User Manual Verification 'Phase 3.1: Interaction Polish' (Protocol in workflow.md) (dddfd75)
 
-## Phase 4: Polish & Verification
+## Phase 4: Polish & Verification [checkpoint: 221e9bb]
 
-- [ ] Task: Update `ARCHITECTURE.md` to reflect the Session/HUD/TileRenderer patterns.
-- [ ] Task: Ensure all commit messages for this track include "fixes #4" or reference Issue #4.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Polish & Verification' (Protocol in workflow.md)
+- [x] Task: Update `ARCHITECTURE.md` to reflect the Session/HUD/TileRenderer patterns. (221e9bb)
+- [x] Task: Ensure all commit messages for this track include "fixes #4" or reference Issue #4. (221e9bb)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Polish & Verification' (Protocol in workflow.md) (221e9bb)
