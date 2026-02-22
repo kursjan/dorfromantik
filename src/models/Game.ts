@@ -19,6 +19,32 @@ export interface PlacementResult {
  * Represents the state of an active game session.
  */
 export class Game {
+  /**
+   * Factory method to create a new game with the board initialized with a starting tile.
+   * @param rules - The rules to use for the game.
+   * @returns A fully initialized Game instance.
+   */
+  static create(rules: GameRules): Game {
+    const board = new Board();
+
+    // 1. Create and place initial tile at origin (0, 0, 0)
+    const startTile = rules.createInitialTile('start-tile');
+    board.place(startTile, new HexCoordinate(0, 0, 0));
+
+    // 2. Create the game instance
+    return new Game({
+      board,
+      rules,
+    });
+  }
+
+  /**
+   * Shorthand for creating a game with standard rules.
+   */
+  static createStandard(): Game {
+    return this.create(GameRules.createStandard());
+  }
+
   readonly board: Board;
   readonly rules: GameRules;
   score: number;

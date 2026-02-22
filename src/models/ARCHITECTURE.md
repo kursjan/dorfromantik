@@ -14,18 +14,17 @@ This directory contains the core data structures and business logic for the Dorf
 - **`Tile`**: Represents a single hexagonal tile with 6 sides of specific terrain types.
 - **`Board`**: A collection of placed tiles mapped to their coordinates. It handles spatial queries and placement validation.
 
-### 3. Session & Rules (`User.ts`, `GameRules.ts`, `Session.ts`, `GameFactory.ts`)
+### 3. Session & Rules (`User.ts`, `GameRules.ts`, `Session.ts`)
 - **`User`**: Basic user identity, compatible with Firebase UID.
 - **`GameRules`**: Configurable settings for a game (initial turns, points per match).
 - **`Session`**: Manages a user's game lifecycle, including their current `activeGame` and a history of finished `games`.
-- **`GameFactory`**: Responsible for the orchestration of new game creation. It initializes the `Board`, creates the `GameRules`, and places the initial "starter" tile (typically all pasture) at the origin `(0, 0, 0)`.
 
 ### 4. Game Engine (`Game.ts`)
 The `Game` class is the central orchestrator of an active session.
 - **State**: Tracks the `Board`, `Score`, and the `TileQueue`.
 - **Turns as Tiles**: The game follows a "Tiles are Turns" philosophy. `remainingTurns` is a derived property of `tileQueue.length`.
 - **Lifecycle**:
-  - **Start**: Typically created via `GameFactory.createStandardGame()`.
+  - **Start**: Typically created via static factory methods: `Game.createStandard()` or `Game.create(rules)`. These methods handle initializing the `Board` and placing the initial "starter" tile at the origin `(0, 0, 0)`.
   - **Active**: Managed within a `Session`.
   - **Logic**:
     - **`placeTile(coord)`**: The primary game action. It pops a tile from the queue, places it on the board, and calculates matching terrain scores with all neighbors.
