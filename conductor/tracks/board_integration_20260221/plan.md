@@ -20,7 +20,12 @@
 - [x] Task: #4.8: Implement `isValidPlacement(coord)` in `CanvasController` (check empty and adjacent). (228a948)
 - [x] Task: #4.9: Implement "Ghost Preview" in `CanvasController` render loop for the hovered valid hex. (228a948)
 - [x] Task: #4.10: Connect `InputManager` click events to `game.placeTile(coord)` and verify HUD/Board updates. (228a948)
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Interaction & Preview' (Protocol in workflow.md)
+
+## Phase 3.1: Interaction Polish
+
+- [ ] Task: #4.11: Refactor `InputManager` to use a distance-based threshold (e.g., 5px) before initiating `onPan`.
+- [ ] Task: #4.12: Ensure `onClick` triggers correctly on `mouseup` if the drag threshold was never exceeded.
+- [ ] Task: Conductor - User Manual Verification 'Phase 3.1: Interaction Polish' (Protocol in workflow.md)
 
 ## Phase 4: Polish & Verification
 
