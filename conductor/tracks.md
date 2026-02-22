@@ -6,3 +6,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Expand Data Model (Session & Game)**
   *Link: [./tracks/expand_data_model_20260220/](./tracks/expand_data_model_20260220/)*
+- [~] **Track: Remove GameFactory (Issue #7)**
+  *Link: [./tracks/remove_game_factory_20260221/](./tracks/remove_game_factory_20260221/)*
