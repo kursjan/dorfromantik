@@ -21,11 +21,11 @@
 - [x] Task: #4.9: Implement "Ghost Preview" in `CanvasController` render loop for the hovered valid hex. (228a948)
 - [x] Task: #4.10: Connect `InputManager` click events to `game.placeTile(coord)` and verify HUD/Board updates. (228a948)
 
-## Phase 3.1: Interaction Polish
+## Phase 3.1: Interaction Polish [checkpoint: dddfd75]
 
-- [ ] Task: #4.11: Refactor `InputManager` to use a distance-based threshold (e.g., 5px) before initiating `onPan`.
-- [ ] Task: #4.12: Ensure `onClick` triggers correctly on `mouseup` if the drag threshold was never exceeded.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3.1: Interaction Polish' (Protocol in workflow.md)
+- [x] Task: #4.11: Refactor `InputManager` to use a distance-based threshold (e.g., 5px) before initiating `onPan`. (dddfd75)
+- [x] Task: #4.12: Ensure `onClick` triggers correctly on `mouseup` if the drag threshold was never exceeded. (dddfd75)
+- [x] Task: Conductor - User Manual Verification 'Phase 3.1: Interaction Polish' (Protocol in workflow.md) (dddfd75)
 
 ## Phase 4: Polish & Verification
 

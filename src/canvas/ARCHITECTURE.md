@@ -69,6 +69,8 @@ The central hub. It:
 - **Owns State:** Camera, Hovered Hex, (Future: Board).
 - **Runs Loop:** Manages `requestAnimationFrame`.
 - **Orchestrates:** `InputManager` callbacks -> updates State -> delegates drawing to Renderers.
+- **Validation:** Provides `isValidPlacement(coord)` by delegating to the `Game` model, ensuring the UI only allows valid actions.
+- **Ghost Preview:** In the render loop, if the hovered hex is valid, it draws a semi-transparent "ghost" of the next tile from the game queue.
 - **Does NOT Render:** It strictly delegates actual canvas API calls to the specialized renderers.
 
 ### Camera (`engine/Camera.ts`)

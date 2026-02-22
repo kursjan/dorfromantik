@@ -28,6 +28,7 @@ The `Game` class is the central orchestrator of an active session.
   - **Start**: Typically created via static factory methods: `Game.createStandard()` or `Game.create(rules)`. These methods handle initializing the `Board` and placing the initial "starter" tile at the origin `(0, 0, 0)`.
   - **Active**: Managed within a `Session`.
   - **Logic**:
+    - **`isValidPlacement(coord)`**: Checks if a hex is empty and adjacent to at least one existing tile. Used for UI validation and Ghost Preview.
     - **`placeTile(coord)`**: The primary game action. It pops a tile from the queue, places it on the board, and calculates matching terrain scores with all neighbors.
     - **`peek()`**: Allows the UI to preview the next tile in the queue.
 
