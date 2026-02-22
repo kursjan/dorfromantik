@@ -15,11 +15,11 @@
 - [x] Task: #4.7: Update `CanvasController.render()` to iterate through the `Board` and render all placed tiles. (ac1202b)
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Canvas Tile Visualization' (Protocol in workflow.md) (8af7c96)
 
-## Phase 3: Interaction & Preview
+## Phase 3: Interaction & Preview [checkpoint: 228a948]
 
-- [ ] Task: #4.8: Implement `isValidPlacement(coord)` in `CanvasController` (check empty and adjacent).
-- [ ] Task: #4.9: Implement "Ghost Preview" in `CanvasController` render loop for the hovered valid hex.
-- [ ] Task: #4.10: Connect `InputManager` click events to `game.placeTile(coord)` and verify HUD/Board updates.
+- [x] Task: #4.8: Implement `isValidPlacement(coord)` in `CanvasController` (check empty and adjacent). (228a948)
+- [x] Task: #4.9: Implement "Ghost Preview" in `CanvasController` render loop for the hovered valid hex. (228a948)
+- [x] Task: #4.10: Connect `InputManager` click events to `game.placeTile(coord)` and verify HUD/Board updates. (228a948)
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Interaction & Preview' (Protocol in workflow.md)
 
 ## Phase 4: Polish & Verification
