@@ -8,6 +8,7 @@ import { HexCoordinate } from '../../models/HexCoordinate';
 import { pixelToHex } from '../utils/HexUtils';
 import { HEX_SIZE, DEFAULT_HEX_STYLE, VALID_PREVIEW_STYLE, INVALID_PREVIEW_STYLE } from '../graphics/HexStyles';
 import { Session } from '../../models/Session';
+import { Tile } from '../../models/Tile';
 
 export class CanvasController {
   private static readonly ZOOM_SENSITIVITY = 0.001;
@@ -26,7 +27,7 @@ export class CanvasController {
   private readonly session: Session;
 
   // Callback for React HUD synchronization
-  public onStatsChange?: (score: number, remainingTurns: number) => void;
+  public onStatsChange?: (score: number, remainingTurns: number, nextTile: Tile | null) => void;
 
   // State
   private animationFrameId: number = 0;
@@ -131,6 +132,13 @@ export class CanvasController {
     this.debugRenderer.drawOverlay(this.camera, this.hoveredHex);
   }
 
+  private notifyStatsChange() {
+    const activeGame = this.session.activeGame;
+    if (activeGame && this.onStatsChange) {
+      this.onStatsChange(activeGame.score, activeGame.remainingTurns, activeGame.peek() || null);
+    }
+  }
+
   // --- Input Handlers ---
 
   private isValidPlacement(coord: HexCoordinate): boolean {
@@ -151,20 +159,18 @@ export class CanvasController {
 
     if (this.isValidPlacement(hex)) {
       activeGame.placeTile(hex);
-
-      // Notify React HUD
-      if (this.onStatsChange) {
-        this.onStatsChange(activeGame.score, activeGame.remainingTurns);
-      }
+      this.notifyStatsChange();
     }
   }
 
   private handleRotateClockwise() {
     this.session.activeGame?.rotateQueuedTileClockwise();
+    this.notifyStatsChange();
   }
 
   private handleRotateCounterClockwise() {
     this.session.activeGame?.rotateQueuedTileCounterClockwise();
+    this.notifyStatsChange();
   }
 
   private handleResize = () => {

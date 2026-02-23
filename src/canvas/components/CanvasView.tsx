@@ -3,6 +3,7 @@ import { CanvasController } from '../engine/CanvasController';
 import { ResetViewButton } from './ResetViewButton';
 import { GameHUD } from './GameHUD';
 import { Session } from '../../models/Session';
+import { Tile } from '../../models/Tile';
 
 interface CanvasViewProps {
   session: Session;
@@ -15,6 +16,7 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
   // State for game stats to ensure React updates when they change
   const [score, setScore] = useState(session.activeGame?.score ?? 0);
   const [remainingTurns, setRemainingTurns] = useState(session.activeGame?.remainingTurns ?? 0);
+  const [nextTile, setNextTile] = useState<Tile | null>(session.activeGame?.peek() ?? null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -24,9 +26,10 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
     const controller = new CanvasController(canvas, session);
 
     // Sync stats when the game state changes
-    controller.onStatsChange = (newScore: number, newTurns: number) => {
+    controller.onStatsChange = (newScore: number, newTurns: number, newNextTile: Tile | null) => {
       setScore(newScore);
       setRemainingTurns(newTurns);
+      setNextTile(newNextTile);
     };
 
     controllerRef.current = controller;
@@ -40,7 +43,7 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
-      <GameHUD score={score} remainingTurns={remainingTurns} />
+      <GameHUD score={score} remainingTurns={remainingTurns} nextTile={nextTile} />
       <ResetViewButton onClick={() => controllerRef.current?.resetCamera()} />
       <canvas
         ref={canvasRef}

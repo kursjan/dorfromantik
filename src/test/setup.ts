@@ -8,6 +8,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn((contextId: string) => {
     return {
       fillStyle: '',
       fillRect: vi.fn(),
+      clearRect: vi.fn(),
       save: vi.fn(),
       restore: vi.fn(),
       translate: vi.fn(),
