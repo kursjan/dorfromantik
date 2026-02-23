@@ -96,6 +96,7 @@ The AI's workflow is iterative, transparent, and responsive to user input.
 
 We use a two-phase development cycle: **Implement -> Review -> Fix**.
 
+### **Standard Review (On-Demand)**
 1.  **Implementation Phase:**
     *   The coding agent implements the feature/fix.
     *   **"Done" Signal:** When the code is ready and verified (tests pass), the agent stops and says: "Ready for Review."
@@ -110,6 +111,15 @@ We use a two-phase development cycle: **Implement -> Review -> Fix**.
     *   The user passes the filtered `REVIEW_FEEDBACK.md` back to the coding agent.
     *   **Mandate:** The coding agent must address *every* item in the feedback file.
     *   Once fixes are applied and verified, the loop is complete.
+
+### **Thorough Review (Deep Dive / Audit)**
+For complex features or comprehensive code audits, we use a structured Conductor-based process (refs #20).
+
+1.  **Initiation:** Triggered by asking for a "Thorough Review" or using `/code-review --against main`.
+2.  **Track Setup:** A dedicated Conductor Track is created. Every target file (or changed file) is listed as a discrete task in `plan.md`.
+3.  **Execution:** The AI processes the plan file-by-file, auditing each against the criteria in `.gemini/reviewer.md`.
+4.  **Reporting:** Findings are appended to a root `REVIEW_FEEDBACK.md`.
+5.  **Completion:** Once all tasks are marked as `[x]`, the track is closed, and the findings are handed over to the **Fix Phase**.
 
 ## **Environment & Context Awareness**
 
