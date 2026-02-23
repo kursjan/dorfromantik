@@ -1,6 +1,5 @@
 import { Board, BoardTile } from './Board';
 import { GameRules } from './GameRules';
-import { HexCoordinate } from './HexCoordinate';
 import { Navigation, type Direction } from './Navigation';
 
 export interface ScoringResult {
