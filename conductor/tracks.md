@@ -16,7 +16,7 @@ This file tracks all major tracks for the project. Each track has its own detail
   *Link: [./tracks/tile_rotation_20260222/](./tracks/tile_rotation_20260222/)*
 - [ ] **Track: Always-on Ghost Preview (#18)**
   *Link: [./tracks/always_on_ghost_preview_20260222/](./tracks/always_on_ghost_preview_20260222/)*
-- [ ] **Track: Refactor Game Scoring Logic**
+- [x] **Track: Refactor Game Scoring Logic**
   *Link: [./tracks/refactor_game_scorer_20260223/](./tracks/refactor_game_scorer_20260223/)*
 - [x] **Track: Perfect Placement Scoring (#16)**
   *Link: [./tracks/perfect_placement_scoring_20260222/](./tracks/perfect_placement_scoring_20260222/)*
