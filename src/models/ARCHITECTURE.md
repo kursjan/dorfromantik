@@ -29,12 +29,19 @@ The `Game` class is the central orchestrator of an active session.
   - **Active**: Managed within a `Session`.
   - **Logic**:
     - **`isValidPlacement(coord)`**: Checks if a hex is empty and adjacent to at least one existing tile. Used for UI validation and Ghost Preview.
-    - **`placeTile(coord)`**: The primary game action. It pops a tile from the queue, places it on the board, and calculates matching terrain scores with all neighbors.
+    - **`placeTile(coord)`**: The primary game action. It places a tile, delegates scoring to `GameScorer`, and updates the score and queue.
     - **`rotateQueuedTileClockwise()` / `rotateQueuedTileCounterClockwise()`**: Rotates the tile currently at the head of the queue.
     - **`peek()`**: Allows the UI to preview the next tile in the queue.
-    - **`isPerfect(coord)`**: Checks if a tile at the given coordinate has 6 matching neighbors.
 
-### 5. Perfect Placement Scoring
+### 5. Scoring Logic (`GameScorer.ts`)
+Encapsulates all rules related to points and bonuses.
+- **Separation of Concerns**: Extracted from `Game` to keep the engine focused on state orchestration.
+- **`scorePlacement(board, tile)`**: Calculates the score for a newly placed tile, including:
+  - **Match Points**: Points for each matching edge with a neighbor.
+  - **Perfect Bonus**: Checks if the placed tile or any of its neighbors have become "Perfect".
+- **`isPerfect(board, boardTile)`**: Helper to determine if a tile at the given coordinate has 6 matching neighbors.
+
+### 6. Perfect Placement Scoring
 The game implements the "Perfect Placement" bonus (Steam rules):
 - **Definition**: A tile is "Perfect" if all 6 of its neighbors exist and their touching terrains match exactly.
 - **Bonus**: Each placement that results in a tile *becoming* perfect awards:
