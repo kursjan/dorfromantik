@@ -125,3 +125,4 @@ Notes to add somewhere
   - Lets see tommorrow
 - I hope using GEMINI_API_KEY will improve model availability. Hopefully I didn't commit.
 - I gave up today and fixed GameScorer on my own. I don't have patience to explain that thing every line of code over and over again.
+- Seems using Tier 1 API key makes agents a bit more responsive, but one runs out of quota quickly.

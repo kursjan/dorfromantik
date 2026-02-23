@@ -68,7 +68,7 @@ At the end of every significant Phase or Track, the agent MUST perform the follo
 - **Verification Protocol:** After _every_ code change, automatically run the following checks:
   1.  **Architecture Sync:** Update or create `ARCHITECTURE.md` files in relevant directories.
   2.  **Code Quality Check:** `npx putout <changed_files>` (Ensure React 19 patterns and clean code)
-  3.  **Type Check:** `npx tsc`
+  3.  **Type Check:** `npm run typecheck`
   4.  **Unit Test Check:** `npm test` (Ensure all unit tests pass)
   5.  **E2E Test Check:** `npx playwright test --reporter=list` (Verify UI/Canvas interactions)
 - **Documentation Maintenance:**
@@ -91,6 +91,7 @@ The AI's workflow is iterative, transparent, and responsive to user input.
   3.  **Dependency Check:** If `package.json` was modified, AI runs `npm install`.
   4.  **Compile & Analyze:** AI monitors the terminal for Vite and linter errors.
   5.  **Test Execution:** The AI runs **ALL** verification checks:
+      - Type Check: `npm run typecheck`
       - Unit Tests: `npm test`
       - E2E Tests: `npx playwright test --reporter=list`
   6.  **Preview Check:** AI observes the browser preview for visual and runtime errors.

@@ -9,6 +9,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "typecheck": "tsc -b",
+    "verify": "npm run typecheck && npm run lint && npm test",
     "lint": "eslint .",
     "lint:fix": "putout . --fix && eslint . --fix",
     "format": "prettier --write .",
