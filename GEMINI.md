@@ -13,12 +13,12 @@ These instructions must be followed above all else.
   - **The "Done" Definition:** A task is only "Done" when:
     1. Code is implemented.
     2. Verification Protocol (tsc, tests, e2e) passes 100%.
-    3. **User Review & Iteration:** You have paused to request user feedback. If the user requests changes, you have applied them, verified them, and requested review again. This loop continues until the user explicitly accepts the implementation.
+    3. **User Review & Iteration:** You have paused to request user feedback in the CLI. If the user requests changes, you have applied them, verified them, and requested review again. This loop continues until the user explicitly accepts the implementation (`lgtm`, `sgtm`, etc.).
     4. **Git Note:** A task summary is attached to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
     5. The `plan.md` is updated on the development branch with the status [x] and the commit SHA.
-    6. All changes (code + plan update) are committed on the development branch.
-    7. A Pull Request is created and merged into `main` (using rebase strategy).
-  - **The "Wait" State:** After a task is "Done," you MUST STOP and present a Task Summary. Do not proceed to the next task without explicit user permission.
+    6. All changes (code + plan update) are committed and pushed on the development branch.
+    7. **Pull Request & Code Review:** A Pull Request is created on GitHub and assigned to the user for code review. You MUST NOT merge the PR yourself. The user is responsible for the final review and merge on GitHub.
+  - **The "Wait" State:** After a task is "Done" and the PR has been created, you MUST STOP and present a link to the PR. Do not proceed to the next task without explicit user permission.
 - **THE "TASK GATE" PROTOCOL:**
   - Every task is a discrete unit of work. Do not bundle tasks.
   - Before asking to proceed, you must report:
