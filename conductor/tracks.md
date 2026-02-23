@@ -1,6 +1,6 @@
 # Project Tracks
 
-This file tracks all major tracks for the project. Each track has its own detailed plan in its respective folder.
+This file tracks all major tracks for the project. Each track has its own detailed plan in its respective folder. Each track should be linked to a dedicated GitHub issue in https://github.com/kursjan/dorfromantik.
 
 ---
 

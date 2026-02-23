@@ -8,6 +8,21 @@
 4. **User Experience First:** Every decision should prioritize user experience
 5. **Non-Interactive & CI-Aware:** Prefer non-interactive commands. Use `CI=true` for watch-mode tools (tests, linters) to ensure single execution.
 
+## Plan
+Each plan consists of phases and tasks. 
+There could be only one phase and one task for a simple plan.
+Plan executes by following the Taks and Phase workflow.
+
+### **Conductor & Plan Management:**
+  - **Focused Updates:** When updating a track's `plan.md` or `spec.md`, modify only the sections directly related to the current task.
+  - **Checkbox Protocol:** Always wait for the user's explicit confirmation before marking a task as complete in the track's `plan.md`.
+  - **Analysis tasks:** Output of analysis is a suggested update in the track's plan or specification, so that the user can verify the tasks and ask the AI to execute them later.
+  - **Check updates:** Both user and AI can modify Conductor files. The AI always reads the file content and preserves any changes made by the user.
+
+### **Issues:** 
+Use GitHub Issues to track every plan. No work should be done without an associated issue number.
+
+
 ## Task Workflow
 
 For the authoritative task execution workflow, including Git Notes and Phase Checkpoints, refer to `GEMINI.md`. The AI Agent strictly follows the protocols defined there.
@@ -25,6 +40,37 @@ Before marking any task complete, verify:
 - [ ] Works correctly on mobile (if applicable)
 - [ ] Documentation updated if needed
 - [ ] No security vulnerabilities introduced
+
+
+## Phase Workflow
+You work on a phase until by doing all the tasks, following the Task Workflow.
+
+Before marking any phase complete
+- [ ] All tasks are done
+- [ ] Ask for an explicit user approval.
+- [ ] **Manual Verification Plan:** Propose a detailed manual test plan for user review.
+- [ ]2.  **Checkpoint Commit:** Commit with message `conductor(checkpoint): Checkpoint end of Phase X`.
+- [ ] 3.  **Git Note:** Attach a detailed verification report (auto tests + manual plan + user confirm) to the checkpoint commit using `git notes`.
+- []4.  **Update Plan:** Mark phase as complete in the Conductor `plan.md` with `[checkpoint: <sha>]`.
+
+
+## Track Workflow
+Before marking a conductor track complete
+- [ ] All phases are done
+- [ ] All unit and e2e tests pass
+- [ ] All changes are commited in Git.
+- [ ] `ARCHITECTURE.md` is updated to reflects new models, patterns, and decisions.
+- [ ] Ask for an explicit user approval.
+      - present user with status of the project
+
+After marking a conductor track as done
+- [ ] Pull Request: A Pull Request is created on GitHub and assigned to the user for code review. 
+      - You MUST NOT merge the PR yourself. The user is responsible for the final review and merge on GitHub.
+      - **The "Wait" State:** After a task is "Done" and the PR has been created, you MUST STOP and present a link to the PR. Do not proceed to the next task without explicit user permission.
+
+## User Approval & Iteration
+When asking for approval (to finish task, phase or track), if the user requests changes, you have applied them, verified them, and requested approval again. This loop continues until the user explicitly accepts the implementation (`lgtm`, `sgtm`, etc.).
+
 
 ## Development Commands
 
@@ -104,17 +150,11 @@ Before requesting review:
    - Images optimized
    - Caching implemented where needed
 
-6. **Mobile Experience**
-   - Touch targets adequate (44x44px)
-   - Text readable without zooming
-   - Performance acceptable on mobile
-   - Interactions feel native
-
 ## Commit Guidelines
 
 ### Message Format
 ```
-<type>(<scope>): <description>
+<type>(<scope>): <description> (<github reference>)
 
 [optional body]
 
@@ -132,39 +172,13 @@ Before requesting review:
 
 ### Examples
 ```bash
-git commit -m "feat(auth): Add remember me functionality"
-git commit -m "fix(posts): Correct excerpt generation for short posts"
-git commit -m "test(comments): Add tests for emoji reaction limits"
+git commit -m "feat(auth): Add remember me functionality (#42)"
+git commit -m "fix(posts): Correct excerpt generation for short posts (fixes #42)"
+git commit -m "test(comments): Add tests for emoji reaction limits (#123)"
 git commit -m "style(mobile): Improve button touch targets"
 ```
 
-## Definition of Done
-
-Refer to `GEMINI.md` for the "Done" definition.
-
 ## Emergency Procedures
-
-### Critical Bug in Production
-1. Create hotfix branch from main
-2. Write failing test for bug
-3. Implement minimal fix
-4. Test thoroughly including mobile
-5. Deploy immediately
-6. Document in plan.md
-
-### Data Loss
-1. Stop all write operations
-2. Restore from latest backup
-3. Verify data integrity
-4. Document incident
-5. Update backup procedures
-
-### Security Breach
-1. Rotate all secrets immediately
-2. Review access logs
-3. Patch vulnerability
-4. Notify affected users (if any)
-5. Document and update security procedures
 
 ## Deployment Workflow
 

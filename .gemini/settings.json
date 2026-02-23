@@ -32,10 +32,5 @@
         ]
       }
     ]
-  },
-  "hooksConfig": {
-    "disabled": [
-      "doc-reminder"
-    ]
   }
 }

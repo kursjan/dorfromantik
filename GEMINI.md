@@ -1,46 +1,58 @@
-# **AI Development Guidelines for React in Firebase Studio**
+# **AI Development Guidelines for Dorfromatik Game**
 
-These guidelines define the operational principles and capabilities of an AI agent (e.g., Gemini) interacting with React projects within the Firebase Studio environment. The goal is to enable an efficient, automated, and error-resilient application design and development workflow, focusing on modern React practices.
+These guidelines define the operational principles and capabilities of an AI agent (e.g., Gemini) developing Dorfromatik, react based game. 
+
+The goal is to enable an efficient, automated, and error-resilient application design and development workflow, focusing on modern React practices and human oversight of automated AI agent work.
 
 ## **CORE OPERATIONAL DIRECTIVES (High Priority)**
 
 These instructions must be followed above all else.
 
-- **Primary Directive:** The implementation plans in `conductor/tracks/<track_id>/plan.md` are roadmaps, **NOT** commands. Always wait for explicit user confirmation before starting any new task from a plan.
+By task we mean conductor task or just ask from a user.
+By phase and track we mean conductor phase and conductor track.
+
+You work either on a conductor track or an ad-hock task. Always define, which type of work you do.
+
+- **Communication:** Communicate in a brief and professional manner.
+- **Scope:** Adhere strictly to the scope of the assigned task and instructions. Make small changes and minimize file touches.
+- **Preservation of User Content:** When asked to "correct" or "improve" a user-authored document, your primary goal is to preserve the user's original content and voice. Corrections and suggestions should be additive or minor edits to the existing text.
+- **Refactoring Rule:** When refactoring, your goal is to improve code structure while preserving all existing business logic. Use the test suite to verify that the logic remains unchanged.
+
+
+### Conductor Workflow
+- Conductor workflow is a track, where more tasks are grouped to phases and contains additional guidelines.
+- The implementation plans in `conductor/tracks/<track_id>/plan.md` are roadmaps, **NOT** commands. 
+  - Always ask for explicit user confirmation to start working on a track
+    - Present user with status, plan and next steps
   - Agent performs only one task at a time.
-- **THE CONDUCTOR EXECUTION ENGINE (MANDATORY):**
   - **Single-Task Loop:** You MUST NOT perform more than one task from `plan.md` in a single response.
-  - **The "Done" Definition:** A task is only "Done" when:
-    1. Code is implemented.
-    2. Verification Protocol (tsc, tests, e2e) passes 100%.
-    3. **User Review & Iteration:** You have paused to request user feedback in the CLI. If the user requests changes, you have applied them, verified them, and requested review again. This loop continues until the user explicitly accepts the implementation (`lgtm`, `sgtm`, etc.).
-    4. **Git Note:** A task summary is attached to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
-    5. The `plan.md` is updated on the development branch with the status [x] and the commit SHA.
+  
+### Task Workflow
+- Every task is a discrete unit of work. Do not bundle tasks.
+- Before starting working on task, ask user for an approval.
+
+- After finishing user request or a task, always ask user for aproval. If they request changes apply them and verify them.
+  - repeat until you get explicit user approval.
+- **"Done" Definition:** A coding task is only "Done" when:
+    1. Code is implemented
+    2. Ensure all changed files have adequate unit tests.
+    3. Verification Protocol (tsc, tests, e2e) passes 100%.
+    3. User approved the work: When asking for approval
+       - present user with a manual verification plan
+       - if the user requests changes, you have applied them, verified them, and requested approval again. 
+       - This loop continues until the user explicitly accepts the implementation (`lgtm`, `sgtm`, etc.).
+    4. A task summary is attached to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
+    5. If working on a track, thehe `plan.md` is updated on the development branch with the status [x] and the commit SHA.
     6. All changes (code + plan update) are committed and pushed on the development branch.
-    7. **Pull Request & Code Review:** A Pull Request is created on GitHub and assigned to the user for code review. You MUST NOT merge the PR yourself. The user is responsible for the final review and merge on GitHub.
-  - **The "Wait" State:** After a task is "Done" and the PR has been created, you MUST STOP and present a link to the PR. Do not proceed to the next task without explicit user permission.
-- **THE "TASK GATE" PROTOCOL:**
-  - Every task is a discrete unit of work. Do not bundle tasks.
-  - Before asking to proceed, you must report:
-    - **Files Modified:** List of paths.
-    - **Verification Results:** "Linting PASSED, Type Check PASSED, Tests PASSED."
-    - **Commit SHA:** The 7-character hash of the task commit.
-- **Conductor & Plan Management:**
-  - **Focused Updates:** When updating a track's `plan.md` or `spec.md`, modify only the sections directly related to the current task.
-  - **Checkbox Protocol:** Always wait for the user's explicit confirmation before marking a task as complete in the track's `plan.md`.
-  - **Analysis tasks:** Output of analysis is a suggested update in the track's plan or specification, so that the user can verify the tasks and ask the AI to execute them later.
-  - **Check updates:** Both user and AI can modify Conductor files. The AI always reads the file content and preserves any changes made by the user.
-- **Task Management (GitHub Integration):**
-  - **Issues:** Use GitHub Issues to track every task, bug, and feature. No work should be done without an associated issue number.
+
+
+### **GitHub Integration:**
+  - Most tasks should have a GitHub Issue. Ask user for the issue or if you can proceed without GitHub issue.
   - **Issue Linkage:**
     - **Development Commits:** Use `refs #123` to link a task to an issue without closing it (e.g., `feat: add hex logic (refs #123)`).
     - **Closing Commits:** ONLY use `fixes #123` or `closes #123` in the final commit of a Track or when the entire feature/bug is verified as complete.
   - **Backlog:** Maintain a `low priority` label on GitHub for non-critical backlog items.
   - **Tooling:** Use the `gh` CLI for creating, listing, and managing issues.
-- **Communication:** Communicate in a brief and professional manner.
-- **Scope:** Adhere strictly to the scope of the assigned task and instructions. Make small changes and minimize file touches.
-- **Preservation of User Content:** When asked to "correct" or "improve" a user-authored document, your primary goal is to preserve the user's original content and voice. Corrections and suggestions should be additive or minor edits to the existing text.
-- **Refactoring Rule:** When refactoring, your goal is to improve code structure while preserving all existing business logic. Use the test suite to verify that the logic remains unchanged.
 
 ## **MULTI-WORKTREE & PRAGMATIC BRANCHING PROTOCOL (High Priority)**
 
@@ -52,16 +64,8 @@ This project uses a "Track-Based" branching model to maintain focus and ensure a
   - **Active Track Identification:** When switching branches or starting work, always verify the active Track ID in `conductor/tracks/<track_id>/metadata.json`.
 - **Remote-First Synchronization:** All changes intended for the codebase MUST be pushed to the remote repository (`origin`).
 - **Rebase-Based Integration:** Integration of a Track into `main` MUST be performed via a rebase-based Pull Request (`gh pr merge --rebase`). This ensures a clean, linear, and auditable history.
-- **Explicit Task Gating:** When a Track or significant Phase is completed, the agent MUST STOP. Even if the user issues a broad "proceed" or "yes" directive, the agent must not transition to a new, unrelated Track without a specific directive naming the target Track.
 
-### **Phase Checkpoint Protocol**
-At the end of every significant Phase or Track, the agent MUST perform the following:
-1.  **Sync Architecture:** Update `ARCHITECTURE.md` to reflect new models, patterns, and decisions.
-2.  **Verify Coverage:** Ensure all changed files have adequate unit tests.
-3.  **Manual Verification Plan:** Propose a detailed manual test plan for user review.
-4.  **Checkpoint Commit:** Commit with message `conductor(checkpoint): Checkpoint end of Phase X`.
-5.  **Git Note:** Attach a detailed verification report (auto tests + manual plan + user confirm) to the checkpoint commit using `git notes`.
-6.  **Update Plan:** Mark phase as complete in the Conductor `plan.md` with `[checkpoint: <sha>]`.
+
 
 ### **Core Engineering Mandates**
 - **Contextual Refactoring Rule:** Always analyze files in the context of the entire project. Check all usages of a class or function to ensure its public API remains valid after refactoring.
@@ -70,7 +74,9 @@ At the end of every significant Phase or Track, the agent MUST perform the follo
   2.  **Code Quality Check:** `npx putout <changed_files>` (Ensure React 19 patterns and clean code)
   3.  **Type Check:** `npm run typecheck`
   4.  **Unit Test Check:** `npm test` (Ensure all unit tests pass)
-  5.  **E2E Test Check:** `npx playwright test --reporter=list` (Verify UI/Canvas interactions)
+  5.  **E2E Test Check:** `npm run e2e` (Verify UI/Canvas interactions)
+      - NOTE that you might need to specify correct PORT, because multiple agents can be running at the same time
+      - When in doubt, ask user for the port number
 - **Documentation Maintenance:**
   - The AI is responsible for keeping project documentation up-to-date.
   - **Architecture Sync:** Whenever a refactoring or architectural change occurs (e.g., adding a new renderer, changing a design pattern), the AI must update the relevant `ARCHITECTURE.md` file (or equivalent) and ensure `conductor/product.md` remains consistent.
@@ -82,7 +88,6 @@ At the end of every significant Phase or Track, the agent MUST perform the follo
 The AI's workflow is iterative, transparent, and responsive to user input.
 
 - **Track Generation & Plan Management:** Each time the user requests a significant change or feature, the AI will propose a new **Track** or update an existing one. This involves creating or updating the track's `spec.md` and `plan.md` within the `conductor/tracks/` directory.
-- **Branch Allocation:** For each new Track, the AI will create or switch to a dedicated development branch named after the track ID or associated GitHub Issue.
 - **Prompt Understanding:** The AI will interpret user prompts to understand the desired changes, new features, bug fixes, or questions. It will ask clarifying questions if the prompt is ambiguous.
 - **Contextual Responses:** The AI will provide conversational and contextual responses, explaining its actions, progress, and any issues encountered. It will summarize changes made.
 - **Error Checking Flow:**
@@ -100,6 +105,9 @@ The AI's workflow is iterative, transparent, and responsive to user input.
 ## **Adversarial Review Loop**
 
 We use a two-phase development cycle: **Implement -> Review -> Fix**.
+
+User can trigger AI or human review at the end of a task, phase or a track to ensure high quality of the code.
+Therefore it is important to ask user if we can move to the next task.
 
 ### **Standard Review (On-Demand)**
 1.  **Implementation Phase:**
@@ -205,7 +213,6 @@ This project uses a custom orientation for "Flat-Top" hexagons:
 
 - **North is (-1, 0, 1)** instead of the standard `(0, -1, 1)`.
 - This requires careful mapping in `HexUtils.ts` (specifically swapping/negating `q` and `r` in pixel-to-hex conversions).
-- **Future AI Warning:** Always check `HexUtils.test.ts` to verify neighbor calculations before extending the grid logic.
 
 ### **E2E Stability (Canvas)**
 

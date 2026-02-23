@@ -139,8 +139,7 @@ export class Game {
       throw new Error('No tiles remaining in the queue');
     }
 
-    this.board.place(tile, coord);
-    const placedTile = this.board.get(coord)!;
+    const placedTile = this.board.place(tile, coord);
 
     // Delegate scoring to GameScorer
     const { scoreAdded, perfectCount } = this.scorer.scorePlacement(this.board, placedTile);
