@@ -1,4 +1,4 @@
-import { Board, BoardTile } from './Board';
+import { Board, type BoardTile } from './Board';
 import { GameRules } from './GameRules';
 import { Navigation, type Direction } from './Navigation';
 
