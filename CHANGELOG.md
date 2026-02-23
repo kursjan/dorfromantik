@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - **E2E Testing:** Configured Playwright for the Vite/Nix environment; added tests for canvas rendering, zooming, and the reset view functionality.
 - **Specialized Renderers:** Refactored the canvas engine to use specialized renderers (`Background`, `Hex`, `Debug`) orchestrated by a central `CanvasController`.
 - **Rotated Hex System:** Implemented a custom hexagonal coordinate system where "North" is defined as `(-1, 0, 1)` to align with the desired visual orientation.
+- **GameScorer:** Extracted scoring logic into a dedicated service for better testability and separation of concerns.
 
 ### Fixed
 

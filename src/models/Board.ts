@@ -1,6 +1,6 @@
 import { HexCoordinate } from './HexCoordinate';
 import { Tile } from './Tile';
-import type { Navigation, NeighborInfo } from './Navigation';
+import type { Navigation, Direction } from './Navigation';
 
 export interface BoardTile {
   id: string; // "q,r,s"
@@ -12,13 +12,20 @@ export class Board {
   private tiles = new Map<string, BoardTile>();
 
   /**
-   * Returns a list of coordinates adjacent to the given coordinate that already have tiles.
+   * Returns a map of directions to existing neighbor tiles.
    */
-  getNeighbors(coord: HexCoordinate, navigation: Navigation): NeighborInfo[] {
-    return navigation.getNeighbors(coord).filter((n) => this.has(n.coordinate));
+  getExistingNeighbors(tile: BoardTile, navigation: Navigation): Partial<Record<Direction, BoardTile>> {
+    const results: Partial<Record<Direction, BoardTile>> = {};
+    for (const { direction, coordinate } of navigation.getNeighbors(tile.coordinate)) {
+      const neighbor = this.get(coordinate);
+      if (neighbor) {
+        results[direction] = neighbor;
+      }
+    }
+    return results;
   }
 
-  place(tile: Tile, coord: HexCoordinate): void {
+  place(tile: Tile, coord: HexCoordinate): BoardTile {
     if (!this.canPlace(coord)) {
       throw new Error(`Position ${coord.getKey()} is already occupied`);
     }
@@ -29,6 +36,7 @@ export class Board {
       coordinate: coord,
     };
     this.tiles.set(id, boardTile);
+    return boardTile;
   }
 
   canPlace(coord: HexCoordinate): boolean {

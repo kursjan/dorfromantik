@@ -70,9 +70,10 @@ describe('Board', () => {
     board.place(tile, neighborCoord); // North of origin
     board.place(tile, nonNeighborCoord); // Far away
 
-    const neighbors = board.getNeighbors(coord, nav);
-    expect(neighbors.length).toBe(1);
-    expect(neighbors[0].coordinate.getKey()).toBe(neighborCoord.getKey());
-    expect(neighbors[0].direction).toBe('north');
+    const placedTile = board.get(coord)!;
+    const neighbors = board.getExistingNeighbors(placedTile, nav);
+    
+    expect(Object.keys(neighbors).length).toBe(1);
+    expect(neighbors.north?.coordinate.getKey()).toBe(neighborCoord.getKey());
   });
 });
