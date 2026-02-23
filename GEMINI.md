@@ -13,9 +13,11 @@ These instructions must be followed above all else.
   - **The "Done" Definition:** A task is only "Done" when:
     1. Code is implemented.
     2. Verification Protocol (tsc, tests, e2e) passes 100%.
-    3. The `plan.md` is updated on the development branch with the status [x] and the commit SHA.
-    4. All changes (code + plan update) are committed on the development branch.
-    5. A Pull Request is created and merged into `main` (using rebase strategy).
+    3. **User Review & Iteration:** You have paused to request user feedback. If the user requests changes, you have applied them, verified them, and requested review again. This loop continues until the user explicitly accepts the implementation.
+    4. **Git Note:** A task summary is attached to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
+    5. The `plan.md` is updated on the development branch with the status [x] and the commit SHA.
+    6. All changes (code + plan update) are committed on the development branch.
+    7. A Pull Request is created and merged into `main` (using rebase strategy).
   - **The "Wait" State:** After a task is "Done," you MUST STOP and present a Task Summary. Do not proceed to the next task without explicit user permission.
 - **THE "TASK GATE" PROTOCOL:**
   - Every task is a discrete unit of work. Do not bundle tasks.
@@ -50,6 +52,13 @@ This project operates in a multi-worktree environment where the `main` branch is
 - **Rebase-Based Integration:** Synchronization with `main` MUST be performed via a rebase-based Pull Request (`gh pr create` and `gh pr merge --rebase`). This ensures a clean, linear, and auditable history.
 - **Mandatory PR Approval:** No changes are merged to `main` without an explicit PR review and approval by the user.
 - **Explicit Task Gating:** When a Track or significant Phase is completed, the agent MUST STOP. Even if the user issues a broad "proceed" or "yes" directive, the agent must not transition to a new, unrelated Track without a specific directive naming the target Track.
+  - **Phase Checkpoint Protocol:**
+    1.  **Sync Architecture:** Update `ARCHITECTURE.md`.
+    2.  **Verify Coverage:** Ensure all changed files have tests.
+    3.  **Manual Verification Plan:** Propose a detailed manual test plan to the user.
+    4.  **Checkpoint Commit:** Commit with message `conductor(checkpoint): Checkpoint end of Phase X`.
+    5.  **Git Note:** Attach a detailed verification report (auto tests + manual plan + user confirm) to the checkpoint commit using `git notes`.
+    6.  **Update Plan:** Mark phase as complete with `[checkpoint: <sha>]`.
 
 - **Contextual Refactoring Rule:** Always analyze files in the context of the entire project. Check all usages of a class or function to ensure its public API remains valid after refactoring.
 - **Verification Protocol:** After _every_ code change, automatically run the following checks:
