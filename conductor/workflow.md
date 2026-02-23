@@ -2,22 +2,22 @@
 
 ## Guiding Principles
 
-1. **The Plan is the Source of Truth:** All work must be tracked in `plan.md`
-2. **The Tech Stack is Deliberate:** Changes to the tech stack must be documented in `tech-stack.md` *before* implementation
-3. **High Code Coverage:** Aim for >80% code coverage for all modules
-4. **User Experience First:** Every decision should prioritize user experience
+1. **The Plan is the Source of Truth:** All work must be tracked in `plan.md`.
+2. **The Tech Stack is Deliberate:** Changes to the tech stack must be documented in `tech-stack.md` *before* implementation.
+3. **High Code Coverage:** Aim for >80% code coverage for all modules.
+4. **User Experience First:** Every decision should prioritize user experience.
 5. **Non-Interactive & CI-Aware:** Prefer non-interactive commands. Use `CI=true` for watch-mode tools (tests, linters) to ensure single execution.
 
 ## Plan
 Each plan consists of phases and tasks. 
 There could be only one phase and one task for a simple plan.
-Plan executes by following the Taks and Phase workflow.
+The plan executes by following the Task and Phase workflow.
 
 ### **Conductor & Plan Management:**
   - **Focused Updates:** When updating a track's `plan.md` or `spec.md`, modify only the sections directly related to the current task.
   - **Checkbox Protocol:** Always wait for the user's explicit confirmation before marking a task as complete in the track's `plan.md`.
-  - **Analysis tasks:** Output of analysis is a suggested update in the track's plan or specification, so that the user can verify the tasks and ask the AI to execute them later.
-  - **Check updates:** Both user and AI can modify Conductor files. The AI always reads the file content and preserves any changes made by the user.
+  - **Analysis Tasks:** The output of analysis is a suggested update in the track's plan or specification, so that the user can verify the tasks and ask the AI to execute them later.
+  - **Check Updates:** Both the user and AI can modify Conductor files. The AI always reads the file content and preserves any changes made by the user.
 
 ### **Issues:** 
 Use GitHub Issues to track every plan. No work should be done without an associated issue number.
@@ -31,45 +31,44 @@ For the authoritative task execution workflow, including Git Notes and Phase Che
 
 Before marking any task complete, verify:
 
-- [ ] All tests pass
-- [ ] Code coverage meets requirements (>80%)
-- [ ] Code follows project's code style guidelines (as defined in `code_styleguides/`)
-- [ ] All public functions/methods are documented (e.g., docstrings, JSDoc, GoDoc)
-- [ ] Type safety is enforced (e.g., type hints, TypeScript types, Go types)
-- [ ] No linting or static analysis errors (using the project's configured tools)
-- [ ] Works correctly on mobile (if applicable)
-- [ ] Documentation updated if needed
-- [ ] No security vulnerabilities introduced
+- [ ] All tests pass.
+- [ ] Code coverage meets requirements (>80%).
+- [ ] Code follows project's code style guidelines (as defined in `code_styleguides/`).
+- [ ] All public functions/methods are documented (e.g., docstrings, JSDoc, GoDoc).
+- [ ] Type safety is enforced (e.g., type hints, TypeScript types, Go types).
+- [ ] No linting or static analysis errors (using the project's configured tools).
+- [ ] Works correctly on mobile (if applicable).
+- [ ] Documentation updated if needed.
+- [ ] No security vulnerabilities introduced.
 
 
 ## Phase Workflow
-You work on a phase until by doing all the tasks, following the Task Workflow.
+You work on a phase by completing all its tasks, following the Task Workflow.
 
-Before marking any phase complete
-- [ ] All tasks are done
-- [ ] Ask for an explicit user approval.
-- [ ] **Manual Verification Plan:** Propose a detailed manual test plan for user review.
-- [ ]2.  **Checkpoint Commit:** Commit with message `conductor(checkpoint): Checkpoint end of Phase X`.
-- [ ] 3.  **Git Note:** Attach a detailed verification report (auto tests + manual plan + user confirm) to the checkpoint commit using `git notes`.
-- []4.  **Update Plan:** Mark phase as complete in the Conductor `plan.md` with `[checkpoint: <sha>]`.
+Before marking any phase complete:
+- [ ] All tasks are done.
+- [ ] Ask for explicit user approval.
+- [ ] Propose a detailed manual test plan for user review.
+- [ ] Commit with the message `conductor(checkpoint): Checkpoint end of Phase X`.
+- [ ] Attach a detailed verification report (auto tests + manual plan + user confirmation) to the checkpoint commit using `git notes`.
+- [ ] Mark the phase as complete in the Conductor `plan.md` with `[checkpoint: <sha>]`.
 
 
 ## Track Workflow
-Before marking a conductor track complete
-- [ ] All phases are done
-- [ ] All unit and e2e tests pass
-- [ ] All changes are commited in Git.
-- [ ] `ARCHITECTURE.md` is updated to reflects new models, patterns, and decisions.
-- [ ] Ask for an explicit user approval.
-      - present user with status of the project
+Before marking a conductor track complete:
+- [ ] All phases are done.
+- [ ] All unit and e2e tests pass.
+- [ ] All changes are committed in Git.
+- [ ] Update `ARCHITECTURE.md` to reflect new models, patterns, and decisions.
+- [ ] Ask for explicit user approval and present the user with the status of the project.
 
-After marking a conductor track as done
-- [ ] Pull Request: A Pull Request is created on GitHub and assigned to the user for code review. 
+After marking a conductor track as done:
+- [ ] Create a Pull Request on GitHub and assign it to the user for code review. 
       - You MUST NOT merge the PR yourself. The user is responsible for the final review and merge on GitHub.
-      - **The "Wait" State:** After a task is "Done" and the PR has been created, you MUST STOP and present a link to the PR. Do not proceed to the next task without explicit user permission.
+- [ ] After a task is "Done" and the PR has been created, you MUST STOP and present a link to the PR. Do not proceed to the next task without explicit user permission.
 
 ## User Approval & Iteration
-When asking for approval (to finish task, phase or track), if the user requests changes, you have applied them, verified them, and requested approval again. This loop continues until the user explicitly accepts the implementation (`lgtm`, `sgtm`, etc.).
+When asking for approval (to finish a task, phase, or track), if the user requests changes, apply them, verify them, and request approval again. This loop continues until the user explicitly accepts the implementation (`lgtm`, `sgtm`, etc.).
 
 
 ## Development Commands

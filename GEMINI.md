@@ -1,6 +1,6 @@
 # **AI Development Guidelines for Dorfromatik Game**
 
-These guidelines define the operational principles and capabilities of an AI agent (e.g., Gemini) developing Dorfromatik, react based game. 
+These guidelines define the operational principles and capabilities of an AI agent (e.g., Gemini) developing Dorfromatik, a React-based game. 
 
 The goal is to enable an efficient, automated, and error-resilient application design and development workflow, focusing on modern React practices and human oversight of automated AI agent work.
 
@@ -8,10 +8,10 @@ The goal is to enable an efficient, automated, and error-resilient application d
 
 These instructions must be followed above all else.
 
-By task we mean conductor task or just ask from a user.
-By phase and track we mean conductor phase and conductor track.
+By "task" we mean a conductor task or a direct user request.
+By "phase" and "track" we mean a conductor phase and a conductor track, respectively.
 
-You work either on a conductor track or an ad-hock task. Always define, which type of work you do.
+You work either on a conductor track or an ad-hoc task. Always define which type of work you are doing.
 
 - **Communication:** Communicate in a brief and professional manner.
 - **Scope:** Adhere strictly to the scope of the assigned task and instructions. Make small changes and minimize file touches.
@@ -20,30 +20,29 @@ You work either on a conductor track or an ad-hock task. Always define, which ty
 
 
 ### Conductor Workflow
-- Conductor workflow is a track, where more tasks are grouped to phases and contains additional guidelines.
-- The implementation plans in `conductor/tracks/<track_id>/plan.md` are roadmaps, **NOT** commands. 
-  - Always ask for explicit user confirmation to start working on a track
-    - Present user with status, plan and next steps
-  - Agent performs only one task at a time.
-  - **Single-Task Loop:** You MUST NOT perform more than one task from `plan.md` in a single response.
+- **Overview:** A Conductor workflow is a track where tasks are grouped into phases and contains additional guidelines.
+- **Implementation Plans:** The implementation plans in `conductor/tracks/<track_id>/plan.md` are roadmaps, **NOT** commands. 
+  - **User Confirmation:** Always ask for explicit user confirmation before starting work on a track.
+  - **Status Presentation:** Present the user with status, plan, and next steps.
+- **Task Execution:** The agent performs only one task at a time.
+- **Single-Task Loop:** You MUST NOT perform more than one task from `plan.md` in a single response.
   
 ### Task Workflow
-- Every task is a discrete unit of work. Do not bundle tasks.
-- Before starting working on task, ask user for an approval.
-
-- After finishing user request or a task, always ask user for aproval. If they request changes apply them and verify them.
-  - repeat until you get explicit user approval.
+- **Discrete Units:** Every task is a discrete unit of work. Do not bundle tasks.
+- **Approval Protocol:** Before starting work on a task, ask the user for approval.
+- **Iteration Loop:** After finishing a user request or a task, always ask the user for approval. If they request changes, apply them, verify them, and request approval again.
+  - **Termination:** Repeat until you get explicit user approval.
 - **"Done" Definition:** A coding task is only "Done" when:
-    1. Code is implemented
-    2. Ensure all changed files have adequate unit tests.
-    3. Verification Protocol (tsc, tests, e2e) passes 100%.
-    3. User approved the work: When asking for approval
-       - present user with a manual verification plan
-       - if the user requests changes, you have applied them, verified them, and requested approval again. 
+    1. **Implementation:** Code is implemented.
+    2. **Testing:** All changed files have adequate unit tests.
+    3. **Verification:** Verification Protocol (tsc, tests, e2e) passes 100%.
+    4. **Approval:** User approved the work:
+       - Present the user with a manual verification plan.
+       - If the user requests changes, apply them, verify them, and request approval again. 
        - This loop continues until the user explicitly accepts the implementation (`lgtm`, `sgtm`, etc.).
-    4. A task summary is attached to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
-    5. If working on a track, thehe `plan.md` is updated on the development branch with the status [x] and the commit SHA.
-    6. All changes (code + plan update) are committed and pushed on the development branch.
+    5. **Summary:** A task summary is attached to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
+    6. **Status Update:** If working on a track, the `plan.md` is updated on the development branch with the status `[x]` and the commit SHA.
+    7. **Persistence:** All changes (code + plan update) are committed and pushed to the development branch.
 
 
 ### **GitHub Integration:**
@@ -62,23 +61,22 @@ This project uses a "Track-Based" branching model to maintain focus and ensure a
   - **New Tracks:** When starting a new Conductor Track (e.g., `feat/tile-rotation`), create a dedicated feature branch.
   - **Minor Fixes & Chores:** For documentation updates, configuration tweaks, or minor verified bug fixes, you may work directly on the current branch (including `main`).
   - **Active Track Identification:** When switching branches or starting work, always verify the active Track ID in `conductor/tracks/<track_id>/metadata.json`.
-- **Remote-First Synchronization:** All changes intended for the codebase MUST be pushed to the remote repository (`origin`).
-- **Rebase-Based Integration:** Integration of a Track into `main` MUST be performed via a rebase-based Pull Request (`gh pr merge --rebase`). This ensures a clean, linear, and auditable history.
+- **Synchronization:** All changes intended for the codebase MUST be pushed to the remote repository (`origin`).
+- **Integration:** Integration of a Track into `main` MUST be performed via a rebase-based Pull Request (`gh pr merge --rebase`). This ensures a clean, linear, and auditable history.
 
 
 
 ### **Core Engineering Mandates**
-- **Contextual Refactoring Rule:** Always analyze files in the context of the entire project. Check all usages of a class or function to ensure its public API remains valid after refactoring.
-- **Verification Protocol:** After _every_ code change, automatically run the following checks:
+- **Refactoring:** Always analyze files in the context of the entire project. Check all usages of a class or function to ensure its public API remains valid after refactoring.
+- **Verification:** After _every_ code change, automatically run the following checks:
   1.  **Architecture Sync:** Update or create `ARCHITECTURE.md` files in relevant directories.
-  2.  **Code Quality Check:** `npx putout <changed_files>` (Ensure React 19 patterns and clean code)
-  3.  **Type Check:** `npm run typecheck`
-  4.  **Unit Test Check:** `npm test` (Ensure all unit tests pass)
-  5.  **E2E Test Check:** `npm run e2e` (Verify UI/Canvas interactions)
-      - NOTE that you might need to specify correct PORT, because multiple agents can be running at the same time
-      - When in doubt, ask user for the port number
-- **Documentation Maintenance:**
-  - The AI is responsible for keeping project documentation up-to-date.
+  2.  **Code Quality Check:** `npx putout <changed_files>` (Ensure React 19 patterns and clean code).
+  3.  **Type Check:** `npm run typecheck`.
+  4.  **Unit Test Check:** `npm test` (Ensure all unit tests pass).
+  5.  **E2E Test Check:** `npm run e2e` (Verify UI/Canvas interactions).
+      - **Note:** You might need to specify the correct `PORT` if multiple agents are running simultaneously.
+      - **Inquiry:** When in doubt, ask the user for the port number.
+- **Maintenance:** The AI is responsible for keeping project documentation up-to-date.
   - **Architecture Sync:** Whenever a refactoring or architectural change occurs (e.g., adding a new renderer, changing a design pattern), the AI must update the relevant `ARCHITECTURE.md` file (or equivalent) and ensure `conductor/product.md` remains consistent.
   - **Code Comments:** Maintain clear, concise JSDoc (or equivalent) for all public classes and methods. Ensure comments explain _intent_ and _parameters_, especially after refactoring.
   - **Brevity:** Updates should be concise yet sufficient for a future AI agent to understand the system structure and design decisions without needing to re-analyze the entire codebase.
@@ -151,7 +149,7 @@ The AI operates within the Firebase Studio development environment, which provid
   - The `web` preview is configured to run `npm run dev -- --port $PORT --host 0.0.0.0`, meaning the Vite dev server is already running and available on a specific port.
   - The AI will continuously monitor the output of the preview server for real-time feedback on changes.
 - **Firebase Integration:** The AI recognizes standard Firebase integration patterns in React, including the use of a `firebase.js` or `firebase.ts` configuration file and interactions with various Firebase SDKs.
-- **Architecture:** The AI can read about architecture of a given folder from an Architecture.md file.
+- **Architecture:** The AI can read about the architecture of a given folder from an `ARCHITECTURE.md` file.
 
 ## **Code Modification & Dependency Management**
 
@@ -172,7 +170,7 @@ The AI is empowered to modify the React codebase and manage its dependencies aut
 
 A critical function of the AI is to continuously monitor for and automatically resolve errors to maintain a runnable and correct application state.
 
-- **Post-Modification Checks:** After _every_ code modification (including adding packages, or modifying existing files), the AI will:
+- **Post-Modification Checks:** After _every_ code modification (including adding packages or modifying existing files), the AI will:
   1.  Monitor the IDE's diagnostics (problem pane) and the terminal output for compilation errors, linting warnings, and runtime exceptions.
   2.  Check the Vite dev server's output for rendering issues, application crashes, or unexpected behavior.
 - **Automatic Error Correction:** The AI will attempt to automatically fix detected errors. This includes, but is not limited to:
@@ -180,8 +178,8 @@ A critical function of the AI is to continuously monitor for and automatically r
   - Type mismatches (if using TypeScript).
   - Unresolved imports or missing package references.
   - Linting rule violations (the AI will automatically run `eslint . --fix`).
-  - Common React-specific issues such as incorrect hook usage, or invalid component returns.
-- **Problem Reporting:** If an error cannot be automatically resolved (e.g., a logic error requiring user clarification, or an environment issue), the AI will clearly report the specific error message, its location, and a concise explanation with a suggested manual intervention or alternative approach to the user.
+  - Common React-specific issues such as incorrect hook usage or invalid component returns.
+- **Problem Reporting:** If an error cannot be automatically resolved (e.g., a logic error requiring user clarification or an environment issue), the AI will clearly report the specific error message, its location, and a concise explanation with a suggested manual intervention or alternative approach to the user.
 
 ## **Modern React Practices**
 
@@ -283,12 +281,12 @@ The AI will use a consistent styling approach, preferring modern solutions like 
 
 **Bold Definition:** The AI uses modern, interactive iconography, images, and UI components like buttons, text fields, animation, effects, gestures, sliders, carousels, navigation, etc.
 
-1.  Fonts \- Choose expressive and relevant typography. Stress and emphasize font sizes to ease understanding, e.g., hero text, section headlines, list headlines, keywords in paragraphs, etc.
-2.  Color \- Include a wide range of color concentrations and hues in the palette to create a vibrant and energetic look and feel.
-3.  Texture \- Apply subtle noise texture to the main background to add a premium, tactile feel.
-4.  Visual effects \- Multi-layered drop shadows create a strong sense of depth. Cards have a soft, deep shadow to look "lifted."
-5.  Iconography \- Incorporate icons to enhance the user’s understanding and the logical navigation of the app.
-6.  Interactivity \- Buttons, checkboxes, sliders, lists, charts, graphs, and other interactive elements have a shadow with elegant use of color to create a "glow" effect.
+1.  Fonts - Choose expressive and relevant typography. Stress and emphasize font sizes to ease understanding, e.g., hero text, section headlines, list headlines, keywords in paragraphs, etc.
+2.  Color - Include a wide range of color concentrations and hues in the palette to create a vibrant and energetic look and feel.
+3.  Texture - Apply subtle noise texture to the main background to add a premium, tactile feel.
+4.  Visual effects - Multi-layered drop shadows create a strong sense of depth. Cards have a soft, deep shadow to look "lifted."
+5.  Iconography - Incorporate icons to enhance the user’s understanding and the logical navigation of the app.
+6.  Interactivity - Buttons, checkboxes, sliders, lists, charts, graphs, and other interactive elements have a shadow with elegant use of color to create a "glow" effect.
 
 ## **Accessibility or A11Y Standards:** The AI implements accessibility features to empower all users, assuming a wide variety of users with different physical abilities, mental abilities, age groups, education levels, and learning styles.
 
@@ -424,7 +422,7 @@ When requested, the AI will facilitate the creation and execution of tests, ensu
   - After generating or modifying tests, and after any significant code change, the AI will automatically execute the relevant tests using `npm test` in the terminal.
   - The AI will report test results (pass/fail, with details on failures) to the user.
 - **Test Updates**
-  - AI will udpate only tests and cases related to the current task and stick strictly to the task at hand.
+  - AI will update only tests and cases related to the current task and stick strictly to the task at hand.
 
 # Firebase MCP
 
