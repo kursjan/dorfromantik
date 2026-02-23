@@ -92,18 +92,24 @@ The AI's workflow is iterative, transparent, and responsive to user input.
   6.  **Preview Check:** AI observes the browser preview for visual and runtime errors.
   7.  **Remediation/Report:** If errors are found, AI attempts automatic fixes. If unsuccessful, it reports details to the user.
 
-## **Code Review Process**
+## **Adversarial Review Loop**
 
-The AI is capable of performing a professional code review upon request. This process is designed to be collaborative and transparent, focusing on improving the overall quality of the codebase.
+We use a two-phase development cycle: **Implement -> Review -> Fix**.
 
-- **Structured Plan:** The code review process will follow a structured plan, which will be created as a new track in `conductor/tracks.md`. This plan will outline the specific files and areas of focus for the review.
-- **Best Practices:** The AI will review the code for adherence to best practices, including SOLID principles, clean code, and design patterns.
-- **Context-Aware Analysis:** The AI will review files by analyzing how a class or function is used throughout the application to understand its context and dependencies. This prevents suggesting changes that would break other parts of the code.
-- **Architectural Integrity:** Verify that each component adheres to the Single Responsibility Principle. Critically evaluate if logic belongs in the current class or should be extracted to a dedicated collaborator (e.g., rendering logic in a controller).
-- **Test Coverage Verification:** For every class under review, the AI will verify that **each public method** has a corresponding unit test. The test must not only exist but also adequately cover the method's logic, arguments, and edge cases.
-- **Organization & Consistency:** Verify that similar methods (e.g., event handlers, lifecycle methods) are grouped together logically and follow a consistent ordering convention.
-- **Actionable Suggestions:** The AI will provide clear, actionable suggestions for improvement. When a refactoring is proposed, it will explain the benefits of the change.
-- **Iterative Refactoring:** The AI will perform refactoring in small, verifiable steps. After each change, the full verification protocol (`tsc`, `npm test`, `npm run e2e`) will be executed to ensure no regressions have been introduced.
+1.  **Implementation Phase:**
+    *   The coding agent implements the feature/fix.
+    *   **"Done" Signal:** When the code is ready and verified (tests pass), the agent stops and says: "Ready for Review."
+
+2.  **Review Phase (User-Driven):**
+    *   The user runs `.gemini/review-loop.sh`.
+    *   This script invokes the **Adversarial Senior Architect** (configured in `.gemini/reviewer.md`) to analyze the changes.
+    *   The reviewer outputs a `REVIEW_FEEDBACK.md` file.
+    *   The user manually filters this feedback to ensure relevance.
+
+3.  **Fix Phase:**
+    *   The user passes the filtered `REVIEW_FEEDBACK.md` back to the coding agent.
+    *   **Mandate:** The coding agent must address *every* item in the feedback file.
+    *   Once fixes are applied and verified, the loop is complete.
 
 ## **Environment & Context Awareness**
 

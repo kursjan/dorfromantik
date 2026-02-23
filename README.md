@@ -123,4 +123,5 @@ Notes to add somewhere
   - I have better experience with code review in github than during development, running 2 agents at the same time
   - I wonder if I can setup conductor to gemini.md or workflow.md to capture this
   - Lets see tommorrow
-- I hope using GEMINI_API_KEY will improve model availability
+- I hope using GEMINI_API_KEY will improve model availability. Hopefully I didn't commit.
+- I gave up today and fixed GameScorer on my own. I don't have patience to explain that thing every line of code over and over again.
