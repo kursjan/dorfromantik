@@ -1,29 +1,49 @@
 # Tech Stack
 
-This document defines the core technologies and patterns used in the Dorfromantik clone project.
+This document defines the core technologies, architectural patterns, and quality standards for the Dorfromantik clone project.
 
 ## Core Language & Frameworks
-- **Language:** TypeScript
-- **Frontend Framework:** React 19
-- **Build Tool:** Vite
+- **Language:** [TypeScript](https://www.typescriptlang.org/) (Strict Mode enabled)
+- **Frontend Framework:** [React 19](https://react.dev/) (Functional components with Hooks)
+- **Runtime Optimization:** React Compiler (Enabled by default for automatic memoization)
+- **Build Tool:** [Vite](https://vitejs.dev/)
 
 ## Infrastructure & Deployment
-- **Platform:** Firebase
+- **Platform:** [Firebase](https://firebase.google.com/)
+- **Development Environment:** [Project IDX](https://idx.google.com/) (Configured via `.idx/dev.nix`)
+- **IDE:** Code OSS (Integrated with Firebase Studio)
 
-## Testing & Quality Assurance
-- **Unit & Integration Testing:** Vitest & React Testing Library
-- **End-to-End (E2E) Testing:** Playwright
-- **Component Development & Docs:** Storybook
-- **Code Quality:** ESLint for linting and Putout for automated refactoring and code cleanup.
+## Architectural Patterns (High Performance 2D)
 
-## Architecture & Rendering
-- **Pattern:** Canvas Controller Pattern. This decouples React's lifecycle from the 60fps canvas rendering loop, using a `CanvasController` class to manage game state and specialized renderers.
-- **Coordinate System:** Rotated Hexagonal (Flat-Top). North is defined as `(-1, 0, 1)`.
+### Canvas Controller Pattern
+- **Pattern:** Decouples React from the Canvas API.
+- **React's Role:** Manages the `<canvas>` element lifecycle and hosts DOM-based UI overlays (HUD, menus).
+- **Controller's Role:** A pure TypeScript class (`CanvasController`) that owns the game state, handles the `requestAnimationFrame` loop, and orchestrates specialized renderers.
+
+### Domain-Driven Design & Centralization
+- **"Tiles are Turns" Philosophy:** `remainingTurns` is a derived property (getter) of `tileQueue.length`.
+- **Geometric Logic Centralization:** All directional logic (neighbors, opposite sides) must reside in the `Navigation` service.
+- **Explicit Domain Accessors:** Prefer explicit methods like `Tile.getTerrain(direction)` over direct property access.
+- **Fail-Fast Session State:** The `CanvasController` throws an error if `session.activeGame` is missing.
+
+### Graphics & Rendering
+- **Rotated Hexagonal Coordinate System:** "Flat-Top" orientation where North is `(-1, 0, 1)`.
+- **Type Safety:** Use `import type` for model imports in graphics files to ensure clean browser stripping.
 
 ## Styling & UI
-- **Styling:** Tailwind CSS for atomic and responsive UI development.
-- **Utilities:** `clsx` and `tailwind-merge` for dynamic class management.
+- **Primary Styling:** Vanilla CSS and CSS Modules (for maximum flexibility and performance).
+- **Iconography:** Interactive iconography and modern UI components (cards with depth, glow effects on interactive elements).
+- **Responsive Design:** Mobile-first approach, ensuring functionality across mobile and web.
 
-## Environment & Infrastructure
-- **Development Environment:** Project-specific configuration managed via `.idx/dev.nix`.
-- **Package Manager:** npm
+## Testing & Quality Assurance
+- **Unit & Integration Testing:** [Vitest](https://vitest.dev/) & [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
+- **End-to-End (E2E) Testing:** [Playwright](https://playwright.dev/)
+- **Component Development & Documentation:** [Storybook](https://storybook.js.org/)
+- **Automated Refactoring:** [Putout](https://github.com/coderaiser/putout)
+- **Code Quality:** [ESLint](https://eslint.org/) (for linting) and [Prettier](https://prettier.io/) (for formatting)
+- **Quality Gates:** Target >80% code coverage for all new modules.
+
+## Project Management
+- **Task Tracking:** Conductor (via `plan.md` and `spec.md` in `conductor/tracks/`)
+- **Issue Tracking:** GitHub Issues
+- **Source Control:** Git (Task-based branching strategy)
