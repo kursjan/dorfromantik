@@ -23,6 +23,9 @@ export class TileRenderer {
    * Reuses the terrain mapping from the Tile model.
    */
   drawTile(tile: Tile, x: number, y: number, style: HexStyle = DEFAULT_HEX_STYLE) {
+    const originalAlpha = this.ctx.globalAlpha;
+    this.ctx.globalAlpha = style.opacity ?? 1;
+
     const corners = getHexCorners(x, y, style.size);
     const terrains = tile.getTerrains();
 
@@ -56,5 +59,7 @@ export class TileRenderer {
     this.ctx.lineWidth = style.lineWidth;
     this.ctx.strokeStyle = style.strokeColor;
     this.ctx.stroke();
+
+    this.ctx.globalAlpha = originalAlpha;
   }
 }

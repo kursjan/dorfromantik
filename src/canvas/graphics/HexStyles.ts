@@ -7,6 +7,7 @@ export interface HexStyle {
   font: string;
   textColor: string;
   lineWidth: number;
+  opacity?: number;
 }
 
 export const HEX_SIZE = 40;
@@ -18,6 +19,7 @@ export const DEFAULT_HEX_STYLE: HexStyle = {
   font: '12px Arial',
   textColor: '#000000',
   lineWidth: 1,
+  opacity: 1,
 };
 
 export const GRID_HEX_STYLE: HexStyle = {
@@ -40,6 +42,24 @@ export const HOVER_HEX_STYLE: HexStyle = {
   lineWidth: 3,
   fillColor: 'rgba(255, 215, 0, 0.2)',
   textColor: '#000',
+};
+
+export const VALID_PREVIEW_STYLE: HexStyle = {
+  ...DEFAULT_HEX_STYLE,
+  strokeColor: '#00FF00', // Green
+  lineWidth: 2,
+  fillColor: 'rgba(0, 255, 0, 0.2)',
+  textColor: '#000',
+  opacity: 0.6,
+};
+
+export const INVALID_PREVIEW_STYLE: HexStyle = {
+  ...DEFAULT_HEX_STYLE,
+  strokeColor: '#FF0000', // Red
+  lineWidth: 2,
+  fillColor: 'rgba(255, 0, 0, 0.2)',
+  textColor: '#000',
+  opacity: 0.3,
 };
 
 export const TERRAIN_COLORS: Record<TerrainType, string> = {
