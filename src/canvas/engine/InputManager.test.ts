@@ -15,6 +15,8 @@ describe('InputManager', () => {
       onClick: vi.fn(),
       onLeave: vi.fn(),
       onResize: vi.fn(),
+      onRotateClockwise: vi.fn(),
+      onRotateCounterClockwise: vi.fn(),
     };
     inputManager = new InputManager(canvas, callbacks);
   });

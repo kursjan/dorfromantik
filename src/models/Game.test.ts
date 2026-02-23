@@ -7,7 +7,7 @@ import {
 import {Game} from './Game';
 import {Board} from './Board';
 import {GameRules} from './GameRules';
-import {Tile, TileProps} from './Tile';
+import {Tile, type TileProps} from './Tile';
 import {HexCoordinate} from './HexCoordinate';
 import {Navigation} from './Navigation';
 

@@ -4,7 +4,7 @@ import { GameHUD } from './GameHUD';
 
 describe('GameHUD', () => {
   it('renders correctly with initial values', () => {
-    render(<GameHUD score={0} remainingTurns={30} />);
+    render(<GameHUD score={0} remainingTurns={30} nextTile={null} />);
     
     expect(screen.getByText(/Score/i)).toBeInTheDocument();
     expect(screen.getByText('0')).toBeInTheDocument();
@@ -13,7 +13,7 @@ describe('GameHUD', () => {
   });
 
   it('renders correctly with updated values', () => {
-    render(<GameHUD score={1250} remainingTurns={15} />);
+    render(<GameHUD score={1250} remainingTurns={15} nextTile={null} />);
     
     expect(screen.getByText('1250')).toBeInTheDocument();
     expect(screen.getByText('15')).toBeInTheDocument();

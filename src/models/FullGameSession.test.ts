@@ -23,32 +23,32 @@ describe('Full Game Session Integration', () => {
     // We'll create tiles where we know the terrains to test matching
     const tile1 = new Tile({
       id: 'tile-1',
-      north: 'forest',
-      northEast: 'forest',
-      southEast: 'forest', // Changed from grass to forest
-      south: 'grass',
-      southWest: 'grass',
-      northWest: 'grass',
+      north: 'tree',
+      northEast: 'tree',
+      southEast: 'tree', // Changed from grass to forest
+      south: 'pasture',
+      southWest: 'pasture',
+      northWest: 'pasture',
     });
 
     const tile2 = new Tile({
       id: 'tile-2',
-      north: 'grass',
-      northEast: 'grass',
-      southEast: 'grass',
-      south: 'forest', // This will face tile1's North if placed at (1, 0, -1)
-      southWest: 'grass',
-      northWest: 'grass',
+      north: 'pasture',
+      northEast: 'pasture',
+      southEast: 'pasture',
+      south: 'tree', // This will face tile1's North if placed at (1, 0, -1)
+      southWest: 'pasture',
+      northWest: 'pasture',
     });
 
     const tile3 = new Tile({
       id: 'tile-3',
-      north: 'grass',
-      northEast: 'grass',
-      southEast: 'grass',
-      south: 'grass',
-      southWest: 'grass', // Matches tile2.northEast (grass)
-      northWest: 'forest', // Matches tile1.southEast (forest)
+      north: 'pasture',
+      northEast: 'pasture',
+      southEast: 'pasture',
+      south: 'pasture',
+      southWest: 'pasture', // Matches tile2.northEast (grass)
+      northWest: 'tree', // Matches tile1.southEast (forest)
     });
 
     const board = new Board();
@@ -91,7 +91,7 @@ describe('Full Game Session Integration', () => {
     //
     // Matches with tile1 (0, 0, 0) at NorthWest of tile3:
     // tile3.northWest (forest) vs tile1.southEast (grass) -> No match.
-    // Let's fix tile1.southEast to be 'forest' to match!
+    // Let's fix tile1.southEast to be 'tree' to match!
     
     // Matches with tile2 (1, 0, -1) at SouthWest of tile3:
     // tile3.southWest (grass) vs tile2.northEast (grass) -> Match! (+10)

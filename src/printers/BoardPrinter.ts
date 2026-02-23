@@ -2,7 +2,7 @@ import { Board } from '../models/Board';
 import { Canvas } from './Canvas';
 import { TilePrinter } from './TilePrinter';
 import { CanvasCoordinates } from './CanvasCoordinates';
-import { UninitializedCanvasBoundsFactory, ICanvasBoundsFactory } from './CanvasBoundsFactory';
+import { UninitializedCanvasBoundsFactory, type ICanvasBoundsFactory } from './CanvasBoundsFactory';
 
 export class BoardPrinter {
   print(board: Board): string {

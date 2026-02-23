@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **Always-on Ghost Preview:** The game now continuously renders a preview of the next tile under the cursor, with distinct styles for valid and invalid placements.
 - **Interactive Camera:** Implemented Panning (drag), Zooming (scroll), and Rotation (Q/E keys).
 - **Hex Interaction:** Added "Hex Picking" to detect and highlight the hexagon currently under the mouse cursor.
 - **Reset View Button:** Added a polished, styled UI component in the top-right corner to restore the camera to its default state.
@@ -17,6 +18,8 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- **Build Stability:** Resolved over 50 TypeScript compilation errors by enforcing stricter type checks (`erasableSyntaxOnly`), correcting domain types (e.g., 'tree' vs 'forest'), and ensuring React component prop safety. This fixed previously failing E2E tests.
+- **E2E Test Configuration:** Made the Playwright test runner robust to multi-worktree environments by using environment variables for the server port.
 - **Coordinate Mapping:** Fixed an issue where world-to-hex conversion didn't account for camera rotation.
 - **Animation Frame Mocks:** Updated unit test mocks to use `globalThis.requestAnimationFrame` for better compatibility.
 - **Git Tracking:** Removed accidentally tracked `test-results/` files from version control.

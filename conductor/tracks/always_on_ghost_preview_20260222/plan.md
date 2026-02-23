@@ -15,3 +15,4 @@
 ## Phase 4: Verification
 - [x] Task: #18.7: Update `e2e/canvas.spec.ts` or add a new test to verify ghost visibility on invalid hexes. [commit: 9b1fffb]
 - [x] Task: #18.8: Perform manual verification using `npm run dev`. [commit: 9b1fffb]
+- [x] Task: #18.9: Final Verification & Sync. All build errors resolved, E2E tests passing, dynamic port configured. [commit: <COMMIT_SHA>]
