@@ -1,0 +1,1 @@
+Always-on Ghost Preview (#18): Implemented visual ghost preview, resolved ~50 TypeScript build errors, configured dynamic E2E ports, and enforced architectural invariants. All tests pass.
