@@ -16,55 +16,58 @@ All tasks follow a strict lifecycle:
 
 1. **Select Task:** Choose the next available task from `plan.md` in sequential order.
 2. **Sync with GitHub:** Before beginning, ensure there is a corresponding GitHub issue for this task. If one does not exist, create it with `gh issue create`.
-3. **Mark In Progress:** Before beginning work, edit `plan.md` and change the task from `[ ]` to `[~]`. Include the GitHub Issue number in the `plan.md` (e.g., `Task: #123: ...`).
+3. **Branch Allocation & Mark In Progress:**
+   - Check out a new development branch named after the task or GitHub issue (e.g., `feat/tile-rotation` or `issue/123`).
+   - Edit `plan.md` and change the task from `[ ]` to `[~]`. Include the GitHub Issue number in the `plan.md` (e.g., `Task: #123: ...`).
 
-3. **Draft Implementation**: 
+4. **Draft Implementation**: 
    - Write the functional code/logic first based on the Spec.
    - Present the code to the user for logic verification.
    - Only after implementation is stable, move to writing tests
 
-4. **Write Failing Tests (Red Phase):**
+5. **Write Failing Tests (Red Phase):**
    - Create a new test file for the feature or bug fix.
    - Write one or more unit tests that clearly define the expected behavior and acceptance criteria for the task.
    - Run the test suite again and confirm that all tests now pass. This is the "Green" phase.
 
-5. **Refactor (Compulsory):**
+6. **Refactor (Compulsory):**
    - With the safety of passing tests, refactor the implementation code and the test code to improve clarity, remove duplication, and enhance performance without changing the external behavior.
    - Rerun tests to ensure they still pass after refactoring.
 
-6. **Verify Coverage:** Run coverage reports using the project's chosen tools. For example, in a Python project, this might look like:
+7. **Verify Coverage:** Run coverage reports using the project's chosen tools. For example, in a Python project, this might look like:
    ```bash
    pytest --cov=app --cov-report=html
    ```
    Target: >80% coverage for new code. The specific tools and commands will vary by language and framework.
 
-7. **Document Deviations:** If implementation differs from tech stack:
+8. **Document Deviations:** If implementation differs from tech stack:
    - **STOP** implementation
    - Update `tech-stack.md` with new design
    - Add dated note explaining the change
    - Resume implementation
 
-8. **Commit Code Changes:**
+9. **Commit Code Changes:**
    - Stage all code changes related to the task.
-   - Propose a clear, concise commit message e.g, `feat(ui): Create basic HTML structure for calculator`.
+   - Propose a clear, concise commit message following the project's guidelines.
    - Perform the commit.
 
-9. **Attach Task Summary with Git Notes:**
-   - **Step 9.1: Get Commit Hash:** Obtain the hash of the *just-completed commit* (`git log -1 --format="%H"`).
-   - **Step 9.2: Draft Note Content:** Create a detailed summary for the completed task. This should include the task name, a summary of changes, a list of all created/modified files, and the core "why" for the change.
-   - **Step 9.3: Attach Note:** Use the `git notes` command to attach the summary to the commit.
+10. **Attach Task Summary with Git Notes:**
+   - **Step 10.1: Get Commit Hash:** Obtain the hash of the *just-completed commit* (`git log -1 --format="%H"`).
+   - **Step 10.2: Draft Note Content:** Create a detailed summary for the completed task. This should include the task name, a summary of changes, a list of all created/modified files, and the core "why" for the change.
+   - **Step 10.3: Attach Note:** Use the `git notes` command to attach the summary to the commit.
      ```bash
      # The note content from the previous step is passed via the -m flag.
      git notes add -m "<note content>" <commit_hash>
      ```
 
-10. **Get and Record Task Commit SHA:**
-    - **Step 10.1: Update Plan:** Read `plan.md`, find the line for the completed task, update its status from `[~]` to `[x]`, and append the first 7 characters of the *just-completed commit's* commit hash.
-    - **Step 10.2: Write Plan:** Write the updated content back to `plan.md`.
+11. **Commit Plan Update (on Development Branch):**
+    - **Step 11.1: Update Plan:** Read `plan.md`, find the line for the completed task, update its status from `[~]` to `[x]`, and append the first 7 characters of the *development* commit hash.
+    - **Step 11.2: Commit Plan:** Stage and commit the modified `plan.md` on the current branch (e.g., `conductor(plan): Mark task '...' as complete`).
 
-11. **Commit Plan Update:**
-    - **Action:** Stage the modified `plan.md` file.
-    - **Action:** Commit this change with a descriptive message (e.g., `conductor(plan): Mark task 'Create user model' as complete`).
+12. **Sync to Main (PR):**
+    - **Step 12.1: Push & PR:** Push the branch to `origin` and create a Pull Request using the **Task Summary** from Step 10 as the PR body (`gh pr create --base main`).
+    - **Step 12.2: User Approval:** **PAUSE** and wait for the user to approve and merge the PR (using rebase strategy).
+    - **Step 12.3: Post-Merge Verification:** Once merged, pull the latest `main`. If the commit SHA changed due to the rebase, update `plan.md` on `main` with the final SHA and commit it.
 
 ### Phase Completion Verification and Checkpointing Protocol
 

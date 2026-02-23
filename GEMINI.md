@@ -13,8 +13,9 @@ These instructions must be followed above all else.
   - **The "Done" Definition:** A task is only "Done" when:
     1. Code is implemented.
     2. Verification Protocol (tsc, tests, e2e) passes 100%.
-    3. A commit is made referencing the GitHub Issue.
-    4. The `plan.md` is updated with the status [x] and the commit SHA.
+    3. The `plan.md` is updated on the development branch with the status [x] and the commit SHA.
+    4. All changes (code + plan update) are committed on the development branch.
+    5. A Pull Request is created and merged into `main` (using rebase strategy).
   - **The "Wait" State:** After a task is "Done," you MUST STOP and present a Task Summary. Do not proceed to the next task without explicit user permission.
 - **THE "TASK GATE" PROTOCOL:**
   - Every task is a discrete unit of work. Do not bundle tasks.
@@ -41,10 +42,13 @@ These instructions must be followed above all else.
 
 ## **MULTI-WORKTREE & HEADLESS WORKSPACE PROTOCOL (High Priority)**
 
-This project often operates in a multi-worktree environment where the `main` branch is checked out in a primary directory.
+This project operates in a multi-worktree environment where the `main` branch is checked out in a primary directory.
 
 - **Main Branch Protection:** NEVER attempt to `git checkout main` or perform local merges into `main` within this workspace.
-- **Remote-First Synchronization:** All changes intended for `main` MUST be pushed to a feature branch on `origin` and merged via a Pull Request (`gh pr create` and `gh pr merge --merge`).
+- **Task-Based Development Branches:** All work is performed on dedicated development branches named after the current Conductor Track or GitHub Issue (e.g., `feat/tile-rotation`, `issue/123`).
+- **Remote-First Synchronization:** All changes intended for `main` MUST be pushed to the task branch on `origin`.
+- **Rebase-Based Integration:** Synchronization with `main` MUST be performed via a rebase-based Pull Request (`gh pr create` and `gh pr merge --rebase`). This ensures a clean, linear, and auditable history.
+- **Mandatory PR Approval:** No changes are merged to `main` without an explicit PR review and approval by the user.
 - **Explicit Task Gating:** When a Track or significant Phase is completed, the agent MUST STOP. Even if the user issues a broad "proceed" or "yes" directive, the agent must not transition to a new, unrelated Track without a specific directive naming the target Track.
 
 - **Contextual Refactoring Rule:** Always analyze files in the context of the entire project. Check all usages of a class or function to ensure its public API remains valid after refactoring.
@@ -65,6 +69,7 @@ This project often operates in a multi-worktree environment where the `main` bra
 The AI's workflow is iterative, transparent, and responsive to user input.
 
 - **Track Generation & Plan Management:** Each time the user requests a significant change or feature, the AI will propose a new **Track** or update an existing one. This involves creating or updating the track's `spec.md` and `plan.md` within the `conductor/tracks/` directory.
+- **Branch Allocation:** For each new Track, the AI will create or switch to a dedicated development branch named after the track ID or associated GitHub Issue.
 - **Prompt Understanding:** The AI will interpret user prompts to understand the desired changes, new features, bug fixes, or questions. It will ask clarifying questions if the prompt is ambiguous.
 - **Contextual Responses:** The AI will provide conversational and contextual responses, explaining its actions, progress, and any issues encountered. It will summarize changes made.
 - **Error Checking Flow:**
