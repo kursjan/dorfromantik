@@ -19,7 +19,15 @@ describe('CanvasBoundsFactory', () => {
     it('stretch() should return an InitializedCanvasBoundsFactory with the bounds of the first tile', () => {
       const factory = new UninitializedCanvasBoundsFactory();
       const board = new Board();
-      const tile = new Tile({ id: 'test' });
+      const tile = new Tile({ 
+        id: 'test',
+        north: 'pasture',
+        northEast: 'pasture',
+        southEast: 'pasture',
+        south: 'pasture',
+        southWest: 'pasture',
+        northWest: 'pasture',
+      });
       const coord = new HexCoordinate(5, -10, 5);
       board.place(tile, coord);
       const boardTile = board.get(coord)!;
@@ -53,7 +61,15 @@ describe('CanvasBoundsFactory', () => {
       const factory = new InitializedCanvasBoundsFactory(initialBounds);
 
       const board = new Board();
-      const tile = new Tile({ id: 'test' });
+      const tile = new Tile({ 
+        id: 'test',
+        north: 'pasture',
+        northEast: 'pasture',
+        southEast: 'pasture',
+        south: 'pasture',
+        southWest: 'pasture',
+        northWest: 'pasture',
+      });
       const coord = new HexCoordinate(1, 0, -1); // Placed to the south-east of the initial bounds
       board.place(tile, coord);
       const boardTile = board.get(coord)!;
@@ -75,7 +91,15 @@ describe('CanvasBoundsFactory', () => {
       const factory = new InitializedCanvasBoundsFactory(initialBounds);
 
       const board = new Board();
-      const tile = new Tile({ id: 'test' });
+      const tile = new Tile({ 
+        id: 'test',
+        north: 'pasture',
+        northEast: 'pasture',
+        southEast: 'pasture',
+        south: 'pasture',
+        southWest: 'pasture',
+        northWest: 'pasture',
+      });
       const coord = new HexCoordinate(-1, 0, 1); // Placed to the north-west of the initial bounds
       board.place(tile, coord);
       const boardTile = board.get(coord)!;

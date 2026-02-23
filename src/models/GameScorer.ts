@@ -14,7 +14,11 @@ export interface ScoringResult {
 export class GameScorer {
   private navigation = new Navigation();
 
-  constructor(private rules: GameRules) {}
+  private rules: GameRules;
+
+  constructor(rules: GameRules) {
+    this.rules = rules;
+  }
 
   /**
    * Calculates the score for a tile placement.

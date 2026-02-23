@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { CanvasView } from './canvas/components/CanvasView';
 import { Session } from './models/Session';
 import { User } from './models/User';

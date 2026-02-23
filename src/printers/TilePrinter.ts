@@ -1,4 +1,4 @@
-import { Tile, TerrainType } from '../models/Tile';
+import { Tile, type TerrainType } from '../models/Tile';
 import { Canvas } from './Canvas';
 
 /**

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { GameScorer } from './GameScorer';
 import { Board } from './Board';
 import { GameRules } from './GameRules';
-import { Tile, TileProps } from './Tile';
+import { Tile, type TileProps, type TerrainType } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
 import { Navigation } from './Navigation';
 
@@ -45,7 +45,7 @@ describe('GameScorer', () => {
   });
 
   // Helper to create a tile with identical terrain on all sides
-  const createTile = (id: string, terrain: string = 'plains'): Tile => {
+  const createTile = (id: string, terrain: TerrainType = 'pasture'): Tile => {
       return new Tile({
           id,
           north: terrain,
@@ -61,12 +61,12 @@ describe('GameScorer', () => {
   const createSpecificTile = (id: string, props: Partial<TileProps>): Tile => {
       const defaults: TileProps = {
           id,
-          north: 'plains',
-          northEast: 'plains',
-          southEast: 'plains',
-          south: 'plains',
-          southWest: 'plains',
-          northWest: 'plains',
+          north: 'pasture',
+          northEast: 'pasture',
+          southEast: 'pasture',
+          south: 'pasture',
+          southWest: 'pasture',
+          northWest: 'pasture',
           ...props
       };
       return new Tile(defaults);
@@ -83,7 +83,7 @@ describe('GameScorer', () => {
 
         const opposite = nav.getOpposite(direction);
         const props: any = {};
-        props[opposite] = 'plains';
+        props[opposite] = 'pasture';
         board.place(createSpecificTile(`${idPrefix}-${direction}`, props), coordinate);
     });
   };
@@ -103,11 +103,11 @@ describe('GameScorer', () => {
       const north = nav.north(center);
 
       // Center has plains at North
-      const centerTile = createSpecificTile('center', { north: 'plains' });
+      const centerTile = createSpecificTile('center', { north: 'pasture' });
       board.place(centerTile, center);
 
       // Neighbor has forest at South (facing center)
-      const northTile = createSpecificTile('north', { south: 'forest' });
+      const northTile = createSpecificTile('north', { south: 'tree' });
       const placed = board.place(northTile, north);
 
       const result = scorer.scorePlacement(board, placed);
@@ -119,11 +119,11 @@ describe('GameScorer', () => {
       const north = nav.north(center);
 
       // Center has plains at North
-      const centerTile = createSpecificTile('center', { north: 'plains' });
+      const centerTile = createSpecificTile('center', { north: 'pasture' });
       board.place(centerTile, center);
 
       // Neighbor has plains at South
-      const northTile = createSpecificTile('north', { south: 'plains' });
+      const northTile = createSpecificTile('north', { south: 'pasture' });
       const placed = board.place(northTile, north);
 
       const result = scorer.scorePlacement(board, placed);
@@ -136,14 +136,14 @@ describe('GameScorer', () => {
       const north = nav.north(center);
       const northEast = nav.northEast(center);
 
-      const northTile = createSpecificTile('north', { south: 'plains' });
-      const neTile = createSpecificTile('ne', { southWest: 'plains' });
+      const northTile = createSpecificTile('north', { south: 'pasture' });
+      const neTile = createSpecificTile('ne', { southWest: 'pasture' });
       
       board.place(northTile, north);
       board.place(neTile, northEast);
 
       // Place center matching both
-      const centerTile = createSpecificTile('center', { north: 'plains', northEast: 'plains' });
+      const centerTile = createSpecificTile('center', { north: 'pasture', northEast: 'pasture' });
       const placed = board.place(centerTile, center);
 
       const result = scorer.scorePlacement(board, placed);
@@ -155,14 +155,14 @@ describe('GameScorer', () => {
       
       // Surround with 6 matching neighbors
       nav.getNeighbors(center).forEach(({ direction, coordinate }) => {
-          // Center will be all 'plains', so neighbors must present 'plains' on opposite side
+          // Center will be all 'pasture', so neighbors must present 'pasture' on opposite side
           const opposite = nav.getOpposite(direction);
           const props: any = {};
-          props[opposite] = 'plains';
+          props[opposite] = 'pasture';
           board.place(createSpecificTile(`n-${direction}`, props), coordinate);
       });
 
-      const centerTile = createTile('center', 'plains');
+      const centerTile = createTile('center', 'pasture');
       const placed = board.place(centerTile, center);
 
       const result = scorer.scorePlacement(board, placed);
@@ -178,11 +178,11 @@ describe('GameScorer', () => {
           const opposite = nav.getOpposite(direction);
           const props: any = {};
           // First 5 match (plains), last one mismatches (forest)
-          props[opposite] = index < 5 ? 'plains' : 'forest';
+          props[opposite] = index < 5 ? 'pasture' : 'tree';
           board.place(createSpecificTile(`n-${direction}`, props), coordinate);
       });
 
-      const centerTile = createTile('center', 'plains');
+      const centerTile = createTile('center', 'pasture');
       const placed = board.place(centerTile, center);
 
       const result = scorer.scorePlacement(board, placed);
@@ -196,7 +196,7 @@ describe('GameScorer', () => {
       const north = nav.north(center);
 
       // 1. Setup Center to be missing only North neighbor to be perfect
-      const centerTile = createTile('center', 'plains');
+      const centerTile = createTile('center', 'pasture');
       board.place(centerTile, center);
 
       // Place 5 neighbors (excluding North) matching Center
@@ -205,7 +205,7 @@ describe('GameScorer', () => {
           
           const opposite = nav.getOpposite(direction);
           const props: any = {};
-          props[opposite] = 'plains';
+          props[opposite] = 'pasture';
           board.place(createSpecificTile(`n-${direction}`, props), coordinate);
       });
 
@@ -215,9 +215,9 @@ describe('GameScorer', () => {
       // North touches NE at SouthEast.
       // North touches NW at SouthWest.
       const northTile = createSpecificTile('north', { 
-          south: 'plains',      // Match Center
-          southEast: 'forest',  // Mismatch NE (which is default plains)
-          southWest: 'forest'   // Mismatch NW (which is default plains)
+          south: 'pasture',      // Match Center
+          southEast: 'tree',  // Mismatch NE (which is default plains)
+          southWest: 'tree'   // Mismatch NW (which is default plains)
       });
       const placed = board.place(northTile, north);
 
@@ -237,14 +237,14 @@ describe('GameScorer', () => {
       const northEast = nav.northEast(center);
 
       // 1. Setup North and NorthEast as candidates
-      board.place(createTile('north', 'plains'), north);
-      board.place(createTile('northEast', 'plains'), northEast);
+      board.place(createTile('north', 'pasture'), north);
+      board.place(createTile('northEast', 'pasture'), northEast);
 
       surroundExceptCenter(north, 'n');
       surroundExceptCenter(northEast, 'ne');
 
       // 2. Place Center matching both
-      const centerTile = createTile('center', 'plains');
+      const centerTile = createTile('center', 'pasture');
       const placed = board.place(centerTile, center);
 
       const result = scorer.scorePlacement(board, placed);
@@ -273,11 +273,11 @@ describe('GameScorer', () => {
     });
 
     it('should return false if 6 neighbors exist but one terrain mismatches', () => {
-      const tile = board.place(createTile('center', 'plains'), center);
+      const tile = board.place(createTile('center', 'pasture'), center);
       
       nav.getNeighbors(center).forEach(({ direction, coordinate }, i) => {
         const opposite = nav.getOpposite(direction);
-        const terrain = i === 5 ? 'forest' : 'plains'; // One mismatch
+        const terrain = i === 5 ? 'tree' : 'pasture'; // One mismatch
         board.place(createSpecificTile(`n${i}`, { [opposite]: terrain }), coordinate);
       });
 
@@ -285,11 +285,11 @@ describe('GameScorer', () => {
     });
 
     it('should return true if 6 neighbors exist and all terrains match', () => {
-      const tile = board.place(createTile('center', 'plains'), center);
+      const tile = board.place(createTile('center', 'pasture'), center);
       
       nav.getNeighbors(center).forEach(({ direction, coordinate }, i) => {
         const opposite = nav.getOpposite(direction);
-        board.place(createSpecificTile(`n${i}`, { [opposite]: 'plains' }), coordinate);
+        board.place(createSpecificTile(`n${i}`, { [opposite]: 'pasture' }), coordinate);
       });
 
       expect(scorer.isPerfect(board, tile)).toBe(true);

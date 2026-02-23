@@ -54,7 +54,7 @@ describe('CanvasController', () => {
     canvas = canvasElement;
 
     // Create a minimal session with an active game
-    const user = new User('user-1', 'Test User');
+    const user = new User('user-1');
     const board = new Board();
     session = new Session('session-1', user);
     session.activeGame = {

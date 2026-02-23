@@ -1,6 +1,6 @@
-import { BoardTile } from '../models/Board';
+import type { BoardTile } from '../models/Board';
 import { CanvasCoordinates } from './CanvasCoordinates';
-import { Point } from './Canvas';
+import type { Point } from './Canvas';
 import { TilePrinter } from './TilePrinter';
 
 export interface CanvasBounds {
@@ -33,7 +33,11 @@ export class UninitializedCanvasBoundsFactory implements ICanvasBoundsFactory {
 }
 
 export class InitializedCanvasBoundsFactory implements ICanvasBoundsFactory {
-  constructor(private readonly bounds: CanvasBounds) {}
+  private readonly bounds: CanvasBounds;
+
+  constructor(bounds: CanvasBounds) {
+    this.bounds = bounds;
+  }
 
   stretch(tile: BoardTile): ICanvasBoundsFactory {
     const tileTopLeft = CanvasCoordinates.getTileCoordinates(tile.coordinate);
