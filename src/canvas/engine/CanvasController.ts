@@ -6,7 +6,7 @@ import { DebugRenderer } from '../graphics/DebugRenderer';
 import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { pixelToHex } from '../utils/HexUtils';
-import { HEX_SIZE, DEFAULT_HEX_STYLE } from '../graphics/HexStyles';
+import { HEX_SIZE, DEFAULT_HEX_STYLE, VALID_PREVIEW_STYLE, INVALID_PREVIEW_STYLE } from '../graphics/HexStyles';
 import { Session } from '../../models/Session';
 
 export class CanvasController {
@@ -111,17 +111,15 @@ export class CanvasController {
       this.tileRenderer.drawTileAtHex(boardTile.tile, boardTile.coordinate, DEFAULT_HEX_STYLE);
     }
 
-    // 4. Ghost Preview for valid placement
-    if (this.hoveredHex && this.isValidPlacement(this.hoveredHex)) {
+    // 4. Ghost Preview
+    if (this.hoveredHex) {
       const nextTile = activeGame.peek();
       if (!nextTile) {
         throw new Error('No tiles remaining in the queue for preview');
       }
-      this.tileRenderer.drawTileAtHex(nextTile, this.hoveredHex, {
-        ...DEFAULT_HEX_STYLE,
-        fillOpacity: 0.5,
-        strokeOpacity: 0.5,
-      });
+      const isValid = this.isValidPlacement(this.hoveredHex);
+      const style = isValid ? VALID_PREVIEW_STYLE : INVALID_PREVIEW_STYLE;
+      this.tileRenderer.drawTileAtHex(nextTile, this.hoveredHex, style);
     }
 
     // Draw highlight for current mouse position
