@@ -42,27 +42,31 @@ These instructions must be followed above all else.
 - **Preservation of User Content:** When asked to "correct" or "improve" a user-authored document, your primary goal is to preserve the user's original content and voice. Corrections and suggestions should be additive or minor edits to the existing text.
 - **Refactoring Rule:** When refactoring, your goal is to improve code structure while preserving all existing business logic. Use the test suite to verify that the logic remains unchanged.
 
-## **MULTI-WORKTREE & HEADLESS WORKSPACE PROTOCOL (High Priority)**
+## **MULTI-WORKTREE & PRAGMATIC BRANCHING PROTOCOL (High Priority)**
 
-This project operates in a multi-worktree environment where the `main` branch is checked out in a primary directory.
+This project uses a "Track-Based" branching model to maintain focus and ensure a clean history.
 
-- **Main Branch Protection:** NEVER attempt to `git checkout main` or perform local merges into `main` within this workspace.
-- **Task-Based Development Branches:** All work is performed on dedicated development branches named after the current Conductor Track or GitHub Issue (e.g., `feat/tile-rotation`, `issue/123`).
-- **Remote-First Synchronization:** All changes intended for `main` MUST be pushed to the task branch on `origin`.
-- **Rebase-Based Integration:** Synchronization with `main` MUST be performed via a rebase-based Pull Request (`gh pr create` and `gh pr merge --rebase`). This ensures a clean, linear, and auditable history.
-- **Mandatory PR Approval:** No changes are merged to `main` without an explicit PR review and approval by the user.
+- **Branching Strategy:**
+  - **New Tracks:** When starting a new Conductor Track (e.g., `feat/tile-rotation`), create a dedicated feature branch.
+  - **Minor Fixes & Chores:** For documentation updates, configuration tweaks, or minor verified bug fixes, you may work directly on the current branch (including `main`).
+  - **Active Track Identification:** When switching branches or starting work, always verify the active Track ID in `conductor/tracks/<track_id>/metadata.json`.
+- **Remote-First Synchronization:** All changes intended for the codebase MUST be pushed to the remote repository (`origin`).
+- **Rebase-Based Integration:** Integration of a Track into `main` MUST be performed via a rebase-based Pull Request (`gh pr merge --rebase`). This ensures a clean, linear, and auditable history.
 - **Explicit Task Gating:** When a Track or significant Phase is completed, the agent MUST STOP. Even if the user issues a broad "proceed" or "yes" directive, the agent must not transition to a new, unrelated Track without a specific directive naming the target Track.
-  - **Phase Checkpoint Protocol:**
-    1.  **Sync Architecture:** Update `ARCHITECTURE.md`.
-    2.  **Verify Coverage:** Ensure all changed files have tests.
-    3.  **Manual Verification Plan:** Propose a detailed manual test plan to the user.
-    4.  **Checkpoint Commit:** Commit with message `conductor(checkpoint): Checkpoint end of Phase X`.
-    5.  **Git Note:** Attach a detailed verification report (auto tests + manual plan + user confirm) to the checkpoint commit using `git notes`.
-    6.  **Update Plan:** Mark phase as complete with `[checkpoint: <sha>]`.
 
+### **Phase Checkpoint Protocol**
+At the end of every significant Phase or Track, the agent MUST perform the following:
+1.  **Sync Architecture:** Update `ARCHITECTURE.md` to reflect new models, patterns, and decisions.
+2.  **Verify Coverage:** Ensure all changed files have adequate unit tests.
+3.  **Manual Verification Plan:** Propose a detailed manual test plan for user review.
+4.  **Checkpoint Commit:** Commit with message `conductor(checkpoint): Checkpoint end of Phase X`.
+5.  **Git Note:** Attach a detailed verification report (auto tests + manual plan + user confirm) to the checkpoint commit using `git notes`.
+6.  **Update Plan:** Mark phase as complete in the Conductor `plan.md` with `[checkpoint: <sha>]`.
+
+### **Core Engineering Mandates**
 - **Contextual Refactoring Rule:** Always analyze files in the context of the entire project. Check all usages of a class or function to ensure its public API remains valid after refactoring.
 - **Verification Protocol:** After _every_ code change, automatically run the following checks:
-  1.  **Architecture Sync:** Update or create `ARCHITECTURE.md` files in relevant directories to reflect new models, patterns, and architectural decisions.
+  1.  **Architecture Sync:** Update or create `ARCHITECTURE.md` files in relevant directories.
   2.  **Code Quality Check:** `npx putout <changed_files>` (Ensure React 19 patterns and clean code)
   3.  **Type Check:** `npx tsc`
   4.  **Unit Test Check:** `npm test` (Ensure all unit tests pass)
