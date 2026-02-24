@@ -1,0 +1,1 @@
+Task 1: Mark DebugRenderer as Obsolete. Added @deprecated JSDoc to src/canvas/graphics/DebugRenderer.ts.
