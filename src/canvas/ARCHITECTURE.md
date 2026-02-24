@@ -15,6 +15,8 @@ The canvas visualization logic is separated from the React component tree to ens
 src/canvas/
 ├── components/        # React Components
 │   ├── CanvasView.tsx      # Entry point (Main container, manages HUD/Canvas sync)
+│   ├── DebugOverlay.tsx    # (NEW) React-based technical info overlay (FPS, Camera)
+│   ├── DebugOverlay.css    # Debug overlay styling
 │   ├── GameHUD.tsx         # Score and Turn counter overlay
 │   ├── GameHUD.css         # HUD styling
 │   ├── ResetViewButton.tsx # UI Overlay for camera control
@@ -26,8 +28,8 @@ src/canvas/
 ├── graphics/          # Rendering Logic
 │   ├── BackgroundRenderer.ts # Clears and draws background
 │   ├── BackgroundStyles.ts   # Background configuration
-│   ├── DebugRenderer.ts      # Draws debug overlay (HUD)
-│   ├── DebugStyles.ts        # Debug overlay configuration
+│   ├── DebugRenderer.ts      # (DEPRECATED) Draws legacy debug overlay
+│   ├── DebugStyles.ts        # (DEPRECATED) Legacy configuration
 │   ├── HexRenderer.ts        # Main game world rendering (Grid, Highlights)
 │   ├── HexStyles.ts          # Hex visual configuration
 │   ├── TileRenderer.ts       # Specialized renderer for 6-sided tiles
@@ -72,6 +74,7 @@ The central hub. It:
 - **Validation:** Provides `isValidPlacement(coord)` by delegating to the `Game` model, ensuring the UI only allows valid actions.
 - **Tile Rotation:** Responds to `onRotateClockwise` and `onRotateCounterClockwise` callbacks by delegating to the `Game` model's rotation logic for the active tile.
 - **Ghost Preview:** In the render loop, if the hovered hex is valid, it draws a semi-transparent "ghost" of the next tile from the game queue.
+- **Stats Publishing:** Calculates FPS and publishes throttled debug stats (FPS, Camera, Hover) to listeners (like `DebugOverlay`).
 - **Does NOT Render:** It strictly delegates actual canvas API calls to the specialized renderers.
 
 ### Camera (`engine/Camera.ts`)
@@ -101,7 +104,7 @@ Stateless rendering utilities. They receive the `Context2D` and necessary data t
 - **BackgroundRenderer:** Handles clearing the screen and drawing the background color.
 - **HexRenderer:** Draws the game grid and debug highlights. It uses `HexStyles.ts` for configuration.
 - **TileRenderer:** Draws the 6-sided terrain wedges for placed tiles. It aligns the model's terrain mapping with the canvas orientation.
-- **DebugRenderer:** Draws technical info (camera pos, zoom, rotation, etc.) on top of the scene.
+- **(Deprecated) DebugRenderer:** Legacy canvas-based debug text. Replaced by `DebugOverlay` component.
 
 ### Styles (`graphics/*Styles.ts`)
 
@@ -117,7 +120,7 @@ While the Controller runs independently for performance, the React-based HUD nee
 - **Pattern:** `CanvasController` exposes an `onStatsChange` callback.
 - **Registration:** `CanvasView` (React) registers a listener in its `useEffect` hook.
 - **Execution:** When the game state changes (e.g., tile placed), the Controller invokes the callback, triggering a `useState` update in React.
-- **Why:** This maintains the "Pure TS for Game Loop" principle while keeping the UI reactive.
+- **Debug Stats:** `CanvasController` also exposes `addDebugStatsListener` for high-frequency updates (FPS, Camera) used by `DebugOverlay`.
 
 ## 6. Data Flow Example: Hovering
 
