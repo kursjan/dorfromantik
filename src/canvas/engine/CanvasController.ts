@@ -10,6 +10,12 @@ import { HEX_SIZE, DEFAULT_HEX_STYLE, VALID_PREVIEW_STYLE, INVALID_PREVIEW_STYLE
 import { Session } from '../../models/Session';
 import { Tile } from '../../models/Tile';
 
+export interface DebugStats {
+  fps: number;
+  camera: { x: number; y: number; zoom: number };
+  hoveredHex: HexCoordinate | null;
+}
+
 export class CanvasController {
   private static readonly ZOOM_SENSITIVITY = 0.001;
   private static readonly ROTATION_SPEED = 0.05;
@@ -26,12 +32,16 @@ export class CanvasController {
   private readonly inputManager: InputManager;
   private readonly session: Session;
 
-  // Callback for React HUD synchronization
+  // Callbacks for React HUD/Overlay synchronization
   public onStatsChange?: (score: number, remainingTurns: number, nextTile: Tile | null) => void;
+  public onDebugStatsChange?: (stats: DebugStats) => void;
 
   // State
   private animationFrameId: number = 0;
   private hoveredHex: HexCoordinate | null = null;
+  private lastLoopTime: number = performance.now();
+  private fps: number = 0;
+  private lastDebugUpdateTime: number = 0;
 
   constructor(canvas: HTMLCanvasElement, session: Session) {
     this.canvas = canvas;
@@ -77,6 +87,13 @@ export class CanvasController {
   }
 
   private loop() {
+    const now = performance.now();
+    const deltaTime = now - this.lastLoopTime;
+    this.lastLoopTime = now;
+    if (deltaTime > 0) {
+      this.fps = 1000 / deltaTime;
+    }
+
     this.update();
     this.render();
     this.animationFrameId = requestAnimationFrame(() => this.loop());
@@ -130,6 +147,17 @@ export class CanvasController {
 
     // 5. UI Overlay
     this.debugRenderer.drawOverlay(this.camera, this.hoveredHex);
+
+    // 6. Push Debug Stats to React (throttled)
+    const now = performance.now();
+    if (this.onDebugStatsChange && now - this.lastDebugUpdateTime > 500) {
+      this.onDebugStatsChange({
+        fps: Math.round(this.fps),
+        camera: { x: this.camera.x, y: this.camera.y, zoom: this.camera.zoom },
+        hoveredHex: this.hoveredHex,
+      });
+      this.lastDebugUpdateTime = now;
+    }
   }
 
   private notifyStatsChange() {
