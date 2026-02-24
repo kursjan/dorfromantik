@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CanvasController } from './CanvasController';
 import { HexRenderer } from '../graphics/HexRenderer';
 import { TileRenderer } from '../graphics/TileRenderer';
-import { DebugRenderer } from '../graphics/DebugRenderer';
 import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { InputManager } from './InputManager';
 import { Session } from '../../models/Session';
@@ -71,7 +70,7 @@ describe('CanvasController', () => {
     expect((controller as any).ctx).toBeDefined();
     expect((controller as any).renderer).toBeInstanceOf(HexRenderer);
     expect((controller as any).tileRenderer).toBeInstanceOf(TileRenderer);
-    expect((controller as any).debugRenderer).toBeInstanceOf(DebugRenderer);
+    // expect((controller as any).debugRenderer).toBeInstanceOf(DebugRenderer);
     expect((controller as any).backgroundRenderer).toBeInstanceOf(BackgroundRenderer);
     expect((controller as any).inputManager).toBeInstanceOf(InputManager);
   });
@@ -85,9 +84,9 @@ describe('CanvasController', () => {
 
     expect(requestAnimationFrameSpy).toHaveBeenCalled();
     const renderer = (controller as any).renderer as any;
-    const debugRenderer = (controller as any).debugRenderer as any;
     expect(renderer.drawDebugGrid).toHaveBeenCalled();
-    expect(debugRenderer.drawOverlay).toHaveBeenCalled();
+    // Debug overlay is now handled by React
+    // expect(debugRenderer.drawOverlay).toHaveBeenCalled();
 
     requestAnimationFrameSpy.mockRestore();
   });
