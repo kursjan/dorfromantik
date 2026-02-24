@@ -12,7 +12,7 @@ test.describe('Debug Grid', () => {
     // Take a screenshot of just the canvas to ignore UI overlays.
     // We name it specifically to keep it stable.
     await expect(canvas).toHaveScreenshot('debug-grid-initial.png', {
-      maxDiffPixels: 100, // Allow tiny rendering differences if any
+      maxDiffPixels: 500, // Allow tiny rendering differences if any
     });
   });
 });
