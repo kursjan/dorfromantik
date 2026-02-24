@@ -10,7 +10,7 @@
   - **Verification:** Unit test to ensure `onDebugStatsChange` is called with correct types.
 
 ## Phase 2: React Component (using **task-conductor** skill)
-- [ ] **Task 3: Create DebugOverlay Component**
+- [x] **Task 3: Create DebugOverlay Component** [013e5e9c9ce90d1e1d2f8709ab5fdf735cf8ce48]
   - Create `src/canvas/components/DebugOverlay.tsx` and `src/canvas/components/DebugOverlay.css`.
   - Implement `F3` key listener for visibility toggle.
   - Subscribe to `controller.onDebugStatsChange`.

@@ -34,7 +34,7 @@ export class CanvasController {
 
   // Callbacks for React HUD/Overlay synchronization
   public onStatsChange?: (score: number, remainingTurns: number, nextTile: Tile | null) => void;
-  public onDebugStatsChange?: (stats: DebugStats) => void;
+  private onDebugStatsChange?: (stats: DebugStats) => void;
 
   // State
   private animationFrameId: number = 0;
@@ -84,6 +84,15 @@ export class CanvasController {
 
   public resetCamera() {
     this.camera.reset();
+  }
+
+  public addDebugStatsListener(callback: (stats: DebugStats) => void): () => void {
+    this.onDebugStatsChange = callback;
+    return () => {
+      if (this.onDebugStatsChange === callback) {
+        this.onDebugStatsChange = undefined;
+      }
+    };
   }
 
   private loop() {
