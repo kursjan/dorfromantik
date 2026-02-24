@@ -13,6 +13,7 @@ vi.mock('../engine/CanvasController', () => {
   const MockController = vi.fn();
   MockController.prototype.destroy = vi.fn();
   MockController.prototype.resetCamera = vi.fn();
+  MockController.prototype.addDebugStatsListener = vi.fn(() => vi.fn());
   return {
     CanvasController: MockController,
   };

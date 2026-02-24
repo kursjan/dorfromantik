@@ -2,7 +2,6 @@ import { Camera } from './Camera';
 import { InputManager } from './InputManager';
 import { HexRenderer } from '../graphics/HexRenderer';
 import { TileRenderer } from '../graphics/TileRenderer';
-import { DebugRenderer } from '../graphics/DebugRenderer';
 import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { pixelToHex } from '../utils/HexUtils';
@@ -27,7 +26,6 @@ export class CanvasController {
   private readonly camera: Camera;
   private readonly renderer: HexRenderer;
   private readonly tileRenderer: TileRenderer;
-  private readonly debugRenderer: DebugRenderer;
   private readonly backgroundRenderer: BackgroundRenderer;
   private readonly inputManager: InputManager;
   private readonly session: Session;
@@ -54,7 +52,6 @@ export class CanvasController {
     this.backgroundRenderer = new BackgroundRenderer(ctx);
     this.renderer = new HexRenderer(ctx);
     this.tileRenderer = new TileRenderer(ctx);
-    this.debugRenderer = new DebugRenderer(ctx);
     this.inputManager = new InputManager(canvas, {
       onPan: (dx, dy) => this.camera.pan(dx, dy),
       onZoom: (delta) => this.handleZoom(delta),
@@ -154,8 +151,8 @@ export class CanvasController {
 
     this.ctx.restore();
 
-    // 5. UI Overlay
-    this.debugRenderer.drawOverlay(this.camera, this.hoveredHex);
+    // 5. UI Overlay (Deprecated - removed in favor of React DebugOverlay)
+    // this.debugRenderer.drawOverlay(this.camera, this.hoveredHex);
 
     // 6. Push Debug Stats to React (throttled)
     const now = performance.now();
