@@ -16,15 +16,15 @@ This skill guides the process from initial idea to a confirmed implementation pl
 
 ## Phase 2: Track Initialization
 **Goal:** Formalize the agreed strategy into a Conductor track.
-**Trigger:** User approval of the draft proposal.
+**Trigger:** Wait for EXPLICT user approval of the draft proposal.
 
 **Action:**
-0.  **Create Github Issue**: Create a dedicated issue. Briefly describe the tracak in the summary. Link this issue in the track metadata and plan.
-1.  **Create Track Files:** Generate the standard Conductor track artifacts (fo example `spec.md`, `plan.md`, `metadata.json`) in a new track directory `conductor/tracks/<track_id>/`.
+1.  **Create Github Issue:** If there is no github issue associated with the task, create one. The issue should have a clear title and description summarizing the task and its context. Link this issue in the track metadata and plan.
+2.  **Create Track Files:** Generate the standard Conductor track artifacts (fo example `spec.md`, `plan.md`, `metadata.json`) in a new track directory `conductor/tracks/<track_id>/`.
     *   Ensure the plan follows the project's task breakdown structure.
     *   **First Task:** The first task of the first phase MUST be to create and switch to the feature branch (e.g., `git checkout -b <track_id>`) using **task-conductor**.
-2.  **Register:** Add the new track to the registry in `conductor/tracks.md`.
-3. **The Mapping Logic (CRITICAL):**
+3.  **Register:** Add the new track to the registry in `conductor/tracks.md`.
+4.  **The Mapping Logic (CRITICAL):**
    - Implementation/Coding/Tests: Append the exact string `using **task-conductor** skill`.
    - Phase/Track Ends: Append the exact string `using **project-orchestrator** skill`.
 
