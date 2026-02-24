@@ -1,0 +1,1 @@
+Task 3: Create DebugOverlay Component. Created DebugOverlay.tsx, DebugOverlay.css, and DebugOverlay.test.tsx. Implemented F3 toggle and subscription to debug stats via addDebugStatsListener.
