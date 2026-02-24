@@ -1,7 +1,7 @@
 # Plan: Debug Overlay Implementation (Issue #29)
 
 ## Phase 1: Engine Preparation (using **task-conductor** skill)
-- [ ] **Task 1: Mark DebugRenderer as Obsolete**
+- [x] **Task 1: Mark DebugRenderer as Obsolete** [2a336f3b8922e3591bc659d5f595a11bf6d227b3]
   - Add JSDoc `@deprecated` to `src/canvas/graphics/DebugRenderer.ts`.
 - [ ] **Task 2: Update CanvasController with Debug Stats**
   - Implement FPS calculation logic in the `loop()` method.

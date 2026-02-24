@@ -2,6 +2,10 @@ import { Camera } from '../engine/Camera';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { DEBUG_OVERLAY_TEXT_COLOR, DEBUG_OVERLAY_FONT } from './DebugStyles';
 
+/**
+ * @deprecated Use the React-based DebugOverlay component instead.
+ * This class will be removed once the React overlay is fully integrated.
+ */
 export class DebugRenderer {
   private ctx: CanvasRenderingContext2D;
 
