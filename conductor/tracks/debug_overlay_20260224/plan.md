@@ -20,7 +20,22 @@
   - **Verification:** Manual check in browser (press F3, verify stats).
 
 ## Phase 3: Cleanup & Finalization (using **project-orchestrator** skill)
-- [x] **Task 5: Final Verification & Commit**
+- [x] **Task 5: Final Verification & Commit** [b7d480dcc1ef1196e60bf4ca40002e6e0d101bef]
   - Run all tests (`npm test`, `npm e2e`, `npm run typecheck`).
   - Update `ARCHITECTURE.md` if needed, `GEMINI.md` if necessary.
+  - Final commit with `fixes #29`.
+
+## Phase: Rework (using **task-conductor** skill)
+- [ ] **Task 6: Implement E2E Test for Debug Overlay**
+  - Create `e2e/debug-overlay.spec.ts`.
+  - Test:
+    - Default state (hidden).
+    - Press `F3` -> visible.
+    - Press `F3` again -> hidden.
+    - Verify content (FPS, Camera, Hover) presence when visible.
+  - **Verification:** `npx playwright test e2e/debug-overlay.spec.ts`.
+
+## Phase: Finalization (using **project-orchestrator** skill)
+- [ ] **Task 7: Final verification and commit**
+  - Run all tests (`npm test`, `npm e2e`, `npm run typecheck`).
   - Final commit with `fixes #29`.
