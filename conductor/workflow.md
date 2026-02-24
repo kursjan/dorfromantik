@@ -28,39 +28,24 @@ Use GitHub Issues to track every plan. No work should be done without an associa
 For the authoritative task execution workflow, including Git Notes and Phase Checkpoints, refer to `GEMINI.md`. The AI Agent strictly follows the protocols defined there.
 
 ### Quality Gates
-
-Before marking any task complete, verify:
-
-- [ ] All tests pass.
-- [ ] Code coverage meets requirements (>80%).
-- [ ] Code follows project's code style guidelines (as defined in `code_styleguides/`).
-- [ ] All public functions/methods are documented (e.g., docstrings, JSDoc, GoDoc).
-- [ ] Type safety is enforced (e.g., type hints, TypeScript types, Go types).
-- [ ] No linting or static analysis errors (using the project's configured tools).
-- [ ] Works correctly on mobile (if applicable).
-- [ ] Documentation updated if needed.
-- [ ] No security vulnerabilities introduced.
-
+Quality gates are enforced procedurally by the **task-conductor** skill. Refer to `.gemini/skills/task-conductor/SKILL.md` for the exact verification steps (Tests, Linting, Type Checks, Coverage) required before a task is considered complete.
 
 ## Phase Workflow
 You work on a phase by completing all its tasks, following the Task Workflow.
 
-Before marking any phase complete:
-- [ ] All tasks are done.
-- [ ] Ask for explicit user approval.
-- [ ] Propose a detailed manual test plan for user review.
-- [ ] Commit with the message `conductor(checkpoint): Checkpoint end of Phase X`.
-- [ ] Attach a detailed verification report (auto tests + manual plan + user confirmation) to the checkpoint commit using `git notes`.
-- [ ] Mark the phase as complete in the Conductor `plan.md` with `[checkpoint: <sha>]`.
-
+**Procedural Mandate:**
+Strictly follow the **Phase Completion Protocol** defined in `.gemini/skills/project-orchestrator/SKILL.md`. This includes:
+- Verification of all tasks.
+- Manual test plan creation and execution.
+- Checkpoint commit with `git notes` report.
+- Updating `plan.md` with the checkpoint SHA.
 
 ## Track Workflow
-Before marking a conductor track complete:
-- [ ] All phases are done.
-- [ ] All unit and e2e tests pass.
-- [ ] All changes are committed in Git.
-- [ ] Update `ARCHITECTURE.md` to reflect new models, patterns, and decisions.
-- [ ] Ask for explicit user approval and present the user with the status of the project.
+**Procedural Mandate:**
+Strictly follow the **Track Completion Protocol** defined in `.gemini/skills/project-orchestrator/SKILL.md`. This includes:
+- Architecture synchronization.
+- Final user approval.
+- PR creation and handover.
 
 After marking a conductor track as done:
 - [ ] Create a Pull Request on GitHub and assign it to the user for code review. 

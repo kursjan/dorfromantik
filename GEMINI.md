@@ -67,6 +67,7 @@ This project uses a "Track-Based" branching model to maintain focus and ensure a
 
 
 ### **Core Engineering Mandates**
+- **Contextual Precedence:** Instructions within an active **Gemini Skill** (e.g., `task-conductor`, `project-orchestrator`) take absolute precedence over the general workflows described below. When executing a Conductor Track, strictly adhere to the methodology defined in the skill file.
 - **Refactoring:** Always analyze files in the context of the entire project. Check all usages of a class or function to ensure its public API remains valid after refactoring.
 - **Verification:** After _every_ code change, automatically run the following checks:
   1.  **Architecture Sync:** Update or create `ARCHITECTURE.md` files in relevant directories.
