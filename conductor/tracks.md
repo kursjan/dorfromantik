@@ -20,3 +20,5 @@ This file tracks all major tracks for the project. Each track has its own detail
   *Link: [./tracks/refactor_game_scorer_20260223/](./tracks/refactor_game_scorer_20260223/)*
 - [x] **Track: Perfect Placement Scoring (#16)**
   *Link: [./tracks/perfect_placement_scoring_20260222/](./tracks/perfect_placement_scoring_20260222/)*
+- [ ] **Track: Debug Overlay (Issue #29)**
+  *Link: [./tracks/debug_overlay_20260224/](./tracks/debug_overlay_20260224/)*
