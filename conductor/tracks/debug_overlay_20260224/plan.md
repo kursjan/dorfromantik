@@ -3,7 +3,7 @@
 ## Phase 1: Engine Preparation (using **task-conductor** skill)
 - [x] **Task 1: Mark DebugRenderer as Obsolete** [2a336f3b8922e3591bc659d5f595a11bf6d227b3]
   - Add JSDoc `@deprecated` to `src/canvas/graphics/DebugRenderer.ts`.
-- [ ] **Task 2: Update CanvasController with Debug Stats**
+- [x] **Task 2: Update CanvasController with Debug Stats** [ec3e7de01482de5d725a0a2b70ed15fb8ad3db55]
   - Implement FPS calculation logic in the `loop()` method.
   - Add `onDebugStatsChange` callback property.
   - Invoke `onDebugStatsChange` in the `render()` loop (throttled to 500ms).

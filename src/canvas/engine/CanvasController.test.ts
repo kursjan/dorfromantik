@@ -128,4 +128,41 @@ describe('CanvasController', () => {
     expect(cancelAnimationFrameSpy).toHaveBeenCalled();
     expect(inputManager.destroy).toHaveBeenCalled();
   });
+
+  it('should notify debug stats change and respect throttling', () => {
+    vi.useFakeTimers();
+    
+    controller = new CanvasController(canvas, session);
+    const callback = vi.fn();
+    controller.onDebugStatsChange = callback;
+
+    // Advance time to ensure now - lastDebugUpdateTime > 500
+    vi.advanceTimersByTime(1000);
+
+    // First render - should notify
+    (controller as any).render();
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith(expect.objectContaining({
+      fps: expect.any(Number),
+      camera: expect.objectContaining({
+        x: expect.any(Number),
+        y: expect.any(Number),
+        zoom: expect.any(Number),
+      }),
+      hoveredHex: null,
+    }));
+
+    callback.mockClear();
+
+    // Render again immediately - should be throttled
+    (controller as any).render();
+    expect(callback).not.toHaveBeenCalled();
+
+    // Advance time by 501ms
+    vi.advanceTimersByTime(501);
+    (controller as any).render();
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    vi.useRealTimers();
+  });
 });
