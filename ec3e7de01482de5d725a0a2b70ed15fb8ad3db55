@@ -1,0 +1,1 @@
+Task 2: Update CanvasController with Debug Stats. Added DebugStats interface and onDebugStatsChange callback. Implemented FPS calculation and throttled notification in CanvasController.
