@@ -134,7 +134,7 @@ describe('CanvasController', () => {
     
     controller = new CanvasController(canvas, session);
     const callback = vi.fn();
-    controller.onDebugStatsChange = callback;
+    controller.addDebugStatsListener(callback);
 
     // Advance time to ensure now - lastDebugUpdateTime > 500
     vi.advanceTimersByTime(1000);
