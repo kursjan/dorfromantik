@@ -15,12 +15,12 @@
   - Implement `F3` key listener for visibility toggle.
   - Subscribe to `controller.onDebugStatsChange`.
   - **Verification:** Vitest/React Testing Library test for visibility toggle and data display.
-- [ ] **Task 4: Integrate into CanvasView**
+- [x] **Task 4: Integrate into CanvasView** [e52011d]
   - Add `DebugOverlay` to `src/canvas/components/CanvasView.tsx`.
   - **Verification:** Manual check in browser (press F3, verify stats).
 
 ## Phase 3: Cleanup & Finalization (using **project-orchestrator** skill)
-- [ ] **Task 5: Final Verification & Commit**
+- [x] **Task 5: Final Verification & Commit**
   - Run all tests (`npm test`, `npm e2e`, `npm run typecheck`).
   - Update `ARCHITECTURE.md` if needed, `GEMINI.md` if necessary.
   - Final commit with `fixes #29`.
