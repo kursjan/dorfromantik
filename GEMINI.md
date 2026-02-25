@@ -47,6 +47,15 @@ Ad hoc task can be implement in main.
     7. **Persistence:** All changes are committed and pushed 
 
 
+### **Commit Strategy**
+- **Ad-Hoc Tasks:** 
+  - Complete task -> Verify -> **Commit immediately** with `git notes` summary.
+- **Conductor Tasks (Phase Workflow):**
+  - Complete task -> Verify -> Update `plan.md` (mark `[x]`).
+  - **Do NOT commit yet.**
+  - Proceed to next task or wait for Phase completion.
+  - **Phase Completion:** The **project-orchestrator** will squash/create a single **Checkpoint Commit** for the entire phase.
+
 ### **GitHub Integration:**
   - Most tasks should have a GitHub Issue. Ask user for the issue or if you can proceed without GitHub issue.
   - **Issue Linkage:**
