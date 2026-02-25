@@ -19,10 +19,14 @@ This skill guides the process from initial idea to a confirmed implementation pl
 **Trigger:** User approval of the draft proposal.
 
 **Action:**
+0.  **Create Github Issue**: Create a dedicated issue. Briefly describe the tracak in the summary. Link this issue in the track metadata and plan.
 1.  **Create Track Files:** Generate the standard Conductor track artifacts (fo example `spec.md`, `plan.md`, `metadata.json`) in a new track directory `conductor/tracks/<track_id>/`.
     *   Ensure the plan follows the project's task breakdown structure.
     *   **First Task:** The first task of the first phase MUST be to create and switch to the feature branch (e.g., `git checkout -b <track_id>`) using **task-conductor**.
 2.  **Register:** Add the new track to the registry in `conductor/tracks.md`.
+3. **The Mapping Logic (CRITICAL):**
+   - Implementation/Coding/Tests: Append the exact string `using **task-conductor** skill`.
+   - Phase/Track Ends: Append the exact string `using **project-orchestrator** skill`.
 
 ## Phase 3: Plan Review & Refinement
 **Goal:** Ensure the generated plan is exacutable by an independent AI agent.
@@ -45,10 +49,16 @@ This skill guides the process from initial idea to a confirmed implementation pl
     *   Inform the user the track is ready.
     *   Ask for next steps. 
 
-# Example workflow
-```markdown
+## Constraints
+- Zero-Anonymity: No task can exist without a skill tag.
+- Mandatory Gates: Every Phase in the plan.md must conclude with a project-orchestrator task to handle checkpointing.
+- Handoff Protocol: End every track initialization with the specific string: TRACK_INITIALIZED: Ready for /conductor:implement.
+
 # Example Plan Structure
 Use this format as the gold standard for all generated `plan.md` files.
+
+```markdown
+# Track: Player Health System
 
 ## Phase 1: Core Mechanics
 - [ ] Create and switch to feature branch `feat/quest-system` using **task-conductor** skill.
