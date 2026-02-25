@@ -22,3 +22,5 @@ This file tracks all major tracks for the project. Each track has its own detail
   *Link: [./tracks/perfect_placement_scoring_20260222/](./tracks/perfect_placement_scoring_20260222/)*
 - [ ] **Track: Debug Overlay (Issue #29)**
   *Link: [./tracks/debug_overlay_20260224/](./tracks/debug_overlay_20260224/)*
+- [ ] **Track: Simple Test Game (#34)**
+  *Link: [./tracks/simple_test_game_20260225/](./tracks/simple_test_game_20260225/)*
