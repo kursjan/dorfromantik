@@ -64,7 +64,8 @@ The project roadmap is managed via **Conductor**. See **[conductor/tracks.md](./
   - `drawDebugGrid` for visualizing the hex grid and coordinates.
   - **Interactive Camera:** Pan (drag), Zoom (scroll), and Rotation (Q/E) implemented.
   - **Hex Interaction:** Mouse hover highlighting (Hex Picking) implemented.
-  - **Refactored Rendering:** Separated rendering logic into specialized renderers (`BackgroundRenderer`, `HexRenderer`, `DebugRenderer`) orchestrated by `CanvasController`.
+  - **Refactored Rendering:** Separated rendering logic into specialized renderers (`BackgroundRenderer`, `HexRenderer`) orchestrated by `CanvasController`.
+  - **Debug Overlay:** React-based overlay (F3) displaying FPS, Camera stats (Zoom/Rotation), and Hex coordinates.
   - **Reset Camera Button:** Added a polished UI component with Storybook stories and E2E verification.
   - **Tile Rotation:** Full support for rotating tiles in the queue using Keyboard (R/F) and Mouse (Right-Click).
 - [x] **Testing & Infrastructure:**
