@@ -26,7 +26,7 @@
   - Final commit with `fixes #29`.
 
 ## Phase: Rework (using **task-conductor** skill)
-- [ ] **Task 6: Implement E2E Test for Debug Overlay**
+- [x] **Task 6: Implement E2E Test for Debug Overlay**
   - Create `e2e/debug-overlay.spec.ts`.
   - Test:
     - Default state (hidden).
