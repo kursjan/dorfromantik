@@ -25,7 +25,7 @@
   - Update `ARCHITECTURE.md` if needed, `GEMINI.md` if necessary.
   - Final commit with `fixes #29`.
 
-## Phase: Rework (using **task-conductor** skill)
+## Phase: Rework (using **task-conductor** skill) [checkpoint: d50b161]
 - [x] **Task 6: Implement E2E Test for Debug Overlay**
   - Create `e2e/debug-overlay.spec.ts`.
   - Test:
@@ -33,6 +33,19 @@
     - Press `F3` -> visible.
     - Press `F3` again -> hidden.
     - Verify content (FPS, Camera, Hover) presence when visible.
+  - **Verification:** `npx playwright test e2e/debug-overlay.spec.ts`.
+
+## Phase: Rework 2 (using **task-conductor** skill)
+- [x] **Task 8: Center Debug Overlay**
+  - Update `src/canvas/components/DebugOverlay.css` to position the overlay in the top-center of the screen.
+  - **Verification:** Visual check / E2E snapshot (optional).
+- [x] **Task 9: Add Rotation Info to Debug Stats**
+  - Update `DebugStats` interface in `src/canvas/engine/CanvasController.ts` to include `rotation` (number, in degrees or radians).
+  - Update `CanvasController.render()` to populate `rotation` from `this.camera.rotation`.
+  - Update `src/canvas/components/DebugOverlay.tsx` to display rotation.
+  - **Verification:** Unit test `CanvasController` for stats update.
+- [x] **Task 10: Verify Rework with E2E Tests**
+  - Update `e2e/debug-overlay.spec.ts` to check for rotation text and centered positioning (if possible via class/style check).
   - **Verification:** `npx playwright test e2e/debug-overlay.spec.ts`.
 
 ## Phase: Finalization (using **project-orchestrator** skill)
