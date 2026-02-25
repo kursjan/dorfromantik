@@ -9,6 +9,7 @@ To create a relaxing, puzzle-like experience for casual gamers where they can bu
 ## Key Features
 - **Hexagonal Grid System:** A robust coordinate system for tile management.
 - **Tile Placement:** Intuitive drag-and-drop or click-to-place mechanics for expanding the board.
+- **Tile Rotation:** Ability to orient tiles before placement to match terrain edges and maximize score.
 - **Dynamic Rendering:** Smooth 2D canvas rendering with pan and zoom capabilities.
 - **Minimalist Aesthetic:** Clean, flat vector graphics that are easy on the eyes.
 
@@ -65,6 +66,7 @@ The project roadmap is managed via **Conductor**. See **[conductor/tracks.md](./
   - **Hex Interaction:** Mouse hover highlighting (Hex Picking) implemented.
   - **Refactored Rendering:** Separated rendering logic into specialized renderers (`BackgroundRenderer`, `HexRenderer`, `DebugRenderer`) orchestrated by `CanvasController`.
   - **Reset Camera Button:** Added a polished UI component with Storybook stories and E2E verification.
+  - **Tile Rotation:** Full support for rotating tiles in the queue using Keyboard (R/F) and Mouse (Right-Click).
 - [x] **Testing & Infrastructure:**
   - Configured Playwright for Vite + Nix environment.
   - Set up Prettier (`npm run format`) and Path Aliases (`@/*`).
