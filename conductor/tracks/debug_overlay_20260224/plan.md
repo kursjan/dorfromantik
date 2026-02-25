@@ -49,6 +49,6 @@
   - **Verification:** `npx playwright test e2e/debug-overlay.spec.ts`.
 
 ## Phase: Finalization (using **project-orchestrator** skill)
-- [ ] **Task 7: Final verification and commit**
+- [x] **Task 7: Final verification and commit**
   - Run all tests (`npm test`, `npm e2e`, `npm run typecheck`).
   - Final commit with `fixes #29`.
