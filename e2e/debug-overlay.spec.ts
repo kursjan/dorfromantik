@@ -8,6 +8,9 @@ test.describe('DebugOverlay', () => {
     // 2. Wait for canvas to be ready
     const canvas = page.locator('canvas[data-testid="game-canvas"]');
     await expect(canvas).toBeVisible();
+
+    // 3. Wait for the controller to be initialized (published on window in dev)
+    await page.waitForFunction(() => (window as any).canvasCtrl !== undefined);
   });
 
   test('should be hidden by default', async ({ page }) => {
@@ -41,7 +44,10 @@ test.describe('DebugOverlay', () => {
     // Check content
     // We use regex to match the expected format
     await expect(overlay).toContainText(/FPS: \d+/);
-    await expect(overlay).toContainText(/Camera: \(.*, .*\) Zoom: .*/);
+    await expect(overlay).toContainText(/Camera: \(.*, .*\) Zoom: .* Rot: \d+°/);
     await expect(overlay).toContainText(/Hover:/);
+
+    // Check styling (centering)
+    await expect(overlay).toHaveCSS('text-align', 'center');
   });
 });

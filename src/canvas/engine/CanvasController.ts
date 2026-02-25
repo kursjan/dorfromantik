@@ -11,7 +11,7 @@ import { Tile } from '../../models/Tile';
 
 export interface DebugStats {
   fps: number;
-  camera: { x: number; y: number; zoom: number };
+  camera: { x: number; y: number; zoom: number; rotation: number };
   hoveredHex: HexCoordinate | null;
 }
 
@@ -159,7 +159,12 @@ export class CanvasController {
     if (this.onDebugStatsChange && now - this.lastDebugUpdateTime > 500) {
       this.onDebugStatsChange({
         fps: Math.round(this.fps),
-        camera: { x: this.camera.x, y: this.camera.y, zoom: this.camera.zoom },
+        camera: {
+          x: this.camera.x,
+          y: this.camera.y,
+          zoom: this.camera.zoom,
+          rotation: this.camera.rotation,
+        },
         hoveredHex: this.hoveredHex,
       });
       this.lastDebugUpdateTime = now;
