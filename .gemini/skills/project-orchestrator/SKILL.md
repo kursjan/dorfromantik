@@ -1,7 +1,10 @@
-# Project Orchestration Skill
-Description: Use this skill when transitioning between phases or finalizing a track.
+---
+name: project-orchestrator
+description: Use this skill when transitioning between phases or finalizing a track.
+---
 
 ## Methodology
+
 ### Phase Completion Protocol
 1. **Consistency Check**: Review all modified files against and update `ARCHITECTURE.md`, `change-log.md`, `tech-stack.md` and other relevant documentation to ensure they reflect the current state of the project.
 2. **Verify Tasks**: Ensure all tasks in the current phase are marked as done.
@@ -22,6 +25,7 @@ Description: Use this skill when transitioning between phases or finalizing a tr
 
 ## Major Rework Protocol (If major issues are found during review)
 If the user identifies **Major Issues** (architectural flaws, missing features, complex bugs) that cannot be solved with minor remediation:
+
 1. **Plan Update**: Immediately add a new "Phase: Rework" to the `plan.md`.
 2. **Task Creation**: Break the feedback into specific implementation tasks within that phase. Ensure each task specifies the **task-conductor** skill.
 3. **Handover**: Explicitly state: "Major issues detected. Rework phase added. Please run `/conductor:implement` to resume execution."

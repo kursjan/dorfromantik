@@ -1,5 +1,7 @@
-# Task Execution Skill
-Description: Use this skill for any coding or implementation task defined in a Conductor track.
+---
+name: task-conductor
+description: Use this skill for any coding or implementation task defined in a Conductor track.
+---
 
 ## Methodology
 1. **Execution**: Perform the requested code changes using available tools.
