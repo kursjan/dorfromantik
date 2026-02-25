@@ -35,7 +35,7 @@
     - Verify content (FPS, Camera, Hover) presence when visible.
   - **Verification:** `npx playwright test e2e/debug-overlay.spec.ts`.
 
-## Phase: Rework 2 (using **task-conductor** skill)
+## Phase: Rework 2 (using **task-conductor** skill) [checkpoint: 63ec2a0]
 - [x] **Task 8: Center Debug Overlay**
   - Update `src/canvas/components/DebugOverlay.css` to position the overlay in the top-center of the screen.
   - **Verification:** Visual check / E2E snapshot (optional).
