@@ -21,6 +21,7 @@ This skill guides the process from initial idea to a confirmed implementation pl
 **Action:**
 1.  **Create Track Files:** Generate the standard Conductor track artifacts (fo example `spec.md`, `plan.md`, `metadata.json`) in a new track directory `conductor/tracks/<track_id>/`.
     *   Ensure the plan follows the project's task breakdown structure.
+    *   **First Task:** The first task of the first phase MUST be to create and switch to the feature branch (e.g., `git checkout -b <track_id>`) using **task-conductor**.
 2.  **Register:** Add the new track to the registry in `conductor/tracks.md`.
 
 ## Phase 3: Plan Review & Refinement
@@ -50,6 +51,7 @@ This skill guides the process from initial idea to a confirmed implementation pl
 Use this format as the gold standard for all generated `plan.md` files.
 
 ## Phase 1: Core Mechanics
+- [ ] Create and switch to feature branch `feat/quest-system` using **task-conductor** skill.
 - [ ] Refactor `QuestGiver.cs` logic using **task-conductor** skill.
 - [ ] Implement unit tests for state transitions using **task-conductor** skill.
 - [ ] **Phase Gate**: Verify architecture and test coverage using **project-orchestrator** skill.

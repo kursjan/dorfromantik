@@ -26,7 +26,7 @@ description: Use this skill when transitioning between phases or finalizing a tr
 ## Major Rework Protocol (If major issues are found during review)
 If the user identifies **Major Issues** (architectural flaws, missing features, complex bugs) that cannot be solved with minor remediation:
 
-1. **Plan Update**: Immediately add a new "Phase: Rework" to the `plan.md`.
+1. **Plan Update**: Immediately add a new "Phase: Rework" to the `plan.md` using the **planning-architect** skill.
 2. **Task Creation**: Break the feedback into specific implementation tasks within that phase. Ensure each task specifies the **task-conductor** skill.
 3. **Handover**: Explicitly state: "Major issues detected. Rework phase added. Please run `/conductor:implement` to resume execution."
 4. **Termination**: End the response immediately. DO NOT attempt to fix major issues within this skill.

@@ -12,7 +12,9 @@ description: Use this skill for any coding or implementation task defined in a C
    - Run **Linting**: `npm run lint` (Fix all auto-fixable issues).
    - **Code Coverage**: Verify critical paths are covered.
    - **Documentation**: Ensure new public functions/classes have JSDoc.
-3. **Impact Summary**: Immediately after execution and verification, provide a concise summary including:
+3. **Persistence & Tracking**:
+   - **Track Workflow**: Mark the task as completed in `conductor/tracks/<track_id>/plan.md` (e.g., `- [x] Task Name`). **Do NOT commit.**
+4. **Impact Summary**: Immediately after execution and verification, provide a concise summary including:
    - Modified files and specific logic changes.
    - Verification results (Test pass/fail, lint status).
    - Any new dependencies or side effects introduced.

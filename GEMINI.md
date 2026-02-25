@@ -20,16 +20,19 @@ You work either on a conductor track or an ad-hoc task. Always define which type
 
 
 ### Conductor Workflow
-- **Overview:** A Conductor workflow is a track where tasks are grouped into phases and contains additional guidelines.
-- **Implementation Plans:** The implementation plans in `conductor/tracks/<track_id>/plan.md` are roadmaps, **NOT** commands. 
-  - **User Confirmation:** Always ask for explicit user confirmation before starting work on a track.
-  - **Status Presentation:** Present the user with status, plan, and next steps.
-- **Task Execution:** The agent performs only one task at a time.
-- **Single-Task Loop:** You MUST NOT perform more than one task from `plan.md` in a single response.
+- Conductor workflow is a track where tasks are grouped into phases, phases consit of tasks.
+  - Agent works on a single task, until phase is done.
+  - **project-orchestrator** triggers phase verification protocol, and commit changes, according to the protocol
+  - Once all phases are done, **project-orchestrator** triggers a PR review.
+    - if user approves, the work is done
+    - if user has concerns, agent fixes them or updates the conductor plan.
+      - after that, work start on new phase of a track
   
-### Task Workflow
+### Ad-hoc Task Workflow
+Ad hoc task can be implement in main.
+
 - **Discrete Units:** Every task is a discrete unit of work. Do not bundle tasks.
-- **Approval Protocol:** Before starting work on a task, ask the user for approval.
+- **Approval Protocol:** Before starting work on a task, ask the user for an explicit approval.
 - **Iteration Loop:** After finishing a user request or a task, always ask the user for approval. If they request changes, apply them, verify them, and request approval again.
   - **Termination:** Repeat until you get explicit user approval.
 - **"Done" Definition:** A coding task is only "Done" when:
@@ -41,8 +44,7 @@ You work either on a conductor track or an ad-hoc task. Always define which type
        - If the user requests changes, apply them, verify them, and request approval again. 
        - This loop continues until the user explicitly accepts the implementation (`lgtm`, `sgtm`, etc.).
     5. **Summary:** A task summary is attached to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
-    6. **Status Update:** If working on a track, the `plan.md` is updated on the development branch with the status `[x]` and the commit SHA.
-    7. **Persistence:** All changes (code + plan update) are committed and pushed to the development branch.
+    7. **Persistence:** All changes are committed and pushed 
 
 
 ### **GitHub Integration:**
@@ -58,11 +60,9 @@ You work either on a conductor track or an ad-hoc task. Always define which type
 This project uses a "Track-Based" branching model to maintain focus and ensure a clean history.
 
 - **Branching Strategy:**
-  - **New Tracks:** When starting a new Conductor Track (e.g., `feat/tile-rotation`), create a dedicated feature branch.
-  - **Minor Fixes & Chores:** For documentation updates, configuration tweaks, or minor verified bug fixes, you may work directly on the current branch (including `main`).
-  - **Active Track Identification:** When switching branches or starting work, always verify the active Track ID in `conductor/tracks/<track_id>/metadata.json`.
+  - **New Tracks:** When starting a new Conductor Track (e.g., `feat/tile-rotation`), create a dedicated feature branch or reuse a universal branch, such as `coding-agent/worker1`
+  - **Minor Fixes, Ad-hoc tasks & Chores:** For documentation updates, configuration tweaks, or minor verified bug fixes, you may work directly on the current branch (including `main`).
 - **Synchronization:** All changes intended for the codebase MUST be pushed to the remote repository (`origin`).
-- **Integration:** Integration of a Track into `main` MUST be performed via a rebase-based Pull Request (`gh pr merge --rebase`). This ensures a clean, linear, and auditable history.
 
 
 
@@ -70,7 +70,6 @@ This project uses a "Track-Based" branching model to maintain focus and ensure a
 - **Contextual Precedence:** Instructions within an active **Gemini Skill** (e.g., `task-conductor`, `project-orchestrator`) take absolute precedence over the general workflows described below. When executing a Conductor Track, strictly adhere to the methodology defined in the skill file.
 - **Refactoring:** Always analyze files in the context of the entire project. Check all usages of a class or function to ensure its public API remains valid after refactoring.
 - **Verification:** After _every_ code change, automatically run the following checks:
-  1.  **Architecture Sync:** Update or create `ARCHITECTURE.md` files in relevant directories.
   2.  **Code Quality Check:** `npx putout <changed_files>` (Ensure React 19 patterns and clean code).
   3.  **Type Check:** `npm run typecheck`.
   4.  **Unit Test Check:** `npm test` (Ensure all unit tests pass).
@@ -78,16 +77,19 @@ This project uses a "Track-Based" branching model to maintain focus and ensure a
       - **Note:** You might need to specify the correct `PORT` if multiple agents are running simultaneously.
       - **Inquiry:** When in doubt, ask the user for the port number.
 - **Maintenance:** The AI is responsible for keeping project documentation up-to-date.
-  - **Architecture Sync:** Whenever a refactoring or architectural change occurs (e.g., adding a new renderer, changing a design pattern), the AI must update the relevant `ARCHITECTURE.md` file (or equivalent) and ensure `conductor/product.md` remains consistent.
+  - **Architecture Sync:** Whenever a refactoring or architectural change occurs (e.g., adding a new renderer, changing a design pattern), the AI must update the relevant `ARCHITECTURE.md` file (`tech-stack.md`, `CHANGELOG.md` or equivalent) and ensure `conductor/product.md` remains consistent.
   - **Code Comments:** Maintain clear, concise JSDoc (or equivalent) for all public classes and methods. Ensure comments explain _intent_ and _parameters_, especially after refactoring.
+    - comment should explain why
+    - do not state obvious in comment, if code is simple
+    - for complex methods, feel free to provide overview in comments
   - **Brevity:** Updates should be concise yet sufficient for a future AI agent to understand the system structure and design decisions without needing to re-analyze the entire codebase.
 
 ## **Iterative Development & User Interaction**
 
 The AI's workflow is iterative, transparent, and responsive to user input.
 
-- **Track Generation & Plan Management:** Each time the user requests a significant change or feature, the AI will propose a new **Track** or update an existing one. This involves creating or updating the track's `spec.md` and `plan.md` within the `conductor/tracks/` directory.
 - **Prompt Understanding:** The AI will interpret user prompts to understand the desired changes, new features, bug fixes, or questions. It will ask clarifying questions if the prompt is ambiguous.
+- **Track Generation & Plan Management:** Each time the user requests a significant change or feature, the AI will propose a new **Track** or update an existing one using **planning-architect** skill. 
 - **Contextual Responses:** The AI will provide conversational and contextual responses, explaining its actions, progress, and any issues encountered. It will summarize changes made.
 - **Error Checking Flow:**
   1.  **Code Change:** AI applies a code modification.
@@ -97,7 +99,7 @@ The AI's workflow is iterative, transparent, and responsive to user input.
   5.  **Test Execution:** The AI runs **ALL** verification checks:
       - Type Check: `npm run typecheck`
       - Unit Tests: `npm test`
-      - E2E Tests: `npx playwright test --reporter=list`
+      - E2E Tests: `npm e2e`
   6.  **Preview Check:** AI observes the browser preview for visual and runtime errors.
   7.  **Remediation/Report:** If errors are found, AI attempts automatic fixes. If unsuccessful, it reports details to the user.
 
