@@ -4,6 +4,7 @@ description: Use this skill for any coding or implementation task defined in a C
 ---
 
 ## Methodology
+0. **Verify Git Branch**: Never develop on main. Reuse suitable branch or create a new one.
 1. **Execution**: Perform the requested code changes using available tools.
 2. **Quality Gate Verification**:
    - Run **Unit Tests**: `npm test` (Ensure all pass).
