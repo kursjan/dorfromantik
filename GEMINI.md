@@ -31,9 +31,8 @@ You work either on a conductor track or an ad-hoc task. Always define which type
 ### Ad-hoc Task Workflow
 Ad hoc task can be implement in main.
 
-- **Discrete Units:** Every task is a discrete unit of work. Do not bundle tasks.
 - **Approval Protocol:** Before starting work on a task, ask the user for an explicit approval.
-- **Iteration Loop:** After finishing a user request or a task, always ask the user for approval. If they request changes, apply them, verify them, and request approval again.
+- **Iteration Loop:** After finishing a user request or a task, always present user with a summary of changes and ask for explicit approval. If they request changes, apply them, verify them, present summary and ask for explicit approval again.
   - **Termination:** Repeat until you get explicit user approval.
 - **"Done" Definition:** A coding task is only "Done" when:
     1. **Implementation:** Code is implemented.
@@ -43,18 +42,23 @@ Ad hoc task can be implement in main.
        - Present the user with a manual verification plan.
        - If the user requests changes, apply them, verify them, and request approval again. 
        - This loop continues until the user explicitly accepts the implementation (`lgtm`, `sgtm`, etc.).
-    5. **Summary:** A task summary is attached to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
-    7. **Persistence:** All changes are committed and pushed 
+
+- **Git Tracking**
+    If user asks you to commit changes:
+    1. **Summary:** Attach task summary to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
+    2. **Persistence:** Committed and pushed all changes
+       - when staging changes, stage only changes AI agent did, do not interfere with users works, if possible
 
 
 ### **Commit Strategy**
 - **Ad-Hoc Tasks:** 
-  - Complete task -> Verify -> **Commit immediately** with `git notes` summary.
+  - Suggest user to commit an ad-hoc tasks after you get explicit approval of your changes. If you can commit:
+    1. **Summary:** Attach task summary to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
+    2. **Persistence:** Committed and pushed all changes
+       - when staging changes, stage only changes AI agent did, do not interfere with users works, if possible
 - **Conductor Tasks (Phase Workflow):**
   - Complete task -> Verify -> Update `plan.md` (mark `[x]`).
-  - **Do NOT commit yet.**
-  - Proceed to next task or wait for Phase completion.
-  - **Phase Completion:** The **project-orchestrator** will squash/create a single **Checkpoint Commit** for the entire phase.
+  - **Phase Completion:** Once a phase is completed, the **project-orchestrator** will squash/create a single **Checkpoint Commit** for the entire phase.
 
 ### **GitHub Integration:**
   - Most tasks should have a GitHub Issue. Ask user for the issue or if you can proceed without GitHub issue.

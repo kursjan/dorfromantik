@@ -126,3 +126,6 @@ Notes to add somewhere
 - I hope using GEMINI_API_KEY will improve model availability. Hopefully I didn't commit.
 - I gave up today and fixed GameScorer on my own. I don't have patience to explain that thing every line of code over and over again.
 - Seems using Tier 1 API key makes agents a bit more responsive, but one runs out of quota quickly.
+- I still don't have any reasonable mental model of Git, whenever there is an issue, I tell AI to "fix that mess"
+  - I want: create branch, develop, sync from main from time to time and create PR to push to main
+  - I have little idea how to do any of this with command line and I don't bother to learn
