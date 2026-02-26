@@ -100,7 +100,7 @@ describe('GameScorer', () => {
 
   it('should score 0 for a single neighbor with no match', () => {
       // Scenario 2. Single Neighbor (No Match): 0 points.
-      const north = nav.north(center);
+      const north = Navigation.north(center);
 
       // Center has plains at North
       const centerTile = createSpecificTile('center', { north: 'pasture' });
@@ -116,7 +116,7 @@ describe('GameScorer', () => {
 
   it('should score 10 for a single neighbor with match', () => {
       // Scenario 3. Single Neighbor (Match): 10 points.
-      const north = nav.north(center);
+      const north = Navigation.north(center);
 
       // Center has plains at North
       const centerTile = createSpecificTile('center', { north: 'pasture' });
@@ -133,8 +133,8 @@ describe('GameScorer', () => {
   it('should score 20 for two matching neighbors', () => {
       // Scenario 4. Double Match: 20 points.
       // Neighbors at North and NorthEast
-      const north = nav.north(center);
-      const northEast = nav.northEast(center);
+      const north = Navigation.north(center);
+      const northEast = Navigation.northEast(center);
 
       const northTile = createSpecificTile('north', { south: 'pasture' });
       const neTile = createSpecificTile('ne', { southWest: 'pasture' });
@@ -193,7 +193,7 @@ describe('GameScorer', () => {
 
   it('should score 70 (10 match + 60 perfect) when a neighbor becomes perfect', () => {
       // Scenario 7. Cascading Perfect: 10 (match) + 60 (neighbor becomes perfect) = 70 points.
-      const north = nav.north(center);
+      const north = Navigation.north(center);
 
       // 1. Setup Center to be missing only North neighbor to be perfect
       const centerTile = createTile('center', 'pasture');
@@ -233,8 +233,8 @@ describe('GameScorer', () => {
 
   it('should score multiple perfect bonuses if one placement completes multiple neighbors', () => {
       // Scenario 8. Double Cascading Perfect: 2 neighbors become perfect = 120 bonus points.
-      const north = nav.north(center);
-      const northEast = nav.northEast(center);
+      const north = Navigation.north(center);
+      const northEast = Navigation.northEast(center);
 
       // 1. Setup North and NorthEast as candidates
       board.place(createTile('north', 'pasture'), north);

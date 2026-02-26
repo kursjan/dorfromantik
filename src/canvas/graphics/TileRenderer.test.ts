@@ -52,7 +52,7 @@ describe('TileRenderer', () => {
   });
 
   it('draws a tile at a specific hex coordinate', () => {
-    const tile = Tile.createRandom('random');
+    const tile = new Tile({id: 'random'});
     const hex = new HexCoordinate(1, 0, -1);
     const drawTileSpy = vi.spyOn(renderer, 'drawTile');
 

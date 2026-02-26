@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Game } from './Game';
 import { Board } from './Board';
-import { GameRules } from './GameRules';
+import { GameRules, SequenceTileGenerator } from './GameRules';
 import { Tile } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
 
@@ -13,7 +13,6 @@ describe('Game Integration (placeTile & Scoring)', () => {
 
   beforeEach(() => {
     board = new Board();
-    rules = new GameRules({ initialTurns: 10, pointsPerMatch: 10 });
     
     // Tile 1: All tree
     tile1 = new Tile({
@@ -31,9 +30,14 @@ describe('Game Integration (placeTile & Scoring)', () => {
   });
 
   it('should place a tile, consume a turn, and remove it from the queue', () => {
-    // Provide 10 tiles manually to match rules.initialTurns
-    const tileQueue = Array(10).fill(tile1);
-    const game = new Game({ board, rules, tileQueue });
+    // Provide 10 tiles manually via SequenceTileGenerator
+    const tiles = Array(10).fill(tile1);
+    rules = new GameRules({ 
+      initialTurns: 10, 
+      pointsPerMatch: 10,
+      tileGenerator: new SequenceTileGenerator(tiles)
+    });
+    const game = new Game({ board, rules });
     const coord = new HexCoordinate(0, 0, 0);
 
     const result = game.placeTile(coord);
@@ -46,8 +50,12 @@ describe('Game Integration (placeTile & Scoring)', () => {
   });
 
   it('should score points when placing a matching tile next to another', () => {
-    const tileQueue = [tile1, tile2];
-    const game = new Game({ board, rules, tileQueue });
+    rules = new GameRules({ 
+      initialTurns: 2, 
+      pointsPerMatch: 10,
+      tileGenerator: new SequenceTileGenerator([tile1, tile2])
+    });
+    const game = new Game({ board, rules });
     
     // Place tile1 at (0,0,0)
     const coord1 = new HexCoordinate(0, 0, 0);
@@ -73,7 +81,12 @@ describe('Game Integration (placeTile & Scoring)', () => {
       south: 'water', southWest: 'water', northWest: 'water'
     });
 
-    const game = new Game({ board, rules, tileQueue: [tile1, mismatchTile] });
+    rules = new GameRules({ 
+      initialTurns: 2, 
+      pointsPerMatch: 10,
+      tileGenerator: new SequenceTileGenerator([tile1, mismatchTile])
+    });
+    const game = new Game({ board, rules });
     
     const result1 = game.placeTile(new HexCoordinate(0, 0, 0));
     expect(result1.scoreAdded).toBe(0);
@@ -85,7 +98,11 @@ describe('Game Integration (placeTile & Scoring)', () => {
   });
 
   it('should throw error if queue is empty', () => {
-    const game = new Game({ board, rules, tileQueue: [] });
+    rules = new GameRules({ 
+      initialTurns: 0, 
+      tileGenerator: new SequenceTileGenerator([])
+    });
+    const game = new Game({ board, rules });
     expect(() => game.placeTile(new HexCoordinate(0,0,0))).toThrow('No tiles remaining in the queue');
   });
 });

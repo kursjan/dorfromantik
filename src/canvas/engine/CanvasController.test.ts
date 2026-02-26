@@ -1,14 +1,14 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { CanvasController } from './CanvasController';
-import { HexRenderer } from '../graphics/HexRenderer';
-import { TileRenderer } from '../graphics/TileRenderer';
-import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
-import { InputManager } from './InputManager';
+import { Tile } from '../../models/Tile';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { Board } from '../../models/Board';
+import { HexCoordinate } from '../../models/HexCoordinate';
 import { Session } from '../../models/Session';
 import { User } from '../../models/User';
-import { Board } from '../../models/Board';
-import { Tile } from '../../models/Tile';
-import { HexCoordinate } from '../../models/HexCoordinate';
+import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
+import { HexRenderer } from '../graphics/HexRenderer';
+import { TileRenderer } from '../graphics/TileRenderer';
+import { CanvasController } from './CanvasController';
+import { InputManager } from './InputManager';
 
 // Mock dependencies
 vi.mock('../graphics/HexRenderer');
@@ -92,7 +92,7 @@ describe('CanvasController', () => {
   });
 
   it('should render tiles from the board', () => {
-    const tile = Tile.createRandom('t1');
+    const tile = new Tile({ id: 't1' });
     const coord = new HexCoordinate(0, 0, 0);
     session.activeGame!.board.place(tile, coord);
 
@@ -111,7 +111,7 @@ describe('CanvasController', () => {
 
   it('should throw error if no active game found in session on construction', () => {
     session.activeGame = undefined;
-    
+
     expect(() => new CanvasController(canvas, session)).toThrow('No active game found in session');
   });
 
@@ -130,7 +130,7 @@ describe('CanvasController', () => {
 
   it('should notify debug stats change and respect throttling', () => {
     vi.useFakeTimers();
-    
+
     controller = new CanvasController(canvas, session);
     const callback = vi.fn();
     controller.addDebugStatsListener(callback);
@@ -141,15 +141,17 @@ describe('CanvasController', () => {
     // First render - should notify
     (controller as any).render();
     expect(callback).toHaveBeenCalledTimes(1);
-    expect(callback).toHaveBeenCalledWith(expect.objectContaining({
-      fps: expect.any(Number),
-      camera: expect.objectContaining({
-        x: expect.any(Number),
-        y: expect.any(Number),
-        zoom: expect.any(Number),
-      }),
-      hoveredHex: null,
-    }));
+    expect(callback).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fps: expect.any(Number),
+        camera: expect.objectContaining({
+          x: expect.any(Number),
+          y: expect.any(Number),
+          zoom: expect.any(Number),
+        }),
+        hoveredHex: null,
+      })
+    );
 
     callback.mockClear();
 

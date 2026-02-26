@@ -30,17 +30,17 @@ export class Navigation {
   getNeighbor(coord: HexCoordinate, direction: Direction): HexCoordinate {
     switch (direction) {
       case 'north':
-        return this.north(coord);
+        return Navigation.north(coord);
       case 'northEast':
-        return this.northEast(coord);
+        return Navigation.northEast(coord);
       case 'southEast':
-        return this.southEast(coord);
+        return Navigation.southEast(coord);
       case 'south':
-        return this.south(coord);
+        return Navigation.south(coord);
       case 'southWest':
-        return this.southWest(coord);
+        return Navigation.southWest(coord);
       case 'northWest':
-        return this.northWest(coord);
+        return Navigation.northWest(coord);
     }
   }
 
@@ -51,27 +51,27 @@ export class Navigation {
     }));
   }
 
-  north(coord: HexCoordinate): HexCoordinate {
+  static north(coord: HexCoordinate): HexCoordinate {
     return new HexCoordinate(coord.q - 1, coord.r, coord.s + 1);
   }
 
-  northEast(coord: HexCoordinate): HexCoordinate {
+  static northEast(coord: HexCoordinate): HexCoordinate {
     return new HexCoordinate(coord.q - 1, coord.r + 1, coord.s);
   }
 
-  southEast(coord: HexCoordinate): HexCoordinate {
+  static southEast(coord: HexCoordinate): HexCoordinate {
     return new HexCoordinate(coord.q, coord.r + 1, coord.s - 1);
   }
 
-  south(coord: HexCoordinate): HexCoordinate {
+  static south(coord: HexCoordinate): HexCoordinate {
     return new HexCoordinate(coord.q + 1, coord.r, coord.s - 1);
   }
 
-  southWest(coord: HexCoordinate): HexCoordinate {
+  static southWest(coord: HexCoordinate): HexCoordinate {
     return new HexCoordinate(coord.q + 1, coord.r - 1, coord.s);
   }
 
-  northWest(coord: HexCoordinate): HexCoordinate {
+  static northWest(coord: HexCoordinate): HexCoordinate {
     return new HexCoordinate(coord.q, coord.r - 1, coord.s + 1);
   }
 }

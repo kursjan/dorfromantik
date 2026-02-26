@@ -9,7 +9,6 @@ export interface GameProps {
   board: Board;
   rules: GameRules;
   score?: number;
-  tileQueue?: Tile[];
 }
 
 export interface PlacementResult {
@@ -66,7 +65,7 @@ export class Game {
     this.scorer = new GameScorer(this.rules);
     
     // If no queue is provided, initialize with random tiles based on rules
-    this.tileQueue = props.tileQueue ?? this.generateInitialQueue(props.rules.initialTurns);
+    this.tileQueue = this.generateInitialQueue();
 
     if (this.score < 0) {
       throw new Error('score must be non-negative');
@@ -147,17 +146,17 @@ export class Game {
     // Add extra tiles to the queue for perfect placements
     const extraTilesCount = perfectCount * this.rules.turnsPerPerfect;
     for (let i = 0; i < extraTilesCount; i++) {
-      this.tileQueue.push(Tile.createRandom(`bonus-${Date.now()}-${i}`));
+      this.tileQueue.push(this.rules.tileGenerator.createTile(`bonus-${Date.now()}-${i}`));
     }
 
     this.score += scoreAdded;
     return { scoreAdded, perfectCount };
   }
 
-  private generateInitialQueue(count: number): Tile[] {
+  private generateInitialQueue(): Tile[] {
     const queue: Tile[] = [];
-    for (let i = 0; i < count; i++) {
-      queue.push(Tile.createRandom(`init-${i}`));
+    for (let i = 0; i < this.rules.initialTurns; i++) {
+      queue.push(this.rules.tileGenerator.createTile(`initial-${i}`));
     }
     return queue;
   }

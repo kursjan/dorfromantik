@@ -57,11 +57,9 @@ export class GameScorer {
     }
 
     // 4. Perfect Bonuses: Check neighbors that might have become perfect
-    for (const neighbor of Object.values(existingNeighbors)) {
-      if (neighbor && this.isPerfect(board, neighbor)) {
-        perfectCount++;
-      }
-    }
+    perfectCount += Object.values(existingNeighbors)
+      .filter((neighbor) => this.isPerfect(board, neighbor))
+      .length;
 
     // 5. Apply Perfect Bonuses
     scoreAdded += perfectCount * this.rules.pointsPerPerfect;
@@ -83,11 +81,11 @@ export class GameScorer {
     }
 
     for (const direction of directions) {
-      const neighbor = existing[direction]!;
+      const existingNeighbor = existing[direction]!;
 
       const myTerrain = boardTile.tile.getTerrain(direction);
       const oppositeSide = this.navigation.getOpposite(direction);
-      const neighborTerrain = neighbor.tile.getTerrain(oppositeSide);
+      const neighborTerrain = existingNeighbor.tile.getTerrain(oppositeSide);
 
       if (myTerrain !== neighborTerrain) {
         return false; // All must match
