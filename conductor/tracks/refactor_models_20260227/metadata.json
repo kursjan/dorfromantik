@@ -1,0 +1,8 @@
+{
+  "id": "refactor_models_20260227",
+  "name": "Refactor src/models",
+  "description": "Implement refactoring and cleanup tasks identified in the models review.",
+  "status": "planned",
+  "created_at": "2026-02-27",
+  "issue_id": "36"
+}
