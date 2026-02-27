@@ -5,7 +5,7 @@ description: Use this skill for any coding or implementation task defined in a C
 
 ## Methodology
 0. **Verify Git Branch**: Never develop on main. Reuse suitable branch or create a new one.
-0. **Task Selection**: Always select the next uncompleted task from the current phase in `conductor/tracks/<track_id>/plan.md`.
+0. **Task Selection**: Always select the next uncompleted task from the current phase in `conductor/tracks/<track_id>/plan.md` and mark it as selected.
 1. **Execution**: Perform the requested code changes using available tools.
 2. **Quality Gate Verification**:
    - Run **Unit Tests**: `npm test` (Ensure all pass).
@@ -21,6 +21,7 @@ description: Use this skill for any coding or implementation task defined in a C
    - Any new dependencies or side effects introduced.
 4. **Approval Gate**: You MUST end the response with the string: "STATUS: WAITING_FOR_APPROVAL".
 5. **Termination**: Do not proceed to any subsequent tasks or steps until the user responds with "APPROVED" or similar.
+6. **Mark as done**: Mark the task as done.
 
 ## Iteration Protocol
 - If the user requests changes, apply them, verify again, and provide an updated impact summary.

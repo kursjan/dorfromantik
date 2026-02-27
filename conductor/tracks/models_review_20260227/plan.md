@@ -84,3 +84,6 @@ Output of the reveiw is a REVIEW_FEEDBACK.md file, with a task per finding and e
 - [x] **Testing:** Verify comprehensive and focused unit test coverage in `User.test.ts`.
 - [x] **Comments:** Ensure clear, non-AI documentation.
 - [x] **Architecture Sync:** Confirm alignment with `ARCHITECTURE.md`.
+
+## Phase 10: ARCHITECTURE.md
+- [x] **Review Architecture Document:** Ensure `src/models/ARCHITECTURE.md` accurately reflects the current codebase and design decisions.
