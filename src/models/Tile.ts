@@ -57,6 +57,11 @@ export class Tile {
   /**
    * Returns a new Tile rotated 60 degrees clockwise.
    * According to spec: North -> NorthWest, NorthEast -> North, etc.
+   *
+   * NOTE: The 'id' is intentionally preserved during rotation. This ensures
+   * that React (or other UI layers) can maintain the tile's identity across
+   * rotations, enabling smooth animations (like CSS transforms) rather than
+   * full component re-mounts.
    */
   rotateClockwise(): Tile {
     return new Tile({
@@ -73,6 +78,11 @@ export class Tile {
   /**
    * Returns a new Tile rotated 60 degrees counter-clockwise.
    * According to spec: North -> NorthEast, NorthEast -> SouthEast, etc.
+   *
+   * NOTE: The 'id' is intentionally preserved during rotation. This ensures
+   * that React (or other UI layers) can maintain the tile's identity across
+   * rotations, enabling smooth animations (like CSS transforms) rather than
+   * full component re-mounts.
    */
   rotateCounterClockwise(): Tile {
     return new Tile({
