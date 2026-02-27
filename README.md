@@ -73,6 +73,21 @@ The more detailed prompt and more `/clear` worked like a charm.
 
 Today was a hard session, with multiple AI agents running at the same time, switching worktrees, branches, AI code review. I am thinking about a good workflow which can help me to gate the code. The model keeps beeing "busy" so I spend quite some time with retries.
 
+# 2026-02-27
+
+I spent lots of time "organizing" and "synchronizing" the AI. I updated workflow manually, because AI made mess out of it, I defined processes and implemented skills, which seem to help to follow the instructions. Anything that touches more than one file is a track for me. I try to make AI to do some work, but I require manual user reviews after each phase in track and I switched to full PR review after a branch is merged to main, to ensure some sort of consistency.
+
+I spend last few days wandering around the codebase. I feel I am again not happy with the quality of code produced by AI. 
+I did experiment with first code-review in https://github.com/kursjan/dorfromantik/issues/36.
+
+I also switched to Cursor. It seesm to work better for refactoring: they are faster. Gemini keeps "grepping" which "brigt mich auf die Palme", it is like 1980s.
+
+I managed wihout big issues to implement a debug overlay using a new process: https://github.com/kursjan/dorfromantik/issues/29.
+
+AI with key (tier1) works much better, otherwise I get lots of retries that are super annoying for the workflow.
+
+I also fought a lots of Git, I am used to Fig/Mercurial and Git makes me nervous...
+
 # Graveyard
 
 Notes to add somewhere
