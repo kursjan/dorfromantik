@@ -1,0 +1,9 @@
+{
+  "id": "models_review_20260227",
+  "issue": 36,
+  "title": "Thorough Review of src/models",
+  "description": "Initiating a deep dive audit of the src/models directory to ensure architectural integrity, performance, and test coverage.",
+  "status": "planned",
+  "priority": "high",
+  "tags": ["review", "audit", "models"]
+}
