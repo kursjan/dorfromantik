@@ -6,6 +6,7 @@ This directory contains the core data structures and business logic for the Dorf
 
 ### 1. Hexagonal Coordinate System (`HexCoordinate.ts`, `Navigation.ts`)
 - **`HexCoordinate`**: Uses a Cube Coordinate system (q, r, s) where `q + r + s = 0`.
+  - **Why not Axial?**: To maintain strict coordinate validation and improve readability, we explicitly use all three coordinates. A `fromAxial(q, r)` helper is deliberately not provided.
 - **`Navigation`**: Provides geometric operations for finding neighbors and opposite sides. 
   - **Orientation**: Flat-top hexagons.
   - **North**: defined as `(-1, 0, 1)`.

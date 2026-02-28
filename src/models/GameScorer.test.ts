@@ -2,9 +2,9 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { GameScorer } from './GameScorer';
 import { Board } from './Board';
 import { GameRules } from './GameRules';
-import { Tile, type TileProps, type TerrainType } from './Tile';
+import { Tile, type TileOptions, type TerrainType } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
-import { Navigation } from './Navigation';
+import { north, northEast, getNeighbors, getOpposite } from './Navigation';
 
 /**
  * 1. Lone Tile: 0 points.
@@ -33,14 +33,12 @@ describe('GameScorer', () => {
   let board: Board;
   let rules: GameRules;
   let scorer: GameScorer;
-  let nav: Navigation;
   let center: HexCoordinate;
 
   beforeEach(() => {
     board = new Board();
     rules = new GameRules({ initialTurns: 10 });
     scorer = new GameScorer(rules);
-    nav = new Navigation();
     center = new HexCoordinate(0, 0, 0);
   });
 
@@ -58,8 +56,8 @@ describe('GameScorer', () => {
   };
 
   // Helper to create a tile with specific sides
-  const createSpecificTile = (id: string, props: Partial<TileProps>): Tile => {
-      const defaults: TileProps = {
+  const createSpecificTile = (id: string, props: Partial<TileOptions>): Tile => {
+      const defaults: TileOptions = {
           id,
           north: 'pasture',
           northEast: 'pasture',
@@ -77,11 +75,11 @@ describe('GameScorer', () => {
    * specifically ignoring the 'center' coordinate to allow for later placement.
    */
   const surroundExceptCenter = (target: HexCoordinate, idPrefix: string) => {
-    nav.getNeighbors(target).forEach(({ direction, coordinate }) => {
+    getNeighbors(target).forEach(({ direction, coordinate }) => {
         if (coordinate.getKey() === center.getKey()) return;
         if (board.has(coordinate)) return;
 
-        const opposite = nav.getOpposite(direction);
+        const opposite = getOpposite(direction);
         const props: any = {};
         props[opposite] = 'pasture';
         board.place(createSpecificTile(`${idPrefix}-${direction}`, props), coordinate);
@@ -100,7 +98,7 @@ describe('GameScorer', () => {
 
   it('should score 0 for a single neighbor with no match', () => {
       // Scenario 2. Single Neighbor (No Match): 0 points.
-      const north = Navigation.north(center);
+      const northCoord = north(center);
 
       // Center has plains at North
       const centerTile = createSpecificTile('center', { north: 'pasture' });
@@ -108,7 +106,7 @@ describe('GameScorer', () => {
 
       // Neighbor has forest at South (facing center)
       const northTile = createSpecificTile('north', { south: 'tree' });
-      const placed = board.place(northTile, north);
+      const placed = board.place(northTile, northCoord);
 
       const result = scorer.scorePlacement(board, placed);
       expect(result.scoreAdded).toBe(0);
@@ -116,7 +114,7 @@ describe('GameScorer', () => {
 
   it('should score 10 for a single neighbor with match', () => {
       // Scenario 3. Single Neighbor (Match): 10 points.
-      const north = Navigation.north(center);
+      const northCoord = north(center);
 
       // Center has plains at North
       const centerTile = createSpecificTile('center', { north: 'pasture' });
@@ -124,7 +122,7 @@ describe('GameScorer', () => {
 
       // Neighbor has plains at South
       const northTile = createSpecificTile('north', { south: 'pasture' });
-      const placed = board.place(northTile, north);
+      const placed = board.place(northTile, northCoord);
 
       const result = scorer.scorePlacement(board, placed);
       expect(result.scoreAdded).toBe(10);
@@ -133,14 +131,14 @@ describe('GameScorer', () => {
   it('should score 20 for two matching neighbors', () => {
       // Scenario 4. Double Match: 20 points.
       // Neighbors at North and NorthEast
-      const north = Navigation.north(center);
-      const northEast = Navigation.northEast(center);
+      const northCoord = north(center);
+      const northEastCoord = northEast(center);
 
       const northTile = createSpecificTile('north', { south: 'pasture' });
       const neTile = createSpecificTile('ne', { southWest: 'pasture' });
       
-      board.place(northTile, north);
-      board.place(neTile, northEast);
+      board.place(northTile, northCoord);
+      board.place(neTile, northEastCoord);
 
       // Place center matching both
       const centerTile = createSpecificTile('center', { north: 'pasture', northEast: 'pasture' });
@@ -154,9 +152,9 @@ describe('GameScorer', () => {
       // Scenario 5. Perfect Ring (Matching): 60 (match) + 60 (bonus) = 120 points.
       
       // Surround with 6 matching neighbors
-      nav.getNeighbors(center).forEach(({ direction, coordinate }) => {
+      getNeighbors(center).forEach(({ direction, coordinate }) => {
           // Center will be all 'pasture', so neighbors must present 'pasture' on opposite side
-          const opposite = nav.getOpposite(direction);
+          const opposite = getOpposite(direction);
           const props: any = {};
           props[opposite] = 'pasture';
           board.place(createSpecificTile(`n-${direction}`, props), coordinate);
@@ -173,9 +171,9 @@ describe('GameScorer', () => {
   it('should score 50 for a full ring with one mismatch', () => {
       // Scenario 6. Perfect Ring (Mismatch): 5 matches, 1 mismatch = 50 points.
       
-      const neighbors = nav.getNeighbors(center);
+      const neighbors = getNeighbors(center);
       neighbors.forEach(({ direction, coordinate }, index) => {
-          const opposite = nav.getOpposite(direction);
+          const opposite = getOpposite(direction);
           const props: any = {};
           // First 5 match (plains), last one mismatches (forest)
           props[opposite] = index < 5 ? 'pasture' : 'tree';
@@ -193,17 +191,17 @@ describe('GameScorer', () => {
 
   it('should score 70 (10 match + 60 perfect) when a neighbor becomes perfect', () => {
       // Scenario 7. Cascading Perfect: 10 (match) + 60 (neighbor becomes perfect) = 70 points.
-      const north = Navigation.north(center);
+      const northCoord = north(center);
 
       // 1. Setup Center to be missing only North neighbor to be perfect
       const centerTile = createTile('center', 'pasture');
       board.place(centerTile, center);
 
       // Place 5 neighbors (excluding North) matching Center
-      nav.getNeighbors(center).forEach(({ direction, coordinate }) => {
+      getNeighbors(center).forEach(({ direction, coordinate }) => {
           if (direction === 'north') return; // Skip North
           
-          const opposite = nav.getOpposite(direction);
+          const opposite = getOpposite(direction);
           const props: any = {};
           props[opposite] = 'pasture';
           board.place(createSpecificTile(`n-${direction}`, props), coordinate);
@@ -219,7 +217,7 @@ describe('GameScorer', () => {
           southEast: 'tree',  // Mismatch NE (which is default plains)
           southWest: 'tree'   // Mismatch NW (which is default plains)
       });
-      const placed = board.place(northTile, north);
+      const placed = board.place(northTile, northCoord);
 
       const result = scorer.scorePlacement(board, placed);
       
@@ -233,15 +231,15 @@ describe('GameScorer', () => {
 
   it('should score multiple perfect bonuses if one placement completes multiple neighbors', () => {
       // Scenario 8. Double Cascading Perfect: 2 neighbors become perfect = 120 bonus points.
-      const north = Navigation.north(center);
-      const northEast = Navigation.northEast(center);
+      const northCoord = north(center);
+      const northEastCoord = northEast(center);
 
       // 1. Setup North and NorthEast as candidates
-      board.place(createTile('north', 'pasture'), north);
-      board.place(createTile('northEast', 'pasture'), northEast);
+      board.place(createTile('north', 'pasture'), northCoord);
+      board.place(createTile('northEast', 'pasture'), northEastCoord);
 
-      surroundExceptCenter(north, 'n');
-      surroundExceptCenter(northEast, 'ne');
+      surroundExceptCenter(northCoord, 'n');
+      surroundExceptCenter(northEastCoord, 'ne');
 
       // 2. Place Center matching both
       const centerTile = createTile('center', 'pasture');
@@ -265,7 +263,7 @@ describe('GameScorer', () => {
     it('should return false if tile has fewer than 6 neighbors', () => {
       const tile = board.place(createTile('center'), center);
       // Place only 3 neighbors
-      nav.getNeighbors(center).slice(0, 3).forEach(({ coordinate }, i) => {
+      getNeighbors(center).slice(0, 3).forEach(({ coordinate }, i) => {
         board.place(createTile(`n${i}`), coordinate);
       });
       
@@ -275,8 +273,8 @@ describe('GameScorer', () => {
     it('should return false if 6 neighbors exist but one terrain mismatches', () => {
       const tile = board.place(createTile('center', 'pasture'), center);
       
-      nav.getNeighbors(center).forEach(({ direction, coordinate }, i) => {
-        const opposite = nav.getOpposite(direction);
+      getNeighbors(center).forEach(({ direction, coordinate }, i) => {
+        const opposite = getOpposite(direction);
         const terrain = i === 5 ? 'tree' : 'pasture'; // One mismatch
         board.place(createSpecificTile(`n${i}`, { [opposite]: terrain }), coordinate);
       });
@@ -287,8 +285,8 @@ describe('GameScorer', () => {
     it('should return true if 6 neighbors exist and all terrains match', () => {
       const tile = board.place(createTile('center', 'pasture'), center);
       
-      nav.getNeighbors(center).forEach(({ direction, coordinate }, i) => {
-        const opposite = nav.getOpposite(direction);
+      getNeighbors(center).forEach(({ direction, coordinate }, i) => {
+        const opposite = getOpposite(direction);
         board.place(createSpecificTile(`n${i}`, { [opposite]: 'pasture' }), coordinate);
       });
 

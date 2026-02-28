@@ -6,7 +6,7 @@ import { Board } from './Board';
 import { GameRules, SequenceTileGenerator } from './GameRules';
 import { Tile } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
-import { Navigation } from './Navigation';
+import { southEast, south } from './Navigation';
 
 describe('Full Game Session Integration', () => {
   let user: User;
@@ -88,7 +88,7 @@ describe('Full Game Session Integration', () => {
     expect(board.get(origin)?.tile).toBe(tile1);
 
     // 4. Place second tile at South of Origin
-    const southCoord = Navigation.south(origin);
+    const southCoord = south(origin);
     const result2 = game.placeTile(southCoord);
     
     expect(result2.scoreAdded).toBe(10);
@@ -97,7 +97,7 @@ describe('Full Game Session Integration', () => {
     expect(board.get(southCoord)?.tile).toBe(tile2);
 
     // 5. Place third tile at South-East of Origin
-    const southEastCoord = Navigation.southEast(origin);
+    const southEastCoord = southEast(origin);
     const result3 = game.placeTile(southEastCoord);
     
     expect(result3.scoreAdded).toBe(20); // Two matches: tile1 and tile2!
