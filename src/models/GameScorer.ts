@@ -27,13 +27,13 @@ export class GameScorer {
    * @returns The scoring result including points added and perfect bonuses.
    */
   scorePlacement(board: Board, placedTile: BoardTile): ScoringResult {
-    const { tile, coordinate } = placedTile;
+    const { tile } = placedTile;
 
     let scoreAdded = 0;
     let perfectCount = 0;
 
     // 1. Identify all neighbors
-    const existingNeighbors = board.getExistingNeighbors(coordinate);
+    const existingNeighbors = board.getExistingNeighbors(placedTile);
 
     // 2. Standard Scoring: matching terrain on adjacent tiles
     for (const [direction, neighbor] of Object.entries(existingNeighbors) as [
@@ -70,7 +70,7 @@ export class GameScorer {
    * A tile is perfect if it has 6 neighbors and all 6 edges match.
    */
   isPerfect(board: Board, boardTile: BoardTile): boolean {
-    const existing = board.getExistingNeighbors(boardTile.coordinate);
+    const existing = board.getExistingNeighbors(boardTile);
     const directions = Object.keys(existing) as Direction[];
 
     // must have all six neighbors to be perfect
