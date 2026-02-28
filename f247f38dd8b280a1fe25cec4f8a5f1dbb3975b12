@@ -1,0 +1,1 @@
+Renamed TileProps to TileOptions for naming consistency. Updated Tile.print() to return a string instead of logging directly to console, making it more testable and versatile. Improved default ID generation for Tiles by adding a static counter to prevent potential collisions in tight loops.
