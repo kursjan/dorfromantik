@@ -3,12 +3,14 @@ import {
     it,
     expect,
     beforeEach,
+    vi,
 } from 'vitest';
 import {Game} from './Game';
 import {Board} from './Board';
-import {GameRules, RandomTileGenerator, SequenceTileGenerator} from './GameRules';
+import {GameRules, RandomTileGenerator, SequenceTileGenerator, TileGenerator} from './GameRules';
 import {Tile} from './Tile';
 import {HexCoordinate} from './HexCoordinate';
+import {GameScorer} from './GameScorer';
 // Add missing tests: https://github.com/kursjan/dorfromantik/issues/35
 describe('Game', () => {
     let board: Board;
@@ -245,6 +247,66 @@ describe('Game', () => {
                 rules: customRules,
             });
             expect(() => game.rotateQueuedTileClockwise()).toThrow('No tiles remaining in the queue');
+        });
+    });
+
+    describe('placeTile', () => {
+        it('should throw error if queue is empty', () => {
+            const customRules = new GameRules({
+                initialTurns: 0,
+                tileGenerator: new SequenceTileGenerator([]),
+            });
+            
+            const game = new Game({
+                board,
+                rules: customRules,
+            });
+            
+            const coord = new HexCoordinate(0, 0, 0);
+            expect(() => game.placeTile(coord)).toThrow('No tiles remaining in the queue');
+        });
+
+        it('should place tile, call scorer, and generate bonus tiles without explicit ID', () => {
+            let passedIds: (string | undefined)[] = [];
+            
+            class TrackingGenerator implements TileGenerator {
+                createTile(id?: string): Tile {
+                    passedIds.push(id);
+                    return randomGenerator.createTile(id);
+                }
+            }
+
+            const customRules = new GameRules({
+                initialTurns: 1,
+                tileGenerator: new TrackingGenerator(),
+                turnsPerPerfect: 2, // 2 bonus tiles per perfect match
+            });
+
+            const game = Game.create(customRules);
+            
+            // Reset tracking after initial queue generation to test only placeTile
+            passedIds = [];
+
+            // Spy on GameScorer to force a perfect placement return
+            const scoreSpy = vi.spyOn(GameScorer.prototype, 'scorePlacement').mockReturnValue({
+                scoreAdded: 100,
+                perfectCount: 1,
+            });
+
+            const coord = new HexCoordinate(1, 0, -1);
+            const result = game.placeTile(coord);
+
+            expect(result.scoreAdded).toBe(100);
+            expect(result.perfectCount).toBe(1);
+            expect(game.score).toBe(100);
+
+            // We expect 2 bonus tiles to be generated because perfectCount = 1 and turnsPerPerfect = 2
+            expect(passedIds.length).toBe(2);
+            // Both bonus tiles should be generated without an explicit ID so the generator handles uniqueness
+            expect(passedIds[0]).toBeUndefined();
+            expect(passedIds[1]).toBeUndefined();
+
+            scoreSpy.mockRestore();
         });
     });
 });
