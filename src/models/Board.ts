@@ -13,10 +13,14 @@ export class Board {
 
   /**
    * Returns a map of directions to existing neighbor tiles.
+   *
+   * Note: This intentionally accepts a BoardTile rather than a HexCoordinate
+   * to ensure we are finding neighbors relative to a fully contextualized tile
+   * that exists (or is being placed) on the board.
    */
-  getExistingNeighbors(coord: HexCoordinate): Partial<Record<Direction, BoardTile>> {
+  getExistingNeighbors(tile: BoardTile): Partial<Record<Direction, BoardTile>> {
     const results: Partial<Record<Direction, BoardTile>> = {};
-    for (const { direction, coordinate } of getNeighbors(coord)) {
+    for (const { direction, coordinate } of getNeighbors(tile.coordinate)) {
       const neighbor = this.get(coordinate);
       if (neighbor) {
         results[direction] = neighbor;
