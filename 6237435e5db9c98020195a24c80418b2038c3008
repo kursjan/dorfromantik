@@ -1,0 +1,8 @@
+Phase 1 Completion Report (Amended):
+- Routing established with react-router-dom.
+- MainMenu and GameBoard pages created.
+- Existing E2E tests updated to use /game.
+- New E2E test for MainMenu navigation added.
+- Added src/pages/ARCHITECTURE.md.
+- All unit tests and typechecks passing.
+- User verified manually on port 5174.
