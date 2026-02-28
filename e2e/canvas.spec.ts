@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('GameCanvas', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to the app (baseURL is configured in playwright.config.ts)
-    await page.goto('/');
+    await page.goto('/game');
   });
 
   test('should render the canvas', async ({ page }) => {

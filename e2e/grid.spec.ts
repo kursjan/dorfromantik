@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Debug Grid', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/game');
   });
 
   test('should render the debug grid correctly', async ({ page }) => {

@@ -1,23 +1,15 @@
-import { useMemo } from 'react';
-import { CanvasView } from './canvas/components/CanvasView';
-import { Session } from './models/Session';
-import { User } from './models/User';
-import { Game } from './models/Game';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import MainMenu from './pages/MainMenu';
+import { GameBoard } from './pages/GameBoard';
 
 function App() {
-  const session = useMemo(() => {
-    const user = new User('local-player');
-    const game = Game.createStandard();
-    const s = new Session('local-session', user);
-    s.startNewGame(game);
-    return s;
-  }, []);
-
   return (
-    <main>
-      <h1>Dorfromantik</h1>
-      <CanvasView session={session} />
-    </main>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<MainMenu />} />
+        <Route path="/game" element={<GameBoard />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

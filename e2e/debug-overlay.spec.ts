@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('DebugOverlay', () => {
   test.beforeEach(async ({ page }) => {
     // 1. Go to the app
-    await page.goto('/');
+    await page.goto('/game');
     
     // 2. Wait for canvas to be ready
     const canvas = page.locator('canvas[data-testid="game-canvas"]');

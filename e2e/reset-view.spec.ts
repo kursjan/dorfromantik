@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Reset View Button', () => {
   test.beforeEach(async ({ page }) => {
     // Go to the game page
-    await page.goto('/');
+    await page.goto('/game');
     // Wait for the canvas to be ready
     await page.waitForSelector('canvas[data-testid="game-canvas"]');
   });
