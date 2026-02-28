@@ -1,6 +1,6 @@
 import { Board, type BoardTile } from './Board';
 import { GameRules } from './GameRules';
-import { Navigation, type Direction } from './Navigation';
+import { getOpposite, type Direction } from './Navigation';
 
 export interface ScoringResult {
   scoreAdded: number;
@@ -12,8 +12,6 @@ export interface ScoringResult {
  * and perfect placement bonuses.
  */
 export class GameScorer {
-  private navigation = new Navigation();
-
   private rules: GameRules;
 
   constructor(rules: GameRules) {
@@ -29,13 +27,13 @@ export class GameScorer {
    * @returns The scoring result including points added and perfect bonuses.
    */
   scorePlacement(board: Board, placedTile: BoardTile): ScoringResult {
-    const { tile } = placedTile;
+    const { tile, coordinate } = placedTile;
 
     let scoreAdded = 0;
     let perfectCount = 0;
 
     // 1. Identify all neighbors
-    const existingNeighbors = board.getExistingNeighbors(placedTile, this.navigation);
+    const existingNeighbors = board.getExistingNeighbors(coordinate);
 
     // 2. Standard Scoring: matching terrain on adjacent tiles
     for (const [direction, neighbor] of Object.entries(existingNeighbors) as [
@@ -43,7 +41,7 @@ export class GameScorer {
       BoardTile,
     ][]) {
       const myTerrain = tile.getTerrain(direction);
-      const oppositeSide = this.navigation.getOpposite(direction);
+      const oppositeSide = getOpposite(direction);
       const neighborTerrain = neighbor.tile.getTerrain(oppositeSide);
 
       if (myTerrain === neighborTerrain) {
@@ -72,7 +70,7 @@ export class GameScorer {
    * A tile is perfect if it has 6 neighbors and all 6 edges match.
    */
   isPerfect(board: Board, boardTile: BoardTile): boolean {
-    const existing = board.getExistingNeighbors(boardTile, this.navigation);
+    const existing = board.getExistingNeighbors(boardTile.coordinate);
     const directions = Object.keys(existing) as Direction[];
 
     // must have all six neighbors to be perfect
@@ -84,7 +82,7 @@ export class GameScorer {
       const existingNeighbor = existing[direction]!;
 
       const myTerrain = boardTile.tile.getTerrain(direction);
-      const oppositeSide = this.navigation.getOpposite(direction);
+      const oppositeSide = getOpposite(direction);
       const neighborTerrain = existingNeighbor.tile.getTerrain(oppositeSide);
 
       if (myTerrain !== neighborTerrain) {

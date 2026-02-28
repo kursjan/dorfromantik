@@ -2,7 +2,7 @@ import { Board } from './Board';
 import { GameRules } from './GameRules';
 import { Tile } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
-import { Navigation } from './Navigation';
+import { getNeighbors } from './Navigation';
 import { GameScorer } from './GameScorer';
 
 export interface GameProps {
@@ -51,7 +51,6 @@ export class Game {
   score: number;
   tileQueue: Tile[];
 
-  private navigation = new Navigation();
   private scorer: GameScorer;
 
   /**
@@ -123,7 +122,7 @@ export class Game {
     }
 
     // 2. Position must be adjacent to an existing tile
-    const neighbors = this.navigation.getNeighbors(coord);
+    const neighbors = getNeighbors(coord);
     return neighbors.some((neighbor) => this.board.has(neighbor.coordinate));
   }
 

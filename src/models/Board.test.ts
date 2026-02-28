@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { Board } from './Board';
 import { Tile } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
-import { Navigation } from './Navigation';
 
 describe('Board', () => {
   let board: Board;
@@ -62,7 +61,6 @@ describe('Board', () => {
   });
 
   it('should return existing neighbors correctly', () => {
-    const nav = new Navigation();
     const neighborCoord = new HexCoordinate(-1, 0, 1);
     const nonNeighborCoord = new HexCoordinate(2, 0, -2);
 
@@ -70,8 +68,7 @@ describe('Board', () => {
     board.place(tile, neighborCoord); // North of origin
     board.place(tile, nonNeighborCoord); // Far away
 
-    const placedTile = board.get(coord)!;
-    const neighbors = board.getExistingNeighbors(placedTile, nav);
+    const neighbors = board.getExistingNeighbors(coord);
     
     expect(Object.keys(neighbors).length).toBe(1);
     expect(neighbors.north?.coordinate.getKey()).toBe(neighborCoord.getKey());

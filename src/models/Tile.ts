@@ -3,7 +3,7 @@ import type { Direction } from './Navigation';
 export const TERRAIN_TYPES = ['tree', 'house', 'water', 'pasture', 'rail', 'field'] as const;
 export type TerrainType = (typeof TERRAIN_TYPES)[number];
 
-export interface TileProps {
+export interface TileOptions {
   id?: string;
   north?: TerrainType;
   northEast?: TerrainType;
@@ -14,6 +14,8 @@ export interface TileProps {
 }
 
 export class Tile {
+  private static idCounter = 0;
+
   readonly type = 'tile';
   readonly id: string;
   readonly north: TerrainType;
@@ -23,14 +25,14 @@ export class Tile {
   readonly southWest: TerrainType;
   readonly northWest: TerrainType;
 
-  constructor(props: TileProps = {}) {
-    this.id = props.id ?? `tile-${Date.now()}`;
-    this.north = props.north ?? 'pasture';
-    this.northEast = props.northEast ?? 'pasture';
-    this.southEast = props.southEast ?? 'pasture';
-    this.south = props.south ?? 'pasture';
-    this.southWest = props.southWest ?? 'pasture';
-    this.northWest = props.northWest ?? 'pasture';
+  constructor(options: TileOptions = {}) {
+    this.id = options.id ?? `tile-${Date.now()}-${Tile.idCounter++}`;
+    this.north = options.north ?? 'pasture';
+    this.northEast = options.northEast ?? 'pasture';
+    this.southEast = options.southEast ?? 'pasture';
+    this.south = options.south ?? 'pasture';
+    this.southWest = options.southWest ?? 'pasture';
+    this.northWest = options.northWest ?? 'pasture';
   }
 
   /**
@@ -100,7 +102,7 @@ export class Tile {
     return type[0].toUpperCase();
   }
 
-  print(): void {
+  print(): string {
     const terrains = this.getTerrains();
     const n = this.getTerrainChar(terrains.north);
     const ne = this.getTerrainChar(terrains.northEast);
@@ -109,11 +111,11 @@ export class Tile {
     const sw = this.getTerrainChar(terrains.southWest);
     const nw = this.getTerrainChar(terrains.northWest);
 
-    console.log(`Tile ${this.id}:`);
-    console.log(`    _ _`);
-    console.log(`  /  ${n}  \\`);
-    console.log(` /${nw}     ${ne}\\`);
-    console.log(` \\${sw}     ${se}/`);
-    console.log(`  \\ _${s}_ /`);
+    return `Tile ${this.id}:
+    _ _
+  /  ${n}  \\
+ /${nw}     ${ne}\\
+ \\${sw}     ${se}/
+  \\ _${s}_ /`;
   }
 }

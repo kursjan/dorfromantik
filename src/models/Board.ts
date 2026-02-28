@@ -1,6 +1,6 @@
 import { HexCoordinate } from './HexCoordinate';
 import { Tile } from './Tile';
-import type { Navigation, Direction } from './Navigation';
+import { getNeighbors, type Direction } from './Navigation';
 
 export interface BoardTile {
   id: string; // "q,r,s"
@@ -14,9 +14,9 @@ export class Board {
   /**
    * Returns a map of directions to existing neighbor tiles.
    */
-  getExistingNeighbors(tile: BoardTile, navigation: Navigation): Partial<Record<Direction, BoardTile>> {
+  getExistingNeighbors(coord: HexCoordinate): Partial<Record<Direction, BoardTile>> {
     const results: Partial<Record<Direction, BoardTile>> = {};
-    for (const { direction, coordinate } of navigation.getNeighbors(tile.coordinate)) {
+    for (const { direction, coordinate } of getNeighbors(coord)) {
       const neighbor = this.get(coordinate);
       if (neighbor) {
         results[direction] = neighbor;
