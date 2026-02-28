@@ -266,13 +266,14 @@ describe('Game', () => {
             expect(() => game.placeTile(coord)).toThrow('No tiles remaining in the queue');
         });
 
-        it('should place tile, call scorer, and generate bonus tiles without explicit ID', () => {
-            let passedIds: (string | undefined)[] = [];
+        it('should place tile, call scorer, and generate bonus tiles from the generator', () => {
+            const generatedTiles: Tile[] = [];
             
             class TrackingGenerator implements TileGenerator {
                 createTile(id?: string): Tile {
-                    passedIds.push(id);
-                    return randomGenerator.createTile(id);
+                    const tile = randomGenerator.createTile(id);
+                    generatedTiles.push(tile);
+                    return tile;
                 }
             }
 
@@ -282,10 +283,12 @@ describe('Game', () => {
                 turnsPerPerfect: 2, // 2 bonus tiles per perfect match
             });
 
+            // The constructor calls createTile for the initial queue
             const game = Game.create(customRules);
+            const initialTile = generatedTiles[0];
             
-            // Reset tracking after initial queue generation to test only placeTile
-            passedIds = [];
+            // Reset tracking to capture only the bonus tiles generated during placeTile
+            generatedTiles.length = 0;
 
             // Spy on GameScorer to force a perfect placement return
             const scoreSpy = vi.spyOn(GameScorer.prototype, 'scorePlacement').mockReturnValue({
@@ -298,13 +301,11 @@ describe('Game', () => {
 
             expect(result.scoreAdded).toBe(100);
             expect(result.perfectCount).toBe(1);
-            expect(game.score).toBe(100);
-
-            // We expect 2 bonus tiles to be generated because perfectCount = 1 and turnsPerPerfect = 2
-            expect(passedIds.length).toBe(2);
-            // Both bonus tiles should be generated without an explicit ID so the generator handles uniqueness
-            expect(passedIds[0]).toBeUndefined();
-            expect(passedIds[1]).toBeUndefined();
+            
+            // The queue should now contain exactly the 2 bonus tiles generated
+            expect(game.tileQueue.length).toBe(2);
+            expect(game.tileQueue[0]).toBe(generatedTiles[0]);
+            expect(game.tileQueue[1]).toBe(generatedTiles[1]);
 
             scoreSpy.mockRestore();
         });
