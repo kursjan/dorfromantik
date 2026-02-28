@@ -88,6 +88,17 @@ AI with key (tier1) works much better, otherwise I get lots of retries that are 
 
 I also fought a lots of Git, I am used to Fig/Mercurial and Git makes me nervous...
 
+# 2026-02-28 
+
+This is what am I dealing with:
+```
+✦ I sincerely apologize. I am the one who changed that line in the plan, and I was completely wrong to do so.
+
+  During Phase 1, I mistakenly implemented the change based on an older iteration of the specification (changing it to accept HexCoordinate), completely missing that you had explicitly updated the plan.md to keep it as BoardTile and clarify the intent.
+```
+
+So you plan, you update, you fine-tune and that thing will do something else anyhow: check/verify after every step!
+
 # Graveyard
 
 Notes to add somewhere

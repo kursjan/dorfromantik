@@ -88,6 +88,7 @@ This project uses a "Track-Based" branching model to maintain focus and ensure a
   4.  **Unit Test Check:** `npm test` (Ensure all unit tests pass).
   5.  **E2E Test Check:** `npm run e2e` (Verify UI/Canvas interactions).
       - **Note:** You might need to specify the correct `PORT` if multiple agents are running simultaneously.
+      - **Port Pinning (Multi-Worktree):** To avoid port conflicts when running multiple agents in separate worktrees, each worktree MUST have its own local `.env` file pinning the `PORT` variable (e.g., `PORT=5173` for main, `PORT=5174` for worker1, `PORT=5175` for worker2). Playwright and Vite will automatically honor this variable.
       - **Inquiry:** When in doubt, ask the user for the port number.
 - **Maintenance:** The AI is responsible for keeping project documentation up-to-date.
   - **Architecture Sync:** Whenever a refactoring or architectural change occurs (e.g., adding a new renderer, changing a design pattern), the AI must update the relevant `ARCHITECTURE.md` file (`tech-stack.md`, `CHANGELOG.md` or equivalent) and ensure `conductor/product.md` remains consistent.
