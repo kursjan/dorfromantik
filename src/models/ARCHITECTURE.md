@@ -26,7 +26,7 @@ The `Game` class is the central orchestrator of an active session.
 - **State**: Tracks the `Board`, `Score`, and the `TileQueue`.
 - **Turns as Tiles**: The game follows a "Tiles are Turns" philosophy. `remainingTurns` is a derived property of `tileQueue.length`.
 - **Lifecycle**:
-  - **Start**: Typically created via static factory methods: `Game.createStandard()` or `Game.create(rules)`. These methods handle initializing the `Board` and placing the initial "starter" tile at the origin `(0, 0, 0)`.
+  - **Start**: Typically created via static factory methods: `Game.create(rules)`. These methods handle initializing the `Board` and placing the initial "starter" tile at the origin `(0, 0, 0)`.
   - **Active**: Managed within a `Session`.
   - **Logic**:
     - **`isValidPlacement(coord)`**: Checks if a hex is empty and adjacent to at least one existing tile. Used for UI validation and Ghost Preview.

@@ -52,7 +52,7 @@ describe('Game', () => {
         });
         
         it('should create a standard game with a pasture starter tile', () => {
-            const game = Game.createStandard();
+            const game = Game.create(GameRules.createStandard());
             
             expect(game.remainingTurns).toBe(30);
             

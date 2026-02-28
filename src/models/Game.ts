@@ -39,13 +39,6 @@ export class Game {
     });
   }
 
-  /**
-   * Shorthand for creating a game with standard rules.
-   */
-  static createStandard(): Game {
-    return this.create(GameRules.createStandard());
-  }
-
   readonly board: Board;
   readonly rules: GameRules;
   score: number;
@@ -145,7 +138,7 @@ export class Game {
     // Add extra tiles to the queue for perfect placements
     const extraTilesCount = perfectCount * this.rules.turnsPerPerfect;
     for (let i = 0; i < extraTilesCount; i++) {
-      this.tileQueue.push(this.rules.tileGenerator.createTile(`bonus-${Date.now()}-${i}`));
+      this.tileQueue.push(this.rules.tileGenerator.createTile());
     }
 
     this.score += scoreAdded;
@@ -155,7 +148,7 @@ export class Game {
   private generateInitialQueue(): Tile[] {
     const queue: Tile[] = [];
     for (let i = 0; i < this.rules.initialTurns; i++) {
-      queue.push(this.rules.tileGenerator.createTile(`initial-${i}`));
+      queue.push(this.rules.tileGenerator.createTile());
     }
     return queue;
   }

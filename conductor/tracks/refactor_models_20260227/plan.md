@@ -10,13 +10,13 @@ This plan executes the refactoring tasks identified in `REVIEW_FEEDBACK.md`.
 - [ ] **Phase Gate**: Verify core utilities and update tests using **project-orchestrator** skill.
 
 ## Phase 2: Game Logic Cleanup
-- [ ] Clarify `Board.ts` `getExistingNeighbors` that it intentionally accepts `BoardTile` using **task-conductor** skill.
-- [ ] Clean up `GameRules.ts` constructor and fix ID generation in `TileGenerator` implementations using **task-conductor** skill.
-- [ ] Optimize `GameScorer.ts` to use static `Navigation` using **task-conductor** skill.
-- [ ] **Phase Gate**: Verify game logic with unit tests using **project-orchestrator** skill.
+- [x] Clarify `Board.ts` `getExistingNeighbors` that it intentionally accepts `BoardTile` using **task-conductor** skill.
+- [x] Clean up `GameRules.ts` constructor and fix ID generation in `TileGenerator` implementations using **task-conductor** skill.
+- [x] Optimize `GameScorer.ts` to use static `Navigation` using **task-conductor** skill.
+- [x] **Phase Gate**: Verify game logic with unit tests using **project-orchestrator** skill.
 
 ## Phase 3: State Management & Integration
-- [ ] Refactor `Game.ts` to use safe ID generation and remove redundant factory methods using **task-conductor** skill.
-- [ ] Clarify `Session.ts` mutability (remove `readonly` from `games` array) using **task-conductor** skill.
+- [x] Refactor `Game.ts` to use safe ID generation and remove redundant factory methods using **task-conductor** skill.
+- [x] Clarify `Session.ts` mutability (remove `readonly` from `games` array) using **task-conductor** skill.
       - User input: YES, games is meant to be mutable, in sense new tiles are added/removed. I don't know what is the right way to express it in TS.
-- [ ] **Final Track Gate**: Run full test suite and commit changes using **project-orchestrator** skill.
+- [x] **Final Track Gate**: Run full test suite and commit changes using **project-orchestrator** skill.
