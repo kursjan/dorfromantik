@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { GameRules } from './GameRules';
+import { GameRules, RandomTileGenerator } from './GameRules';
 
 describe('GameRules', () => {
   it('should create GameRules with specified values', () => {
@@ -38,5 +38,23 @@ describe('GameRules', () => {
 
   it('should throw error if turnsPerPerfect is negative', () => {
     expect(() => new GameRules({ turnsPerPerfect: -1 })).toThrow('turnsPerPerfect must be non-negative');
+  });
+});
+
+describe('RandomTileGenerator', () => {
+  it('should generate unique IDs', () => {
+    const generator = new RandomTileGenerator();
+    const tile1 = generator.createTile();
+    const tile2 = generator.createTile();
+    
+    expect(tile1.id).not.toBe(tile2.id);
+    expect(tile1.id).toMatch(/^tile-gen-\d+-[a-z0-9]{6}$/);
+    expect(tile2.id).toMatch(/^tile-gen-\d+-[a-z0-9]{6}$/);
+  });
+  
+  it('should use provided ID if supplied', () => {
+    const generator = new RandomTileGenerator();
+    const tile = generator.createTile('custom-id');
+    expect(tile.id).toBe('custom-id');
   });
 });
