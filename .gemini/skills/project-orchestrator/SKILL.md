@@ -9,7 +9,16 @@ description: Use this skill when transitioning between phases or finalizing a tr
 1. **Consistency Check**: Review all modified files against and update `ARCHITECTURE.md`, `change-log.md`, `tech-stack.md` and other relevant documentation to ensure they reflect the current state of the project.
 2. **Verify Tasks**: Ensure all tasks in the current phase are marked as done.
 3. **Test Plan**: Propose a detailed manual test plan for user review.
-4. **Checkpoint Commit**: Create a commit with the message `Checkpoint end of Phase X: [summary of changes]`.
+4. **Checkpoint Commit**: Create a final commit to finalize the phase and capture any remaining state updates (e.g., updates to `plan.md`). 
+   - Execute the following exact commands to create the checkpoint:
+     ```bash
+     git add .
+     git commit -m "Checkpoint end of Phase X: [summary of changes]"
+     ```
+   - If there are no uncommitted changes, use the following to mark the phase boundary:
+     ```bash
+     git commit --allow-empty -m "Checkpoint end of Phase X: [summary of changes]"
+     ```
 5. **Verification Report**: Attach the results of auto-tests + manual plan + user confirmation to the checkpoint commit using `git notes add -m "<report>"`.
 6. **State Sync**: 
    - Update the `plan.md` or track file to reflect the completed phase.
