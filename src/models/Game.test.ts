@@ -267,45 +267,44 @@ describe('Game', () => {
         });
 
         it('should place tile, call scorer, and generate bonus tiles from the generator', () => {
-            const generatedTiles: Tile[] = [];
-            
-            class TrackingGenerator implements TileGenerator {
-                createTile(id?: string): Tile {
-                    const tile = randomGenerator.createTile(id);
-                    generatedTiles.push(tile);
-                    return tile;
-                }
-            }
+            // 1. Define the exact tiles we expect the generator to yield
+            const initialTile = randomGenerator.createTile('initial-tile');
+            const expectedBonus1 = randomGenerator.createTile('bonus-1');
+            const expectedBonus2 = randomGenerator.createTile('bonus-2');
 
+            // 2. Configure rules to use a SequenceTileGenerator that will return exactly those tiles in order
             const customRules = new GameRules({
                 initialTurns: 1,
-                tileGenerator: new TrackingGenerator(),
+                tileGenerator: new SequenceTileGenerator([initialTile, expectedBonus1, expectedBonus2]),
                 turnsPerPerfect: 2, // 2 bonus tiles per perfect match
             });
 
-            // The constructor calls createTile for the initial queue
+            // 3. Create the game. This consumes 'initialTile' to fill the initial queue of size 1.
             const game = Game.create(customRules);
-            const initialTile = generatedTiles[0];
             
-            // Reset tracking to capture only the bonus tiles generated during placeTile
-            generatedTiles.length = 0;
+            // Verify initial state
+            expect(game.tileQueue.length).toBe(1);
+            expect(game.tileQueue[0]).toBe(initialTile);
 
-            // Spy on GameScorer to force a perfect placement return
+            // Spy on GameScorer to force a perfect placement return without having to set up the board perfectly
             const scoreSpy = vi.spyOn(GameScorer.prototype, 'scorePlacement').mockReturnValue({
                 scoreAdded: 100,
                 perfectCount: 1,
             });
 
             const coord = new HexCoordinate(1, 0, -1);
+            
+            // 4. Place the tile. This removes 'initialTile' from the queue, places it, 
+            // and asks the generator for 2 new bonus tiles (perfectCount: 1 * turnsPerPerfect: 2).
             const result = game.placeTile(coord);
 
             expect(result.scoreAdded).toBe(100);
             expect(result.perfectCount).toBe(1);
             
-            // The queue should now contain exactly the 2 bonus tiles generated
+            // 5. Verify the queue now contains exactly the expected bonus tiles in order
             expect(game.tileQueue.length).toBe(2);
-            expect(game.tileQueue[0]).toBe(generatedTiles[0]);
-            expect(game.tileQueue[1]).toBe(generatedTiles[1]);
+            expect(game.tileQueue[0]).toBe(expectedBonus1);
+            expect(game.tileQueue[1]).toBe(expectedBonus2);
 
             scoreSpy.mockRestore();
         });
