@@ -1,0 +1,1 @@
+Refactored HexCoordinate to explicitly use Cube coordinates and documented why axial helpers are omitted. Converted Navigation to a functional utility by exporting loose functions, improving tree-shakability and reducing verbosity. Updated all consumers (Board, Game, GameScorer and tests) to use the new functional Navigation API.
