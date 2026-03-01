@@ -36,6 +36,8 @@ To create a relaxing, puzzle-like experience for casual gamers where they can bu
 
 ### System Architecture
 - **Frontend:** React (Vite) + TypeScript.
+- **Routing:** Centralized navigation using `react-router-dom`.
+- **State Management:** Centralized `SessionContext` for cross-page data persistence.
 - **Canvas Engine:** Custom Controller Pattern (Decoupled from React).
   - **Pattern:** `React Component` -> `CanvasController` -> `Renderers` / `InputManager`.
   - **Documentation:** See **[src/canvas/ARCHITECTURE.md](./src/canvas/ARCHITECTURE.md)**.
@@ -68,6 +70,14 @@ The project roadmap is managed via **Conductor**. See **[conductor/tracks.md](./
   - **Debug Overlay:** React-based overlay (F3) displaying FPS, Camera stats (Zoom/Rotation), and Hex coordinates.
   - **Reset Camera Button:** Added a polished UI component with Storybook stories and E2E verification.
   - **Tile Rotation:** Full support for rotating tiles in the queue using Keyboard (R/F) and Mouse (Right-Click).
+- [x] **Main Menu & Routing:**
+  - Dedicated Main Menu with a high-contrast glassmorphism aesthetic.
+  - Routing between the Menu and the Game Board using `react-router-dom`.
+  - Centralized session management to persist game state during navigation.
+- [x] **Polished UI Components:**
+  - `GameCard`: Modern display for saved game sessions with hover effects.
+  - `SettingsModal`: Interactive overlay for game configurations.
+  - Full visual verification and isolation using Storybook.
 - [x] **Testing & Infrastructure:**
   - Configured Playwright for Vite + Nix environment.
   - Set up Prettier (`npm run format`) and Path Aliases (`@/*`).

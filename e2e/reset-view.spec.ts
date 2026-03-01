@@ -1,11 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { startStandardGame } from './test-utils';
 
 test.describe('Reset View Button', () => {
   test.beforeEach(async ({ page }) => {
-    // Go to the game page
-    await page.goto('/');
-    // Wait for the canvas to be ready
-    await page.waitForSelector('canvas[data-testid="game-canvas"]');
+    await startStandardGame(page);
   });
 
   test('should be visible and reset the camera after panning', async ({ page }) => {

@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { startStandardGame } from './test-utils';
 
 test.describe('GameHUD', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await startStandardGame(page);
   });
 
   test('should display initial score and turns', async ({ page }) => {

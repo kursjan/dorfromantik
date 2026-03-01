@@ -1,0 +1,122 @@
+.settings-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.settings-modal {
+  --color-forest-green: #2d5a27;
+  --color-parchment: #f4ead5;
+  --color-sky-blue: #87ceeb;
+
+  background: rgba(244, 234, 213, 0.98);
+  width: 100%;
+  max-width: 500px;
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 40px rgba(45, 90, 39, 0.1);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.settings-modal__header {
+  margin-bottom: 32px;
+  border-bottom: 2px solid rgba(45, 90, 39, 0.1);
+  padding-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.settings-modal__title {
+  margin: 0;
+  font-size: 1.8rem;
+  color: var(--color-forest-green);
+  font-weight: 700;
+}
+
+.settings-modal__content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.settings-modal__section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settings-modal__section-title {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #7a7a7a;
+  font-weight: 700;
+}
+
+.settings-modal__footer {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.settings-modal__close-btn {
+  background: var(--color-forest-green);
+  color: white;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+  box-shadow: 0 4px 12px rgba(45, 90, 39, 0.3);
+}
+
+.settings-modal__close-btn:hover {
+  background: #3e7a36;
+  transform: scale(1.05);
+}
+
+.settings-modal__close-btn:active {
+  transform: scale(0.98);
+}
+
+/* Decorative element */
+.settings-modal::before {
+  content: '';
+  position: absolute;
+  bottom: -30px;
+  left: -30px;
+  width: 100px;
+  height: 100px;
+  background: var(--color-sky-blue);
+  opacity: 0.15;
+  border-radius: 50%;
+  filter: blur(30px);
+}
+
+/* Placeholder for actual settings */
+.settings-placeholder {
+  background: rgba(255, 255, 255, 0.4);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px dashed #ccc;
+  color: #888;
+  font-style: italic;
+  text-align: center;
+}

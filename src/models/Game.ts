@@ -6,6 +6,9 @@ import { getNeighbors } from './Navigation';
 import { GameScorer } from './GameScorer';
 
 export interface GameProps {
+  id?: string;
+  name?: string;
+  lastPlayed?: string;
   board: Board;
   rules: GameRules;
   score?: number;
@@ -41,6 +44,9 @@ export class Game {
 
   readonly board: Board;
   readonly rules: GameRules;
+  readonly id: string;
+  readonly name: string;
+  lastPlayed: string;
   score: number;
   tileQueue: Tile[];
 
@@ -51,6 +57,9 @@ export class Game {
    * @param props - Properties to initialize the game state.
    */
   constructor(props: GameProps) {
+    this.id = props.id ?? `game-${Date.now()}`;
+    this.name = props.name ?? 'New Journey';
+    this.lastPlayed = props.lastPlayed ?? new Date().toISOString();
     this.board = props.board;
     this.rules = props.rules;
     this.score = props.score ?? 0;
@@ -142,6 +151,7 @@ export class Game {
     }
 
     this.score += scoreAdded;
+    this.lastPlayed = new Date().toISOString();
     return { scoreAdded, perfectCount };
   }
 

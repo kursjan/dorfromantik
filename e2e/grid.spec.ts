@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { startStandardGame } from './test-utils';
 
 test.describe('Debug Grid', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await startStandardGame(page);
   });
 
   test('should render the debug grid correctly', async ({ page }) => {
