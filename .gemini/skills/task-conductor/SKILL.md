@@ -4,7 +4,7 @@ description: Use this skill for any coding or implementation task defined in a C
 ---
 
 ## Methodology
-0. **Verify Git Branch**: Never develop on main. Reuse suitable branch or create a new one.
+0. **Verify Git Branch**: Never develop on main. Reuse a suitable branch or create a new one. If a new branch is created, immediately push it to the remote with `git push -u origin HEAD` to ensure it is tracked by GitHub and Reviewable.
 0. **Task Selection**: Always select the next uncompleted task from the current phase in `conductor/tracks/<track_id>/plan.md` and mark it as selected.
 1. **Execution**: Perform the requested code changes using available tools.
 2. **Quality Gate Verification**:

@@ -99,11 +99,22 @@ This is what am I dealing with:
 
 So you plan, you update, you fine-tune and that thing will do something else anyhow: check/verify after every step!
 
+Implementation of https://github.com/kursjan/dorfromantik/issues/36, [plan](https://github.com/kursjan/dorfromantik/blob/main/conductor/archive/refactor_models_20260227/plan.md) was like. The workflow is: wait for approval after every task, do commit and wait for approval after every phase:
+Phase 1
+- I created branch. Approve.
+- I changed a single line in a file: Approve
+- ...
+- Phase 1 commited. Approve
+...
+...
+Phase 3:
+... I implemented phase 3, changed the plan, installed new depenedency, also refactored code acording to legacy and invalid document, reverted your changes, commited the track to main and I just started working on antoher track...
+
 # Graveyard
 
 Notes to add somewhere
 
-- Agent tends to run wild and do much more
+- Agent tends to run wild and do much moreG
   - I have to keep it reminded to do only work I ask it to do
   - Non coding example, fresh start, fresh context: update readme file, journal entries to fix my englis
     - results in updates in the whole file. One has to ask several times to keep the scope minimal, not to reorganize stuff

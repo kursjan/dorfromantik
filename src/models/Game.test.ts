@@ -7,7 +7,7 @@ import {
 } from 'vitest';
 import {Game} from './Game';
 import {Board} from './Board';
-import {GameRules, RandomTileGenerator, SequenceTileGenerator, TileGenerator} from './GameRules';
+import {GameRules, RandomTileGenerator, SequenceTileGenerator} from './GameRules';
 import {Tile} from './Tile';
 import {HexCoordinate} from './HexCoordinate';
 import {GameScorer} from './GameScorer';
