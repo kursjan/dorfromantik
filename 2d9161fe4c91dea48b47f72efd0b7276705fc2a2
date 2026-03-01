@@ -1,0 +1,10 @@
+Phase 3 Verification Report:
+- Unit Tests: 153 passed.
+- Manual Test Plan:
+  1. Main Menu Layout: Verify the two-column layout with sidebar and game list.
+  2. Aesthetics: Confirm Pure Parchment background with Forest Green text/buttons.
+  3. Interactivity: Verify Settings button toggles the modal.
+  4. Interactivity: Verify Standard/Test Game buttons navigate to /game.
+  5. Interactivity: Verify Logout button hover effect.
+  6. Scrolling: Ensure the game list scrolls smoothly if overflow occurs.
+- Checkpoint SHA: 2d9161f
