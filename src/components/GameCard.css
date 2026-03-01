@@ -5,28 +5,34 @@
   --color-sky-blue: #87ceeb;
 
   cursor: pointer;
-  width: 280px;
-  padding: 24px;
-  border-radius: 20px;
+  width: 100%;
+  max-width: 320px;
+  padding: 20px;
+  border-radius: 16px;
   background: var(--color-parchment);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.4);
   box-shadow: 
-    0 10px 30px rgba(45, 90, 39, 0.15),
-    0 1px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    0 4px 12px rgba(45, 90, 39, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
+              box-shadow 0.3s ease, 
+              background-color 0.3s ease;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #3e3e3e;
   position: relative;
   overflow: hidden;
+  /* Fix for rough edges during transform */
+  backface-visibility: hidden;
+  -webkit-font-smoothing: subpixel-antialiased;
 }
 
 .game-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-4px) scale(1.02);
   box-shadow: 
-    0 20px 40px rgba(45, 90, 39, 0.25),
-    0 1px 12px rgba(0, 0, 0, 0.1);
+    0 12px 24px rgba(45, 90, 39, 0.2),
+    0 1px 8px rgba(0, 0, 0, 0.1);
   background: rgba(244, 234, 213, 0.95);
 }
 

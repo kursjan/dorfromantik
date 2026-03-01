@@ -13,8 +13,8 @@ describe('App', () => {
   it('renders start game button and navigates to game canvas', async () => {
     render(<App />);
     
-    // Check for Start Game button
-    const startButton = screen.getByRole('button', { name: /Start Game/i });
+    // Check for Standard Game button
+    const startButton = screen.getByRole('button', { name: /Standard Game/i });
     expect(startButton).toBeInTheDocument();
     
     // Click the button to navigate
