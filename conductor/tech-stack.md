@@ -5,6 +5,8 @@ This document defines the core technologies, architectural patterns, and quality
 ## Core Language & Frameworks
 - **Language:** [TypeScript](https://www.typescriptlang.org/) (Strict Mode enabled)
 - **Frontend Framework:** [React 19](https://react.dev/) (Functional components with Hooks)
+- **Routing:** [React Router 7](https://reactrouter.com/)
+- **State Management:** React Context API (Centralized Session management)
 - **Runtime Optimization:** React Compiler (Enabled by default for automatic memoization)
 - **Build Tool:** [Vite](https://vitejs.dev/)
 
