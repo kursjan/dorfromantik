@@ -11,15 +11,15 @@
 - [x] **Phase Gate**: User manually verifies the barebones menu routes to the game successfully using **project-orchestrator** skill. [checkpoint: 6237435e5db9c98020195a24c80418b2038c3008]
 
 
-## Phase 2: Component Driven Development (Storybook)
-- [ ] Setup a new story file `src/components/GameCard.stories.tsx` using **task-conductor** skill.
-- [ ] Implement `src/components/GameCard.tsx` to match the visual requirements (Forest Green/Parchment styling,
+## Phase 2: Component Driven Development (Storybook) [checkpoint: 1be8100]
+- [x] Setup a new story file `src/components/GameCard.stories.tsx` using **task-conductor** skill.
+- [x] Implement `src/components/GameCard.tsx` to match the visual requirements (Forest Green/Parchment styling,
       glassmorphism) and verify it in Storybook using **task-conductor** skill.
-- [ ] Setup a new story file `src/components/SettingsModal.stories.tsx` using **task-conductor** skill.
-- [ ] Implement `src/components/SettingsModal.tsx` to match the visual requirements and verify it in Storybook
+- [x] Setup a new story file `src/components/SettingsModal.stories.tsx` using **task-conductor** skill.
+- [x] Implement `src/components/SettingsModal.tsx` to match the visual requirements and verify it in Storybook
       using **task-conductor** skill.
-- [ ] **Phase Gate**: Verify the standalone UI components render correctly and interactively in the Storybook
-      preview using **project-orchestrator** skill.
+- [x] **Phase Gate**: Verify the standalone UI components render correctly and interactively in the Storybook
+      preview using **project-orchestrator** skill. [checkpoint: 1be8100]
 
 ## Phase 3: Main Menu UI Implementation
 - [ ] Create `src/components/GameCard.tsx` and a placeholder `src/components/SettingsModal.tsx` using **task-conductor** skill.
