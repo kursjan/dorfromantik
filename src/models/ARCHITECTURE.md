@@ -6,6 +6,7 @@ This directory contains the core data structures and business logic for the Dorf
 
 ### 1. Hexagonal Coordinate System (`HexCoordinate.ts`, `Navigation.ts`)
 - **`HexCoordinate`**: Uses a Cube Coordinate system (q, r, s) where `q + r + s = 0`.
+  - **Why not Axial?**: To maintain strict coordinate validation and improve readability, we explicitly use all three coordinates. A `fromAxial(q, r)` helper is deliberately not provided.
 - **`Navigation`**: Provides geometric operations for finding neighbors and opposite sides. 
   - **Orientation**: Flat-top hexagons.
   - **North**: defined as `(-1, 0, 1)`.
@@ -25,7 +26,7 @@ The `Game` class is the central orchestrator of an active session.
 - **State**: Tracks the `Board`, `Score`, and the `TileQueue`.
 - **Turns as Tiles**: The game follows a "Tiles are Turns" philosophy. `remainingTurns` is a derived property of `tileQueue.length`.
 - **Lifecycle**:
-  - **Start**: Typically created via static factory methods: `Game.createStandard()` or `Game.create(rules)`. These methods handle initializing the `Board` and placing the initial "starter" tile at the origin `(0, 0, 0)`.
+  - **Start**: Typically created via static factory methods: `Game.create(rules)`. These methods handle initializing the `Board` and placing the initial "starter" tile at the origin `(0, 0, 0)`.
   - **Active**: Managed within a `Session`.
   - **Logic**:
     - **`isValidPlacement(coord)`**: Checks if a hex is empty and adjacent to at least one existing tile. Used for UI validation and Ghost Preview.

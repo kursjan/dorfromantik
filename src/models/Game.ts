@@ -2,7 +2,7 @@ import { Board } from './Board';
 import { GameRules } from './GameRules';
 import { Tile } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
-import { Navigation } from './Navigation';
+import { getNeighbors } from './Navigation';
 import { GameScorer } from './GameScorer';
 
 export interface GameProps {
@@ -42,13 +42,6 @@ export class Game {
     });
   }
 
-  /**
-   * Shorthand for creating a game with standard rules.
-   */
-  static createStandard(): Game {
-    return this.create(GameRules.createStandard());
-  }
-
   readonly board: Board;
   readonly rules: GameRules;
   readonly id: string;
@@ -57,7 +50,6 @@ export class Game {
   score: number;
   tileQueue: Tile[];
 
-  private navigation = new Navigation();
   private scorer: GameScorer;
 
   /**
@@ -132,7 +124,7 @@ export class Game {
     }
 
     // 2. Position must be adjacent to an existing tile
-    const neighbors = this.navigation.getNeighbors(coord);
+    const neighbors = getNeighbors(coord);
     return neighbors.some((neighbor) => this.board.has(neighbor.coordinate));
   }
 
@@ -155,7 +147,7 @@ export class Game {
     // Add extra tiles to the queue for perfect placements
     const extraTilesCount = perfectCount * this.rules.turnsPerPerfect;
     for (let i = 0; i < extraTilesCount; i++) {
-      this.tileQueue.push(this.rules.tileGenerator.createTile(`bonus-${Date.now()}-${i}`));
+      this.tileQueue.push(this.rules.tileGenerator.createTile());
     }
 
     this.score += scoreAdded;
@@ -166,7 +158,7 @@ export class Game {
   private generateInitialQueue(): Tile[] {
     const queue: Tile[] = [];
     for (let i = 0; i < this.rules.initialTurns; i++) {
-      queue.push(this.rules.tileGenerator.createTile(`initial-${i}`));
+      queue.push(this.rules.tileGenerator.createTile());
     }
     return queue;
   }

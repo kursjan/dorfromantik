@@ -3,12 +3,14 @@ import {
     it,
     expect,
     beforeEach,
+    vi,
 } from 'vitest';
 import {Game} from './Game';
 import {Board} from './Board';
 import {GameRules, RandomTileGenerator, SequenceTileGenerator} from './GameRules';
 import {Tile} from './Tile';
 import {HexCoordinate} from './HexCoordinate';
+import {GameScorer} from './GameScorer';
 // Add missing tests: https://github.com/kursjan/dorfromantik/issues/35
 describe('Game', () => {
     let board: Board;
@@ -52,7 +54,7 @@ describe('Game', () => {
         });
         
         it('should create a standard game with a pasture starter tile', () => {
-            const game = Game.createStandard();
+            const game = Game.create(GameRules.createStandard());
             
             expect(game.remainingTurns).toBe(30);
             
@@ -245,6 +247,66 @@ describe('Game', () => {
                 rules: customRules,
             });
             expect(() => game.rotateQueuedTileClockwise()).toThrow('No tiles remaining in the queue');
+        });
+    });
+
+    describe('placeTile', () => {
+        it('should throw error if queue is empty', () => {
+            const customRules = new GameRules({
+                initialTurns: 0,
+                tileGenerator: new SequenceTileGenerator([]),
+            });
+            
+            const game = new Game({
+                board,
+                rules: customRules,
+            });
+            
+            const coord = new HexCoordinate(0, 0, 0);
+            expect(() => game.placeTile(coord)).toThrow('No tiles remaining in the queue');
+        });
+
+        it('should place tile, call scorer, and generate bonus tiles from the generator', () => {
+            // 1. Define the exact tiles we expect the generator to yield
+            const initialTile = randomGenerator.createTile('initial-tile');
+            const expectedBonus1 = randomGenerator.createTile('bonus-1');
+            const expectedBonus2 = randomGenerator.createTile('bonus-2');
+
+            // 2. Configure rules to use a SequenceTileGenerator that will return exactly those tiles in order
+            const customRules = new GameRules({
+                initialTurns: 1,
+                tileGenerator: new SequenceTileGenerator([initialTile, expectedBonus1, expectedBonus2]),
+                turnsPerPerfect: 2, // 2 bonus tiles per perfect match
+            });
+
+            // 3. Create the game. This consumes 'initialTile' to fill the initial queue of size 1.
+            const game = Game.create(customRules);
+            
+            // Verify initial state
+            expect(game.tileQueue.length).toBe(1);
+            expect(game.tileQueue[0]).toBe(initialTile);
+
+            // Spy on GameScorer to force a perfect placement return without having to set up the board perfectly
+            const scoreSpy = vi.spyOn(GameScorer.prototype, 'scorePlacement').mockReturnValue({
+                scoreAdded: 100,
+                perfectCount: 1,
+            });
+
+            const coord = new HexCoordinate(1, 0, -1);
+            
+            // 4. Place the tile. This removes 'initialTile' from the queue, places it, 
+            // and asks the generator for 2 new bonus tiles (perfectCount: 1 * turnsPerPerfect: 2).
+            const result = game.placeTile(coord);
+
+            expect(result.scoreAdded).toBe(100);
+            expect(result.perfectCount).toBe(1);
+            
+            // 5. Verify the queue now contains exactly the expected bonus tiles in order
+            expect(game.tileQueue.length).toBe(2);
+            expect(game.tileQueue[0]).toBe(expectedBonus1);
+            expect(game.tileQueue[1]).toBe(expectedBonus2);
+
+            scoreSpy.mockRestore();
         });
     });
 });

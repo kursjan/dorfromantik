@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { hexToPixel, pixelToHex, getHexCorners } from './HexUtils';
 import { HexCoordinate } from '../../models/HexCoordinate';
-import { Navigation } from '../../models/Navigation';
+import { north, northEast, southEast, south, southWest, northWest } from '../../models/Navigation';
 
 describe('HexUtils', () => {
   const center = new HexCoordinate(0, 0, 0);
@@ -16,8 +16,8 @@ describe('HexUtils', () => {
     });
 
     it('converts North neighbor (-1, 0, 1) to (0, -size * sqrt(3))', () => {
-      const north = Navigation.north(center);
-      const { x, y } = hexToPixel(north, HEX_SIZE);
+      const northCoord = north(center);
+      const { x, y } = hexToPixel(northCoord, HEX_SIZE);
 
       const expectedY = -HEX_SIZE * SQRT3;
 
@@ -26,8 +26,8 @@ describe('HexUtils', () => {
     });
 
     it('converts South neighbor (1, 0, -1) to (0, size * sqrt(3))', () => {
-      const south = Navigation.south(center);
-      const { x, y } = hexToPixel(south, HEX_SIZE);
+      const southCoord = south(center);
+      const { x, y } = hexToPixel(southCoord, HEX_SIZE);
 
       const expectedY = HEX_SIZE * SQRT3;
 
@@ -36,7 +36,7 @@ describe('HexUtils', () => {
     });
 
     it('converts North-East neighbor (-1, 1, 0) to (size * 1.5, -size * sqrt(3)/2)', () => {
-      const ne = Navigation.northEast(center);
+      const ne = northEast(center);
       const { x, y } = hexToPixel(ne, HEX_SIZE);
 
       const expectedX = HEX_SIZE * 1.5;
@@ -47,7 +47,7 @@ describe('HexUtils', () => {
     });
 
     it('converts South-West neighbor (1, -1, 0) to (-size * 1.5, size * sqrt(3)/2)', () => {
-      const sw = Navigation.southWest(center);
+      const sw = southWest(center);
       const { x, y } = hexToPixel(sw, HEX_SIZE);
 
       const expectedX = -HEX_SIZE * 1.5;
@@ -58,7 +58,7 @@ describe('HexUtils', () => {
     });
 
     it('converts South-East neighbor (0, 1, -1) to (size * 1.5, size * sqrt(3)/2)', () => {
-      const se = Navigation.southEast(center);
+      const se = southEast(center);
       const { x, y } = hexToPixel(se, HEX_SIZE);
 
       const expectedX = HEX_SIZE * 1.5;
@@ -69,7 +69,7 @@ describe('HexUtils', () => {
     });
 
     it('converts North-West neighbor (0, -1, 1) to (-size * 1.5, -size * sqrt(3)/2)', () => {
-      const nw = Navigation.northWest(center);
+      const nw = northWest(center);
       const { x, y } = hexToPixel(nw, HEX_SIZE);
 
       const expectedX = -HEX_SIZE * 1.5;
@@ -89,7 +89,7 @@ describe('HexUtils', () => {
     });
 
     it('handles rounding correctly for points inside a hex', () => {
-      const target = Navigation.north(center);
+      const target = north(center);
       const centerPixel = hexToPixel(target, HEX_SIZE);
 
       const result = pixelToHex(centerPixel.x + 5, centerPixel.y + 5, HEX_SIZE);
@@ -98,12 +98,12 @@ describe('HexUtils', () => {
 
     it('round trips correctly for all neighbors', () => {
       const neighbors = [
-        Navigation.north(center),
-        Navigation.south(center),
-        Navigation.northEast(center),
-        Navigation.southEast(center),
-        Navigation.southWest(center),
-        Navigation.northWest(center),
+        north(center),
+        south(center),
+        northEast(center),
+        southEast(center),
+        southWest(center),
+        northWest(center),
       ];
 
       neighbors.forEach((neighbor) => {
@@ -151,8 +151,8 @@ describe('HexUtils', () => {
     const CUSTOM_SIZE = 10;
 
     it('calculates pixel position correctly with different size', () => {
-      const north = Navigation.north(center);
-      const { x, y } = hexToPixel(north, CUSTOM_SIZE);
+      const northCoord = north(center);
+      const { x, y } = hexToPixel(northCoord, CUSTOM_SIZE);
 
       // For size 10, North should be at (0, -10 * sqrt(3)) = (0, -17.32)
       const expectedY = -CUSTOM_SIZE * SQRT3;
@@ -165,7 +165,7 @@ describe('HexUtils', () => {
     });
 
     it('round trips correctly with different size', () => {
-      const target = Navigation.southEast(center);
+      const target = southEast(center);
       const { x, y } = hexToPixel(target, CUSTOM_SIZE);
       const result = pixelToHex(x, y, CUSTOM_SIZE);
 

@@ -3,6 +3,18 @@ export class HexCoordinate {
   readonly r: number;
   readonly s: number;
 
+  /**
+   * Creates a new HexCoordinate using the Cube Coordinate system (q, r, s).
+   *
+   * **Note:** We deliberately avoid using an `axial` factory helper (q, r)
+   * to ensure that the zero-sum invariant (`q + r + s = 0`) is explicitly
+   * defined and validated by the caller. This improves code readability
+   * and prevents "magic" coordinate derivation.
+   *
+   * @param q The column coordinate.
+   * @param r The row coordinate.
+   * @param s The third coordinate (must be equal to -q - r).
+   */
   constructor(q: number, r: number, s: number) {
     if (!Number.isInteger(q) || !Number.isInteger(r) || !Number.isInteger(s)) {
       throw new Error(`Invalid HexCoordinate: ${q},${r},${s}. Coordinates must be integers.`);

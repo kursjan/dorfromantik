@@ -7,7 +7,7 @@ import { Game } from './Game';
 export class Session {
   readonly sessionId: string;
   readonly user: User;
-  readonly games: Game[];
+  games: Game[];
   activeGame?: Game;
 
   /**

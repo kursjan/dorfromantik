@@ -61,26 +61,6 @@ export class GameRules {
     });
   }
 
-  /**
-   * Creates a GameRules instance configured for a "test game" mode.
-   * Uses an options object so callers can use named-style arguments.
-   * 
-   * @deprecated
-   */
-  static create(options: GameRulesOptions = {}): GameRules {
-    return new GameRules({
-      // Base defaults for test game
-      initialTurns: 10,
-      pointsPerMatch: 10,
-      pointsPerPerfect: 60,
-      turnsPerPerfect: 1,
-      initialTileGenerator: new PastureTileGenerator(),
-      tileGenerator: new RandomTileGenerator(),
-      // Allow overrides via "named" options
-      ...options,
-    });
-  }
-
   createInitialTile(id: string = 'start-tile'): Tile {
     return this.initialTileGenerator.createTile(id);
   }
@@ -97,7 +77,7 @@ export interface TileGenerator {
  * Tile generator implementation for a standard all-pasture tile.
  */
 export class PastureTileGenerator implements TileGenerator {
-  createTile(id: string = 'start-tile'): Tile {
+  createTile(id?: string): Tile {
     return new Tile({
       id,
       north: 'pasture',
@@ -111,9 +91,12 @@ export class PastureTileGenerator implements TileGenerator {
 }
 
 export class RandomTileGenerator implements TileGenerator {
-  createTile(id: string = this.generateId()): Tile {
+  private static counter = 0;
+
+  createTile(id?: string): Tile {
+    const finalId = id ?? this.generateId();
     return new Tile({
-      id,
+      id: finalId,
       north: this.getRandomTerrain(),
       northEast: this.getRandomTerrain(),
       southEast: this.getRandomTerrain(),
@@ -129,14 +112,13 @@ export class RandomTileGenerator implements TileGenerator {
   }
 
   /**
-   * Generates a unique tile ID using the current timestamp and a random alphanumeric string.
-   * This helps ensure that each tile created has a distinct identifier.
-   * @returns A unique string ID for a tile, e.g. "tile-1670918234567-xk8p2f"
+   * Generates a unique tile ID using a counter and a random alphanumeric string.
+   * This helps ensure that each tile created has a distinct identifier without relying on Date.now().
+   * @returns A unique string ID for a tile, e.g. "tile-gen-42-xk8p2f"
    */
   private generateId(): string {
-    const timestamp = Date.now();
     const randomPart = Math.random().toString(36).slice(2, 8);
-    return `tile-${timestamp}-${randomPart}`;
+    return `tile-gen-${RandomTileGenerator.counter++}-${randomPart}`;
   }
 }
 

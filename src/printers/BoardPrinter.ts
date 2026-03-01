@@ -23,7 +23,10 @@ export class BoardPrinter {
     }
 
     const output = canvas.toString();
-    console.log(output);
     return output;
+  }
+
+  printToConsole(board: Board): void {
+    console.log(this.print(board));
   }
 }

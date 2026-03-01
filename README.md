@@ -88,11 +88,33 @@ AI with key (tier1) works much better, otherwise I get lots of retries that are 
 
 I also fought a lots of Git, I am used to Fig/Mercurial and Git makes me nervous...
 
+# 2026-02-28 
+
+This is what am I dealing with:
+```
+✦ I sincerely apologize. I am the one who changed that line in the plan, and I was completely wrong to do so.
+
+  During Phase 1, I mistakenly implemented the change based on an older iteration of the specification (changing it to accept HexCoordinate), completely missing that you had explicitly updated the plan.md to keep it as BoardTile and clarify the intent.
+```
+
+So you plan, you update, you fine-tune and that thing will do something else anyhow: check/verify after every step!
+
+Implementation of https://github.com/kursjan/dorfromantik/issues/36, [plan](https://github.com/kursjan/dorfromantik/blob/main/conductor/archive/refactor_models_20260227/plan.md) was like. The workflow is: wait for approval after every task, do commit and wait for approval after every phase:
+Phase 1
+- I created branch. Approve.
+- I changed a single line in a file: Approve
+- ...
+- Phase 1 commited. Approve
+...
+...
+Phase 3:
+... I implemented phase 3, changed the plan, installed new depenedency, also refactored code acording to legacy and invalid document, reverted your changes, commited the track to main and I just started working on antoher track...
+
 # Graveyard
 
 Notes to add somewhere
 
-- Agent tends to run wild and do much more
+- Agent tends to run wild and do much moreG
   - I have to keep it reminded to do only work I ask it to do
   - Non coding example, fresh start, fresh context: update readme file, journal entries to fix my englis
     - results in updates in the whole file. One has to ask several times to keep the scope minimal, not to reorganize stuff
