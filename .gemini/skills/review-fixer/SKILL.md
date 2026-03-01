@@ -23,11 +23,13 @@ Automatically address code review feedback left on the current pull request by m
    - Stage the modified files: `git add <files>`
    - Create a commit summarizing the fixes: `git commit -m "fix(review): address PR comments"`
    - Push the changes to the remote branch: `git push origin HEAD`
-6. **Reporting:**
-   - Optionally use `gh api` or `gh pr comment` to reply to the resolved threads indicating they have been fixed.
-   - Summarize the actions taken and provide the commit hash to the user.
+6. **Reporting & Communication (GitHub Replies):**
+   - You MUST reply directly to the specific comment threads on the GitHub PR using `gh api` or `gh pr review`.
+   - **For Directives (Code Changes):** After pushing the fix, reply to the comment thread with "Done", followed by a brief, technical explanation of *how* and *why* you implemented the fix.
+   - **For Questions/Inquiries:** Do not modify code. Formulate a technical explanation or justification and reply directly to the comment thread.
+   - Summarize the actions taken and provide the commit hash to the user in the CLI.
 
 ## Constraints
-- Only address comments that require code changes. If a comment is a question or unclear, stop and ask the user for clarification before making assumptions.
-- Do not merge the PR. Only push the fixes.
+- If a comment is a direct question or a request for clarification, treat it as an Inquiry: reply to the thread on GitHub with the answer and do not modify the codebase.
+- Do not merge the PR. Only push the fixes and reply to comments.
 - Ensure all quality gates pass before pushing. If a fix breaks a test, attempt to fix the test or stop and ask for help.
