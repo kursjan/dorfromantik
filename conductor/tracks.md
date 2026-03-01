@@ -26,5 +26,5 @@ This file tracks all major tracks for the project. Each track has its own detail
   *Link: [./tracks/simple_test_game_20260225/](./tracks/simple_test_game_20260225/)*
 - [ ] **Track: Thorough Review of src/models (#36)**
   *Link: [./tracks/models_review_20260227/](./tracks/models_review_20260227/)*
-- [~] **Track: Main Menu UI and Routing (Issue #32)**
+- [x] **Track: Main Menu UI and Routing (Issue #32)**
   *Link: [./tracks/main_menu_routing_20260227/](./tracks/main_menu_routing_20260227/)*
