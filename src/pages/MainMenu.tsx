@@ -2,17 +2,28 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GameCard } from '../components/GameCard';
 import { SettingsModal } from '../components/SettingsModal';
+import { useSession } from '../context/SessionContext';
 import './MainMenu.css';
-
-// Placeholder data for saved games
-const SAVED_GAMES = [
-  { id: '1', name: 'Valley of Peace', score: 2450, lastPlayed: new Date().toISOString() },
-  { id: '2', name: 'Forest Edge', score: 1200, lastPlayed: new Date(Date.now() - 86400000).toISOString() },
-];
 
 const MainMenu: React.FC = () => {
   const navigate = useNavigate();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const { session, startNewStandardGame, startNewTestGame, continueGame } = useSession();
+
+  const handleStartStandard = () => {
+    startNewStandardGame();
+    navigate('/game');
+  };
+
+  const handleStartTest = () => {
+    startNewTestGame();
+    navigate('/game');
+  };
+
+  const handleContinue = (gameId: string) => {
+    continueGame(gameId);
+    navigate('/game');
+  };
 
   return (
     <div className="main-menu">
@@ -25,13 +36,13 @@ const MainMenu: React.FC = () => {
             <div className="main-menu__actions">
               <button 
                 className="main-menu__button"
-                onClick={() => navigate('/game')}
+                onClick={handleStartStandard}
               >
                 Standard Game
               </button>
               <button 
                 className="main-menu__button main-menu__button--secondary"
-                onClick={() => navigate('/game')}
+                onClick={handleStartTest}
               >
                 Test Game
               </button>
@@ -52,17 +63,14 @@ const MainMenu: React.FC = () => {
           <div className="main-menu__games-section">
             <span className="main-menu__section-title">Continue Journey</span>
             <div className="main-menu__games-list">
-              {SAVED_GAMES.map(game => (
+              {session.games.map(game => (
                 <GameCard 
                   key={game.id}
                   id={game.id}
                   name={game.name}
                   score={game.score}
                   lastPlayed={game.lastPlayed}
-                  onSelect={(id) => {
-                    console.log('Continuing game:', id);
-                    navigate('/game');
-                  }}
+                  onSelect={handleContinue}
                 />
               ))}
             </div>

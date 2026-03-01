@@ -21,14 +21,14 @@
 - [x] **Phase Gate**: Verify the standalone UI components render correctly and interactively in the Storybook
       preview using **project-orchestrator** skill. [checkpoint: 1be8100]
 
-## Phase 3: Main Menu UI Implementation
+## Phase 3: Main Menu UI Implementation [checkpoint: 2d9161f]
 - [x] Create `src/components/GameCard.tsx` and a placeholder `src/components/SettingsModal.tsx` using **task-conductor** skill.
 - [x] Implement the Forest Green/Parchment styling and glassmorphism look on `MainMenu.tsx` using **task-conductor** skill.
 - [x] Add the full layout to `MainMenu.tsx`: Game List placeholders, "Start Standard Game", "Start Test Game", "Settings" (toggles modal), and "Logout" using **task-conductor** skill.
-- [ ] **Phase Gate**: Verify UI components and styling rendering properly using **project-orchestrator** skill.
+- [x] **Phase Gate**: Verify UI components and styling rendering properly using **project-orchestrator** skill. [checkpoint: 2d9161f]
 
-## Phase 4: Data Integration & Menu E2E Test
-- [ ] Connect the `Session` model to the `MainMenu` to correctly populate the scrollable list of saved games using **task-conductor** skill.
-- [ ] Ensure the styled "Start Game" buttons correctly trigger a new game state and navigate to `/game` using **task-conductor** skill.
-- [ ] Update the `e2e/main-menu.spec.ts` test to verify the new styled buttons and the Settings modal toggle using **task-conductor** skill.
-- [ ] **Final Track Gate**: Final verification and Git commit using **project-orchestrator** skill.
+## Phase 4: Data Integration & Menu E2E Test [checkpoint: 4307ab3]
+- [x] Connect the `Session` model to the `MainMenu` to correctly populate the scrollable list of saved games using **task-conductor** skill.
+- [x] Ensure the styled "Start Game" buttons correctly trigger a new game state and navigate to `/game` using **task-conductor** skill.
+- [x] Update the `e2e/main-menu.spec.ts` test to verify the new styled buttons and the Settings modal toggle using **task-conductor** skill.
+- [x] **Final Track Gate**: Final verification and Git commit using **project-orchestrator** skill. [checkpoint: 4307ab3]

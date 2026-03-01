@@ -1,15 +1,12 @@
 import { test, expect } from '@playwright/test';
+import { startStandardGame } from './test-utils';
 
 test.describe('DebugOverlay', () => {
   test.beforeEach(async ({ page }) => {
-    // 1. Go to the app
-    await page.goto('/game');
-    
-    // 2. Wait for canvas to be ready
-    const canvas = page.locator('canvas[data-testid="game-canvas"]');
-    await expect(canvas).toBeVisible();
+    // 1. Go to the app and start game
+    await startStandardGame(page);
 
-    // 3. Wait for the controller to be initialized (published on window in dev)
+    // 2. Wait for the controller to be initialized (published on window in dev)
     await page.waitForFunction(() => (window as any).canvasCtrl !== undefined);
   });
 

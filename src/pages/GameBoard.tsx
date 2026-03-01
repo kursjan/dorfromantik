@@ -1,17 +1,18 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { CanvasView } from '../canvas/components/CanvasView';
-import { Session } from '../models/Session';
-import { User } from '../models/User';
-import { Game } from '../models/Game';
+import { useSession } from '../context/SessionContext';
 
 export const GameBoard: React.FC = () => {
-  const session = useMemo(() => {
-    const user = new User('local-player');
-    const game = Game.createStandard();
-    const s = new Session('local-session', user);
-    s.startNewGame(game);
-    return s;
-  }, []);
+  const { session } = useSession();
+
+  if (!session.activeGame) {
+    return (
+      <div style={{ padding: '20px', textAlign: 'center' }}>
+        <h2>No active game session</h2>
+        <p>Please return to the main menu to start a new game.</p>
+      </div>
+    );
+  }
 
   return (
     <main>
