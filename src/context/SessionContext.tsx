@@ -47,14 +47,14 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [session, setSession] = useState<Session>(createInitialSession);
 
   const startNewStandardGame = () => {
-    const game = Game.createStandard();
+    const game = Game.create(GameRules.createStandard());
     const newSession = new Session(session.sessionId, session.user, game, [...session.games]);
     setSession(newSession);
   };
 
   const startNewTestGame = () => {
     // For now, same as standard
-    const game = Game.createStandard();
+    const game = Game.create(GameRules.createStandard());
     const newSession = new Session(session.sessionId, session.user, game, [...session.games]);
     setSession(newSession);
   };
