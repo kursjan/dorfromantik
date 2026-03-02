@@ -61,8 +61,32 @@ export class GameRules {
     });
   }
 
+  static createTest(): GameRules {
+    return new GameRules({
+      initialTurns: 6,
+      tileGenerator: new SequenceTileGenerator([
+        new Tile({ id: '1' }),
+        new Tile({ id: '2' }),
+        new Tile({ id: '3' }),
+        new Tile({ id: '4' }),
+        new Tile({ id: '5' }),
+        new Tile({ id: '6' }),
+        new Tile({ id: '7' }),
+        new Tile({ id: '8' }),
+      ]),
+    });
+  }
+
   createInitialTile(id: string = 'start-tile'): Tile {
     return this.initialTileGenerator.createTile(id);
+  }
+  
+  createInitialQueue(): Tile[] {
+    const queue: Tile[] = [];
+    for (let i = 0; i < this.initialTurns; i++) {
+      queue.push(this.tileGenerator.createTile());
+    }
+    return queue;
   }
 }
 

@@ -15,14 +15,13 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
   const controllerRef = useRef<CanvasController | null>(null);
   const activeGame = session.activeGame;
 
-  // CRITICAL: Ensure an active game is always present.
   if (!activeGame) {
     throw new Error('CanvasView requires an active game in the session.');
   }
 
   // State for game stats to ensure React updates when they change
-  const [score, setScore] = useState(activeGame.score ?? 0);
-  const [remainingTurns, setRemainingTurns] = useState(activeGame.remainingTurns ?? 0);
+  const [score, setScore] = useState(activeGame.score);
+  const [remainingTurns, setRemainingTurns] = useState(activeGame.remainingTurns);
   const [nextTile, setNextTile] = useState<Tile | null>(activeGame.peek() ?? null);
   const [controller, setController] = useState<CanvasController | null>(null);
 
@@ -30,7 +29,6 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Initialize Controller (activeGame is guaranteed to exist here)
     const newController = new CanvasController(canvas, session);
     setController(newController);
 

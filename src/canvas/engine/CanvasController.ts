@@ -46,6 +46,7 @@ export class CanvasController {
     this.session = session;
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Could not get 2d context');
+    if (!session.activeGame) throw new Error("No active game found in session");
     this.ctx = ctx;
 
     this.camera = new Camera({ x: 0, y: 0, zoom: 1 });
@@ -136,11 +137,8 @@ export class CanvasController {
     }
 
     // 4. Ghost Preview
-    if (this.hoveredHex) {
-      const nextTile = activeGame.peek();
-      if (!nextTile) {
-        throw new Error('No tiles remaining in the queue for preview');
-      }
+    if (activeGame.inProgress() && this.hoveredHex) {
+      const nextTile = activeGame.peek()!;
       const isValid = this.isValidPlacement(this.hoveredHex);
       const style = isValid ? VALID_PREVIEW_STYLE : INVALID_PREVIEW_STYLE;
       this.tileRenderer.drawTileAtHex(nextTile, this.hoveredHex, style);
@@ -150,9 +148,6 @@ export class CanvasController {
     this.renderer.drawHighlight(this.hoveredHex);
 
     this.ctx.restore();
-
-    // 5. UI Overlay (Deprecated - removed in favor of React DebugOverlay)
-    // this.debugRenderer.drawOverlay(this.camera, this.hoveredHex);
 
     // 6. Push Debug Stats to React (throttled)
     const now = performance.now();
@@ -181,12 +176,11 @@ export class CanvasController {
   // --- Input Handlers ---
 
   private isValidPlacement(coord: HexCoordinate): boolean {
-    return this.session.activeGame?.isValidPlacement(coord) ?? false;
+    return this.session.activeGame!.isValidPlacement(coord);
   }
 
   private handleMouseClick(mouseX: number, mouseY: number) {
-    const activeGame = this.session.activeGame;
-    if (!activeGame) return;
+    const activeGame = this.session.activeGame!;
 
     const worldPos = this.camera.screenToWorld(
       mouseX,
@@ -196,19 +190,19 @@ export class CanvasController {
     );
     const hex = pixelToHex(worldPos.x, worldPos.y, HEX_SIZE);
 
-    if (this.isValidPlacement(hex)) {
+    if (activeGame.inProgress() && this.isValidPlacement(hex)) {
       activeGame.placeTile(hex);
       this.notifyStatsChange();
     }
   }
 
   private handleRotateClockwise() {
-    this.session.activeGame?.rotateQueuedTileClockwise();
+    this.session.activeGame!.rotateQueuedTileClockwise();
     this.notifyStatsChange();
   }
 
   private handleRotateCounterClockwise() {
-    this.session.activeGame?.rotateQueuedTileCounterClockwise();
+    this.session.activeGame!.rotateQueuedTileCounterClockwise();
     this.notifyStatsChange();
   }
 

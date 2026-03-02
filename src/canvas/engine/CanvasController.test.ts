@@ -1,6 +1,5 @@
 import { Tile } from '../../models/Tile';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Board } from '../../models/Board';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { Session } from '../../models/Session';
 import { User } from '../../models/User';
@@ -9,6 +8,8 @@ import { HexRenderer } from '../graphics/HexRenderer';
 import { TileRenderer } from '../graphics/TileRenderer';
 import { CanvasController } from './CanvasController';
 import { InputManager } from './InputManager';
+import { Game } from '../../models/Game';
+import { GameRules } from '../../models/GameRules';
 
 // Mock dependencies
 vi.mock('../graphics/HexRenderer');
@@ -54,13 +55,8 @@ describe('CanvasController', () => {
 
     // Create a minimal session with an active game
     const user = new User('user-1');
-    const board = new Board();
     session = new Session('session-1', user);
-    session.activeGame = {
-      board,
-      score: 0,
-      remainingTurns: 30,
-    } as any;
+    session.activeGame = Game.create(GameRules.createTest());
 
     vi.clearAllMocks();
   });
@@ -93,7 +89,7 @@ describe('CanvasController', () => {
 
   it('should render tiles from the board', () => {
     const tile = new Tile({ id: 't1' });
-    const coord = new HexCoordinate(0, 0, 0);
+    const coord = new HexCoordinate(-1, 0, 1);
     session.activeGame!.board.place(tile, coord);
 
     controller = new CanvasController(canvas, session);

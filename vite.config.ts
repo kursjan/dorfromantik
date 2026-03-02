@@ -1,68 +1,79 @@
 /// <reference types="vitest/config" />
 /// <reference types="vitest" />
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-
-// https://vite.dev/config/
 import { fileURLToPath } from 'node:url';
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import { playwright } from '@vitest/browser-playwright';
+
 const dirname =
   typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
-// More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
+export default defineConfig(({ mode }) => {
+  // Load ALL environment variables from .env (even those without VITE_ prefix)
+  const env = loadEnv(mode, process.cwd(), '');
+  const targetPort = parseInt(env.PORT || '5173');
+
+  return {
+    // 1. Unified Port for Dev and Preview
+    server: {
+      port: targetPort,
+      strictPort: true,
     },
-  },
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: './src/test/setup.ts',
-    exclude: [
-      '**/node_modules/**',
-      '**/dist/**',
-      '**/e2e/**',
-      '**/.{idea,git,cache,output,temp}/**',
-    ],
-    projects: [
-      {
-        test: {
-          name: 'unit',
-          globals: true,
-          environment: 'jsdom',
-          setupFiles: './src/test/setup.ts',
-          include: ['src/**/*.test.{ts,tsx}'],
-        },
+    preview: {
+      port: targetPort,
+      strictPort: true,
+    },
+
+    plugins: [react()],
+    resolve: {
+      alias: {
+        '@': path.resolve(dirname, './src'),
       },
-      {
-        extends: true,
-        plugins: [
-          // The plugin will run tests for the stories defined in your Storybook config
-          // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
-          storybookTest({
-            configDir: path.join(dirname, '.storybook'),
-          }),
-        ],
-        test: {
-          name: 'storybook',
-          browser: {
-            enabled: true,
-            headless: true,
-            provider: playwright({}),
-            instances: [
-              {
-                browser: 'chromium',
-              },
-            ],
+    },
+
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: './src/test/setup.ts',
+      // 2. Ensure tests can see the same .env variables
+      env: env, 
+      exclude: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/e2e/**',
+        '**/.{idea,git,cache,output,temp}/**',
+      ],
+      projects: [
+        {
+          test: {
+            name: 'unit',
+            globals: true,
+            environment: 'jsdom',
+            setupFiles: './src/test/setup.ts',
+            include: ['src/**/*.test.{ts,tsx}'],
           },
-          setupFiles: ['.storybook/vitest.setup.ts'],
         },
-      },
-    ],
-  },
+        {
+          extends: true,
+          plugins: [
+            storybookTest({
+              configDir: path.join(dirname, '.storybook'),
+            }),
+          ],
+          test: {
+            name: 'storybook',
+            browser: {
+              enabled: true,
+              headless: true,
+              provider: playwright({}),
+              instances: [{ browser: 'chromium' }],
+            },
+            setupFiles: ['.storybook/vitest.setup.ts'],
+          },
+        },
+      ],
+    },
+  };
 });
