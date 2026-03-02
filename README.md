@@ -8,85 +8,81 @@ This is an Agent assisted project. I was guiding Gemini agent and I myself didn'
 
 # Journal
 
-Also AI-edited, I don't write like that. When reading, tone down all superlatives.< >
-
 ## Day 1: Project Setup and Foundations
 
-The first day was focused on setting up the project and establishing a baseline for the core game mechanics.
+The first day was about setting up the project starting a core game mechanics.
 
-- **Technology Selection:** I consulted the Agent to choose the appropriate technologies. We settled on React with TypeScript for the frontend and Firebase Studio for the development environment.
-- **Initial Scaffolding:** The Agent set up the React project, configured the testing frameworks, and created an initial development plan.
-- **Core Models:** We successfully implemented the foundational models for `Tile`, `HexCoordinate`, and `Board`, along with their corresponding tests.
-- **Early Observations:** I quickly noticed the Agent's tendency to work too far ahead without verification. This led to the creation of an "interaction protocol" to ensure a more disciplined, test-driven approach:
+- I consulted the Agent to choose the technologies. We decided for React with TypeScript for the frontend and Firebase Studio for the development environment (since I have a Chromebook).
+- The Agent set up the React project, configured the testing frameworks, and created an initial development plan.
+- We implemented the basic models for `Tile`, `HexCoordinate`, and `Board`, along with their corresponding tests.
+- I noticed the Agent's tendency to work too far ahead without verification. I had to start working on an "interaction protocol" to ensure a more disciplined, test-driven approach:
   - No flattery, no apologies, be brief.
   - Write tests and run them before committing.
+  - Ask for an approval.
 
 By the end of the day, I had a running application with a solid set of basic tests, all without writing a single line of code myself.
 
 ## Day 2: ASCII and UI Rendering
 
-Day two presented the first significant challenge: visualizing the hexagonal grid.
 
-- **ASCII Printer:** The initial attempt to create an ASCII representation of the board was problematic. The Agent struggled with the flat-top, cube coordinate system we had chosen, leading to overly complex and incorrect logic. I had to intervene and break the problem down into smaller, more manageable tasks:
+- The initial attempt to create an ASCII representation of the board didn't work. The Agent struggled with the flat-top, cube coordinate system we had chosen, leading to overly complex and incorrect logic. I had to intervene and break the problem down into smaller, more manageable tasks:
   1.  An `AsciiCanvas` for basic character placement.
   2.  A `TilePrinter` to render a single tile.
   3.  A `BoardPrinter` to orchestrate the rendering of all tiles.
-- **UI Rendering:** The Agent made significant progress on the canvas-based UI. However, it initially went off-track by implementing new logic before the basic rendering was functional, and it failed to catch a JavaScript error.
-- **Canvas Success:** After some course correction, the Agent did an excellent job of implementing the canvas rendering, including features like grid visualization, hex highlighting, zoom, and pan.
+- The Agent made a good progress on the canvas-based UI. However, it initially went off-track by implementing new logic before the basic rendering worked, and it failed to catch a JavaScript error.
+- After some course correction, the Agent did well implementing the canvas rendering, including features like grid visualization, hex highlighting, zoom, and pan.
 
 Despite some initial frustration, day two was a success. The ASCII and UI rendering implementations were of good quality, and the generated tests were decent.
 
 ## Day 3: Testing and Code Review
 
-With the core rendering in place, the focus shifted to testing and improving the quality of the existing code.
+With the core rendering in place, my focus shifted to testing and improving the quality of the existing code.
 
-- **Advanced Testing:** We implemented Playwright tests for image comparison and used mocks and spies to test the canvas implementation.
-- **Initial Code Review:** I asked the Agent to perform a code review, as the codebase was becoming disorganized and difficult to understand in certain areas. The initial review was superficial, which prompted me to request a more detailed, file-by-file analysis.
+- We implemented Playwright tests for image comparison and used mocks and spies to test the canvas implementation.
+- I asked the Agent to perform a code review, as the codebase was becoming disorganized and difficult to understand. The initial review was superficial, so I had to go file by file myself and ask agent each time why it didn't raised the issue during the code review. I was adding these answer as instructions to the code review protocol. 
 
 ## Day 4: Deep Dive into Code Quality
 
 This day was dedicated entirely to a thorough code review and refactoring process.
 
-- **Establishing a Protocol:** The file-by-file review was still not yielding the desired results, so I established a more rigorous code review protocol. This included documenting all design decisions to ensure the Agent would adhere to them in future changes.
-- **Refactoring Challenges:** A seemingly minor optimization—changing `board.getAllTiles` from returning an array to an iterator—led to a significant amount of friction. The Agent struggled to work with the iterator and insisted on a stateful, `if`-based solution for the ASCII rendering. After a great deal of effort, I was able to guide the Agent to a more elegant, polymorphic solution.
-- **End Result:** By the end of the day, the codebase was in a much better state: more readable, consistent, and with a clear separation of concerns.
-
-While no new features were implemented, the intensive refactoring and code review were crucial for the long-term health of the project.
+- The file-by-file review was still not yielding the desired results, so I established a more rigorous code review protocol. This included documenting all design decisions to ensure the Agent would adhere to them in future changes.
+- A seemingly minor optimization — changing `board.getAllTiles` from returning an array to an iterator — led to **a journey** of frustration. The Agent struggled to work with the iterator and insisted on a stateful, `if`-based solution inside a for loop. After a great deal of effort, I was able to guide the Agent to a more elegant, polymorphic solution. Till the very end, the agent was not able to admit my solutioun would work. Only after tests passed it admitted it was wrong.
+- By the end of the day, the codebase was in a much better state: more readable, consistent, and with a clear separation of concerns.
 
 ## Day 5 and 6: Reconciliation
 
-I had a feeling I don't have enough progress. I was fighting AI too much and everything took more and more time. I started looking around, how others use AI. It seems there is a gap between my capabilities and what others do. After watching some videos, I realized two crutial topics:
-- Context management
-- Plan management
+I had a feeling I don't make enough progress. I was fighting AI too much and everything took more and more time. I started looking around, how others use AI. It seems there is a gap between my capabilities and what others do. After watching some videos, I realized two crutial topics
+- Context management, which I did to some extend, but not well enough
+- Plan management, which cannot be done with simple gemini.md file as AI tends to omit them, the longer it works, the worse.
 
 Also Firebase had an outage (WTH, I thought this is Google!), so I moved to a local stack. It is actually much more responsive, so I will likely keep using crostini (chromebook), VSCODE and gemini-cli. It also helped me to better understand what is Firebase, Gemini, VSCODE and React.
 
 I discovered gemini-cli and tooling around, like `/ask`, `/hooks`.
 
 I managed to implement reset button. Original prompt (along the lines): `add a reset button to reset view of the camera` went super bad and I hat to restore from git. Next time, I created plan with:
-- create reset logi in controller
-- create simple button (to verify integration)
+- create reset hook in controller
+- create a simple button (to verify integration)
 - style the button
-The more detailed prompt and more `/clear` worked like a charm.
+The `/clear` and more detailed prompt worked like a charm.
 
 # 2026-02-22
 
-Today was a hard session, with multiple AI agents running at the same time, switching worktrees, branches, AI code review. I am thinking about a good workflow which can help me to gate the code. The model keeps beeing "busy" so I spend quite some time with retries.
+Today was a hard session, with multiple AI agents running at the same time, switching worktrees, branches, AI code review. I am thinking about a good workflow which can help me to gate the code. The model keeps beeing "busy" so I spend quite some time with retries. (edit: this is because I used free tier, which is unusable for any serious work).
 
 # 2026-02-27
 
-I spent lots of time "organizing" and "synchronizing" the AI. I updated workflow manually, because AI made mess out of it, I defined processes and implemented skills, which seem to help to follow the instructions. Anything that touches more than one file is a track for me. I try to make AI to do some work, but I require manual user reviews after each phase in track and I switched to full PR review after a branch is merged to main, to ensure some sort of consistency.
+I spent lots of time "organizing" and "synchronizing" the AI. I updated workflow manually, because AI made mess out of it, I defined processes and implemented skills, which seem to help to follow the instructions. Anything that touches more than one file is a track for me. I ask AI to do some work, but in a separate branch and I require manual user reviews after each phase in the track and I switched to full PR review after a branch is merged to main.
 
 I spend last few days wandering around the codebase. I feel I am again not happy with the quality of code produced by AI. 
 I did experiment with first code-review in https://github.com/kursjan/dorfromantik/issues/36.
 
-I also switched to Cursor. It seesm to work better for refactoring: they are faster. Gemini keeps "grepping" which "brigt mich auf die Palme", it is like 1980s.
+I also switched to Cursor. It seesm to work better for refactoring: they are faster. Gemini keeps using `grep` to find references, which "brigt mich auf die Palme",it feels like approach from 1980s.
 
 I managed wihout big issues to implement a debug overlay using a new process: https://github.com/kursjan/dorfromantik/issues/29.
 
 AI with key (tier1) works much better, otherwise I get lots of retries that are super annoying for the workflow.
 
-I also fought a lots of Git, I am used to Fig/Mercurial and Git makes me nervous...
+I also fought a lots of Git, I find it needlessly complicated. 
 
 # 2026-02-28 
 
@@ -97,18 +93,38 @@ This is what am I dealing with:
   During Phase 1, I mistakenly implemented the change based on an older iteration of the specification (changing it to accept HexCoordinate), completely missing that you had explicitly updated the plan.md to keep it as BoardTile and clarify the intent.
 ```
 
-So you plan, you update, you fine-tune and that thing will do something else anyhow: check/verify after every step!
+So you plan, you update, you fine-tune and that AI thing will do something else anyhow: thoroughly check/verify after every step! It drains a lot of mental energy.
 
-Implementation of https://github.com/kursjan/dorfromantik/issues/36, [plan](https://github.com/kursjan/dorfromantik/blob/main/conductor/archive/refactor_models_20260227/plan.md) was like. The workflow is: wait for approval after every task, do commit and wait for approval after every phase:
+The workflow is: wait for approval after every task, do commit and wait for approval after every phase. The implementation of https://github.com/kursjan/dorfromantik/issues/36, [plan](https://github.com/kursjan/dorfromantik/blob/main/conductor/archive/refactor_models_20260227/plan.md) started fine, but went quite wild: 
+
 Phase 1
 - I created branch. Approve.
 - I changed a single line in a file: Approve
 - ...
-- Phase 1 commited. Approve
-...
-...
-Phase 3:
-... I implemented phase 3, changed the plan, installed new depenedency, also refactored code acording to legacy and invalid document, reverted your changes, commited the track to main and I just started working on antoher track...
+- Phase 1 commited. Approve [so far so good]
+- ...
+- ...
+- a bit later
+- ...
+- Phase 3:
+- ... 
+- ... I implemented Phase 3, changed the plan, installed new depenedency, refactored code acording to legacy and invalid document, reverted your changes, commited the track to main without your approval and I just started working on antoher track...
+
+
+# 2026-03-02
+The thought of the day. What is AI good at now? So far it can generate small pieces of code, maybe tests. Because it is unreliable, I have to setup thorough process and review any changes done by the AI. So far so good and I would say it even "saves" some time, even though by far not as much as some would like to.
+
+But here is a catch I realized: Coding time is not an unproductive time. Going through the codebase, figuring out how are things linked, realizing small details about data flow, corner-cases, and so on help me to understand the code better, to get ideas about improvements and to review changes made by AI. To conclude 
+- AI can save me some time by doing simple coding (typing), but it has to be thoroughly reviewed
+- Even the time saved on coding (typing) is not a 100% gain, there is a cost associated to a developer not going through their code, not learning about it. 
+- Just to be clear, I wouldn't say that all coding done by AI is a loss, some parts are helpful.
+
+Whenever I deep dive into the code without on my own, I discover discrepancies, issues with workflow, data flow, decisions that haven't been made, subtle soon to be bugs. This raises a thought: AI coding is like telling a sculptor they don't need to chisel, just tell me what to chisel and AI agent will chisel it for them. But then what is a value of such a creation? Who makes all these decisions hidden after every stroke? Who creates the and evolves the initial idea as the work progresses?
+- if I need a replica, I can copy-paste
+- if I need a hiqh quality specialized software, I need to be part of the creation, to influnce every single decision
+- if I just need a prototype, wihout any need for quality, just a bit of customization AI can do, I guess
+
+Also interesting, when I think about analogy of AI coding, only artistic analogies pop-out (Sculptor without chisel, pianist who is not playing the notes). But I don't think SWE is an art.
 
 # Graveyard
 
