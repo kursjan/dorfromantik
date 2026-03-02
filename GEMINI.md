@@ -74,6 +74,7 @@ This project uses a "Track-Based" branching model to maintain focus and ensure a
 
 - **Branching Strategy:**
   - **New Tracks:** When starting a new Conductor Track (e.g., `feat/tile-rotation`), create a dedicated feature branch or reuse a universal branch, such as `coding-agent/worker1`
+  - **Merging:** When working in a branch, all PRs to sync with `main` MUST use a **rebase** strategy (no squash) to preserve a linear and detailed history. All PRs must be reviewed and approved by the user.
   - **Minor Fixes, Ad-hoc tasks & Chores:** For documentation updates, configuration tweaks, or minor verified bug fixes, you may work directly on the current branch (including `main`).
 - **Synchronization:** All changes intended for the codebase MUST be pushed to the remote repository (`origin`).
 
