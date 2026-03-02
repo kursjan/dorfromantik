@@ -2,18 +2,15 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { Session } from './Session';
 import { User } from './User';
 import { Game } from './Game';
-import { Board } from './Board';
 import { GameRules } from './GameRules';
 
 describe('Session', () => {
   let user: User;
   let gameRules: GameRules;
-  let board: Board;
 
   beforeEach(() => {
     user = new User('user-123');
     gameRules = new GameRules({ initialTurns: 10, pointsPerMatch: 10 });
-    board = new Board();
   });
 
   it('should initialize with a sessionId and user', () => {
@@ -26,7 +23,7 @@ describe('Session', () => {
 
   it('should allow starting a new game', () => {
     const session = new Session('session-456', user);
-    const game = new Game({ board, rules: gameRules });
+    const game = Game.create(gameRules);
     
     session.startNewGame(game);
     
@@ -35,7 +32,7 @@ describe('Session', () => {
 
   it('should move the active game to history when ending it', () => {
     const session = new Session('session-456', user);
-    const game = new Game({ board, rules: gameRules });
+    const game = Game.create(gameRules);
     
     session.startNewGame(game);
     session.endActiveGame();
@@ -52,8 +49,8 @@ describe('Session', () => {
 
   it('should automatically archive the current active game when starting a new one', () => {
     const session = new Session('session-456', user);
-    const game1 = new Game({ board, rules: gameRules });
-    const game2 = new Game({ board, rules: gameRules });
+    const game1 = Game.create(gameRules);
+    const game2 = Game.create(gameRules);
     
     session.startNewGame(game1);
     session.startNewGame(game2);

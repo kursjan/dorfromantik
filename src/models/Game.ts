@@ -12,6 +12,7 @@ export interface GameProps {
   board: Board;
   rules: GameRules;
   score?: number;
+  tileQueue?: Tile[];
 }
 
 export interface PlacementResult {
@@ -24,7 +25,7 @@ export interface PlacementResult {
  */
 export class Game {
   /**
-   * Factory method to create a new game with the board initialized with a starting tile.
+   * Factory method to create a new game with the board and tileQueue initialized with a starting tile.
    * @param rules - The rules to use for the game.
    * @returns A fully initialized Game instance.
    */
@@ -35,10 +36,14 @@ export class Game {
     const startTile = rules.createInitialTile('start-tile');
     board.place(startTile, new HexCoordinate(0, 0, 0));
 
+    // If no queue is provided, initialize with random tiles based on rules
+    const tileQueue = rules.createInitialQueue();
+
     // 2. Create the game instance
     return new Game({
-      board,
-      rules,
+      rules: rules,
+      board: board,
+      tileQueue: tileQueue,
     });
   }
 
@@ -53,6 +58,9 @@ export class Game {
   private scorer: GameScorer;
 
   /**
+   * Instructions for AI agent:
+   * Prefer Game.create(). Use this only with an explcit approval of the project owner.
+   *
    * Creates a new instance of Game.
    * @param props - Properties to initialize the game state.
    */
@@ -64,13 +72,15 @@ export class Game {
     this.rules = props.rules;
     this.score = props.score ?? 0;
     this.scorer = new GameScorer(this.rules);
-    
-    // If no queue is provided, initialize with random tiles based on rules
-    this.tileQueue = this.generateInitialQueue();
+    this.tileQueue = props.tileQueue ?? [];
 
     if (this.score < 0) {
       throw new Error('score must be non-negative');
     }
+  }
+
+  inProgress(): boolean {
+    return this.remainingTurns > 0;
   }
 
   /**
@@ -153,13 +163,5 @@ export class Game {
     this.score += scoreAdded;
     this.lastPlayed = new Date().toISOString();
     return { scoreAdded, perfectCount };
-  }
-
-  private generateInitialQueue(): Tile[] {
-    const queue: Tile[] = [];
-    for (let i = 0; i < this.rules.initialTurns; i++) {
-      queue.push(this.rules.tileGenerator.createTile());
-    }
-    return queue;
   }
 }

@@ -1,12 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { Session } from './Session';
-import { User } from './User';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { Game } from './Game';
-import { Board } from './Board';
 import { GameRules, SequenceTileGenerator } from './GameRules';
-import { Tile } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
-import { southEast, south } from './Navigation';
+import { south, southEast } from './Navigation';
+import { Session } from './Session';
+import { Tile } from './Tile';
+import { User } from './User';
 
 describe('Full Game Session Integration', () => {
   let user: User;
@@ -64,28 +63,26 @@ describe('Full Game Session Integration', () => {
       northWest: 'tree',
     });
 
-    const board = new Board();
     const rules = new GameRules({
-      initialTurns: 3,
+      initialTurns: 2,
       pointsPerMatch: 10,
-      tileGenerator: new SequenceTileGenerator([tile1, tile2, tile3])
+      initialTileGenerator: new SequenceTileGenerator([tile1]),
+      tileGenerator: new SequenceTileGenerator([tile2, tile3])
     });
 
-    const game = new Game({ board, rules });
+    const game = Game.create(rules);
+    const origin = new HexCoordinate(0, 0, 0);
 
     // 2. Start the game in the session
     session.startNewGame(game);
     expect(session.activeGame).toBe(game);
-    expect(game.remainingTurns).toBe(3);
+
+    // TODO: Assert size of tiles on board. 
+    // expect(game.board.getAll()).toBe(1)
+    expect(game.board.get(origin)?.tile).toBe(tile1);
+    expect(game.remainingTurns).toBe(2);
     expect(game.score).toBe(0);
 
-    // 3. Place first tile at Origin (0,0,0)
-    const origin = new HexCoordinate(0, 0, 0);
-    game.placeTile(origin);
-    
-    expect(game.score).toBe(0);
-    expect(game.remainingTurns).toBe(2);
-    expect(board.get(origin)?.tile).toBe(tile1);
 
     // 4. Place second tile at South of Origin
     const southCoord = south(origin);
@@ -94,7 +91,7 @@ describe('Full Game Session Integration', () => {
     expect(result2.scoreAdded).toBe(10);
     expect(game.score).toBe(10);
     expect(game.remainingTurns).toBe(1);
-    expect(board.get(southCoord)?.tile).toBe(tile2);
+    expect(game.board.get(southCoord)?.tile).toBe(tile2);
 
     // 5. Place third tile at South-East of Origin
     const southEastCoord = southEast(origin);
@@ -103,13 +100,14 @@ describe('Full Game Session Integration', () => {
     expect(result3.scoreAdded).toBe(20); // Two matches: tile1 and tile2!
     expect(game.score).toBe(30);
     expect(game.remainingTurns).toBe(0);
-    expect(board.get(southEastCoord)?.tile).toBe(tile3);
+    expect(game.board.get(southEastCoord)?.tile).toBe(tile3);
 
     // 6. Verify Session State
     expect(session.activeGame).toBe(game);
     expect(session.games.length).toBe(0);
 
     // 7. End Game
+    // TODO: this end game is weird, it should end once turns run out
     session.endActiveGame();
     expect(session.activeGame).toBeUndefined();
     expect(session.games.length).toBe(1);
