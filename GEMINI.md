@@ -84,9 +84,10 @@ This project uses a "Track-Based" branching model to maintain focus and ensure a
 - **Contextual Precedence:** Instructions within an active **Gemini Skill** (e.g., `task-conductor`, `project-orchestrator`) take absolute precedence over the general workflows described below. When executing a Conductor Track, strictly adhere to the methodology defined in the skill file.
 - **Refactoring:** Always analyze files in the context of the entire project. Check all usages of a class or function to ensure its public API remains valid after refactoring.
 - **Verification:**
-  1. **Development Loop:** After _every_ code change, run `npx putout <changed_files>`, `npm run typecheck`, and `npm test`.
-  2. **Phase/Track Gates:** Run `npm run e2e` ONLY when completing a Conductor Phase or finalizing an Ad-hoc Task.
-  3. **Targeted E2E:** You may run specific E2E tests (e.g., `npx playwright test e2e/main-menu.spec.ts`) if your changes directly affect visual rendering or complex UI flows, but avoid running the full suite unnecessarily.
+  1. **Development Loop (Logic):** If you are modifying pure TypeScript logic (`src/models`, `src/utils`, etc.), run `npx putout <changed_files>`, `npm run typecheck`, and **`npm run test:unit`** for fast feedback.
+  2. **Development Loop (UI):** If you are modifying React components or styling (`.tsx`, `.css`), run `npx putout <changed_files>`, `npm run typecheck`, `npm run test:unit`, AND **`npm run test:ui`** to ensure visual components render correctly.
+  3. **Phase/Track Gates:** Run `npm run e2e` ONLY when completing a Conductor Phase or finalizing an Ad-hoc Task.
+  4. **Targeted E2E:** You may run specific E2E tests (e.g., `npx playwright test e2e/main-menu.spec.ts`) if your changes directly affect visual rendering or complex UI flows, but avoid running the full suite unnecessarily.
       - **Port Pinning (Multi-Worktree):** To avoid port conflicts when running multiple agents in separate worktrees, each worktree MUST have its own local `.env` file pinning the `PORT` variable (e.g., `PORT=5173` for main, `PORT=5174` for worker1, `PORT=5175` for worker2). Playwright and Vite will automatically honor this variable.
       - **Inquiry:** When in doubt, ask the user for the port number.
 - **Maintenance:** The AI is responsible for keeping project documentation up-to-date.
@@ -110,7 +111,8 @@ The AI's workflow is iterative, transparent, and responsive to user input.
   3.  **Dependency Check:** If `package.json` was modified, AI runs `npm install`.
   4.  **Compile & Analyze:** AI monitors the terminal for Vite and linter errors.
   5.  **Test Execution:** The AI runs the appropriate verification checks:
-      - **Always:** `npm run typecheck` and `npm test`.
+      - **Always:** `npm run typecheck` and `npm run test:unit`.
+      - **UI Changes:** `npm run test:ui`.
       - **At Gates only:** `npm run e2e` (unless the task specifically requires visual verification).
   6.  **Preview Check:** AI observes the browser preview for visual and runtime errors.
   7.  **Remediation/Report:** If errors are found, AI attempts automatic fixes. If unsuccessful, it reports details to the user.
