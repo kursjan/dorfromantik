@@ -28,3 +28,5 @@ This file tracks all major tracks for the project. Each track has its own detail
   *Link: [./tracks/models_review_20260227/](./tracks/models_review_20260227/)*
 - [x] **Track: Main Menu UI and Routing (Issue #32)**
   *Link: [./archive/main_menu_routing_20260227/](./archive/main_menu_routing_20260227/)*
+- [ ] **Track: Firebase Auth & Storage Integration (#41)**
+  *Link: [./tracks/firebase_integration_20260305/](./tracks/firebase_integration_20260305/)*
