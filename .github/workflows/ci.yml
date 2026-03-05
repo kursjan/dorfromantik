@@ -29,11 +29,11 @@ jobs:
         npm run lint
         npm run typecheck
 
-    - name: Run Unit Tests (Vitest)
-      run: npm test
-
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+
+    - name: Run Unit Tests (Vitest)
+      run: npm test
 
     - name: Run Playwright E2E Tests
       run: npm run e2e
