@@ -83,12 +83,10 @@ This project uses a "Track-Based" branching model to maintain focus and ensure a
 ### **Core Engineering Mandates**
 - **Contextual Precedence:** Instructions within an active **Gemini Skill** (e.g., `task-conductor`, `project-orchestrator`) take absolute precedence over the general workflows described below. When executing a Conductor Track, strictly adhere to the methodology defined in the skill file.
 - **Refactoring:** Always analyze files in the context of the entire project. Check all usages of a class or function to ensure its public API remains valid after refactoring.
-- **Verification:** After _every_ code change, automatically run the following checks:
-  2.  **Code Quality Check:** `npx putout <changed_files>` (Ensure React 19 patterns and clean code).
-  3.  **Type Check:** `npm run typecheck`.
-  4.  **Unit Test Check:** `npm test` (Ensure all unit tests pass).
-  5.  **E2E Test Check:** `npm run e2e` (Verify UI/Canvas interactions).
-      - **Note:** You might need to specify the correct `PORT` if multiple agents are running simultaneously.
+- **Verification:**
+  1. **Development Loop:** After _every_ code change, run `npx putout <changed_files>`, `npm run typecheck`, and `npm test`.
+  2. **Phase/Track Gates:** Run `npm run e2e` ONLY when completing a Conductor Phase or finalizing an Ad-hoc Task.
+  3. **Targeted E2E:** You may run specific E2E tests (e.g., `npx playwright test e2e/main-menu.spec.ts`) if your changes directly affect visual rendering or complex UI flows, but avoid running the full suite unnecessarily.
       - **Port Pinning (Multi-Worktree):** To avoid port conflicts when running multiple agents in separate worktrees, each worktree MUST have its own local `.env` file pinning the `PORT` variable (e.g., `PORT=5173` for main, `PORT=5174` for worker1, `PORT=5175` for worker2). Playwright and Vite will automatically honor this variable.
       - **Inquiry:** When in doubt, ask the user for the port number.
 - **Maintenance:** The AI is responsible for keeping project documentation up-to-date.
@@ -111,10 +109,9 @@ The AI's workflow is iterative, transparent, and responsive to user input.
   2.  **Lint/Format:** AI runs `eslint . --fix`.
   3.  **Dependency Check:** If `package.json` was modified, AI runs `npm install`.
   4.  **Compile & Analyze:** AI monitors the terminal for Vite and linter errors.
-  5.  **Test Execution:** The AI runs **ALL** verification checks:
-      - Type Check: `npm run typecheck`
-      - Unit Tests: `npm test`
-      - E2E Tests: `npm e2e`
+  5.  **Test Execution:** The AI runs the appropriate verification checks:
+      - **Always:** `npm run typecheck` and `npm test`.
+      - **At Gates only:** `npm run e2e` (unless the task specifically requires visual verification).
   6.  **Preview Check:** AI observes the browser preview for visual and runtime errors.
   7.  **Remediation/Report:** If errors are found, AI attempts automatic fixes. If unsuccessful, it reports details to the user.
 
