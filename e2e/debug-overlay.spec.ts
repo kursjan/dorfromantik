@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
-import { startStandardGame } from './test-utils';
+import { startTestGame } from './test-utils';
 
 test.describe('DebugOverlay', () => {
   test.beforeEach(async ({ page }) => {
     // 1. Go to the app and start game
-    await startStandardGame(page);
+    await startTestGame(page);
 
     // 2. Wait for the controller to be initialized (published on window in dev)
     await page.waitForFunction(() => (window as any).canvasCtrl !== undefined);

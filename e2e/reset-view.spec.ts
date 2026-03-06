@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { startStandardGame } from './test-utils';
+import { startTestGame } from './test-utils';
 
 test.describe('Reset View Button', () => {
   test.beforeEach(async ({ page }) => {
-    await startStandardGame(page);
+    await startTestGame(page);
   });
 
   test('should be visible and reset the camera after panning', async ({ page }) => {

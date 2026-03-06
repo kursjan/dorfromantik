@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { startStandardGame } from './test-utils';
+import { startTestGame } from './test-utils';
 
 test.describe('GameCanvas', () => {
   test.beforeEach(async ({ page }) => {
-    await startStandardGame(page);
+    await startTestGame(page);
   });
 
   test('should render the canvas', async ({ page }) => {

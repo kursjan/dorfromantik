@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { startStandardGame } from './test-utils';
+import { startTestGame } from './test-utils';
 
 test.describe('Rotation Logic', () => {
   test.beforeEach(async ({ page }) => {
-    await startStandardGame(page);
+    await startTestGame(page);
     // Wait for canvas controller to be available (exposed in DEV mode in CanvasController.ts)
     await page.waitForFunction(() => (window as any).canvasCtrl !== undefined);
   });
