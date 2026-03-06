@@ -165,6 +165,112 @@ describe('CanvasController', () => {
     vi.useRealTimers();
   });
 
+  it('should handle camera reset', () => {
+    controller = new CanvasController(canvas, session);
+    const camera = (controller as any).camera;
+    controller.resetCamera();
+    expect(camera.reset).toHaveBeenCalled();
+  });
+
+  it('should allow removing debug stats listener', () => {
+    controller = new CanvasController(canvas, session);
+    const callback = vi.fn();
+    const removeListener = controller.addDebugStatsListener(callback);
+    
+    expect((controller as any).onDebugStatsChange).toBe(callback);
+    removeListener();
+    expect((controller as any).onDebugStatsChange).toBeUndefined();
+  });
+
+  it('should throw error in render if active game is missing', () => {
+    controller = new CanvasController(canvas, session);
+    session.activeGame = undefined;
+    expect(() => (controller as any).render()).toThrow('No active game found in session');
+  });
+
+  it('should render ghost preview when hovering over a hex', () => {
+    controller = new CanvasController(canvas, session);
+    (controller as any).hoveredHex = new HexCoordinate(1, 0, -1);
+    
+    const tileRenderer = (controller as any).tileRenderer as any;
+    (controller as any).render();
+
+    expect(tileRenderer.drawTileAtHex).toHaveBeenCalledWith(
+      expect.any(Tile),
+      (controller as any).hoveredHex,
+      expect.any(Object)
+    );
+  });
+
+  it('should update camera rotation based on input manager continuous rotation', () => {
+    controller = new CanvasController(canvas, session);
+    const inputManager = (controller as any).inputManager as any;
+    const camera = (controller as any).camera;
+    
+    // Simulate continuous rotation input (clockwise)
+    inputManager.getRotationDirection.mockReturnValue(1);
+    
+    (controller as any).update();
+    
+    expect(camera.rotateBy).toHaveBeenCalledWith(0.05);
+  });
+
+  it('should cover input manager callbacks', () => {
+    let capturedCallbacks: any;
+    
+    // We need to temporarily override the mock for this specific test
+    const OriginalInputManager = vi.mocked(InputManager);
+    OriginalInputManager.mockImplementation(function (this: any, _canvas: any, callbacks: any) {
+      capturedCallbacks = callbacks;
+      this.destroy = vi.fn();
+      this.getRotationDirection = vi.fn().mockReturnValue(0);
+      return this;
+    } as any);
+
+    controller = new CanvasController(canvas, session);
+    const camera = (controller as any).camera;
+    const zoomSpy = vi.spyOn(controller as any, 'handleZoom');
+    const hoverSpy = vi.spyOn(controller as any, 'handleHover');
+    const clickSpy = vi.spyOn(controller as any, 'handleMouseClick');
+    const rotateCWSpy = vi.spyOn(controller as any, 'handleRotateClockwise');
+    const rotateCCWSpy = vi.spyOn(controller as any, 'handleRotateCounterClockwise');
+    const leaveSpy = vi.spyOn(controller as any, 'handleLeave');
+
+    capturedCallbacks.onPan(10, 20);
+    expect(camera.pan).toHaveBeenCalledWith(10, 20);
+
+    capturedCallbacks.onZoom(100);
+    expect(zoomSpy).toHaveBeenCalledWith(100);
+
+    vi.mocked(pixelToHex).mockReturnValue(new HexCoordinate(0, 0, 0));
+
+    capturedCallbacks.onHover(50, 50);
+    expect(hoverSpy).toHaveBeenCalledWith(50, 50);
+
+    capturedCallbacks.onClick(50, 50);
+    expect(clickSpy).toHaveBeenCalledWith(50, 50);
+
+    capturedCallbacks.onRotateClockwise();
+    expect(rotateCWSpy).toHaveBeenCalled();
+
+    capturedCallbacks.onRotateCounterClockwise();
+    expect(rotateCCWSpy).toHaveBeenCalled();
+
+    capturedCallbacks.onLeave();
+    expect(leaveSpy).toHaveBeenCalled();
+    
+    // Resize test
+    capturedCallbacks.onResize();
+    expect(canvas.width).toBe(window.innerWidth);
+
+    // Restore the default mock behavior
+    OriginalInputManager.mockImplementation(function (this: any) {
+      this.destroy = vi.fn();
+      this.getRotationDirection = vi.fn().mockReturnValue(0);
+      return this;
+    } as any);
+  });
+
   describe('Input Handlers', () => {
     beforeEach(() => {
       controller = new CanvasController(canvas, session);
