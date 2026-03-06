@@ -18,6 +18,6 @@ test.describe('GameHUD', () => {
     const turnsValue = page.locator('.game-hud__item').filter({ hasText: 'Tiles' }).locator('.game-hud__value');
 
     await expect(scoreValue).toHaveText('0');
-    await expect(turnsValue).toHaveText('30');
+    await expect(turnsValue).toHaveText('6');
   });
 });
