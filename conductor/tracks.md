@@ -31,4 +31,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [ ] **Track: Firebase Auth & Storage Integration (#41)**
   *Link: [./tracks/firebase_integration_20260305/](./tracks/firebase_integration_20260305/)*
 - [x] **Track: Tech Debt: CanvasController Test Coverage (#43)**
-  *Link: [./tracks/canvas_controller_tests_20260305/](./tracks/canvas_controller_tests_20260305/)*
+  *Link: [./archive/canvas_controller_tests_20260305/](./archive/canvas_controller_tests_20260305/)*
