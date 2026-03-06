@@ -58,7 +58,8 @@ Ad hoc task can be implement in main.
        - when staging changes, stage only changes AI agent did, do not interfere with users works, if possible
 - **Conductor Tasks (Phase Workflow):**
   - Complete task -> Verify -> Update `plan.md` (mark `[x]`).
-  - **Phase Completion:** Once a phase is completed, the **project-orchestrator** will create a single **Checkpoint Commit** for the entire phase.
+  - **Task Commit:** Commit the individual task immediately after it is verified to prevent data loss.
+  - **Phase Completion:** Once a phase is completed, the **project-orchestrator** will perform a final verification and create a **Phase Checkpoint** commit if necessary.
 
 ### **GitHub Integration:**
   - Most tasks should have a GitHub Issue. Ask user for the issue or if you can proceed without GitHub issue.
