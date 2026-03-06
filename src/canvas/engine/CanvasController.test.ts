@@ -10,8 +10,10 @@ import { CanvasController } from './CanvasController';
 import { InputManager } from './InputManager';
 import { Game } from '../../models/Game';
 import { GameRules } from '../../models/GameRules';
+import { pixelToHex } from '../utils/HexUtils';
 
 // Mock dependencies
+vi.mock('../utils/HexUtils');
 vi.mock('../graphics/HexRenderer');
 vi.mock('../graphics/TileRenderer');
 vi.mock('../graphics/DebugRenderer');
@@ -161,5 +163,122 @@ describe('CanvasController', () => {
     expect(callback).toHaveBeenCalledTimes(1);
 
     vi.useRealTimers();
+  });
+
+  describe('Input Handlers', () => {
+    beforeEach(() => {
+      controller = new CanvasController(canvas, session);
+    });
+
+    it('should handle zoom and respect sensitivity bounds', () => {
+      const camera = (controller as any).camera;
+      const zoomBySpy = vi.spyOn(camera, 'zoomBy');
+      
+      (controller as any).handleZoom(100);
+      
+      // ZOOM_SENSITIVITY is 0.001, MIN_ZOOM is 0.5, MAX_ZOOM is 3.0
+      expect(zoomBySpy).toHaveBeenCalledWith(
+        -0.1, // -100 * 0.001
+        0.5,
+        3.0
+      );
+    });
+
+    it('should handle hover and update hoveredHex', () => {
+      // Mock screenToWorld to return predictable coords
+      const camera = (controller as any).camera;
+      // Depending on HexSize, 0,0 is hex 0,0,0
+      camera.screenToWorld = vi.fn().mockReturnValue({ x: 0, y: 0 });
+      vi.mocked(pixelToHex).mockReturnValue(new HexCoordinate(0, 0, 0));
+      
+      (controller as any).handleHover(100, 100);
+      
+      // Based on pixelToHex(0, 0)
+      expect((controller as any).hoveredHex).toEqual(new HexCoordinate(0, 0, 0));
+    });
+
+    it('should handle leave and clear hoveredHex', () => {
+      (controller as any).hoveredHex = new HexCoordinate(0, 0, 0);
+      
+      (controller as any).handleLeave();
+      
+      expect((controller as any).hoveredHex).toBeNull();
+    });
+
+    it('should handle rotate clockwise and notify stats change', () => {
+      const activeGame = session.activeGame!;
+      const rotateSpy = vi.spyOn(activeGame, 'rotateQueuedTileClockwise');
+      const notifySpy = vi.fn();
+      controller.onStatsChange = notifySpy;
+
+      (controller as any).handleRotateClockwise();
+
+      expect(rotateSpy).toHaveBeenCalled();
+      expect(notifySpy).toHaveBeenCalledWith(
+        activeGame.score,
+        activeGame.remainingTurns,
+        activeGame.peek()
+      );
+    });
+
+    it('should handle rotate counter-clockwise and notify stats change', () => {
+      const activeGame = session.activeGame!;
+      const rotateSpy = vi.spyOn(activeGame, 'rotateQueuedTileCounterClockwise');
+      const notifySpy = vi.fn();
+      controller.onStatsChange = notifySpy;
+
+      (controller as any).handleRotateCounterClockwise();
+
+      expect(rotateSpy).toHaveBeenCalled();
+      expect(notifySpy).toHaveBeenCalledWith(
+        activeGame.score,
+        activeGame.remainingTurns,
+        activeGame.peek()
+      );
+    });
+
+    it('should handle mouse click and place tile if placement is valid', () => {
+      const activeGame = session.activeGame!;
+      const placeTileSpy = vi.spyOn(activeGame, 'placeTile');
+      const notifySpy = vi.fn();
+      controller.onStatsChange = notifySpy;
+
+      // Coordinate (1, 0, -1) is adjacent to (0, 0, 0) and likely empty initially
+      const targetCoord = new HexCoordinate(1, 0, -1);
+
+      const camera = (controller as any).camera;
+      camera.screenToWorld = vi.fn().mockReturnValue({ x: 100, y: 100 });
+      
+      // We need to mock pixelToHex to return our targetCoord
+      vi.mocked(pixelToHex).mockReturnValue(targetCoord);
+      
+      // Mock isValidPlacement to return true
+      vi.spyOn(activeGame, 'isValidPlacement').mockReturnValue(true);
+
+      (controller as any).handleMouseClick(100, 100);
+
+      expect(placeTileSpy).toHaveBeenCalledWith(targetCoord);
+      expect(notifySpy).toHaveBeenCalled();
+    });
+
+    it('should not place tile on mouse click if placement is invalid', () => {
+      const activeGame = session.activeGame!;
+      const placeTileSpy = vi.spyOn(activeGame, 'placeTile');
+      const notifySpy = vi.fn();
+      controller.onStatsChange = notifySpy;
+
+      const targetCoord = new HexCoordinate(0, 0, 0); // Occupied
+      const camera = (controller as any).camera;
+      camera.screenToWorld = vi.fn().mockReturnValue({ x: 0, y: 0 });
+      vi.mocked(pixelToHex).mockReturnValue(targetCoord);
+      
+      // Mock isValidPlacement to return false
+      vi.spyOn(activeGame, 'isValidPlacement').mockReturnValue(false);
+
+      (controller as any).handleMouseClick(0, 0);
+
+      expect(placeTileSpy).not.toHaveBeenCalled();
+      expect(notifySpy).not.toHaveBeenCalled();
+    });
   });
 });
