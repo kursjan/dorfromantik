@@ -1,11 +1,11 @@
 # Track: Firebase Auth & Storage Integration
 
-## Phase 1: Core Logic & Serialization (No UI, No DB yet)
-- [x] Create and switch to feature branch `feat/firebase-integration` using **task-conductor** skill.
+## Phase 1: Core Logic & Serialization (No UI, No DB yet) [checkpoint: 0acf0bf]
+- [x] Create and switch to feature branch feat/firebase-integration using **task-conductor** skill.
 - [x] Install `firebase` dependency and create a basic `src/services/firebase.ts` initialization file using **task-conductor** skill.
 - [x] Implement a `GameSerializer.ts` utility to safely convert a `Game` instance to plain JSON and reconstruct it back into classes using **task-conductor** skill.
-- [~] Write exhaustive unit tests for `GameSerializer` to ensure no data is lost during conversion using **task-conductor** skill.
-- [ ] **Phase Gate**: Verify serialization logic is 100% correct using **project-orchestrator** skill.
+- [x] Write exhaustive unit tests for `GameSerializer` to ensure no data is lost during conversion using **task-conductor** skill.
+- [x] **Phase Gate**: Verify serialization logic is 100% correct using **project-orchestrator** skill.
 
 ## Phase 2: Authentication State
 - [ ] Implement a standalone `AuthService.ts` wrapper for Firebase anonymous login and Google Sign-In using **task-conductor** skill. (Use Vitest mocks for testing).
