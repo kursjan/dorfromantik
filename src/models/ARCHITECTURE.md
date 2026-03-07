@@ -42,7 +42,17 @@ Encapsulates all rules related to points and bonuses.
   - **Perfect Bonus**: Checks if the placed tile or any of its neighbors have become "Perfect".
 - **`isPerfect(board, boardTile)`**: Helper to determine if a tile at the given coordinate has 6 matching neighbors.
 
-### 6. Perfect Placement Scoring
+### 6. Persistence & Serialization (`GameSerializer.ts`)
+The `GameSerializer` class is responsible for converting complex class-based game state into plain JSON and back.
+- **Goal:** Enable storing and loading game state from Firebase/Firestore without losing the behavioral methods and properties of the class instances.
+- **Scope:** It recursively handles:
+  - `Game` (ID, name, score, metadata)
+  - `Board` (A Map of coordinates to tiles)
+  - `Tile` (Terrain types for all 6 sides, rotation-stable IDs)
+  - `HexCoordinate` (Cube coordinate system validation)
+- **Pattern:** Each `serialize` method returns a `JSON` interface (e.g., `GameJSON`), and each `deserialize` method reconstructs the class instance (e.g., `new Game(...)`).
+
+### 7. Perfect Placement Scoring
 The game implements the "Perfect Placement" bonus (Steam rules):
 - **Definition**: A tile is "Perfect" if all 6 of its neighbors exist and their touching terrains match exactly.
 - **Bonus**: Each placement that results in a tile *becoming* perfect awards:
