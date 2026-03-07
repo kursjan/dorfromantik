@@ -11,11 +11,16 @@ This document defines the core technologies, architectural patterns, and quality
 - **Build Tool:** [Vite](https://vitejs.dev/)
 
 ## Infrastructure & Deployment
-- **Platform:** [Firebase](https://firebase.google.com/)
+- **Platform:** [Firebase](https://firebase.google.com/) (Auth & Firestore)
 - **Development Environment:** [Project IDX](https://idx.google.com/) (Configured via `.idx/dev.nix`)
 - **IDE:** Code OSS (Integrated with Firebase Studio)
 
 ## Architectural Patterns (High Performance 2D)
+
+### Persistence & Serialization
+- **GameSerializer:** A specialized utility to convert complex class-based game state (Game, Board, Tile, HexCoordinate) into plain JSON for Firebase storage and back into class instances.
+- **Firebase Auth:** Handles anonymous and permanent user authentication.
+- **Firestore:** Persistent storage for user profiles and saved game states.
 
 ### Canvas Controller Pattern
 - **Pattern:** Decouples React from the Canvas API.
