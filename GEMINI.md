@@ -168,6 +168,10 @@ The AI operates within the Firebase Studio development environment, which provid
   - The `web` preview is configured to run `npm run dev -- --port $PORT --host 0.0.0.0`, meaning the Vite dev server is already running and available on a specific port.
   - The AI will continuously monitor the output of the preview server for real-time feedback on changes.
 - **Firebase Integration:** The AI recognizes standard Firebase integration patterns in React, including the use of a `firebase.js` or `firebase.ts` configuration file and interactions with various Firebase SDKs.
+- **Environment Variables Strategy (.env vs .env.local):**
+  - **`.env` (Worktree Specific):** This file is strictly for worktree-specific configurations like `PORT` (e.g., `PORT=5174` for worker1). It must remain unique to each folder to prevent port collisions.
+  - **`.env.local` (Shared Secrets):** This file stores shared project secrets like Firebase API keys. To ensure consistency, there should only be one physical `.env.local` file located in the `main` directory. All other worktrees (`worker1`, `worker2`) should use a symlink pointing to the physical file (e.g. `ln -s ../dorfromantik/.env.local .env.local`).
+  - **`.env.example` (Tracked Template):** This is the only environment file tracked by Git. It must only contain placeholder values and document the required keys for the project.
 - **Architecture:** The AI can read about the architecture of a given folder from an `ARCHITECTURE.md` file.
 
 ## **Code Modification & Dependency Management**
