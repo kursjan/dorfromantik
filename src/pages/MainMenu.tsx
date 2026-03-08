@@ -10,6 +10,7 @@ const MainMenu: React.FC = () => {
   const navigate = useNavigate();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { session, startNewStandardGame, startNewTestGame, continueGame } = useSession();
+  const { user } = session;
 
   const handleStartStandard = () => {
     startNewStandardGame();
@@ -37,7 +38,17 @@ const MainMenu: React.FC = () => {
   return (
     <div className="main-menu">
       <div className="main-menu__container">
-        <h1 className="main-menu__title">Dorfromantik</h1>
+        <header className="main-menu__header">
+          <h1 className="main-menu__title">Dorfromantik</h1>
+          <div className="main-menu__profile">
+            <span className={`main-menu__profile-badge ${user.isAnonymous ? 'main-menu__profile-badge--anon' : 'main-menu__profile-badge--perm'}`}>
+              {user.isAnonymous ? 'Guest' : 'Player'}
+            </span>
+            <span className="main-menu__profile-name">
+              {user.displayName || user.id.substring(0, 12)}
+            </span>
+          </div>
+        </header>
         
         <div className="main-menu__content">
           <div className="main-menu__sidebar">
