@@ -1,21 +1,11 @@
-export interface UserProps {
-  id: string;
-  displayName?: string | null;
-}
-
-/**
- * Represents a user in the system.
- */
 export abstract class User {
   readonly id: string;
-  readonly displayName?: string | null;
 
-  constructor(props: UserProps) {
-    if (!props.id || props.id.trim() === '') {
+  constructor(id: string) {
+    if (!id || id.trim() === '') {
       throw new Error('User ID cannot be empty');
     }
-    this.id = props.id;
-    this.displayName = props.displayName;
+    this.id = id;
   }
 
   abstract get isAnonymous(): boolean;
@@ -26,7 +16,7 @@ export abstract class User {
  */
 export class AnonymousUser extends User {
   constructor(id: string) {
-    super({ id });
+    super(id);
   }
 
   get isAnonymous(): boolean {
@@ -38,8 +28,11 @@ export class AnonymousUser extends User {
  * Represents a user who has linked a permanent account (e.g., via Google).
  */
 export class RegisteredUser extends User {
-  constructor(props: UserProps) {
-    super(props);
+  readonly displayName?: string | null;
+
+  constructor(id: string, displayName?: string | null) {
+    super(id);
+    this.displayName = displayName;
   }
 
   get isAnonymous(): boolean {

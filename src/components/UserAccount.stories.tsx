@@ -25,6 +25,6 @@ export const Guest: Story = {
 
 export const Permanent: Story = {
   args: {
-    user: new RegisteredUser({ id: 'permanent-456', displayName: 'Jane Doe' }),
+    user: new RegisteredUser('permanent-456', 'Jane Doe'),
   },
 };
