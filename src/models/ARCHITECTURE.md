@@ -17,11 +17,15 @@ This directory contains the core data structures and business logic for the Dorf
   - **`rotateClockwise()` / `rotateCounterClockwise()`**: Returns a *new* Tile instance with shifted terrain properties.
 
 ### 3. Session & Rules (`User.ts`, `GameRules.ts`, `Session.ts`)
-- **`User`**: Basic user identity, compatible with Firebase UID.
+- **`User`**: Represents a player identity. It supports both **Anonymous Guests** (auto-assigned on app load) and **Permanent Accounts** (linked via Google). It tracks `id`, `isAnonymous`, and `displayName`.
 - **`GameRules`**: Configurable settings for a game (initial turns, points per match).
 - **`Session`**: Manages a user's game lifecycle, including their current `activeGame` and a history of finished `games`.
 
-### 4. Game Engine (`Game.ts`)
+### 4. Services & Providers
+- **`AuthService.ts`**: A stateless wrapper around the Firebase Authentication SDK. It provides unified methods for anonymous login, Google sign-in, and auth state monitoring.
+- **`SessionProvider`**: A React context provider that orchestrates the user's session. It listens to `AuthService` changes, initializes the `User` model, and manages the transition between guest and permanent account states.
+
+### 5. Game Engine (`Game.ts`)
 The `Game` class is the central orchestrator of an active session.
 - **State**: Tracks the `Board`, `Score`, and the `TileQueue`.
 - **Turns as Tiles**: The game follows a "Tiles are Turns" philosophy. `remainingTurns` is a derived property of `tileQueue.length`.
