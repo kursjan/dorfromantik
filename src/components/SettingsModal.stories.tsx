@@ -2,12 +2,12 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { SettingsModal } from './SettingsModal';
 import { SessionContext } from '../context/SessionContext';
 import { Session } from '../models/Session';
-import { User } from '../models/User';
+import { AnonymousUser, RegisteredUser } from '../models/User';
 import { Game } from '../models/Game';
 import { Board } from '../models/Board';
 import { GameRules } from '../models/GameRules';
 
-const mockUser = new User('mock-user-123', true, 'Guest Player');
+const mockUser = new AnonymousUser('mock-user-123');
 const mockSession = new Session('mock-session-123', mockUser);
 mockSession.games.push(
   new Game({
@@ -62,7 +62,7 @@ export const PermanentAccount: Story = {
   },
   decorators: [
     (Story) => {
-      const permanentUser = new User('permanent-user-456', false, 'Jane Doe');
+      const permanentUser = new RegisteredUser({ id: 'permanent-user-456', displayName: 'Jane Doe' });
       const permanentSession = new Session('perm-session-456', permanentUser);
       return (
         <SessionContext.Provider

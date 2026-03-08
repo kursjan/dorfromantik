@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { UserAccount } from './UserAccount';
-import { User } from '../models/User';
+import { AnonymousUser, RegisteredUser } from '../models/User';
 
 const meta = {
   title: 'UI/Components/UserAccount',
@@ -19,12 +19,12 @@ type Story = StoryObj<typeof meta>;
 
 export const Guest: Story = {
   args: {
-    user: new User('guest-123', true),
+    user: new AnonymousUser('guest-123'),
   },
 };
 
 export const Permanent: Story = {
   args: {
-    user: new User('permanent-456', false, 'Jane Doe'),
+    user: new RegisteredUser({ id: 'permanent-456', displayName: 'Jane Doe' }),
   },
 };
