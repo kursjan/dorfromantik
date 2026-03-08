@@ -1,7 +1,24 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import App from './App';
+
+vi.mock('./services/AuthService', () => {
+  const mockUser = { uid: 'mock-uid', isAnonymous: true, displayName: 'Test User' };
+  return {
+    AuthService: {
+      signInAnonymously: vi.fn().mockResolvedValue(mockUser),
+      signInWithGoogle: vi.fn().mockResolvedValue(mockUser),
+      signOut: vi.fn().mockResolvedValue(undefined),
+      onAuthStateChanged: vi.fn((callback) => {
+        // Immediately invoke with a mock user
+        callback(mockUser);
+        return vi.fn(); // Mock unsubscribe function
+      }),
+      getCurrentUser: vi.fn().mockReturnValue(mockUser),
+    }
+  };
+});
 
 describe('App', () => {
   it('renders dorfromantik header on main menu', () => {
