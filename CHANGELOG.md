@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 
+- **Firebase Authentication:** Implemented full authentication lifecycle using Firebase.
+  - **Anonymous Sessions:** Players are automatically assigned a guest ID on app load, allowing immediate play.
+  - **Google Account Linking:** Integrated Google Sign-In to allow users to upgrade from a guest session to a permanent account.
+  - **User Profile UI:** Added a `UserAccount` component and updated the `MainMenu` and `SettingsModal` to display player identity and login status.
 - **Firebase Integration (Initial):** Added the `firebase` SDK and initialization logic for Authentication and Firestore.
 - **Game Serialization:** Implemented `GameSerializer` to convert complex class-based game state (Game, Board, Tile, HexCoordinate) into plain JSON for persistent storage and back into functional class instances. This is a critical foundation for cross-session play and cloud saving.
 - **Always-on Ghost Preview:** The game now continuously renders a preview of the next tile under the cursor, with distinct styles for valid and invalid placements.
