@@ -10,8 +10,8 @@
 ## Phase 2: Authentication State
 - [x] Implement a standalone `AuthService.ts` wrapper for Firebase anonymous login and Google Sign-In using **task-conductor** skill. (Use Vitest mocks for testing).
 - [x] Update `models/User.ts` and `SessionContext.tsx` to automatically sign in anonymously and expose the Firebase UID using **task-conductor** skill.
-- [~] Build a "Sign In" UI component (e.g., in `MainMenu` or `SettingsModal`) that calls `AuthService` using **task-conductor** skill.
-- [ ] **Phase Gate**: Verify UI and Auth state synchronization using **project-orchestrator** skill.
+- [x] Build a "Sign In" UI component (e.g., in `MainMenu` or `SettingsModal`) that calls `AuthService` using **task-conductor** skill.
+- [~] **Phase Gate**: Verify UI and Auth state synchronization using **project-orchestrator** skill.
 
 ## Phase 2.1: Account Linking & Auth State Robustness
 - [ ] Update `AuthService.ts` to use `linkWithPopup` when upgrading an anonymous account to a Google account using **task-conductor** skill.
