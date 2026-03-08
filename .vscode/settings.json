@@ -1,0 +1,5 @@
+{
+  "search.exclude": {
+    "**/conductor/archive/**": true
+  }
+}
