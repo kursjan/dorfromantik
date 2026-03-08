@@ -4,6 +4,7 @@ import { GameCard } from '../components/GameCard';
 import { SettingsModal } from '../components/SettingsModal';
 import { useSession } from '../context/SessionContext';
 import { AuthService } from '../services/AuthService';
+import { RegisteredUser } from '../models/User';
 import './MainMenu.css';
 
 const MainMenu: React.FC = () => {
