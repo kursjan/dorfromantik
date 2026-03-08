@@ -72,12 +72,14 @@ const MainMenu: React.FC = () => {
               >
                 Settings
               </button>
-              <button 
-                className="main-menu__button main-menu__button--danger"
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
+              {!user.isAnonymous && (
+                <button 
+                  className="main-menu__button main-menu__button--danger"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              )}
             </div>
           </div>
 
