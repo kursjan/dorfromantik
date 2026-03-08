@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import App from './App';
 
 vi.mock('./services/AuthService', () => {
-  const mockUser = { uid: 'mock-uid', isAnonymous: true, displayName: 'Test User' };
+  const mockUser = { uid: 'mock-uid', isAnonymous: true, displayName: null };
   return {
     AuthService: {
       signInAnonymously: vi.fn().mockResolvedValue(mockUser),
