@@ -1,15 +1,15 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Session } from './Session';
-import { User } from './User';
+import { AnonymousUser } from './User';
 import { Game } from './Game';
 import { GameRules } from './GameRules';
 
 describe('Session', () => {
-  let user: User;
+  let user: AnonymousUser;
   let gameRules: GameRules;
 
   beforeEach(() => {
-    user = new User('user-123');
+    user = new AnonymousUser('user-123');
     gameRules = new GameRules({ initialTurns: 10, pointsPerMatch: 10 });
   });
 

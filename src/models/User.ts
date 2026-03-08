@@ -1,24 +1,48 @@
+export interface UserProps {
+  id: string;
+  displayName?: string | null;
+}
+
 /**
  * Represents a user in the system.
  */
-export class User {
+export abstract class User {
   readonly id: string;
-  readonly isAnonymous: boolean;
   readonly displayName?: string | null;
 
-  /**
-   * Creates a new User.
-   * @param id - The unique identifier for the user (e.g., Firebase UID).
-   * @param isAnonymous - Whether the user is an anonymous guest.
-   * @param displayName - The user's display name, if available.
-   * @throws Error if the id is empty.
-   */
-  constructor(id: string, isAnonymous: boolean = true, displayName?: string | null) {
-    if (!id || id.trim() === '') {
+  constructor(props: UserProps) {
+    if (!props.id || props.id.trim() === '') {
       throw new Error('User ID cannot be empty');
     }
-    this.id = id;
-    this.isAnonymous = isAnonymous;
-    this.displayName = displayName;
+    this.id = props.id;
+    this.displayName = props.displayName;
+  }
+
+  abstract get isAnonymous(): boolean;
+}
+
+/**
+ * Represents a guest user who hasn't linked a permanent account.
+ */
+export class AnonymousUser extends User {
+  constructor(id: string) {
+    super({ id });
+  }
+
+  get isAnonymous(): boolean {
+    return true;
+  }
+}
+
+/**
+ * Represents a user who has linked a permanent account (e.g., via Google).
+ */
+export class RegisteredUser extends User {
+  constructor(props: UserProps) {
+    super(props);
+  }
+
+  get isAnonymous(): boolean {
+    return false;
   }
 }
