@@ -62,7 +62,7 @@ export const PermanentAccount: Story = {
   },
   decorators: [
     (Story) => {
-      const permanentUser = new RegisteredUser({ id: 'permanent-user-456', displayName: 'Jane Doe' });
+      const permanentUser = new RegisteredUser('permanent-user-456', 'Jane Doe');
       const permanentSession = new Session('perm-session-456', permanentUser);
       return (
         <SessionContext.Provider
