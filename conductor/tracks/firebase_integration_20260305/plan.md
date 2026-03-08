@@ -7,11 +7,11 @@
 - [x] Write exhaustive unit tests for `GameSerializer` to ensure no data is lost during conversion using **task-conductor** skill.
 - [x] **Phase Gate**: Verify serialization logic is 100% correct using **project-orchestrator** skill.
 
-## Phase 2: Authentication State
+## Phase 2: Authentication State [checkpoint: 303856a]
 - [x] Implement a standalone `AuthService.ts` wrapper for Firebase anonymous login and Google Sign-In using **task-conductor** skill. (Use Vitest mocks for testing).
 - [x] Update `models/User.ts` and `SessionContext.tsx` to automatically sign in anonymously and expose the Firebase UID using **task-conductor** skill.
 - [x] Build a "Sign In" UI component (e.g., in `MainMenu` or `SettingsModal`) that calls `AuthService` using **task-conductor** skill.
-- [~] **Phase Gate**: Verify UI and Auth state synchronization using **project-orchestrator** skill.
+- [x] **Phase Gate**: Verify UI and Auth state synchronization using **project-orchestrator** skill.
 
 ## Phase 3: Firestore Integration
 - [ ] Define TypeScript interfaces for Firestore documents (`UserProfile` and `SavedGame`) using **task-conductor** skill.
