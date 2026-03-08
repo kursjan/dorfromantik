@@ -16,7 +16,7 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
       if (firebaseUser) {
         const user = firebaseUser.isAnonymous
           ? new AnonymousUser(firebaseUser.uid)
-          : new RegisteredUser(firebaseUser.uid, firebaseUser.displayName);
+          : new RegisteredUser(firebaseUser.uid, firebaseUser.displayName || firebaseUser.uid);
         
         const newSession = new Session(`session-${firebaseUser.uid}`, user);
 
