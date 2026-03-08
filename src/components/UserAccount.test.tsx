@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UserAccount } from './UserAccount';
-import { User } from '../models/User';
+import { AnonymousUser, RegisteredUser } from '../models/User';
 import { AuthService } from '../services/AuthService';
 
 vi.mock('../services/AuthService', () => ({
@@ -17,7 +17,7 @@ describe('UserAccount', () => {
   });
 
   it('renders guest status for anonymous users', () => {
-    const user = new User('guest-123', true);
+    const user = new AnonymousUser('guest-123');
     render(<UserAccount user={user} />);
 
     expect(screen.getByText(/Guest Session/i)).toBeInTheDocument();
@@ -26,7 +26,7 @@ describe('UserAccount', () => {
   });
 
   it('renders permanent status for signed-in users', () => {
-    const user = new User('permanent-123', false, 'John Doe');
+    const user = new RegisteredUser({ id: 'permanent-123', displayName: 'John Doe' });
     render(<UserAccount user={user} />);
 
     expect(screen.getByText(/Permanent Account/i)).toBeInTheDocument();
@@ -35,7 +35,7 @@ describe('UserAccount', () => {
   });
 
   it('calls signInWithGoogle when Link button is clicked', () => {
-    const user = new User('guest-123', true);
+    const user = new AnonymousUser('guest-123');
     render(<UserAccount user={user} />);
 
     fireEvent.click(screen.getByText(/Link Google Account/i));
@@ -43,7 +43,7 @@ describe('UserAccount', () => {
   });
 
   it('calls signOut when Sign Out button is clicked', () => {
-    const user = new User('permanent-123', false);
+    const user = new RegisteredUser({ id: 'permanent-123' });
     render(<UserAccount user={user} />);
 
     fireEvent.click(screen.getByText(/Sign Out/i));

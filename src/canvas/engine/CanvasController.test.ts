@@ -2,7 +2,7 @@ import { Tile } from '../../models/Tile';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { Session } from '../../models/Session';
-import { User } from '../../models/User';
+import { AnonymousUser } from '../../models/User';
 import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexRenderer } from '../graphics/HexRenderer';
 import { TileRenderer } from '../graphics/TileRenderer';
@@ -56,7 +56,7 @@ describe('CanvasController', () => {
     canvas = canvasElement;
 
     // Create a minimal session with an active game
-    const user = new User('user-1');
+    const user = new AnonymousUser('user-1');
     session = new Session('session-1', user);
     session.activeGame = Game.create(GameRules.createTest());
 
