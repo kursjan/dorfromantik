@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { Session } from '../models/Session';
-import { AnonymousUser, RegisteredUser, User } from '../models/User';
+import { AnonymousUser, RegisteredUser } from '../models/User';
 import { Game } from '../models/Game';
 import { Board } from '../models/Board';
 import { GameRules } from '../models/GameRules';
@@ -14,15 +14,9 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
   useEffect(() => {
     const unsubscribe = AuthService.onAuthStateChanged((firebaseUser) => {
       if (firebaseUser) {
-        let user: User;
-        if (firebaseUser.isAnonymous) {
-          user = new AnonymousUser(firebaseUser.uid);
-        } else {
-          user = new RegisteredUser({ 
-            id: firebaseUser.uid, 
-            displayName: firebaseUser.displayName 
-          });
-        }
+        const user = firebaseUser.isAnonymous
+          ? new AnonymousUser(firebaseUser.uid)
+          : new RegisteredUser(firebaseUser.uid, firebaseUser.displayName);
         
         const newSession = new Session(`session-${firebaseUser.uid}`, user);
 

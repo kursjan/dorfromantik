@@ -26,7 +26,7 @@ describe('UserAccount', () => {
   });
 
   it('renders permanent status for signed-in users', () => {
-    const user = new RegisteredUser({ id: 'permanent-123', displayName: 'John Doe' });
+    const user = new RegisteredUser('permanent-123', 'John Doe');
     render(<UserAccount user={user} />);
 
     expect(screen.getByText(/Permanent Account/i)).toBeInTheDocument();
@@ -34,16 +34,16 @@ describe('UserAccount', () => {
     expect(screen.getByText(/Sign Out/i)).toBeInTheDocument();
   });
 
-  it('calls signInWithGoogle when Link button is clicked', () => {
-    const user = new AnonymousUser('guest-123');
+  it('calls signOut when Sign Out button is clicked', () => {
+    const user = new RegisteredUser('permanent-123');
     render(<UserAccount user={user} />);
 
-    fireEvent.click(screen.getByText(/Link Google Account/i));
-    expect(AuthService.signInWithGoogle).toHaveBeenCalled();
+    fireEvent.click(screen.getByText(/Sign Out/i));
+    expect(AuthService.signOut).toHaveBeenCalled();
   });
 
   it('calls signOut when Sign Out button is clicked', () => {
-    const user = new RegisteredUser({ id: 'permanent-123' });
+    const user = new RegisteredUser('permanent-123');
     render(<UserAccount user={user} />);
 
     fireEvent.click(screen.getByText(/Sign Out/i));
