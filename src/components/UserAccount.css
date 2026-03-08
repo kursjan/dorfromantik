@@ -1,0 +1,118 @@
+.user-account {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.user-account__info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.user-account__status {
+  display: flex;
+  align-items: center;
+}
+
+.user-account__badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.user-account__badge--anonymous {
+  background: linear-gradient(135deg, #6b7280, #374151);
+  color: #f3f4f6;
+  border: 1px solid #9ca3af;
+}
+
+.user-account__badge--permanent {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #f0fdf4;
+  border: 1px solid #34d399;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+}
+
+.user-account__details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 1rem;
+  font-size: 0.875rem;
+}
+
+.user-account__label {
+  color: #9ca3af;
+  font-weight: 500;
+  margin: 0;
+}
+
+.user-account__value {
+  color: #f3f4f6;
+  font-family: monospace;
+  word-break: break-all;
+  margin: 0;
+}
+
+.user-account__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.user-account__button {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.user-account__button--google {
+  background: linear-gradient(135deg, #4285f4, #34a853, #fbbc05, #ea4335);
+  background-size: 200% 200%;
+  color: white;
+  animation: google-gradient 5s ease infinite;
+}
+
+.user-account__button--google:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(66, 133, 244, 0.4);
+}
+
+.user-account__button--secondary {
+  background: #374151;
+  color: #d1d5db;
+  border: 1px solid #4b5563;
+}
+
+.user-account__button--secondary:hover {
+  background: #4b5563;
+  color: #f3f4f6;
+}
+
+.user-account__note {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-style: italic;
+  margin: 0;
+  line-height: 1.4;
+}
+
+@keyframes google-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

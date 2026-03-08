@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { GameCard } from '../components/GameCard';
 import { SettingsModal } from '../components/SettingsModal';
 import { useSession } from '../context/SessionContext';
+import { AuthService } from '../services/AuthService';
 import './MainMenu.css';
 
 const MainMenu: React.FC = () => {
@@ -23,6 +24,14 @@ const MainMenu: React.FC = () => {
   const handleContinue = (gameId: string) => {
     continueGame(gameId);
     navigate('/game');
+  };
+
+  const handleLogout = async () => {
+    try {
+      await AuthService.signOut();
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
 
   return (
@@ -54,6 +63,7 @@ const MainMenu: React.FC = () => {
               </button>
               <button 
                 className="main-menu__button main-menu__button--danger"
+                onClick={handleLogout}
               >
                 Logout
               </button>
