@@ -1,4 +1,6 @@
 import React from 'react';
+import { useSession } from '../context/SessionContext';
+import { UserAccount } from './UserAccount';
 import './SettingsModal.css';
 
 export interface SettingsModalProps {
@@ -7,6 +9,8 @@ export interface SettingsModalProps {
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
+  const { session } = useSession();
+  
   if (!isOpen) return null;
 
   return (
@@ -17,6 +21,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         </div>
         
         <div className="settings-modal__content">
+          <div className="settings-modal__section">
+            <span className="settings-modal__section-title">Profile & Account</span>
+            <UserAccount user={session.user} />
+          </div>
+
           <div className="settings-modal__section">
             <span className="settings-modal__section-title">Audio</span>
             <div className="settings-placeholder">Volume controls coming soon...</div>
@@ -37,4 +46,3 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     </div>
   );
 };
-
