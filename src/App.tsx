@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainMenu from './pages/MainMenu';
 import { GameBoard } from './pages/GameBoard';
-import { SessionProvider } from './context/SessionContext';
+import { SessionProvider } from './context/SessionProvider';
 
 function App() {
   return (
