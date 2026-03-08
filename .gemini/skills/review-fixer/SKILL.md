@@ -25,13 +25,15 @@ Automatically address code review feedback left on the current pull request by m
    - Push the changes to the remote branch: `git push origin HEAD`
 6. **Reporting & Communication (GitHub Replies):**
    - You must reply individually to *each* specific comment thread you addressed. Do not post a single top-level summary comment on the PR.
-   - **How to reply:**
-     1. During Step 1 (`gh pr view`), identify the `id` of each comment thread.
-     2. For each addressed thread, execute:
-        ```bash
-        gh api graphql -f query='mutation { addPullRequestReviewThreadReply(input: {pullRequestReviewThreadId: "<THREAD_ID>", body: "Done. <Brief explanation>"}) { clientMutationId } }'
-        ```
-   - **For Questions/Inquiries:** Do not modify code. Formulate a technical explanation and reply directly to the comment thread using the same command above.
+   - To reply, you must first identify the `id` of each comment thread from your `gh pr view` output.
+   - **For Directives (Code Changes):** After pushing the fix, reply to the comment thread with "Done", followed by a brief, technical explanation of *how* and *why* you implemented the fix. Execute:
+     ```bash
+     gh api graphql -f query='mutation { addPullRequestReviewThreadReply(input: {pullRequestReviewThreadId: "<THREAD_ID>", body: "Done. <Brief explanation>"}) { clientMutationId } }'
+     ```
+   - **For Questions/Inquiries:** Do not modify code. Formulate a technical explanation or justification and reply directly to the comment thread. Execute:
+     ```bash
+     gh api graphql -f query='mutation { addPullRequestReviewThreadReply(input: {pullRequestReviewThreadId: "<THREAD_ID>", body: "<Your technical explanation>"}) { clientMutationId } }'
+     ```
    - **Verification:** After replying, verify that all open comments have been addressed by re-running `gh pr view --json comments,reviews` and checking that no actionable feedback remains unanswered.
    - Finally, summarize the actions taken and provide the commit hash to the user in the CLI.
 
