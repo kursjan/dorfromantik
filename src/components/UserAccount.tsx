@@ -40,7 +40,7 @@ export const UserAccount: React.FC<UserAccountProps> = ({ user }) => {
         <div className="user-account__details">
           <p className="user-account__label">User ID:</p>
           <p className="user-account__value">{user.id}</p>
-          {!user.isAnonymous && (user as RegisteredUser).displayName && (
+          {!user.isAnonymous && (
             <>
               <p className="user-account__label">Name:</p>
               <p className="user-account__value">{(user as RegisteredUser).displayName}</p>

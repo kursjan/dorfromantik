@@ -46,7 +46,7 @@ const MainMenu: React.FC = () => {
               {user.isAnonymous ? 'Guest' : 'Player'}
             </span>
             <span className="main-menu__profile-name">
-              {!user.isAnonymous && (user as RegisteredUser).displayName ? (user as RegisteredUser).displayName : user.id.substring(0, 12)}
+              {user.isAnonymous ? user.id.substring(0, 12) : (user as RegisteredUser).displayName}
             </span>
           </div>
         </header>

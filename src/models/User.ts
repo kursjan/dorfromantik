@@ -28,10 +28,13 @@ export class AnonymousUser extends User {
  * Represents a user who has linked a permanent account (e.g., via Google).
  */
 export class RegisteredUser extends User {
-  readonly displayName?: string | null;
+  readonly displayName: string;
 
-  constructor(id: string, displayName?: string | null) {
+  constructor(id: string, displayName: string) {
     super(id);
+    if (!displayName || displayName.trim() === '') {
+      throw new Error('RegisteredUser displayName cannot be empty');
+    }
     this.displayName = displayName;
   }
 

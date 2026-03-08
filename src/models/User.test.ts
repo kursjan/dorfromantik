@@ -24,15 +24,12 @@ describe('User Polymorphism', () => {
       expect(user.displayName).toBe('Test Player');
     });
 
-    it('should create a RegisteredUser without a display name', () => {
-      const user = new RegisteredUser('user-789');
-      expect(user.id).toBe('user-789');
-      expect(user.isAnonymous).toBe(false);
-      expect(user.displayName).toBeUndefined();
+    it('should throw an error if the ID is empty', () => {
+      expect(() => new RegisteredUser('', 'Test Player')).toThrow('User ID cannot be empty');
     });
 
-    it('should throw an error if the ID is empty', () => {
-      expect(() => new RegisteredUser('')).toThrow('User ID cannot be empty');
+    it('should throw an error if the displayName is empty', () => {
+      expect(() => new RegisteredUser('user-789', '')).toThrow('RegisteredUser displayName cannot be empty');
     });
   });
 });
