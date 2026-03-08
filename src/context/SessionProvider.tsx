@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { Session } from '../models/Session';
-import { User } from '../models/User';
+import { AnonymousUser, RegisteredUser, User } from '../models/User';
 import { Game } from '../models/Game';
 import { Board } from '../models/Board';
 import { GameRules } from '../models/GameRules';
@@ -14,7 +14,16 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
   useEffect(() => {
     const unsubscribe = AuthService.onAuthStateChanged((firebaseUser) => {
       if (firebaseUser) {
-        const user = new User(firebaseUser.uid, firebaseUser.isAnonymous, firebaseUser.displayName);
+        let user: User;
+        if (firebaseUser.isAnonymous) {
+          user = new AnonymousUser(firebaseUser.uid);
+        } else {
+          user = new RegisteredUser({ 
+            id: firebaseUser.uid, 
+            displayName: firebaseUser.displayName 
+          });
+        }
+        
         const newSession = new Session(`session-${firebaseUser.uid}`, user);
 
         // Add some historical games for demonstration (will be replaced by Firestore later)
@@ -51,26 +60,25 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
   }, []);
 
   const startNewStandardGame = () => {
-    if (!session) return;
+    if (!session) throw new Error("Cannot start game: Session is not initialized");
     const game = Game.create(GameRules.createStandard());
     const newSession = new Session(session.sessionId, session.user, game, [...session.games]);
     setSession(newSession);
   };
 
   const startNewTestGame = () => {
-    if (!session) return;
+    if (!session) throw new Error("Cannot start game: Session is not initialized");
     const game = Game.create(GameRules.createTest());
     const newSession = new Session(session.sessionId, session.user, game, [...session.games]);
     setSession(newSession);
   };
 
   const continueGame = (gameId: string) => {
-    if (!session) return;
+    if (!session) throw new Error("Cannot continue game: Session is not initialized");
     const game = session.games.find(g => g.id === gameId);
-    if (game) {
-      const newSession = new Session(session.sessionId, session.user, game, [...session.games]);
-      setSession(newSession);
-    }
+    if (!game) throw new Error(`Cannot continue game: Game with id ${gameId} not found`);
+    const newSession = new Session(session.sessionId, session.user, game, [...session.games]);
+    setSession(newSession);
   };
 
   // Wait for auth to initialize before rendering children

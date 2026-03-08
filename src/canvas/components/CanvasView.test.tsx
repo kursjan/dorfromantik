@@ -5,7 +5,7 @@ import { Game } from '../../models/Game';
 import { Tile } from '../../models/Tile';
 import { GameRules } from '../../models/GameRules';
 import { Session } from '../../models/Session';
-import { User } from '../../models/User';
+import { AnonymousUser } from '../../models/User';
 import { CanvasController } from '../engine/CanvasController';
 import { CanvasView } from './CanvasView';
 
@@ -25,7 +25,7 @@ describe('CanvasView', () => {
   let game: Game;
 
   beforeEach(() => {
-    const user = new User('test-user');
+    const user = new AnonymousUser('test-user');
     const board = new Board();
     const rules = new GameRules();
     game = new Game({ board, rules, tileQueue: [new Tile(), new Tile()], score: 100 });

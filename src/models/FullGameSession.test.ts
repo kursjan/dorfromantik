@@ -5,14 +5,14 @@ import { HexCoordinate } from './HexCoordinate';
 import { south, southEast } from './Navigation';
 import { Session } from './Session';
 import { Tile } from './Tile';
-import { User } from './User';
+import { AnonymousUser, User } from './User';
 
 describe('Full Game Session Integration', () => {
   let user: User;
   let session: Session;
 
   beforeEach(() => {
-    user = new User('player-1');
+    user = new AnonymousUser('player-1');
     session = new Session('session-1', user);
   });
 
