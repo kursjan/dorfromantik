@@ -35,7 +35,7 @@ describe('UserAccount', () => {
   });
 
   it('calls signOut when Sign Out button is clicked', () => {
-    const user = new RegisteredUser('permanent-123');
+    const user = new RegisteredUser('permanent-123', 'Test Player');
     render(<UserAccount user={user} />);
 
     fireEvent.click(screen.getByText(/Sign Out/i));
@@ -43,7 +43,7 @@ describe('UserAccount', () => {
   });
 
   it('calls signOut when Sign Out button is clicked', () => {
-    const user = new RegisteredUser('permanent-123');
+    const user = new RegisteredUser('permanent-123', 'Test Player');
     render(<UserAccount user={user} />);
 
     fireEvent.click(screen.getByText(/Sign Out/i));
