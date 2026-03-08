@@ -30,9 +30,6 @@ export class AuthService {
     return credential.user;
   }
 
-  /**
-   * Signs out the current user.
-   */
   static async signOut(): Promise<void> {
     await signOut(auth);
   }
