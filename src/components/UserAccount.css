@@ -23,20 +23,16 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .user-account__badge--anonymous {
-  background: linear-gradient(135deg, #6b7280, #374151);
-  color: #f3f4f6;
-  border: 1px solid #9ca3af;
+  background: #6b7280;
+  color: white;
 }
 
 .user-account__badge--permanent {
-  background: linear-gradient(135deg, #10b981, #059669);
-  color: #f0fdf4;
-  border: 1px solid #34d399;
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+  background: var(--color-forest-green, #2d5a27);
+  color: white;
 }
 
 .user-account__details {
@@ -47,16 +43,17 @@
 }
 
 .user-account__label {
-  color: #9ca3af;
-  font-weight: 500;
+  color: #4b5563;
+  font-weight: 600;
   margin: 0;
 }
 
 .user-account__value {
-  color: #f3f4f6;
+  color: #111827;
   font-family: monospace;
   word-break: break-all;
   margin: 0;
+  font-weight: 500;
 }
 
 .user-account__actions {
@@ -77,42 +74,36 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.user-account__button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .user-account__button--google {
-  background: linear-gradient(135deg, #4285f4, #34a853, #fbbc05, #ea4335);
-  background-size: 200% 200%;
+  background: var(--color-forest-green, #2d5a27);
   color: white;
-  animation: google-gradient 5s ease infinite;
 }
 
 .user-account__button--google:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(66, 133, 244, 0.4);
+  background: #3e7a36;
 }
 
 .user-account__button--secondary {
   background: #374151;
-  color: #d1d5db;
-  border: 1px solid #4b5563;
+  color: white;
 }
 
 .user-account__button--secondary:hover {
   background: #4b5563;
-  color: #f3f4f6;
 }
 
 .user-account__note {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: #4b5563;
   font-style: italic;
   margin: 0;
   line-height: 1.4;
-}
-
-@keyframes google-gradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
 }
