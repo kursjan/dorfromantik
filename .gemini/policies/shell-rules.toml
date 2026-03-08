@@ -1,0 +1,6 @@
+# Auto-allow testing commands without asking for permission
+[[rule]]
+toolName = "run_shell_command"
+commandPrefix = ["CI=true npm run test:unit", "npm run test:unit", "npm test", "npm run typecheck", "npx putout", "npm run lint"]
+decision = "allow"
+priority = 100
