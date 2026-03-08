@@ -182,3 +182,6 @@ Notes to add somewhere
 - I still don't have any reasonable mental model of Git, whenever there is an issue, I tell AI to "fix that mess"
   - I want: create branch, develop, sync from main from time to time and create PR to push to main
   - I have little idea how to do any of this with command line and I don't bother to learn
+- Working with git is still a mess.. today an 3.1 agent messed up merge with main again
+- And I noticed that 2.5 seems to be much less reliable than 3.1
+  - fixing errors (failing tests), creation of a github issue, refactoring
