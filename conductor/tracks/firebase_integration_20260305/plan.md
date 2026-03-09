@@ -26,7 +26,7 @@
 - [x] **Phase Gate**: Verify GitHub Actions Playwright E2E tests pass without real keys using **project-orchestrator** skill.
 
 ## Phase 2.3: Auth Testing & Coverage
-- [ ] Fix component tests in `src/components/UserAccount.test.tsx` (remove duplicate `signOut` test and add "Link Google Account" button test) using **task-conductor** skill.
+- [x] Fix component tests in `src/components/UserAccount.test.tsx` (remove duplicate `signOut` test and add "Link Google Account" button test) using **task-conductor** skill.
 - [ ] Implement context tests in `src/context/SessionProvider.test.tsx` to verify `onAuthStateChanged` orchestration and anonymous fallback using **task-conductor** skill.
 - [ ] Add E2E Playwright tests (`e2e/auth.spec.ts`) utilizing Mock Auth to verify the end-to-end login/logout visual flow using **task-conductor** skill.
 - [ ] **Phase Gate**: Verify all unit, component, and E2E tests for authentication pass successfully using **project-orchestrator** skill.

@@ -42,11 +42,11 @@ describe('UserAccount', () => {
     expect(AuthService.signOut).toHaveBeenCalled();
   });
 
-  it('calls signOut when Sign Out button is clicked', () => {
-    const user = new RegisteredUser('permanent-123', 'Test Player');
+  it('calls signInWithGoogle when Link Google Account button is clicked', () => {
+    const user = new AnonymousUser('guest-123');
     render(<UserAccount user={user} />);
 
-    fireEvent.click(screen.getByText(/Sign Out/i));
-    expect(AuthService.signOut).toHaveBeenCalled();
+    fireEvent.click(screen.getByText(/Link Google Account/i));
+    expect(AuthService.signInWithGoogle).toHaveBeenCalled();
   });
 });
