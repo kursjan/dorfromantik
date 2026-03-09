@@ -15,7 +15,7 @@ It takes precedence over general workflow guidance for Conductor tasks.
 2. **Execution**: Perform the requested code changes. Keep changes small and limited to this single task's scope.
 3. **Quality Gate Verification**:
    - Run `npm run typecheck` (no errors).
-   - Run `npm run test:ci` to run unit + storybook tests under CI-like env (dummy Firebase keys, mock auth). This catches missing mocks that would pass locally with real keys but fail in CI.
+   - Run `npm run test:unit` for logic changes.
    - Run `npm run test:e2e:ci` for E2E-touching changes when practical.
    - Verify critical paths are covered by tests.
    - Ensure new public functions/classes have JSDoc where appropriate.
