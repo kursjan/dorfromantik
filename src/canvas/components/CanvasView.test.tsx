@@ -9,7 +9,12 @@ import { AnonymousUser } from '../../models/User';
 import { CanvasController } from '../engine/CanvasController';
 import { CanvasView } from './CanvasView';
 
-// Mock CanvasController
+vi.mock('../../services/FirestoreService', () => ({
+  FirestoreService: {
+    saveGameState: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
 vi.mock('../engine/CanvasController', () => {
   const MockController = vi.fn();
   MockController.prototype.destroy = vi.fn();
