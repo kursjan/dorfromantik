@@ -16,7 +16,8 @@ It takes precedence over general workflow guidance for Conductor tasks.
 3. **Quality Gate Verification**:
    - Run `npm run typecheck` (no errors).
    - Run `npm run test:unit` for logic changes.
-   - Run `npm run test:e2e:ci` for E2E-touching changes when practical.
+   - Run `npm run test:ui` for React UI / `.tsx` / styling changes when practical.
+   - Run `npm run test:e2e` for E2E-touching changes when practical.
    - Verify critical paths are covered by tests.
    - Ensure new public functions/classes have JSDoc where appropriate.
 4. **Impact Summary**: After execution and verification, provide a concise summary:
