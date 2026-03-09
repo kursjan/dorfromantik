@@ -9,7 +9,7 @@ import {
 import { auth } from "./firebase";
 
 // Mock Auth State
-let mockUser: any = null;
+let mockUser: Partial<FirebaseUser> | null = null;
 let authListeners: ((user: FirebaseUser | null) => void)[] = [];
 
 const notifyListeners = () => {
@@ -26,7 +26,7 @@ export class AuthService {
     if (isMockAuth) {
       mockUser = { uid: 'mock-anon-123', isAnonymous: true, displayName: null };
       notifyListeners();
-      return mockUser;
+      return mockUser as FirebaseUser;
     }
     const credential = await signInAnonymously(auth);
     return credential.user;
@@ -36,7 +36,7 @@ export class AuthService {
     if (isMockAuth) {
       mockUser = { uid: 'mock-google-456', isAnonymous: false, displayName: 'Test User' };
       notifyListeners();
-      return mockUser;
+      return mockUser as FirebaseUser;
     }
     const provider = new GoogleAuthProvider();
     try {

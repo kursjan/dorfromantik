@@ -13,9 +13,9 @@ export const UserAccount: React.FC<UserAccountProps> = ({ user }) => {
     try {
       await AuthService.signInWithGoogle();
       // SessionContext will automatically update via onAuthStateChanged
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to link Google account", error);
-      const errorCode = error?.code || 'unknown-error';
+      const errorCode = (error as { code?: string })?.code || 'unknown-error';
       alert(`Failed to sign in with Google: ${errorCode}\n\nCheck the browser console for details.`);
     }
   };
