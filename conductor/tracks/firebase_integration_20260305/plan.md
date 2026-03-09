@@ -14,7 +14,7 @@
 - [x] **Phase Gate**: Verify UI and Auth state synchronization using **project-orchestrator** skill.
 
 ## Phase 2.1: Account Linking & Auth State Robustness
-- [ ] Update `AuthService.ts` to use `linkWithPopup` when upgrading an anonymous account to a Google account using **task-conductor** skill.
+- [x] Update `AuthService.ts` to use `linkWithPopup` when upgrading an anonymous account to a Google account using **task-conductor** skill.
 - [ ] Implement a robust `onAuthStateChanged` listener in `SessionContext.tsx` to handle the initial asynchronous auth loading state using **task-conductor** skill.
 - [ ] **Phase Gate**: Verify account linking works without data loss and loading state is smooth using **project-orchestrator** skill.
 
