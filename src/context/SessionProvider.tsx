@@ -10,6 +10,7 @@ import { SessionContext } from './SessionContext';
 
 export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
     const unsubscribe = AuthService.onAuthStateChanged((firebaseUser) => {
@@ -42,10 +43,12 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
           })
         );
         setSession(newSession);
+        setIsInitializing(false);
       } else {
         // Automatically sign in anonymously if there is no user
         AuthService.signInAnonymously().catch((error) => {
           console.error("Failed to sign in anonymously", error);
+          setIsInitializing(false);
         });
       }
     });
@@ -76,8 +79,13 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
   };
 
   // Wait for auth to initialize before rendering children
-  if (!session) {
+  if (isInitializing) {
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'white' }}>Loading Profile...</div>;
+  }
+
+  // Fallback for unexpected states
+  if (!session) {
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'red' }}>Initialization Error. Please Refresh.</div>;
   }
 
   return (
