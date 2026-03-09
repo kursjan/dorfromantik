@@ -1,0 +1,57 @@
+---
+description: Core workflow, testing, and git rules for Dorfromantik worker1 when using Cursor.
+alwaysApply: true
+---
+
+# Workflow & Task Scope
+
+- Prefer working via **Conductor tracks** (`conductor/tracks/**/plan.md`) or explicit, well-scoped ad-hoc tasks.
+- For Conductor work:
+  - Read the current track's `plan.md` and clearly identify the **current phase** and the **next unchecked task**.
+  - Work on **one task at a time**; keep changes small and limited to that task's scope.
+  - Preserve the user's wording and intent in existing docs and comments wherever possible.
+- For ad-hoc tasks:
+  - Confirm the scope with the user.
+  - Avoid large refactors unless explicitly requested.
+
+# Verification & Quality Gates
+
+- After **any** non-trivial code change:
+  - Run `npm run typecheck`.
+  - Run `npm run test:unit` for logic changes (`src/models`, `src/utils`, etc.).
+- For React UI / `.tsx` / styling changes:
+  - Also run `npm run test:ui` when practical.
+- For Conductor **phase or track completion**, and other major milestones:
+  - Run end-to-end checks (e.g. `npm run test:e2e` or targeted Playwright tests) as described in project docs.
+- If tests or typecheck fail:
+  - Fix the issues where possible instead of ignoring them.
+  - If you must stop with a failing state, clearly report why and where it fails.
+
+# Git & Branching
+
+- Do **not** develop directly on `main` for feature work; use a dedicated branch (e.g. `coding-agent/worker1` or a track-specific branch).
+- Keep commits **small and focused**:
+  - One Conductor task → one verified commit, whenever practical.
+- Commit messages should follow the pattern:
+  - `<type>(<scope>): <description> (refs #issue)`
+  - Example: `feat(auth): add anonymous session initialization (refs #42)`.
+- When asked to create phase or track checkpoints:
+  - Ensure all work is committed and pushed.
+  - Use an explicit checkpoint commit message summarizing changes for that phase/track.
+
+# User Approval & Iteration
+
+- After implementing a Conductor task or significant ad-hoc change:
+  - Provide a concise summary of what changed (files + main logic changes).
+  - Report which verification steps were run and their results.
+  - Then stop and wait for explicit user approval before:
+    - Moving to the next Conductor task,
+    - Or making further non-trivial edits.
+- Respect phrases like "lgtm", "sgtm", "approved" as signals that the user is satisfied.
+
+# Environment & Tooling
+
+- Assume a Vite + React + Firebase project with Node 20+.
+- Respect per-worktree `.env` configuration (e.g. `PORT=5174` for this worker).
+- Do not introduce new global tools or services without first confirming with the user.
+
