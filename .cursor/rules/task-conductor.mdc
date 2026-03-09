@@ -23,17 +23,17 @@ It takes precedence over general workflow guidance for Conductor tasks.
    - Modified files and specific logic changes.
    - Verification results (test pass/fail, typecheck, lint status).
    - Any new dependencies or side effects introduced.
-5. **Approval Gate**: You MUST end the response with the literal string:
-   `STATUS: WAITING_FOR_APPROVAL`
-   This is a hard stop. Do NOT continue past this point.
-6. **Termination**: Do NOT proceed to any subsequent task or step until the user responds with an approval signal ("approved", "lgtm", "sgtm", or similar).
-7. **Persist & Mark Done**: Only after user approval:
-   - Mark the task `[x]` in `plan.md`.
+5. **Persistence & Tracking** (immediately after verification passes):
    - Commit the changes with a clear message referencing the GitHub issue:
      - Format: `<type>(<scope>): <description> (refs #<issue>)`
      - Example: `feat(auth): add SessionProvider context tests (refs #41)`
    - Use `refs #N` for in-progress work. Only use `fixes #N` or `closes #N` in the final commit of a track.
    - Ask the user for the issue number if unknown. Most tasks should have one.
+6. **Approval Gate**: You MUST end the response with the literal string:
+   `STATUS: WAITING_FOR_APPROVAL`
+   This is a hard stop. Do NOT continue past this point.
+7. **Termination**: Do NOT proceed to any subsequent task or step until the user responds with an approval signal ("approved", "lgtm", "sgtm", or similar).
+8. **Mark as Done**: Only after user approval, mark the task `[x]` in `plan.md`.
 
 ## Constraints
 
