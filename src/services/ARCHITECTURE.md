@@ -10,6 +10,14 @@ A wrapper for Firebase Authentication that handles anonymous login, Google Sign-
 - **Mock Mode**: Controlled by the `VITE_USE_MOCK_AUTH` environment variable. When enabled, it bypasses the real Firebase SDK and returns mock user objects. This is critical for stable E2E testing in CI without needing real API keys.
 - **State Management**: While it interacts with Firebase's internal state, the primary way the app consumes auth state is via `AuthService.onAuthStateChanged`.
 
+### FirestoreService (`src/services/FirestoreService.ts`)
+Handles persisting and loading game state to/from Firestore.
+
+- **Collection Structure**: `users/{uid}/savedGames/{gameId}` stores `SavedGameDoc` documents wrapping serialized `GameJSON`.
+- **Versioning**: Each saved document includes a `version` field (`SAVED_GAME_VERSION`) to support future data migrations.
+- **Mock Mode**: Same `VITE_USE_MOCK_AUTH` gate as `AuthService`. Uses an in-memory `Map` store for CI/E2E testing.
+- **Integration Points**: `CanvasView` triggers debounced saves (2s) via `CanvasController.onTilePlaced`; `SessionProvider` loads games on auth initialization.
+
 ### Firebase (`src/services/firebase.ts`)
 The central initialization point for the Firebase JS SDK. It configures Auth and Firestore using environment variables loaded by Vite.
 
