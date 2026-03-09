@@ -1,5 +1,18 @@
 {
   "search.exclude": {
     "**/conductor/archive/**": true
-  }
+  },
+  "cursor.terminal.allowList": [
+    "npm run typecheck",
+    "npm run lint",
+    "npm run lint:fix",
+    "npm run verify",
+    "npm run test",
+    "npm run test:unit",
+    "npm run test:ui",
+    "npm run test:coverage",
+    "npm run test:e2e",
+    "npm run test:e2e:ci",
+    "tail -15"
+  ]
 }
