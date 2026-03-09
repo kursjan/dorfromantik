@@ -1,0 +1,16 @@
+=== Track Completion Verification Report ===
+Track: firebase_integration_20260305
+Date: 2026-03-09
+
+Automated Tests:
+- typecheck: PASS (tsc -b, 0 errors)
+- unit tests: 185/185 passed (30 files)
+- E2E tests: 26/26 passed (Chromium, mock auth)
+
+Manual Verification:
+- [x] Firestore DB created (test mode, Standard edition)
+- [x] firestore.rules deployed
+- [x] Game state persists after tile placement (debounced save)
+- [x] Saved games load on session init ("Continue Journey")
+- [x] Firestore Console shows data at users/{uid}/savedGames/{gameId}
+- [x] Google Sign-In works, no linkWithPopup regression
