@@ -1,9 +1,9 @@
 {
-  "version": 1,
   "permissions": {
     "allow": [
       "Shell(npm)",
-      "Shell(tail)"
+      "Shell(tail)",
+      "Shell(git)"
     ],
     "deny": []
   }
