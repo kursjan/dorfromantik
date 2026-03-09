@@ -2,6 +2,7 @@ import {
   signInAnonymously, 
   GoogleAuthProvider, 
   signInWithPopup, 
+  linkWithPopup,
   signOut, 
   onAuthStateChanged,
   type User as FirebaseUser
@@ -34,14 +35,22 @@ export class AuthService {
 
   static async signInWithGoogle(): Promise<FirebaseUser> {
     if (isMockAuth) {
-      mockUser = { uid: 'mock-google-456', isAnonymous: false, displayName: 'Test User' };
+      mockUser = { uid: 'mock-anon-123', isAnonymous: false, displayName: 'Test User' }; // Keep same mock ID to simulate linking
       notifyListeners();
       return mockUser as FirebaseUser;
     }
     const provider = new GoogleAuthProvider();
     try {
-      const credential = await signInWithPopup(auth, provider);
-      return credential.user;
+      const currentUser = auth.currentUser;
+      if (currentUser && currentUser.isAnonymous) {
+        // Upgrade anonymous account
+        const credential = await linkWithPopup(currentUser, provider);
+        return credential.user;
+      } else {
+        // Standard login
+        const credential = await signInWithPopup(auth, provider);
+        return credential.user;
+      }
     } catch (error) {
       console.error("Firebase Auth Error Details:", error);
       throw error;
