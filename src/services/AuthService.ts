@@ -19,8 +19,13 @@ export class AuthService {
 
   static async signInWithGoogle(): Promise<FirebaseUser> {
     const provider = new GoogleAuthProvider();
-    const credential = await signInWithPopup(auth, provider);
-    return credential.user;
+    try {
+      const credential = await signInWithPopup(auth, provider);
+      return credential.user;
+    } catch (error) {
+      console.error("Firebase Auth Error Details:", error);
+      throw error;
+    }
   }
 
   static async signOut(): Promise<void> {
