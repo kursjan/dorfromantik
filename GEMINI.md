@@ -88,7 +88,7 @@ This project uses a "Track-Based" branching model to maintain focus and ensure a
 - **Verification:**
   1. **Development Loop (Logic):** If you are modifying pure TypeScript logic (`src/models`, `src/utils`, etc.), run `npx putout <changed_files>`, `npm run typecheck`, and **`npm run test:unit`** for fast feedback.
   2. **Development Loop (UI):** If you are modifying React components or styling (`.tsx`, `.css`), run `npx putout <changed_files>`, `npm run typecheck`, `npm run test:unit`, AND **`npm run test:ui`** to ensure visual components render correctly.
-  3. **Phase/Track Gates:** Run `npm run e2e` ONLY when completing a Conductor Phase or finalizing an Ad-hoc Task.
+  3. **Phase/Track Gates:** Run `npm run test:e2e` ONLY when completing a Conductor Phase or finalizing an Ad-hoc Task.
   4. **Targeted E2E:** You may run specific E2E tests (e.g., `npx playwright test e2e/main-menu.spec.ts`) if your changes directly affect visual rendering or complex UI flows, but avoid running the full suite unnecessarily.
       - **Port Pinning (Multi-Worktree):** To avoid port conflicts when running multiple agents in separate worktrees, each worktree MUST have its own local `.env` file pinning the `PORT` variable (e.g., `PORT=5173` for main, `PORT=5174` for worker1, `PORT=5175` for worker2). Playwright and Vite will automatically honor this variable.
       - **Inquiry:** When in doubt, ask the user for the port number.
@@ -115,7 +115,7 @@ The AI's workflow is iterative, transparent, and responsive to user input.
   5.  **Test Execution:** The AI runs the appropriate verification checks:
       - **Always:** `npm run typecheck` and `npm run test:unit`.
       - **UI Changes:** `npm run test:ui`.
-      - **At Gates only:** `npm run e2e` (unless the task specifically requires visual verification).
+      - **At Gates only:** `npm run test:e2e` (unless the task specifically requires visual verification).
   6.  **Preview Check:** AI observes the browser preview for visual and runtime errors.
   7.  **Remediation/Report:** If errors are found, AI attempts automatic fixes. If unsuccessful, it reports details to the user.
 
