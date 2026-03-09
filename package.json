@@ -20,6 +20,7 @@
     "test:ui": "vitest run --project=storybook",
     "test:coverage": "vitest run --coverage",
     "e2e": "playwright test",
+    "test:e2e:ci": "TEST_ENV=ci playwright test",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "prepare": "husky"
