@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 
+- **Auth Testing & Coverage (Phase 2.3):** Comprehensive test coverage for the authentication subsystem.
+  - **SessionProvider Context Tests:** 8 unit tests verifying `onAuthStateChanged` orchestration, anonymous fallback, session creation for both user types, error states, and cleanup.
+  - **E2E Auth Flow Tests:** 8 Playwright tests (mock auth) covering the full login/logout visual flow including anonymous state, Google sign-in upgrade, sign-out, and a regression test for the re-auth cycle (guards against `linkWithPopup` reintroduction).
+  - **AuthService Regression Test:** Unit test verifying `signInWithPopup` is always used instead of `linkWithPopup`, even for anonymous users.
 - **Mock Auth Strategy (Phase 2.2):** Introduced a robust "Mock Auth" mode to the `AuthService` to unblock CI and E2E testing.
   - **Offline Testing:** When `VITE_USE_MOCK_AUTH=true` is set, the app bypasses the real Firebase SDK and uses deterministic mock users, allowing tests to pass in environments without real API keys (like GitHub Actions).
   - **CI Environment Config:** Added `.env.ci` for dummy credentials and a new `npm run test:e2e:ci` script to run Playwright with CI-specific settings.
