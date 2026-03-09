@@ -22,13 +22,9 @@ test.describe('Main Menu', () => {
     await expect(canvas).toBeVisible();
   });
 
-  test('navigates to game canvas when Continue is clicked on a game card', async ({ page }) => {
-    const continueButton = page.locator('.game-card').first().getByRole('button', { name: /Continue/i });
-    await continueButton.click();
-
-    await expect(page).toHaveURL(/\/game$/);
-    const canvas = page.locator('[data-testid="game-canvas"]');
-    await expect(canvas).toBeVisible();
+  test('shows empty game list when no saved games exist', async ({ page }) => {
+    await expect(page.locator('.game-card')).toHaveCount(0);
+    await expect(page.locator('text=Continue Journey')).toBeVisible();
   });
 
   test('toggles the Settings modal', async ({ page }) => {

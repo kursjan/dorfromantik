@@ -11,27 +11,32 @@ vi.mock('./services/AuthService', () => {
       signInWithGoogle: vi.fn().mockResolvedValue(mockUser),
       signOut: vi.fn().mockResolvedValue(undefined),
       onAuthStateChanged: vi.fn((callback) => {
-        // Immediately invoke with a mock user
         callback(mockUser);
-        return vi.fn(); // Mock unsubscribe function
+        return vi.fn();
       }),
       getCurrentUser: vi.fn().mockReturnValue(mockUser),
     }
   };
 });
 
+vi.mock('./services/FirestoreService', () => ({
+  FirestoreService: {
+    loadAllGames: vi.fn().mockResolvedValue([]),
+    saveGameState: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
 describe('App', () => {
-  it('renders dorfromantik header on main menu', () => {
+  it('renders dorfromantik header on main menu', async () => {
     render(<App />);
-    const headerElement = screen.getByText(/Dorfromantik/i);
+    const headerElement = await screen.findByText(/Dorfromantik/i);
     expect(headerElement).toBeInTheDocument();
   });
 
   it('renders start game button and navigates to game canvas', async () => {
     render(<App />);
     
-    // Check for Standard Game button
-    const startButton = screen.getByRole('button', { name: /Standard Game/i });
+    const startButton = await screen.findByRole('button', { name: /Standard Game/i });
     expect(startButton).toBeInTheDocument();
     
     // Click the button to navigate
