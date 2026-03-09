@@ -2,7 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthService } from './AuthService';
 import { 
   signInAnonymously, 
-  signInWithPopup, 
+  signInWithPopup,
+  linkWithPopup,
   signOut,
   onAuthStateChanged 
 } from 'firebase/auth';
@@ -13,15 +14,15 @@ vi.mock('firebase/auth', () => ({
   signInAnonymously: vi.fn(),
   GoogleAuthProvider: vi.fn(),
   signInWithPopup: vi.fn(),
+  linkWithPopup: vi.fn(),
   signOut: vi.fn(),
   onAuthStateChanged: vi.fn(),
 }));
 
 // Mock our local firebase initialization to avoid actual side effects
+const mockAuth = vi.hoisted(() => ({ currentUser: null as any }));
 vi.mock('./firebase', () => ({
-  auth: {
-    currentUser: null,
-  },
+  auth: mockAuth,
 }));
 
 describe('AuthService', () => {
@@ -64,5 +65,19 @@ describe('AuthService', () => {
     AuthService.onAuthStateChanged(callback);
 
     expect(onAuthStateChanged).toHaveBeenCalledWith(expect.anything(), callback);
+  });
+
+  // Regression: linkWithPopup was disabled because the re-auth cycle
+  // (link -> logout -> login) throws credential-already-in-use.
+  // See AuthService.ts signInWithGoogle for details.
+  it('should use signInWithPopup, not linkWithPopup, even for anonymous users', async () => {
+    mockAuth.currentUser = { uid: 'anon-uid', isAnonymous: true };
+    const mockUser = { uid: 'google-uid', displayName: 'Test User' };
+    (signInWithPopup as any).mockResolvedValue({ user: mockUser });
+
+    await AuthService.signInWithGoogle();
+
+    expect(signInWithPopup).toHaveBeenCalled();
+    expect(linkWithPopup).not.toHaveBeenCalled();
   });
 });
