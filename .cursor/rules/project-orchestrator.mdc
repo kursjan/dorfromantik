@@ -41,6 +41,7 @@ It activates when all tasks in a phase are marked `[x]` in `plan.md`.
 
 ## Constraints
 
+- **NEVER merge PRs.** Only the user merges. The assistant prepares PRs (create, update, mark ready) but never runs `gh pr merge` or equivalent.
 - Do NOT start new implementation tasks during phase/track completion.
 - Minor remediation fixes (bug fixes, small tweaks from review) ARE permitted.
 - Focus on project state, documentation, and verification.
