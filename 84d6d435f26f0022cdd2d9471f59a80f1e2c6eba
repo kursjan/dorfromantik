@@ -1,0 +1,14 @@
+Phase 2.3: Auth Testing & Coverage - Verification Report
+
+Automated Tests:
+- typecheck: PASS
+- unit tests: 178/178 PASS (29 files)
+- E2E tests: 26/26 PASS (8 auth specs + 18 existing)
+
+Manual Test Plan:
+1. Open app in browser -> verify "Guest" badge and truncated UID on main menu
+2. Open Settings -> verify "Guest Session" badge, user ID, "Link Google Account" button
+3. Click "Link Google Account" -> verify upgrade to "Permanent Account", display name shown, "Sign Out" button
+4. Close settings -> verify main menu shows "Player" badge, display name, "Logout" button
+5. Click "Logout" -> verify return to "Guest" state, "Logout" button hidden
+6. Repeat sign-in after sign-out -> verify no errors (linkWithPopup regression)
