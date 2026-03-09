@@ -8,7 +8,7 @@ import {
 import { db } from './firebase';
 import { GameSerializer } from '../models/GameSerializer';
 import { Game } from '../models/Game';
-import type { SavedGameDoc } from './firestore-types';
+import { SAVED_GAME_VERSION, type SavedGameDoc } from './firestore-types';
 
 const isMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === 'true';
 
@@ -21,6 +21,7 @@ let mockSavedGames: Map<string, Map<string, SavedGameDoc>> = new Map();
 export class FirestoreService {
   static async saveGameState(userId: string, game: Game): Promise<void> {
     const savedGame: SavedGameDoc = {
+      version: SAVED_GAME_VERSION,
       gameId: game.id,
       userId,
       gameState: GameSerializer.serialize(game),

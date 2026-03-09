@@ -12,11 +12,15 @@ export interface UserProfileDoc {
   lastLoginAt: string;
 }
 
+/** Current schema version for SavedGameDoc. Increment when the shape changes. */
+export const SAVED_GAME_VERSION = 1;
+
 /**
  * Firestore document stored at `users/{uid}/savedGames/{gameId}`.
  * Wraps the serialized game state with storage metadata.
  */
 export interface SavedGameDoc {
+  version: number;
   gameId: string;
   userId: string;
   gameState: GameJSON;
