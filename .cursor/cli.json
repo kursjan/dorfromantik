@@ -1,9 +1,19 @@
 {
   "permissions": {
     "allow": [
+      "Shell(cat)",
+      "Shell(echo)",
+      "Shell(git)",
+      "Shell(grep)",
+      "Shell(head)",
+      "Shell(ls)",
+      "Shell(mkdir)",
+      "Shell(node)",
       "Shell(npm)",
+      "Shell(npx)",
+      "Shell(pwd)",
       "Shell(tail)",
-      "Shell(git)"
+      "Shell(tsc)"
     ],
     "deny": []
   }
