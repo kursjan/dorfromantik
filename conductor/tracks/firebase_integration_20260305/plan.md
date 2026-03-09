@@ -15,7 +15,7 @@
 
 ## Phase 2.1: Account Linking & Auth State Robustness
 - [x] Update `AuthService.ts` to use `linkWithPopup` when upgrading an anonymous account to a Google account using **task-conductor** skill.
-- [ ] Implement a robust `onAuthStateChanged` listener in `SessionContext.tsx` to handle the initial asynchronous auth loading state using **task-conductor** skill.
+- [x] Implement a robust `onAuthStateChanged` listener in `SessionContext.tsx` (actually `SessionProvider.tsx`) to handle the initial asynchronous auth loading state using **task-conductor** skill.
 - [ ] **Phase Gate**: Verify account linking works without data loss and loading state is smooth using **project-orchestrator** skill.
 
 ## Phase 2.2: Mock Auth for CI & E2E Tests (Issue #49) [checkpoint: 075d0af]
