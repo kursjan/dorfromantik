@@ -3,9 +3,9 @@ import type { ReactNode } from 'react';
 import { Session } from '../models/Session';
 import { AnonymousUser, RegisteredUser } from '../models/User';
 import { Game } from '../models/Game';
-import { Board } from '../models/Board';
 import { GameRules } from '../models/GameRules';
 import { AuthService } from '../services/AuthService';
+import { FirestoreService } from '../services/FirestoreService';
 import { SessionContext } from './SessionContext';
 
 export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -26,32 +26,20 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
       const user = firebaseUser.isAnonymous
         ? new AnonymousUser(firebaseUser.uid)
         : new RegisteredUser(firebaseUser.uid, firebaseUser.displayName || firebaseUser.uid);
-      
-      const newSession = new Session(`session-${firebaseUser.uid}`, user);
 
-      // Add some historical games for demonstration (will be replaced by Firestore later)
-      newSession.games.push(
-        new Game({ 
-          id: '1', 
-          name: 'Valley of Peace', 
-          score: 2450, 
-          lastPlayed: new Date().toISOString(),
-          board: new Board(),
-          rules: GameRules.createStandard()
+      FirestoreService.loadAllGames(firebaseUser.uid)
+        .then((games) => {
+          const newSession = new Session(`session-${firebaseUser.uid}`, user);
+          newSession.games = games;
+          setSession(newSession);
+          setIsInitializing(false);
         })
-      );
-      newSession.games.push(
-        new Game({ 
-          id: '2', 
-          name: 'Forest Edge', 
-          score: 1200, 
-          lastPlayed: new Date(Date.now() - 86400000).toISOString(),
-          board: new Board(),
-          rules: GameRules.createStandard()
-        })
-      );
-      setSession(newSession);
-      setIsInitializing(false);
+        .catch((error) => {
+          console.error('Failed to load saved games', error);
+          const newSession = new Session(`session-${firebaseUser.uid}`, user);
+          setSession(newSession);
+          setIsInitializing(false);
+        });
     });
 
     return unsubscribe;

@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { SessionProvider } from './SessionProvider';
 import { useSession } from './SessionContext';
 import { AuthService } from '../services/AuthService';
+import { FirestoreService } from '../services/FirestoreService';
 import type { User as FirebaseUser } from 'firebase/auth';
 
 vi.mock('../services/AuthService', () => ({
@@ -12,8 +13,15 @@ vi.mock('../services/AuthService', () => ({
   },
 }));
 
+vi.mock('../services/FirestoreService', () => ({
+  FirestoreService: {
+    loadAllGames: vi.fn(),
+  },
+}));
+
 const onAuthStateChanged = AuthService.onAuthStateChanged as Mock;
 const signInAnonymously = AuthService.signInAnonymously as Mock;
+const loadAllGames = FirestoreService.loadAllGames as Mock;
 
 function TestConsumer() {
   const { session } = useSession();
@@ -43,6 +51,8 @@ describe('SessionProvider', () => {
       isAnonymous: true,
       displayName: null,
     } as unknown as FirebaseUser);
+
+    loadAllGames.mockResolvedValue([]);
   });
 
   it('shows loading state before auth resolves', () => {
@@ -161,7 +171,10 @@ describe('SessionProvider', () => {
     expect(mockUnsubscribe).toHaveBeenCalledOnce();
   });
 
-  it('populates session with demo games', async () => {
+  it('loads saved games from Firestore on auth', async () => {
+    const mockGames = [{ id: 'g1' }, { id: 'g2' }];
+    loadAllGames.mockResolvedValueOnce(mockGames);
+
     function GameCountConsumer() {
       const { session } = useSession();
       return <span data-testid="game-count">{session.games.length}</span>;
@@ -175,7 +188,7 @@ describe('SessionProvider', () => {
 
     act(() => {
       capturedCallback({
-        uid: 'demo-user',
+        uid: 'user-with-games',
         isAnonymous: true,
         displayName: null,
       } as unknown as FirebaseUser);
@@ -183,6 +196,34 @@ describe('SessionProvider', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('game-count')).toHaveTextContent('2');
+    });
+    expect(loadAllGames).toHaveBeenCalledWith('user-with-games');
+  });
+
+  it('creates session with empty games when Firestore load fails', async () => {
+    loadAllGames.mockRejectedValueOnce(new Error('Firestore unavailable'));
+
+    function GameCountConsumer() {
+      const { session } = useSession();
+      return <span data-testid="game-count">{session.games.length}</span>;
+    }
+
+    render(
+      <SessionProvider>
+        <GameCountConsumer />
+      </SessionProvider>
+    );
+
+    act(() => {
+      capturedCallback({
+        uid: 'offline-user',
+        isAnonymous: true,
+        displayName: null,
+      } as unknown as FirebaseUser);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('game-count')).toHaveTextContent('0');
     });
   });
 });
