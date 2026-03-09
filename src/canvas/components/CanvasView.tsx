@@ -1,9 +1,10 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { CanvasController } from '../engine/CanvasController';
 import { ResetViewButton } from './ResetViewButton';
 import { GameHUD } from './GameHUD';
 import { DebugOverlay } from './DebugOverlay';
 import { Session } from '../../models/Session';
+import { FirestoreService } from '../../services/FirestoreService';
 import type { Tile } from '../../models/Tile';
 
 interface CanvasViewProps {
@@ -24,6 +25,17 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
   const [remainingTurns, setRemainingTurns] = useState(activeGame.remainingTurns);
   const [nextTile, setNextTile] = useState<Tile | null>(activeGame.peek() ?? null);
   const [controller, setController] = useState<CanvasController | null>(null);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const debouncedSave = useCallback(() => {
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      if (!activeGame) return;
+      FirestoreService.saveGameState(session.user.id, activeGame).catch((err) =>
+        console.error('Failed to save game state', err)
+      );
+    }, 2000);
+  }, [session, activeGame]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -32,22 +44,23 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
     const newController = new CanvasController(canvas, session);
     setController(newController);
 
-    // Sync stats when the game state changes
     newController.onStatsChange = (newScore: number, newTurns: number, newNextTile: Tile | null) => {
       setScore(newScore);
       setRemainingTurns(newTurns);
       setNextTile(newNextTile);
     };
 
+    newController.onTilePlaced = debouncedSave;
+
     controllerRef.current = newController;
 
-    // Cleanup on unmount
     return () => {
       newController.destroy();
       controllerRef.current = null;
       setController(null);
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
-  }, [session, activeGame]); // Depend on activeGame to re-init if a new game starts
+  }, [session, activeGame, debouncedSave]);
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>

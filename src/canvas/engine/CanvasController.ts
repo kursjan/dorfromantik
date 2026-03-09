@@ -30,8 +30,9 @@ export class CanvasController {
   private readonly inputManager: InputManager;
   private readonly session: Session;
 
-  // Callbacks for React HUD/Overlay synchronization
+  // Callbacks for React synchronization
   public onStatsChange?: (score: number, remainingTurns: number, nextTile: Tile | null) => void;
+  public onTilePlaced?: () => void;
   private onDebugStatsChange?: (stats: DebugStats) => void;
 
   // State
@@ -193,6 +194,7 @@ export class CanvasController {
     if (activeGame.inProgress() && this.isValidPlacement(hex)) {
       activeGame.placeTile(hex);
       this.notifyStatsChange();
+      this.onTilePlaced?.();
     }
   }
 
