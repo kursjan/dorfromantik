@@ -1,4 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+vi.hoisted(() => {
+  vi.stubEnv('VITE_USE_MOCK_AUTH', '');
+});
+
 import { FirestoreService } from './FirestoreService';
 import { SAVED_GAME_VERSION } from './firestore-types';
 import { Game } from '../models/Game';
