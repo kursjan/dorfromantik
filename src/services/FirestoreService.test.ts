@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { FirestoreService } from './FirestoreService';
+import { SAVED_GAME_VERSION } from './firestore-types';
 import { Game } from '../models/Game';
 import { Board } from '../models/Board';
 import { GameRules } from '../models/GameRules';
@@ -57,7 +58,7 @@ describe('FirestoreService', () => {
       }));
     });
 
-    it('should include savedAt timestamp', async () => {
+    it('should include savedAt timestamp and version', async () => {
       (doc as any).mockReturnValue({});
       (setDoc as any).mockResolvedValue(undefined);
 
@@ -67,6 +68,7 @@ describe('FirestoreService', () => {
       const savedDoc = (setDoc as any).mock.calls[0][1];
       expect(savedDoc.savedAt).toBeDefined();
       expect(new Date(savedDoc.savedAt).getTime()).not.toBeNaN();
+      expect(savedDoc.version).toBe(SAVED_GAME_VERSION);
     });
   });
 

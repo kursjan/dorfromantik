@@ -25,16 +25,16 @@
 - [x] Update `.github/workflows/ci.yml` to use `VITE_USE_MOCK_AUTH=true` or the new CI testing script using **task-conductor** skill.
 - [x] **Phase Gate**: Verify GitHub Actions Playwright E2E tests pass without real keys using **project-orchestrator** skill.
 
-## Phase 2.3: Auth Testing & Coverage
+## Phase 2.3: Auth Testing & Coverage [checkpoint: 84d6d43]
 - [x] Fix component tests in `src/components/UserAccount.test.tsx` (remove duplicate `signOut` test and add "Link Google Account" button test) using **task-conductor** skill.
 - [x] Implement context tests in `src/context/SessionProvider.test.tsx` to verify `onAuthStateChanged` orchestration and anonymous fallback using **task-conductor** skill.
 - [x] Add E2E Playwright tests (`e2e/auth.spec.ts`) utilizing Mock Auth to verify the end-to-end login/logout visual flow using **task-conductor** skill.
 - [x] **Phase Gate**: Verify all unit, component, and E2E tests for authentication pass successfully using **project-orchestrator** skill.
 
 ## Phase 3: Firestore Integration
-- [ ] Define TypeScript interfaces for Firestore documents (`UserProfile` and `SavedGame`) using **task-conductor** skill.
-- [ ] Implement `FirestoreService.ts` with methods to `saveGameState` and `loadGameState` using **task-conductor** skill.
-- [ ] Implement `firestore.rules` to ensure users can only read/write their own `UserProfile` and `SavedGame` documents using **task-conductor** skill.
+- [x] Define TypeScript interfaces for Firestore documents (`UserProfile` and `SavedGame`) using **task-conductor** skill.
+- [x] Implement `FirestoreService.ts` with methods to `saveGameState` and `loadGameState` using **task-conductor** skill.
+- [x] Implement `firestore.rules` to ensure users can only read/write their own `UserProfile` and `SavedGame` documents using **task-conductor** skill.
 - [ ] Add a versioning identifier to the Firestore save payload to support future data migrations using **task-conductor** skill.
 - [ ] Integrate `FirestoreService.saveGameState` into the main game loop (debounced after a tile is placed) using **task-conductor** skill.
 - [ ] Integrate `FirestoreService.loadGameState` into the initial load sequence if a user returns using **task-conductor** skill.
