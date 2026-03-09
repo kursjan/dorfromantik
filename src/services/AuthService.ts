@@ -2,7 +2,6 @@ import {
   signInAnonymously, 
   GoogleAuthProvider, 
   signInWithPopup, 
-  linkWithPopup,
   signOut, 
   onAuthStateChanged,
   type User as FirebaseUser
@@ -43,12 +42,19 @@ export class AuthService {
 
     const provider = new GoogleAuthProvider();
     try {
-      const currentUser = auth.currentUser;
-      if (currentUser?.isAnonymous) {
-        // Upgrade anonymous account
-        const credential = await linkWithPopup(currentUser, provider);
-        return credential.user;
-      }
+      // Linking accounts to an anonymous account requires more complicated flow, consider:
+      // 1. Link
+      // 2. Logout (maybe clear cookies)
+      //    -> which will create new anonymous account
+      // 3. Login again -> this will throw because new  credential-already-in-use
+      //    meaning that kurs.jan@gmail is already linked to id from step 1.
+      //
+      // const currentUser = auth.currentUser;
+      // if (currentUser?.isAnonymous) {
+      //   // Try to upgrade anonymous account by linking Google
+      //   const credential = await linkWithPopup(currentUser, provider);
+      //   return credential.user;
+      // }
 
       // Standard login or if already a registered user (switching accounts)
       const credential = await signInWithPopup(auth, provider);
