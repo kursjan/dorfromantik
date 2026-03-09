@@ -35,7 +35,7 @@
 - [x] Define TypeScript interfaces for Firestore documents (`UserProfile` and `SavedGame`) using **task-conductor** skill.
 - [x] Implement `FirestoreService.ts` with methods to `saveGameState` and `loadGameState` using **task-conductor** skill.
 - [x] Implement `firestore.rules` to ensure users can only read/write their own `UserProfile` and `SavedGame` documents using **task-conductor** skill.
-- [ ] Add a versioning identifier to the Firestore save payload to support future data migrations using **task-conductor** skill.
-- [ ] Integrate `FirestoreService.saveGameState` into the main game loop (debounced after a tile is placed) using **task-conductor** skill.
-- [ ] Integrate `FirestoreService.loadGameState` into the initial load sequence if a user returns using **task-conductor** skill.
-- [ ] **Final Track Gate**: Final manual verification by user, E2E test update, and Git commit using **project-orchestrator** skill.
+- [x] Add a versioning identifier to the Firestore save payload to support future data migrations using **task-conductor** skill.
+- [x] Integrate `FirestoreService.saveGameState` into the main game loop (debounced after a tile is placed) using **task-conductor** skill.
+- [x] Integrate `FirestoreService.loadGameState` into the initial load sequence if a user returns using **task-conductor** skill.
+- [x] **Final Track Gate**: Final manual verification by user, E2E test update, and Git commit using **project-orchestrator** skill.

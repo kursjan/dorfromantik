@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 
+- **Firestore Integration (Phase 3):** Cloud persistence for game state.
+  - **Data Model:** `UserProfileDoc` and `SavedGameDoc` Firestore document interfaces with schema versioning (`SAVED_GAME_VERSION`).
+  - **FirestoreService:** Save/load/list game state via `users/{uid}/savedGames/{gameId}` sub-collection, with in-memory mock store for CI/E2E.
+  - **Security Rules:** `firestore.rules` enforcing user-scoped read/write (`request.auth.uid == uid`).
+  - **Auto-Save:** Debounced save (2s) after each tile placement via `CanvasController.onTilePlaced` callback.
+  - **Auto-Load:** `SessionProvider` loads saved games from Firestore on auth, replacing hardcoded demo data.
 - **Auth Testing & Coverage (Phase 2.3):** Comprehensive test coverage for the authentication subsystem.
   - **SessionProvider Context Tests:** 8 unit tests verifying `onAuthStateChanged` orchestration, anonymous fallback, session creation for both user types, error states, and cleanup.
   - **E2E Auth Flow Tests:** 8 Playwright tests (mock auth) covering the full login/logout visual flow including anonymous state, Google sign-in upgrade, sign-out, and a regression test for the re-auth cycle (guards against `linkWithPopup` reintroduction).
