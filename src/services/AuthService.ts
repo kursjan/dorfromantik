@@ -29,6 +29,7 @@ export class AuthService {
       notifyListeners();
       return mockUser as FirebaseUser;
     }
+
     const credential = await signInAnonymously(auth);
     return credential.user;
   }
@@ -39,18 +40,19 @@ export class AuthService {
       notifyListeners();
       return mockUser as FirebaseUser;
     }
+
     const provider = new GoogleAuthProvider();
     try {
       const currentUser = auth.currentUser;
-      if (currentUser && currentUser.isAnonymous) {
+      if (currentUser?.isAnonymous) {
         // Upgrade anonymous account
         const credential = await linkWithPopup(currentUser, provider);
         return credential.user;
-      } else {
-        // Standard login
-        const credential = await signInWithPopup(auth, provider);
-        return credential.user;
       }
+
+      // Standard login or if already a registered user (switching accounts)
+      const credential = await signInWithPopup(auth, provider);
+      return credential.user;
     } catch (error) {
       console.error("Firebase Auth Error Details:", error);
       throw error;
@@ -75,6 +77,7 @@ export class AuthService {
         authListeners = authListeners.filter(l => l !== callback);
       };
     }
+
     return onAuthStateChanged(auth, callback);
   }
 
