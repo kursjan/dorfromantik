@@ -18,12 +18,15 @@ alwaysApply: true
 
 - After **any** non-trivial code change:
   - Run `npm run typecheck`.
-  - Run `npm run test:ci-local` — runs unit + storybook tests under CI-like env (dummy Firebase keys, `VITE_USE_MOCK_AUTH=true`). This catches missing mocks that would pass locally but fail in CI.
+  - Run `npm run test:unit` for logic changes (`src/models`, `src/utils`, etc.).
+- For React UI / `.tsx` / styling changes:
+  - Also run `npm run test:ui` when practical.
 - For Conductor **phase or track completion**, and other major milestones:
-  - Also run `npm run test:e2e:ci` for full E2E coverage.
+  - Run end-to-end checks (e.g. `npm run test:e2e` or targeted Playwright tests) as described in project docs.
 - If tests or typecheck fail:
   - Fix the issues where possible instead of ignoring them.
   - If you must stop with a failing state, clearly report why and where it fails.
+  - Verify CI pipeline by running `npm run test:ci`
 
 # Git & Branching
 
