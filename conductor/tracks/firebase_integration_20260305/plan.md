@@ -18,6 +18,13 @@
 - [ ] Implement a robust `onAuthStateChanged` listener in `SessionContext.tsx` to handle the initial asynchronous auth loading state using **task-conductor** skill.
 - [ ] **Phase Gate**: Verify account linking works without data loss and loading state is smooth using **project-orchestrator** skill.
 
+## Phase 2.2: Mock Auth for CI & E2E Tests (Issue #49)
+- [ ] Create `.env.ci` with dummy Firebase credentials to prevent CI crashes using **task-conductor** skill.
+- [ ] Implement Mock Auth mode in `AuthService.ts` when `VITE_USE_MOCK_AUTH=true` using **task-conductor** skill.
+- [ ] Update `vite.config.ts` and `playwright.config.ts` to support the CI test environment using **task-conductor** skill.
+- [ ] Update `.github/workflows/ci.yml` to use `VITE_USE_MOCK_AUTH=true` or the new CI testing script using **task-conductor** skill.
+- [ ] **Phase Gate**: Verify GitHub Actions Playwright E2E tests pass without real keys using **project-orchestrator** skill.
+
 ## Phase 3: Firestore Integration
 - [ ] Define TypeScript interfaces for Firestore documents (`UserProfile` and `SavedGame`) using **task-conductor** skill.
 - [ ] Implement `FirestoreService.ts` with methods to `saveGameState` and `loadGameState` using **task-conductor** skill.
