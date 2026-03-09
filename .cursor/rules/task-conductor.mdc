@@ -1,0 +1,43 @@
+---
+description: Strict task-conductor protocol for Conductor track work. Enforces one-task-at-a-time execution with mandatory approval gates.
+alwaysApply: true
+---
+
+# Task Conductor Protocol
+
+This rule governs ALL Conductor track work (tasks defined in `conductor/tracks/**/plan.md`).
+It takes precedence over general workflow guidance for Conductor tasks.
+
+## Methodology
+
+0. **Verify Git Branch**: Never develop on `main`. Reuse a suitable branch or create a new one. If a new branch is created, immediately push it to the remote with `git push -u origin HEAD`.
+1. **Task Selection**: Always select the **next uncompleted task** from the current phase in the track's `plan.md`.
+2. **Execution**: Perform the requested code changes. Keep changes small and limited to this single task's scope.
+3. **Quality Gate Verification**:
+   - Run `npm run typecheck` (no errors).
+   - Run `npm run test:unit` for logic changes.
+   - Run `npm run test:ui` for React UI / `.tsx` / styling changes when practical.
+   - Verify critical paths are covered by tests.
+   - Ensure new public functions/classes have JSDoc where appropriate.
+4. **Impact Summary**: After execution and verification, provide a concise summary:
+   - Modified files and specific logic changes.
+   - Verification results (test pass/fail, typecheck, lint status).
+   - Any new dependencies or side effects introduced.
+5. **Approval Gate**: You MUST end the response with the literal string:
+   `STATUS: WAITING_FOR_APPROVAL`
+   This is a hard stop. Do NOT continue past this point.
+6. **Termination**: Do NOT proceed to any subsequent task or step until the user responds with an approval signal ("approved", "lgtm", "sgtm", or similar).
+7. **Persist & Mark Done**: Only after user approval:
+   - Mark the task `[x]` in `plan.md`.
+   - Commit the changes with a clear message referencing the GitHub issue:
+     - Format: `<type>(<scope>): <description> (refs #<issue>)`
+     - Example: `feat(auth): add SessionProvider context tests (refs #41)`
+   - Use `refs #N` for in-progress work. Only use `fixes #N` or `closes #N` in the final commit of a track.
+   - Ask the user for the issue number if unknown. Most tasks should have one.
+
+## Constraints
+
+- **Never combine multiple Conductor tasks** into a single execution cycle.
+- **One task per turn** -- implement, verify, summarize, stop.
+- If the user requests changes after seeing the summary, apply them, re-verify, provide an updated summary, and stop again with `STATUS: WAITING_FOR_APPROVAL`.
+- This loop continues until the user explicitly approves.
