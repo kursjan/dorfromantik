@@ -126,6 +126,9 @@ Whenever I deep dive into the code without on my own, I discover discrepancies, 
 
 Also interesting, when I think about analogy of AI coding, only artistic analogies pop-out (Sculptor without chisel, pianist who is not playing the notes). But I don't think SWE is an art.
 
+# 2026-03-09
+Today I switched from Gemin CLI to cursor CLI, because Gemini kept throttling me and no matter how much money I wanted to pay, limits said: no quota, QPD. I have to say, the monitoring is terrible, the graphs are delayed and I based on historical data in graphs, I was throttled even before reaching 250QPD.
+
 # Graveyard
 
 Notes to add somewhere
