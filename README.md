@@ -126,11 +126,14 @@ Whenever I deep dive into the code without on my own, I discover discrepancies, 
 
 Also interesting, when I think about analogy of AI coding, only artistic analogies pop-out (Sculptor without chisel, pianist who is not playing the notes). But I don't think SWE is an art.
 
+# 2026-03-09
+Today I switched from Gemin CLI to cursor CLI, because Gemini kept throttling me and no matter how much money I wanted to pay, limits said: no quota, QPD. I have to say, the monitoring is terrible, the graphs are delayed and I based on historical data in graphs, I was throttled even before reaching 250QPD.
+
 # Graveyard
 
 Notes to add somewhere
 
-- Agent tends to run wild and do much moreG
+- Agent tends to run wild and do much more
   - I have to keep it reminded to do only work I ask it to do
   - Non coding example, fresh start, fresh context: update readme file, journal entries to fix my englis
     - results in updates in the whole file. One has to ask several times to keep the scope minimal, not to reorganize stuff
@@ -141,7 +144,7 @@ Notes to add somewhere
   - it knows to update imports, from time to time checks compilation errors etc
   - it knows how to find references
   - it knows to use console.log as a trick to get right "expected results" for tests
-- When agent gets lots, it pays off to clear the window, one cannot recover from that
+- When agent gets lost, it pays off to clear the window, one cannot recover from that
 - Keep the state of the project and your plan in MD files, so that you can ramp-up new agent quickly
 - Keep the communication protocl in the MD file, don't rely on chat history
 - It is pretty bad in code review, I have to instruct it a lot to do code review at least somehow close to my standards
