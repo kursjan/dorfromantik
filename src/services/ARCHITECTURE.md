@@ -9,6 +9,7 @@ A wrapper for Firebase Authentication that handles anonymous login, Google Sign-
 
 - **Mock Mode**: Controlled by the `VITE_USE_MOCK_AUTH` environment variable. When enabled, it bypasses the real Firebase SDK and returns mock user objects. This is critical for stable E2E testing in CI without needing real API keys.
 - **State Management**: While it interacts with Firebase's internal state, the primary way the app consumes auth state is via `AuthService.onAuthStateChanged`.
+- **Service Interface (Phase 1)**: The auth layer is also modeled via an `IAuthService` interface with `FirebaseAuthService` and `MockAuthService` implementations under `src/services/auth/`, preparing the codebase for React-based dependency injection in later phases.
 
 ### FirestoreService (`src/services/FirestoreService.ts`)
 Handles persisting and loading game state to/from Firestore.

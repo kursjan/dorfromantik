@@ -188,3 +188,7 @@ Notes to add somewhere
 - Working with git is still a mess.. today an 3.1 agent messed up merge with main again
 - And I noticed that 2.5 seems to be much less reliable than 3.1
   - fixing errors (failing tests), creation of a github issue, refactoring
+- Aider and Mistral is a big nono
+- Continue.dev and Mistral was OK-ish, but it didn't follow protocol
+  - it created new uinimplemented methods during refactoring
+  - it made a bit messy tests (auth and mock service in one test file)

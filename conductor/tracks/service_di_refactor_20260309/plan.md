@@ -8,11 +8,11 @@
 
 ## Phase 1: Auth Service — Interface & Implementations
 
-- [ ] 1.1 Create `IAuthService` interface in `src/services/auth/IAuthService.ts`.
-- [ ] 1.2 Create `FirebaseAuthService` implementing `IAuthService` in `src/services/auth/FirebaseAuthService.ts` (real Firebase logic, no mock branches).
-- [ ] 1.3 Create `MockAuthService` implementing `IAuthService` in `src/services/auth/MockAuthService.ts` (in-memory mock logic).
-- [ ] 1.4 Add/adapt unit tests for `MockAuthService` and `FirebaseAuthService` in `src/services/auth/`.
-- [ ] **Phase Gate** using **project-orchestrator** skill.
+- [x] 1.1 Create `IAuthService` interface in `src/services/auth/IAuthService.ts`.
+- [x] 1.2 Create `FirebaseAuthService` implementing `IAuthService` in `src/services/auth/FirebaseAuthService.ts` (real Firebase logic, no mock branches).
+- [x] 1.3 Create `MockAuthService` implementing `IAuthService` in `src/services/auth/MockAuthService.ts` (in-memory mock logic).
+- [x] 1.4 Add/adapt unit tests for `MockAuthService` and `FirebaseAuthService` in `src/services/auth/`.
+- [x] **Phase Gate** using **project-orchestrator** skill.
 
 ## Phase 2: Firestore Service — Interface & Implementations
 

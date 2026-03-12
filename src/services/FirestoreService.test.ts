@@ -4,8 +4,7 @@ vi.hoisted(() => {
   vi.stubEnv('VITE_USE_MOCK_AUTH', '');
 });
 
-import { FirestoreService } from './FirestoreService';
-import { SAVED_GAME_VERSION } from './firestore-types';
+import { SAVED_GAME_VERSION, type SavedGameDoc } from './firestore-types';
 import { Game } from '../models/Game';
 import { Board } from '../models/Board';
 import { GameRules } from '../models/GameRules';
@@ -17,7 +16,19 @@ import {
   collection,
   getDocs,
 } from 'firebase/firestore';
+import { FirestoreService } from './FirestoreService';
 
+function createTestGame(id = 'test-game-1'): Game {
+  return new Game({
+    id,
+    name: 'Test Game',
+    board: new Board(),
+    rules: GameRules.createStandard(),
+    score: 100,
+  });
+}
+
+// Mock Firebase Firestore
 vi.mock('firebase/firestore', () => ({
   getFirestore: vi.fn(),
   doc: vi.fn(),
@@ -31,16 +42,6 @@ vi.mock('./firebase', () => ({
   db: {},
 }));
 
-function createTestGame(id = 'test-game-1'): Game {
-  return new Game({
-    id,
-    name: 'Test Game',
-    board: new Board(),
-    rules: GameRules.createStandard(),
-    score: 100,
-  });
-}
-
 describe('FirestoreService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -49,13 +50,13 @@ describe('FirestoreService', () => {
   describe('saveGameState', () => {
     it('should write a SavedGameDoc to the correct Firestore path', async () => {
       const mockRef = { id: 'ref' };
-      (doc as any).mockReturnValue(mockRef);
-      (setDoc as any).mockResolvedValue(undefined);
+      doc.mockReturnValue(mockRef);
+      setDoc.mockResolvedValue(undefined);
 
       const game = createTestGame();
       await FirestoreService.saveGameState('user-1', game);
 
-      expect(doc).toHaveBeenCalledWith({}, 'users', 'user-1', 'savedGames', 'test-game-1');
+      expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', 'user-1', 'savedGames', 'test-game-1');
       expect(setDoc).toHaveBeenCalledWith(mockRef, expect.objectContaining({
         gameId: 'test-game-1',
         userId: 'user-1',
@@ -64,13 +65,13 @@ describe('FirestoreService', () => {
     });
 
     it('should include savedAt timestamp and version', async () => {
-      (doc as any).mockReturnValue({});
-      (setDoc as any).mockResolvedValue(undefined);
+      doc.mockReturnValue({});
+      setDoc.mockResolvedValue(undefined);
 
       const game = createTestGame();
       await FirestoreService.saveGameState('user-1', game);
 
-      const savedDoc = (setDoc as any).mock.calls[0][1];
+      const savedDoc = setDoc.mock.calls[0][1] as SavedGameDoc;
       expect(savedDoc.savedAt).toBeDefined();
       expect(new Date(savedDoc.savedAt).getTime()).not.toBeNaN();
       expect(savedDoc.version).toBe(SAVED_GAME_VERSION);
@@ -81,8 +82,8 @@ describe('FirestoreService', () => {
     it('should return a Game when document exists', async () => {
       const game = createTestGame();
       const serialized = GameSerializer.serialize(game);
-      (doc as any).mockReturnValue({});
-      (getDoc as any).mockResolvedValue({
+      doc.mockReturnValue({});
+      getDoc.mockResolvedValue({
         exists: () => true,
         data: () => ({ gameState: serialized }),
       });
@@ -95,8 +96,8 @@ describe('FirestoreService', () => {
     });
 
     it('should return null when document does not exist', async () => {
-      (doc as any).mockReturnValue({});
-      (getDoc as any).mockResolvedValue({
+      doc.mockReturnValue({});
+      getDoc.mockResolvedValue({
         exists: () => false,
       });
 
@@ -109,8 +110,8 @@ describe('FirestoreService', () => {
     it('should return all games for a user', async () => {
       const game1 = createTestGame('game-1');
       const game2 = createTestGame('game-2');
-      (collection as any).mockReturnValue({});
-      (getDocs as any).mockResolvedValue({
+      collection.mockReturnValue({});
+      getDocs.mockResolvedValue({
         docs: [
           { data: () => ({ gameState: GameSerializer.serialize(game1) }) },
           { data: () => ({ gameState: GameSerializer.serialize(game2) }) },
@@ -125,11 +126,13 @@ describe('FirestoreService', () => {
     });
 
     it('should return empty array when user has no games', async () => {
-      (collection as any).mockReturnValue({});
-      (getDocs as any).mockResolvedValue({ docs: [] });
+      collection.mockReturnValue({});
+      getDocs.mockResolvedValue({ docs: [] });
 
       const result = await FirestoreService.loadAllGames('user-1');
       expect(result).toEqual([]);
     });
   });
 });
+
+// Mock mode is still covered indirectly via FirestoreService's internal mock store.
