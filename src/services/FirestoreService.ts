@@ -8,7 +8,7 @@ import {
 import { db } from './firebase';
 import { GameSerializer } from '../models/GameSerializer';
 import { Game } from '../models/Game';
-import { SAVED_GAME_VERSION, type SavedGameDoc } from './firestore-types';
+import { SAVED_GAME_VERSION, type SavedGameDoc } from './firestore/firestore-types';
 
 const isMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === 'true';
 

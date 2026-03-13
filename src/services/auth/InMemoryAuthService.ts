@@ -1,4 +1,3 @@
-// src/services/auth/MockAuthService.ts
 import type { IAuthService } from "./IAuthService";
 
 // Mock Auth State
@@ -10,9 +9,18 @@ const notifyListeners = () => {
 };
 
 /**
- * Mock implementation of IAuthService for testing.
+ * In-memory implementation of IAuthService for non-Firebase environments.
+ * 
+ * This FAKE implementation provides a lightweight alternative to Firebase Auth
+ * with real behavioral logic. It's used in production when VITE_USE_MOCK_AUTH=true.
+ * 
+ * This allows the app to run without Firebase dependencies in:
+ * - CI/CD environments
+ * - E2E tests
+ * - Local development
+ * - Testing scenarios
  */
-export class MockAuthService implements IAuthService {
+export class InMemoryAuthService implements IAuthService {
   async signInAnonymously(): Promise<string> {
     mockUser = { uid: 'mock-anon-123', isAnonymous: true, displayName: null };
     notifyListeners();

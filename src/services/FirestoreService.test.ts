@@ -4,7 +4,7 @@ vi.hoisted(() => {
   vi.stubEnv('VITE_USE_MOCK_AUTH', '');
 });
 
-import { SAVED_GAME_VERSION, type SavedGameDoc } from './firestore-types';
+import { SAVED_GAME_VERSION, type SavedGameDoc } from './firestore/firestore-types';
 import { Game } from '../models/Game';
 import { Board } from '../models/Board';
 import { GameRules } from '../models/GameRules';
