@@ -1,36 +1,36 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-import { MockAuthService } from './auth/MockAuthService';
+import { InMemoryAuthService } from './auth/InMemoryAuthService';
 
-describe('MockAuthService (Fake Implementation)', () => {
-  const mockAuthService = new MockAuthService();
+describe('InMemoryAuthService (Fake Implementation)', () => {
+  const inMemoryAuthService = new InMemoryAuthService();
 
   beforeEach(() => {
-    mockAuthService._resetMockStore();
+    inMemoryAuthService._resetMockStore();
   });
 
   it('signs in anonymously and returns a stable uid', async () => {
-    const uid = await mockAuthService.signInAnonymously();
+    const uid = await inMemoryAuthService.signInAnonymously();
     expect(uid).toBe('mock-anon-123');
   });
 
   it('signs in with Google and returns same uid', async () => {
-    const uid = await mockAuthService.signInWithGoogle();
+    const uid = await inMemoryAuthService.signInWithGoogle();
     expect(uid).toBe('mock-anon-123');
   });
 
   it('signs out and clears current user', async () => {
-    await mockAuthService.signInAnonymously();
-    await mockAuthService.signOut();
-    const uid = await mockAuthService.getCurrentUser();
+    await inMemoryAuthService.signInAnonymously();
+    await inMemoryAuthService.signOut();
+    const uid = await inMemoryAuthService.getCurrentUser();
     expect(uid).toBeNull();
   });
 
   it('invokes auth state listener with current uid', async () => {
-    await mockAuthService.signInAnonymously();
+    await inMemoryAuthService.signInAnonymously();
     const callback = vi.fn();
 
-    const unsubscribe = mockAuthService.onAuthStateChanged(callback);
+    const unsubscribe = inMemoryAuthService.onAuthStateChanged(callback);
     await new Promise((resolve) => setTimeout(resolve, 0));
     unsubscribe();
 
@@ -38,8 +38,8 @@ describe('MockAuthService (Fake Implementation)', () => {
   });
 
   it('returns current user uid when logged in', async () => {
-    await mockAuthService.signInAnonymously();
-    const uid = await mockAuthService.getCurrentUser();
+    await inMemoryAuthService.signInAnonymously();
+    const uid = await inMemoryAuthService.getCurrentUser();
     expect(uid).toBe('mock-anon-123');
   });
 });

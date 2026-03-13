@@ -10,10 +10,8 @@ let mockSavedGames: Map<string, Map<string, SavedGameDoc>> = new Map();
 /**
  * In-memory implementation of IFirestoreService for non-Firebase environments.
  * 
- * NOTE: Despite the name "Mock", this is actually a FAKE implementation:
- * - It has real behavioral logic (not just test stubs)
- * - It's used in production when VITE_USE_MOCK_AUTH=true
- * - It provides a lightweight alternative to Firebase Firestore
+ * This FAKE implementation provides a lightweight alternative to Firebase Firestore
+ * with real behavioral logic. It's used in production when VITE_USE_MOCK_AUTH=true.
  * 
  * This allows the app to run without Firebase dependencies in:
  * - CI/CD environments
@@ -21,7 +19,7 @@ let mockSavedGames: Map<string, Map<string, SavedGameDoc>> = new Map();
  * - Local development
  * - Testing scenarios
  */
-export class MockFirestoreService implements IFirestoreService {
+export class InMemoryFirestoreService implements IFirestoreService {
   async saveGameState(userId: string, game: Game): Promise<void> {
     if (!mockSavedGames.has(userId)) {
       mockSavedGames.set(userId, new Map());

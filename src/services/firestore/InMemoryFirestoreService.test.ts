@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 
-import { MockFirestoreService } from './MockFirestoreService';
+import { InMemoryFirestoreService } from './InMemoryFirestoreService';
 import { Game } from '../../models/Game';
 import { Board } from '../../models/Board';
 import { GameRules } from '../../models/GameRules';
@@ -15,20 +15,20 @@ function createTestGame(id = 'test-game-1'): Game {
   });
 }
 
-describe('MockFirestoreService (Fake Implementation)', () => {
-  const mockFirestoreService = new MockFirestoreService();
+describe('InMemoryFirestoreService (Fake Implementation)', () => {
+  const inMemoryFirestoreService = new InMemoryFirestoreService();
 
   beforeEach(() => {
-    mockFirestoreService._resetMockStore();
+    inMemoryFirestoreService._resetMockStore();
   });
 
   it('saves game state to mock store', async () => {
     const mockUserId = 'test-user';
     const mockGame = createTestGame();
 
-    await mockFirestoreService.saveGameState(mockUserId, mockGame);
+    await inMemoryFirestoreService.saveGameState(mockUserId, mockGame);
 
-    const result = await mockFirestoreService.loadGameState(mockUserId, mockGame.id);
+    const result = await inMemoryFirestoreService.loadGameState(mockUserId, mockGame.id);
     expect(result).toBeInstanceOf(Game);
     expect(result?.id).toBe(mockGame.id);
   });
@@ -37,8 +37,8 @@ describe('MockFirestoreService (Fake Implementation)', () => {
     const mockUserId = 'test-user';
     const mockGame = createTestGame();
 
-    await mockFirestoreService.saveGameState(mockUserId, mockGame);
-    const result = await mockFirestoreService.loadGameState(mockUserId, mockGame.id);
+    await inMemoryFirestoreService.saveGameState(mockUserId, mockGame);
+    const result = await inMemoryFirestoreService.loadGameState(mockUserId, mockGame.id);
 
     expect(result).toBeInstanceOf(Game);
     expect(result?.id).toBe(mockGame.id);
@@ -48,7 +48,7 @@ describe('MockFirestoreService (Fake Implementation)', () => {
     const mockUserId = 'test-user';
     const mockGameId = 'non-existent-game';
 
-    const result = await mockFirestoreService.loadGameState(mockUserId, mockGameId);
+    const result = await inMemoryFirestoreService.loadGameState(mockUserId, mockGameId);
 
     expect(result).toBeNull();
   });
@@ -58,10 +58,10 @@ describe('MockFirestoreService (Fake Implementation)', () => {
     const game1 = createTestGame('game-1');
     const game2 = createTestGame('game-2');
 
-    await mockFirestoreService.saveGameState(mockUserId, game1);
-    await mockFirestoreService.saveGameState(mockUserId, game2);
+    await inMemoryFirestoreService.saveGameState(mockUserId, game1);
+    await inMemoryFirestoreService.saveGameState(mockUserId, game2);
 
-    const results = await mockFirestoreService.loadAllGames(mockUserId);
+    const results = await inMemoryFirestoreService.loadAllGames(mockUserId);
 
     expect(results).toHaveLength(2);
     expect(results[0]).toBeInstanceOf(Game);
@@ -71,7 +71,7 @@ describe('MockFirestoreService (Fake Implementation)', () => {
   it('returns empty array when no games exist for user', async () => {
     const mockUserId = 'test-user';
 
-    const results = await mockFirestoreService.loadAllGames(mockUserId);
+    const results = await inMemoryFirestoreService.loadAllGames(mockUserId);
 
     expect(results).toHaveLength(0);
   });
@@ -80,10 +80,10 @@ describe('MockFirestoreService (Fake Implementation)', () => {
     const mockUserId = 'test-user';
     const mockGame = createTestGame();
 
-    await mockFirestoreService.saveGameState(mockUserId, mockGame);
-    mockFirestoreService._resetMockStore();
+    await inMemoryFirestoreService.saveGameState(mockUserId, mockGame);
+    inMemoryFirestoreService._resetMockStore();
 
-    const result = await mockFirestoreService.loadGameState(mockUserId, mockGame.id);
+    const result = await inMemoryFirestoreService.loadGameState(mockUserId, mockGame.id);
     expect(result).toBeNull();
   });
 
@@ -93,11 +93,11 @@ describe('MockFirestoreService (Fake Implementation)', () => {
     const game1 = createTestGame('user1-game');
     const game2 = createTestGame('user2-game');
 
-    await mockFirestoreService.saveGameState(user1, game1);
-    await mockFirestoreService.saveGameState(user2, game2);
+    await inMemoryFirestoreService.saveGameState(user1, game1);
+    await inMemoryFirestoreService.saveGameState(user2, game2);
 
-    const user1Games = await mockFirestoreService.loadAllGames(user1);
-    const user2Games = await mockFirestoreService.loadAllGames(user2);
+    const user1Games = await inMemoryFirestoreService.loadAllGames(user1);
+    const user2Games = await inMemoryFirestoreService.loadAllGames(user2);
 
     expect(user1Games).toHaveLength(1);
     expect(user2Games).toHaveLength(1);
