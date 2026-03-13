@@ -3,27 +3,23 @@ import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 
-vi.mock('./services/AuthService', () => {
-  const mockUser = { uid: 'mock-uid', isAnonymous: true, displayName: null };
-  return {
-    AuthService: {
-      signInAnonymously: vi.fn().mockResolvedValue(mockUser),
-      signInWithGoogle: vi.fn().mockResolvedValue(mockUser),
-      signOut: vi.fn().mockResolvedValue(undefined),
-      onAuthStateChanged: vi.fn((callback) => {
-        callback(mockUser);
-        return vi.fn();
-      }),
-      getCurrentUser: vi.fn().mockReturnValue(mockUser),
-    }
-  };
-});
-
-vi.mock('./services/FirestoreService', () => ({
-  FirestoreService: {
+// Mock the service hooks
+vi.mock('./services/hooks/useServices', () => ({
+  useAuthService: vi.fn(() => ({
+    signInAnonymously: vi.fn().mockResolvedValue('mock-uid'),
+    signInWithGoogle: vi.fn().mockResolvedValue('mock-uid'),
+    signOut: vi.fn().mockResolvedValue(undefined),
+    getCurrentUser: vi.fn().mockResolvedValue('mock-uid'),
+    onAuthStateChanged: vi.fn((callback) => {
+      // Immediately call callback with user id
+      callback('mock-uid');
+      return vi.fn();
+    }),
+  })),
+  useFirestoreService: vi.fn(() => ({
     loadAllGames: vi.fn().mockResolvedValue([]),
     saveGameState: vi.fn().mockResolvedValue(undefined),
-  },
+  })),
 }));
 
 describe('App', () => {
