@@ -1,4 +1,4 @@
-import type { GameJSON } from '../models/GameSerializer';
+import type { GameJSON } from '../../models/GameSerializer';
 
 /**
  * Firestore document stored at `users/{uid}`.

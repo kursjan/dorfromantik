@@ -17,9 +17,9 @@
 ## Phase 2: Firestore Service — Interface & Implementations
 
 - [x] 2.1 Create `IFirestoreService` interface in `src/services/firestore/IFirestoreService.ts`.
-- [ ] 2.2 Create `FirebaseFirestoreService` implementing `IFirestoreService` in `src/services/firestore/FirebaseFirestoreService.ts`.
+- [x] 2.2 Create `FirebaseFirestoreService` implementing `IFirestoreService` in `src/services/firestore/FirebaseFirestoreService.ts`.
 - [ ] 2.3 Create `MockFirestoreService` implementing `IFirestoreService` in `src/services/firestore/MockFirestoreService.ts` (with `_resetMockStore`).
-- [ ] 2.4 Move `firestore-types.ts` into `src/services/firestore/` subdirectory.
+- [x] 2.4 Move `firestore-types.ts` into `src/services/firestore/` subdirectory.
 - [ ] 2.5 Add/adapt unit tests for `MockFirestoreService` and `FirebaseFirestoreService` in `src/services/firestore/`.
 - [ ] **Phase Gate** using **project-orchestrator** skill.
 
