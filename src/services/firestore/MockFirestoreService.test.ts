@@ -15,7 +15,7 @@ function createTestGame(id = 'test-game-1'): Game {
   });
 }
 
-describe('MockFirestoreService', () => {
+describe('MockFirestoreService (Fake Implementation)', () => {
   const mockFirestoreService = new MockFirestoreService();
 
   beforeEach(() => {

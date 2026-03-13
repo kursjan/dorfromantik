@@ -42,7 +42,7 @@ vi.mock('../firebase', () => ({
   db: mockDb,
 }));
 
-describe('FirebaseFirestoreService', () => {
+describe('FirebaseFirestoreService (Real Implementation)', () => {
   const firestoreService = new FirebaseFirestoreService();
 
   beforeEach(() => {

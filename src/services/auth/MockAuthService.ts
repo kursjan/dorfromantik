@@ -10,7 +10,18 @@ const notifyListeners = () => {
 };
 
 /**
- * Mock implementation of IAuthService for testing.
+ * In-memory implementation of IAuthService for non-Firebase environments.
+ * 
+ * NOTE: Despite the name "Mock", this is actually a FAKE implementation:
+ * - It has real behavioral logic (not just test stubs)
+ * - It's used in production when VITE_USE_MOCK_AUTH=true
+ * - It provides a lightweight alternative to Firebase Auth
+ * 
+ * This allows the app to run without Firebase dependencies in:
+ * - CI/CD environments
+ * - E2E tests
+ * - Local development
+ * - Testing scenarios
  */
 export class MockAuthService implements IAuthService {
   async signInAnonymously(): Promise<string> {

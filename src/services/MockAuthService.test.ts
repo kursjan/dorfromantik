@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 import { MockAuthService } from './auth/MockAuthService';
 
-describe('MockAuthService', () => {
+describe('MockAuthService (Fake Implementation)', () => {
   const mockAuthService = new MockAuthService();
 
   beforeEach(() => {

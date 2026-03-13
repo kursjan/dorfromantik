@@ -2,6 +2,10 @@
 
 /**
  * Interface for AuthService, defining core authentication operations.
+ * 
+ * Implementations:
+ * - FirebaseAuthService: Real Firebase implementation (production)
+ * - MockAuthService: In-memory fake implementation (non-Firebase environments)
  */
 export interface IAuthService {
   /**

@@ -8,7 +8,18 @@ import type { IFirestoreService } from './IFirestoreService';
 let mockSavedGames: Map<string, Map<string, SavedGameDoc>> = new Map();
 
 /**
- * Mock implementation of IFirestoreService for testing.
+ * In-memory implementation of IFirestoreService for non-Firebase environments.
+ * 
+ * NOTE: Despite the name "Mock", this is actually a FAKE implementation:
+ * - It has real behavioral logic (not just test stubs)
+ * - It's used in production when VITE_USE_MOCK_AUTH=true
+ * - It provides a lightweight alternative to Firebase Firestore
+ * 
+ * This allows the app to run without Firebase dependencies in:
+ * - CI/CD environments
+ * - E2E tests
+ * - Local development
+ * - Testing scenarios
  */
 export class MockFirestoreService implements IFirestoreService {
   async saveGameState(userId: string, game: Game): Promise<void> {
