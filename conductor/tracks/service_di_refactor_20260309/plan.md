@@ -21,7 +21,7 @@
 - [x] 2.3 Create `MockFirestoreService` implementing `IFirestoreService` in `src/services/firestore/MockFirestoreService.ts` (with `_resetMockStore`).
 - [x] 2.4 Move `firestore-types.ts` into `src/services/firestore/` subdirectory.
 - [x] 2.5 Add/adapt unit tests for `InMemoryFirestoreService` and `FirebaseFirestoreService` in `src/services/firestore/`.
-- [x] **Phase Gate** using **project-orchestrator** skill.
+- [x] **Phase Gate** using **project-orchestrator** skill. [checkpoint: d1df397]
 
 ## Phase 3: React Context Wiring & Consumer Migration
 
