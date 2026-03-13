@@ -1,4 +1,3 @@
-// src/services/auth/MockAuthService.ts
 import type { IAuthService } from "./IAuthService";
 
 // Mock Auth State
