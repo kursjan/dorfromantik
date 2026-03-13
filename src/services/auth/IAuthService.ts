@@ -1,5 +1,3 @@
-// src/services/auth/IAuthService.ts
-
 export interface IAuthService {
   signInAnonymously(): Promise<string>;
   signInWithGoogle(): Promise<string>;
