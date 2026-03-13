@@ -44,8 +44,4 @@ export class FirebaseFirestoreService implements IFirestoreService {
     );
   }
 
-  _resetMockStore(): void {
-    // No-op for real Firebase implementation
-    // This method is only relevant for mock implementations
-  }
 }
