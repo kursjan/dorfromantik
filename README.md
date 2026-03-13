@@ -192,3 +192,8 @@ Notes to add somewhere
 - Continue.dev and Mistral was OK-ish, but it didn't follow protocol
   - it created new uinimplemented methods during refactoring
   - it made a bit messy tests (auth and mock service in one test file)
+- Today I tried Mistral and Vibe, but I gave up
+  - coding performance was mediocre and super slow
+  - I tried to setup skills, but I didn't manage, it did something, but ignored most of my instructions after some
+  - then I discovered it supports skills: https://docs.mistral.ai/mistral-vibe/agents-skills but was not able to set it up
+  - so I gave up, I don't have enough patience to make it working :(
