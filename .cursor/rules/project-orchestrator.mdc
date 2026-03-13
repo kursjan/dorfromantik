@@ -1,47 +1,30 @@
 ---
-description: Phase and track completion protocol. Use when all tasks in a phase are done, or when finalizing a track.
+description: Always route Conductor phase/track completion through the project-orchestrator SKILL.
 alwaysApply: true
 ---
 
-# Project Orchestrator Protocol
+# Project Orchestrator Rule (Router)
 
-This rule governs phase transitions and track finalization for Conductor work.
-It activates when all tasks in a phase are marked `[x]` in `plan.md`.
+This rule governs **phase transitions and track finalization** for Conductor work.
+It does **not** restate the full protocol; instead it enforces use of the
+`project-orchestrator` SKILL as the authoritative playbook.
 
-## Phase Completion Protocol
+## When this rule applies
 
-1. **Consistency Check**: Review modified files and update `ARCHITECTURE.md`, `CHANGELOG.md`, `tech-stack.md`, and other relevant documentation to reflect the current state.
-2. **Verify Tasks**: Ensure all tasks in the current phase are marked as done in `plan.md`.
-3. **Manual Test Plan**: Propose a detailed manual test plan for user review.
-4. **Checkpoint Commit**: Create a checkpoint commit and push to remote:
-   ```
-   git add .
-   git commit -m "Checkpoint end of Phase X.Y: [summary]"
-   git push origin HEAD
-   ```
-   If no uncommitted changes, use `--allow-empty`.
-5. **Draft PR**: Ensure a Pull Request exists for the branch:
-   - Check: `gh pr view`
-   - If none exists: `gh pr create --draft --title "WIP: [Track Name]" --body "Tracking progress for [Track ID]"`
-6. **Verification Report**: Attach auto-test results + manual plan to the checkpoint commit:
-   ```
-   git notes add -m "<report>" <commit_hash>
-   ```
-7. **State Sync**: Update `plan.md` to mark the phase header with `[checkpoint: <sha>]`.
-8. **Phase Gate**: End the response with:
-   `STATUS: PHASE_COMPLETED_WAITING_FOR_REVIEW`
+- The current phase in `conductor/tracks/**/plan.md` has all tasks marked `[x]`, **and**
+- You are:
+  - Completing a **phase gate** task that says `using **project-orchestrator** skill`, or
+  - Completing the **final track gate**, or
+  - The user explicitly asks to “finish the phase/track”.
 
-## Track Completion Protocol (all phases done)
+In these cases the agent **must**:
 
-1. **Architecture Sync**: Update `ARCHITECTURE.md` across the project.
-2. **Final Approval**: Present a final project status summary and ask for explicit user approval.
-3. **PR Creation**: Create a Pull Request on GitHub (not draft) and assign to the user.
-4. **Handover**: Present the PR link. Do NOT merge -- the user must review and merge.
-5. **Termination**: End with `TRACK_COMPLETED: Ready for review`.
-
-## Constraints
-
-- **NEVER merge PRs.** Only the user merges. The assistant prepares PRs (create, update, mark ready) but never runs `gh pr merge` or equivalent.
-- Do NOT start new implementation tasks during phase/track completion.
-- Minor remediation fixes (bug fixes, small tweaks from review) ARE permitted.
-- Focus on project state, documentation, and verification.
+1. Load and follow `.cursor/skills/project-orchestrator/SKILL.md` step-by-step for:
+   - Consistency checks and doc updates,
+   - Checkpoint commits and pushes,
+   - Draft/regular PR management,
+   - Verification report and `plan.md` annotations,
+   - Ending with the correct gate markers
+     (`STATUS: PHASE_COMPLETED_WAITING_FOR_REVIEW` or `TRACK_COMPLETED: Ready for review`).
+2. Avoid starting new implementation tasks (coding) while this protocol is active,
+   except for small remediation tweaks directly tied to phase/track completion.
