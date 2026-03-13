@@ -50,8 +50,8 @@ describe('FirestoreService', () => {
   describe('saveGameState', () => {
     it('should write a SavedGameDoc to the correct Firestore path', async () => {
       const mockRef = { id: 'ref' };
-      doc.mockReturnValue(mockRef);
-      setDoc.mockResolvedValue(undefined);
+      (doc as unknown as any).mockReturnValue(mockRef);
+      (setDoc as unknown as any).mockResolvedValue(undefined);
 
       const game = createTestGame();
       await FirestoreService.saveGameState('user-1', game);
@@ -65,13 +65,13 @@ describe('FirestoreService', () => {
     });
 
     it('should include savedAt timestamp and version', async () => {
-      doc.mockReturnValue({});
-      setDoc.mockResolvedValue(undefined);
+      (doc as unknown as any).mockReturnValue({});
+      (setDoc as unknown as any).mockResolvedValue(undefined);
 
       const game = createTestGame();
       await FirestoreService.saveGameState('user-1', game);
 
-      const savedDoc = setDoc.mock.calls[0][1] as SavedGameDoc;
+      const savedDoc = ((setDoc as unknown as any).mock.calls[0][1]) as SavedGameDoc;
       expect(savedDoc.savedAt).toBeDefined();
       expect(new Date(savedDoc.savedAt).getTime()).not.toBeNaN();
       expect(savedDoc.version).toBe(SAVED_GAME_VERSION);
@@ -82,8 +82,8 @@ describe('FirestoreService', () => {
     it('should return a Game when document exists', async () => {
       const game = createTestGame();
       const serialized = GameSerializer.serialize(game);
-      doc.mockReturnValue({});
-      getDoc.mockResolvedValue({
+      (doc as unknown as any).mockReturnValue({});
+      (getDoc as unknown as any).mockResolvedValue({
         exists: () => true,
         data: () => ({ gameState: serialized }),
       });
@@ -96,8 +96,8 @@ describe('FirestoreService', () => {
     });
 
     it('should return null when document does not exist', async () => {
-      doc.mockReturnValue({});
-      getDoc.mockResolvedValue({
+      (doc as unknown as any).mockReturnValue({});
+      (getDoc as unknown as any).mockResolvedValue({
         exists: () => false,
       });
 
@@ -110,8 +110,8 @@ describe('FirestoreService', () => {
     it('should return all games for a user', async () => {
       const game1 = createTestGame('game-1');
       const game2 = createTestGame('game-2');
-      collection.mockReturnValue({});
-      getDocs.mockResolvedValue({
+      (collection as unknown as any).mockReturnValue({});
+      (getDocs as unknown as any).mockResolvedValue({
         docs: [
           { data: () => ({ gameState: GameSerializer.serialize(game1) }) },
           { data: () => ({ gameState: GameSerializer.serialize(game2) }) },
@@ -126,8 +126,8 @@ describe('FirestoreService', () => {
     });
 
     it('should return empty array when user has no games', async () => {
-      collection.mockReturnValue({});
-      getDocs.mockResolvedValue({ docs: [] });
+      (collection as unknown as any).mockReturnValue({});
+      (getDocs as unknown as any).mockResolvedValue({ docs: [] });
 
       const result = await FirestoreService.loadAllGames('user-1');
       expect(result).toEqual([]);
