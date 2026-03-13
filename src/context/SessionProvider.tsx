@@ -1,71 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { Session } from '../models/Session';
-import { AnonymousUser } from '../models/User';
+import { AnonymousUser, RegisteredUser } from '../models/User';
 import { Game } from '../models/Game';
 import { GameRules } from '../models/GameRules';
-import { useAuthService } from '../services/hooks/useServices';
-import { useFirestoreService } from '../services/hooks/useServices';
+import { AuthService } from '../services/AuthService';
+import { FirestoreService } from '../services/FirestoreService';
 import { SessionContext } from './SessionContext';
 
 export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
-  const authService = useAuthService();
-  const firestoreService = useFirestoreService();
 
   useEffect(() => {
-    const unsubscribe = authService.onAuthStateChanged((userId) => {
-      if (!userId) {
+    const unsubscribe = AuthService.onAuthStateChanged((firebaseUser) => {
+      if (!firebaseUser) {
         // Automatically sign in anonymously if there is no user
-        authService.signInAnonymously()
-          .then((newUserId) => {
-            // Create anonymous user for new user
-            const user = new AnonymousUser(newUserId);
-            
-            // Load games for this user
-            firestoreService.loadAllGames(newUserId)
-              .then((games) => {
-                const newSession = new Session(`session-${newUserId}`, user);
-                newSession.games = games;
-                setSession(newSession);
-                setIsInitializing(false);
-              })
-              .catch((error) => {
-                console.error('Failed to load saved games', error);
-                const newSession = new Session(`session-${newUserId}`, user);
-                setSession(newSession);
-                setIsInitializing(false);
-              });
-          })
-          .catch((error) => {
-            console.error("Failed to sign in anonymously", error);
-            setIsInitializing(false);
-          });
+        AuthService.signInAnonymously().catch((error) => {
+          console.error("Failed to sign in anonymously", error);
+          setIsInitializing(false);
+        });
         return;
       }
 
-      // For now, treat all users as anonymous since we don't have display name info
-      // In a real implementation, we would need to fetch user profile data
-      const user = new AnonymousUser(userId);
+      const user = firebaseUser.isAnonymous
+        ? new AnonymousUser(firebaseUser.uid)
+        : new RegisteredUser(firebaseUser.uid, firebaseUser.displayName || firebaseUser.uid);
 
-      firestoreService.loadAllGames(userId)
+      FirestoreService.loadAllGames(firebaseUser.uid)
         .then((games) => {
-          const newSession = new Session(`session-${userId}`, user);
+          const newSession = new Session(`session-${firebaseUser.uid}`, user);
           newSession.games = games;
           setSession(newSession);
           setIsInitializing(false);
         })
         .catch((error) => {
           console.error('Failed to load saved games', error);
-          const newSession = new Session(`session-${userId}`, user);
+          const newSession = new Session(`session-${firebaseUser.uid}`, user);
           setSession(newSession);
           setIsInitializing(false);
         });
     });
 
     return unsubscribe;
-  }, [authService, firestoreService]);
+  }, []);
   
   // Wait for auth to initialize before rendering children
   if (isInitializing) {

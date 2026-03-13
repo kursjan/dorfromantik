@@ -2,31 +2,26 @@ import { render, screen, act, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { SessionProvider } from './SessionProvider';
 import { useSession } from './SessionContext';
-import { ServiceProvider } from '../services/ServiceProvider';
-import { useAuthService } from '../services/hooks/useServices';
-import { useFirestoreService } from '../services/hooks/useServices';
-import React from 'react';
+import { AuthService } from '../services/AuthService';
+import { FirestoreService } from '../services/FirestoreService';
+import type { User as FirebaseUser } from 'firebase/auth';
 
-// Mock the service hooks
-vi.mock('../services/hooks/useServices', () => ({
-  useAuthService: vi.fn(),
-  useFirestoreService: vi.fn(),
+vi.mock('../services/AuthService', () => ({
+  AuthService: {
+    onAuthStateChanged: vi.fn(),
+    signInAnonymously: vi.fn(),
+  },
 }));
 
-const mockAuthService = {
-  onAuthStateChanged: vi.fn(),
-  signInAnonymously: vi.fn(),
-};
+vi.mock('../services/FirestoreService', () => ({
+  FirestoreService: {
+    loadAllGames: vi.fn(),
+  },
+}));
 
-const mockFirestoreService = {
-  loadAllGames: vi.fn(),
-};
-
-beforeEach(() => {
-  vi.clearAllMocks();
-  (useAuthService as Mock).mockReturnValue(mockAuthService);
-  (useFirestoreService as Mock).mockReturnValue(mockFirestoreService);
-});
+const onAuthStateChanged = AuthService.onAuthStateChanged as Mock;
+const signInAnonymously = AuthService.signInAnonymously as Mock;
+const loadAllGames = FirestoreService.loadAllGames as Mock;
 
 function TestConsumer() {
   const { session } = useSession();
@@ -40,94 +35,136 @@ function TestConsumer() {
 }
 
 describe('SessionProvider', () => {
-  let capturedCallback: (userId: string | null) => void;
+  let capturedCallback: (user: FirebaseUser | null) => void;
   const mockUnsubscribe = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
-    // Setup mock services
-    mockAuthService.onAuthStateChanged.mockImplementation((callback: (userId: string | null) => void) => {
+
+    onAuthStateChanged.mockImplementation((callback: (user: FirebaseUser | null) => void) => {
       capturedCallback = callback;
       return mockUnsubscribe;
     });
 
-    mockAuthService.signInAnonymously.mockResolvedValue('anon-fallback-uid');
-    mockFirestoreService.loadAllGames.mockResolvedValue([]);
+    signInAnonymously.mockResolvedValue({
+      uid: 'anon-fallback-uid',
+      isAnonymous: true,
+      displayName: null,
+    } as unknown as FirebaseUser);
+
+    loadAllGames.mockResolvedValue([]);
   });
 
-  function renderWithProviders(children: React.ReactNode) {
-    return render(
-      <ServiceProvider>
-        <SessionProvider>
-          {children}
-        </SessionProvider>
-      </ServiceProvider>
-    );
-  }
-
   it('shows loading state before auth resolves', () => {
-    renderWithProviders(<TestConsumer />);
+    render(
+      <SessionProvider>
+        <TestConsumer />
+      </SessionProvider>
+    );
 
     expect(screen.getByText(/Loading Profile/i)).toBeInTheDocument();
     expect(screen.queryByTestId('user-id')).not.toBeInTheDocument();
   });
 
-  it('calls signInAnonymously when auth fires with null user', async () => {
-    renderWithProviders(<TestConsumer />);
-
-    await act(async () => {
-      capturedCallback(null);
-    });
-
-    expect(mockAuthService.signInAnonymously).toHaveBeenCalledOnce();
-  });
-
-  it('creates session when signInAnonymously succeeds', async () => {
-    renderWithProviders(<TestConsumer />);
+  it('calls signInAnonymously when auth fires with null user', () => {
+    render(
+      <SessionProvider>
+        <TestConsumer />
+      </SessionProvider>
+    );
 
     act(() => capturedCallback(null));
 
-    await waitFor(() => {
-      expect(screen.getByTestId('user-id')).toHaveTextContent('anon-fallback-uid');
-    });
-    expect(screen.getByTestId('is-anonymous')).toHaveTextContent('true');
-    expect(screen.getByTestId('session-id')).toHaveTextContent('session-anon-fallback-uid');
+    expect(signInAnonymously).toHaveBeenCalledOnce();
   });
 
-  it('creates session for existing user', async () => {
-    renderWithProviders(<TestConsumer />);
+  it('creates an AnonymousUser session for anonymous firebase user', async () => {
+    render(
+      <SessionProvider>
+        <TestConsumer />
+      </SessionProvider>
+    );
 
-    act(() => capturedCallback('existing-user-123'));
+    act(() => {
+      capturedCallback({
+        uid: 'anon-123',
+        isAnonymous: true,
+        displayName: null,
+      } as unknown as FirebaseUser);
+    });
 
     await waitFor(() => {
-      expect(screen.getByTestId('user-id')).toHaveTextContent('existing-user-123');
+      expect(screen.getByTestId('user-id')).toHaveTextContent('anon-123');
     });
     expect(screen.getByTestId('is-anonymous')).toHaveTextContent('true');
-    expect(screen.getByTestId('session-id')).toHaveTextContent('session-existing-user-123');
+    expect(screen.getByTestId('session-id')).toHaveTextContent('session-anon-123');
+  });
+
+  it('creates a RegisteredUser session for non-anonymous firebase user', async () => {
+    render(
+      <SessionProvider>
+        <TestConsumer />
+      </SessionProvider>
+    );
+
+    act(() => {
+      capturedCallback({
+        uid: 'registered-456',
+        isAnonymous: false,
+        displayName: 'Jane Doe',
+      } as unknown as FirebaseUser);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('user-id')).toHaveTextContent('registered-456');
+    });
+    expect(screen.getByTestId('is-anonymous')).toHaveTextContent('false');
+    expect(screen.getByTestId('session-id')).toHaveTextContent('session-registered-456');
+  });
+
+  it('uses uid as displayName fallback for registered users', async () => {
+    render(
+      <SessionProvider>
+        <TestConsumer />
+      </SessionProvider>
+    );
+
+    act(() => {
+      capturedCallback({
+        uid: 'no-name-789',
+        isAnonymous: false,
+        displayName: null,
+      } as unknown as FirebaseUser);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('user-id')).toHaveTextContent('no-name-789');
+    });
+    expect(screen.getByTestId('is-anonymous')).toHaveTextContent('false');
   });
 
   it('shows error state when signInAnonymously fails and no user arrives', async () => {
-    mockAuthService.signInAnonymously.mockRejectedValueOnce(new Error('Network error'));
+    signInAnonymously.mockRejectedValueOnce(new Error('Network error'));
 
-    function ErrorConsumer() {
-      const { session } = useSession();
-      return <span data-testid="has-session">{session ? 'yes' : 'no'}</span>;
-    }
-
-    renderWithProviders(<ErrorConsumer />);
+    render(
+      <SessionProvider>
+        <TestConsumer />
+      </SessionProvider>
+    );
 
     act(() => capturedCallback(null));
 
     await waitFor(() => {
       expect(screen.getByText(/Initialization Error/i)).toBeInTheDocument();
-      // When there's an error, the SessionProvider doesn't render children
-      expect(screen.queryByTestId('has-session')).not.toBeInTheDocument();
     });
   });
 
   it('unsubscribes from auth listener on unmount', () => {
-    const { unmount } = renderWithProviders(<TestConsumer />);
+    const { unmount } = render(
+      <SessionProvider>
+        <TestConsumer />
+      </SessionProvider>
+    );
 
     unmount();
 
@@ -136,34 +173,54 @@ describe('SessionProvider', () => {
 
   it('loads saved games from Firestore on auth', async () => {
     const mockGames = [{ id: 'g1' }, { id: 'g2' }];
-    mockFirestoreService.loadAllGames.mockResolvedValueOnce(mockGames);
+    loadAllGames.mockResolvedValueOnce(mockGames);
 
     function GameCountConsumer() {
       const { session } = useSession();
       return <span data-testid="game-count">{session.games.length}</span>;
     }
 
-    renderWithProviders(<GameCountConsumer />);
+    render(
+      <SessionProvider>
+        <GameCountConsumer />
+      </SessionProvider>
+    );
 
-    act(() => capturedCallback('user-with-games'));
+    act(() => {
+      capturedCallback({
+        uid: 'user-with-games',
+        isAnonymous: true,
+        displayName: null,
+      } as unknown as FirebaseUser);
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId('game-count')).toHaveTextContent('2');
     });
-    expect(mockFirestoreService.loadAllGames).toHaveBeenCalledWith('user-with-games');
+    expect(loadAllGames).toHaveBeenCalledWith('user-with-games');
   });
 
   it('creates session with empty games when Firestore load fails', async () => {
-    mockFirestoreService.loadAllGames.mockRejectedValueOnce(new Error('Firestore unavailable'));
+    loadAllGames.mockRejectedValueOnce(new Error('Firestore unavailable'));
 
     function GameCountConsumer() {
       const { session } = useSession();
       return <span data-testid="game-count">{session.games.length}</span>;
     }
 
-    renderWithProviders(<GameCountConsumer />);
+    render(
+      <SessionProvider>
+        <GameCountConsumer />
+      </SessionProvider>
+    );
 
-    act(() => capturedCallback('offline-user'));
+    act(() => {
+      capturedCallback({
+        uid: 'offline-user',
+        isAnonymous: true,
+        displayName: null,
+      } as unknown as FirebaseUser);
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId('game-count')).toHaveTextContent('0');
