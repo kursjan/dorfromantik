@@ -1,0 +1,1 @@
+Phase 3 checkpoint: typecheck, test:unit, test:ui, lint passed. MainMenu migrated to useAuthService(); E2E auth logout fixed. All Phase 3 consumers (SessionProvider, UserAccount, CanvasView, MainMenu) use DI hooks.
