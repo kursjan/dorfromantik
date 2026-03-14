@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 
+- **Service DI Refactor (#50):** Replaced legacy monolithic `AuthService` and `FirestoreService` with a React DI pattern.
+  - **Interfaces:** `IAuthService` (with `AuthUser` DTO) and `IFirestoreService`; implementations: `FirebaseAuthService` / `InMemoryAuthService`, `FirebaseFirestoreService` / `InMemoryFirestoreService`.
+  - **Wiring:** `ServiceProvider` provides implementations (from `VITE_USE_MOCK_AUTH` or optional injection for tests); `useAuthService()` and `useFirestoreService()` are the only way app code accesses these services.
+  - **Consumers:** `SessionProvider`, `UserAccount`, `CanvasView`, and `MainMenu` migrated to use the hooks. Legacy `AuthService.ts` and `FirestoreService.ts` removed.
+
 - **Firestore Integration (Phase 3):** Cloud persistence for game state.
   - **Data Model:** `UserProfileDoc` and `SavedGameDoc` Firestore document interfaces with schema versioning (`SAVED_GAME_VERSION`).
   - **FirestoreService:** Save/load/list game state via `users/{uid}/savedGames/{gameId}` sub-collection, with in-memory mock store for CI/E2E.

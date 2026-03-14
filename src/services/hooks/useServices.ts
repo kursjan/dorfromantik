@@ -1,4 +1,3 @@
-// src/services/hooks/useServices.ts
 import { useContext } from 'react';
 import type { IAuthService } from '../auth/IAuthService';
 import type { IFirestoreService } from '../firestore/IFirestoreService';

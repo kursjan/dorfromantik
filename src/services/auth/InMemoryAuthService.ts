@@ -1,11 +1,11 @@
-import type { IAuthService } from "./IAuthService";
+import type { IAuthService, AuthUser } from "./IAuthService";
 
 // Mock Auth State
-let mockUser: { uid: string; isAnonymous: boolean; displayName: string | null } | null = null;
-let authListeners: ((userId: string | null) => void)[] = [];
+let mockUser: AuthUser | null = null;
+let authListeners: ((user: AuthUser | null) => void)[] = [];
 
 const notifyListeners = () => {
-  authListeners.forEach((l) => l(mockUser?.uid || null));
+  authListeners.forEach((l) => l(mockUser));
 };
 
 /**
@@ -21,16 +21,16 @@ const notifyListeners = () => {
  * - Testing scenarios
  */
 export class InMemoryAuthService implements IAuthService {
-  async signInAnonymously(): Promise<string> {
+  async signInAnonymously(): Promise<AuthUser> {
     mockUser = { uid: 'mock-anon-123', isAnonymous: true, displayName: null };
     notifyListeners();
-    return mockUser.uid;
+    return mockUser;
   }
 
-  async signInWithGoogle(): Promise<string> {
+  async signInWithGoogle(): Promise<AuthUser> {
     mockUser = { uid: 'mock-anon-123', isAnonymous: false, displayName: 'Test User' };
     notifyListeners();
-    return mockUser.uid;
+    return mockUser;
   }
 
   async signOut(): Promise<void> {
@@ -38,14 +38,14 @@ export class InMemoryAuthService implements IAuthService {
     notifyListeners();
   }
 
-  async getCurrentUser(): Promise<string | null> {
-    return mockUser?.uid || null;
+  async getCurrentUser(): Promise<AuthUser | null> {
+    return mockUser ?? null;
   }
 
-  onAuthStateChanged(callback: (userId: string | null) => void): () => void {
+  onAuthStateChanged(callback: (user: AuthUser | null) => void): () => void {
     authListeners.push(callback);
     // Trigger immediately like Firebase does
-    setTimeout(() => callback(mockUser?.uid || null), 0);
+    setTimeout(() => callback(mockUser), 0);
     return () => {
       authListeners = authListeners.filter((l) => l !== callback);
     };

@@ -4,7 +4,7 @@ import { ResetViewButton } from './ResetViewButton';
 import { GameHUD } from './GameHUD';
 import { DebugOverlay } from './DebugOverlay';
 import { Session } from '../../models/Session';
-import { FirestoreService } from '../../services/FirestoreService';
+import { useFirestoreService } from '../../services/hooks/useServices';
 import type { Tile } from '../../models/Tile';
 
 interface CanvasViewProps {
@@ -12,6 +12,7 @@ interface CanvasViewProps {
 }
 
 export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
+  const firestoreService = useFirestoreService();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const controllerRef = useRef<CanvasController | null>(null);
   const activeGame = session.activeGame;
@@ -31,11 +32,11 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
       if (!activeGame) return;
-      FirestoreService.saveGameState(session.user.id, activeGame).catch((err) =>
+      firestoreService.saveGameState(session.user.id, activeGame).catch((err) =>
         console.error('Failed to save game state', err)
       );
     }, 2000);
-  }, [session, activeGame]);
+  }, [session, activeGame, firestoreService]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

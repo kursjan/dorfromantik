@@ -27,16 +27,16 @@
 
 - [x] 3.1 Create `ServiceProvider` context in `src/services/ServiceProvider.tsx` — reads `VITE_USE_MOCK_AUTH`, instantiates real or mock services, exposes `useAuthService()` and `useFirestoreService()` hooks.
 - [x] 3.2 Wire `ServiceProvider` into `App.tsx` (wrap app tree).
-- [ ] 3.3 Migrate `SessionProvider` — replace static `AuthService` / `FirestoreService` calls with context hooks.
-- [ ] 3.4 Migrate `UserAccount` — replace static `AuthService` calls with `useAuthService()`.
-- [ ] 3.5 Migrate `CanvasView` — replace static `FirestoreService` calls with `useFirestoreService()`.
-- [ ] 3.6 Migrate `MainMenu` — if it references services directly.
-- [ ] **Phase Gate** using **project-orchestrator** skill.
+- [x] 3.3 Migrate `SessionProvider` — replace static `AuthService` / `FirestoreService` calls with context hooks.
+- [x] 3.4 Migrate `UserAccount` — replace static `AuthService` calls with `useAuthService()`.
+- [x] 3.5 Migrate `CanvasView` — replace static `FirestoreService` calls with `useFirestoreService()`.
+- [x] 3.6 Migrate `MainMenu` — if it references services directly.
+- [x] **Phase Gate** using **project-orchestrator** skill. [checkpoint: 7667310]
 
 ## Phase 4: Cleanup & Final Verification
 
-- [ ] 4.1 Delete old monolithic `src/services/AuthService.ts` and `src/services/FirestoreService.ts`.
-- [ ] 4.2 Update all test files that mock the old static services to use the new DI pattern.
-- [ ] 4.3 Update `src/services/ARCHITECTURE.md` to reflect the new structure.
-- [ ] 4.4 Full verification: `npm run typecheck`, `npm run test:unit`, `npm run test:e2e:ci`.
-- [ ] **Final Track Gate** using **project-orchestrator** skill.
+- [x] 4.1 Delete old monolithic `src/services/AuthService.ts` and `src/services/FirestoreService.ts`.
+- [x] 4.2 Update all test files that mock the old static services to use the new DI pattern. (No changes needed — already migrated in Phase 3.)
+- [x] 4.3 Update `src/services/ARCHITECTURE.md` to reflect the new structure.
+- [x] 4.4 Full verification: `npm run typecheck`, `npm run test:unit`, `npm run test:e2e:ci`.
+- [x] **Final Track Gate** using **project-orchestrator** skill.

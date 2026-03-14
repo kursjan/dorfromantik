@@ -1,28 +1,36 @@
 // src/services/auth/FirebaseAuthService.ts
-import { 
-  signInAnonymously, 
-  GoogleAuthProvider, 
-  signInWithPopup, 
-  signOut, 
+import {
+  signInAnonymously,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
   onAuthStateChanged,
 } from "firebase/auth";
 import { auth } from "../firebase";
-import type { IAuthService } from "./IAuthService";
+import type { IAuthService, AuthUser } from "./IAuthService";
+
+function toAuthUser(user: { uid: string; isAnonymous: boolean; displayName: string | null }): AuthUser {
+  return {
+    uid: user.uid,
+    isAnonymous: user.isAnonymous,
+    displayName: user.displayName ?? null,
+  };
+}
 
 /**
  * Firebase implementation of IAuthService.
  */
 export class FirebaseAuthService implements IAuthService {
-  async signInAnonymously(): Promise<string> {
+  async signInAnonymously(): Promise<AuthUser> {
     const credential = await signInAnonymously(auth);
-    return credential.user.uid;
+    return toAuthUser(credential.user);
   }
 
-  async signInWithGoogle(): Promise<string> {
+  async signInWithGoogle(): Promise<AuthUser> {
     const provider = new GoogleAuthProvider();
     try {
       const credential = await signInWithPopup(auth, provider);
-      return credential.user.uid;
+      return toAuthUser(credential.user);
     } catch (error) {
       console.error("Firebase Auth Error Details:", error);
       throw error;
@@ -33,13 +41,14 @@ export class FirebaseAuthService implements IAuthService {
     await signOut(auth);
   }
 
-  async getCurrentUser(): Promise<string | null> {
-    return auth.currentUser?.uid || null;
+  async getCurrentUser(): Promise<AuthUser | null> {
+    const user = auth.currentUser;
+    return user ? toAuthUser(user) : null;
   }
 
-  onAuthStateChanged(callback: (userId: string | null) => void): () => void {
+  onAuthStateChanged(callback: (user: AuthUser | null) => void): () => void {
     return onAuthStateChanged(auth, (user) => {
-      callback(user?.uid || null);
+      callback(user ? toAuthUser(user) : null);
     });
   }
 }

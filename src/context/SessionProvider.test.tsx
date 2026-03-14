@@ -2,26 +2,25 @@ import { render, screen, act, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { SessionProvider } from './SessionProvider';
 import { useSession } from './SessionContext';
-import { AuthService } from '../services/AuthService';
-import { FirestoreService } from '../services/FirestoreService';
 import type { User as FirebaseUser } from 'firebase/auth';
 
-vi.mock('../services/AuthService', () => ({
-  AuthService: {
-    onAuthStateChanged: vi.fn(),
-    signInAnonymously: vi.fn(),
-  },
+const mockOnAuthStateChanged = vi.fn();
+const mockSignInAnonymously = vi.fn();
+const mockLoadAllGames = vi.fn();
+
+vi.mock('../services/hooks/useServices', () => ({
+  useAuthService: () => ({
+    onAuthStateChanged: mockOnAuthStateChanged,
+    signInAnonymously: mockSignInAnonymously,
+  }),
+  useFirestoreService: () => ({
+    loadAllGames: mockLoadAllGames,
+  }),
 }));
 
-vi.mock('../services/FirestoreService', () => ({
-  FirestoreService: {
-    loadAllGames: vi.fn(),
-  },
-}));
-
-const onAuthStateChanged = AuthService.onAuthStateChanged as Mock;
-const signInAnonymously = AuthService.signInAnonymously as Mock;
-const loadAllGames = FirestoreService.loadAllGames as Mock;
+const onAuthStateChanged = mockOnAuthStateChanged as Mock;
+const signInAnonymously = mockSignInAnonymously as Mock;
+const loadAllGames = mockLoadAllGames as Mock;
 
 function TestConsumer() {
   const { session } = useSession();
