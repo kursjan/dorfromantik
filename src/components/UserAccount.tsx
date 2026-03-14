@@ -1,7 +1,7 @@
 import React from 'react';
 import { User } from '../models/User';
 import { RegisteredUser } from '../models/User';
-import { AuthService } from '../services/AuthService';
+import { useAuthService } from '../services/hooks/useServices';
 import './UserAccount.css';
 
 interface UserAccountProps {
@@ -9,9 +9,11 @@ interface UserAccountProps {
 }
 
 export const UserAccount: React.FC<UserAccountProps> = ({ user }) => {
+  const authService = useAuthService();
+
   const handleLinkGoogle = async () => {
     try {
-      await AuthService.signInWithGoogle();
+      await authService.signInWithGoogle();
       // SessionContext will automatically update via onAuthStateChanged
     } catch (error: unknown) {
       console.error("Failed to link Google account", error);
@@ -22,7 +24,7 @@ export const UserAccount: React.FC<UserAccountProps> = ({ user }) => {
 
   const handleSignOut = async () => {
     try {
-      await AuthService.signOut();
+      await authService.signOut();
     } catch (error) {
       console.error("Failed to sign out", error);
     }
