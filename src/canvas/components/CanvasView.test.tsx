@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Board } from '../../models/Board';
@@ -8,12 +9,9 @@ import { Session } from '../../models/Session';
 import { AnonymousUser } from '../../models/User';
 import { CanvasController } from '../engine/CanvasController';
 import { CanvasView } from './CanvasView';
-
-vi.mock('../../services/FirestoreService', () => ({
-  FirestoreService: {
-    saveGameState: vi.fn().mockResolvedValue(undefined),
-  },
-}));
+import { ServiceProvider } from '../../services/ServiceProvider';
+import { InMemoryAuthService } from '../../services/auth/InMemoryAuthService';
+import { InMemoryFirestoreService } from '../../services/firestore/InMemoryFirestoreService';
 
 vi.mock('../engine/CanvasController', () => {
   const MockController = vi.fn();
@@ -26,10 +24,14 @@ vi.mock('../engine/CanvasController', () => {
 });
 
 describe('CanvasView', () => {
+  const authService = new InMemoryAuthService();
+  const firestoreService = new InMemoryFirestoreService();
   let session: Session;
   let game: Game;
 
   beforeEach(() => {
+    authService._resetMockStore();
+    firestoreService._resetMockStore();
     const user = new AnonymousUser('test-user');
     const board = new Board();
     const rules = new GameRules();
@@ -38,8 +40,16 @@ describe('CanvasView', () => {
     vi.clearAllMocks();
   });
 
+  function renderWithProvider(ui: React.ReactElement) {
+    return render(
+      <ServiceProvider authService={authService} firestoreService={firestoreService}>
+        {ui}
+      </ServiceProvider>
+    );
+  }
+
   it('renders correctly with HUD and Canvas', () => {
-    render(<CanvasView session={session} />);
+    renderWithProvider(<CanvasView session={session} />);
 
     // Check HUD is present with session values
     expect(screen.getByText(/Score/i)).toBeInTheDocument();
@@ -52,13 +62,13 @@ describe('CanvasView', () => {
   });
 
   it('initializes CanvasController on mount', () => {
-    render(<CanvasView session={session} />);
+    renderWithProvider(<CanvasView session={session} />);
 
     expect(CanvasController).toHaveBeenCalled();
   });
 
   it('cleans up CanvasController on unmount', () => {
-    const { unmount } = render(<CanvasView session={session} />);
+    const { unmount } = renderWithProvider(<CanvasView session={session} />);
 
     const controllerInstance = vi.mocked(CanvasController).mock.results[0].value;
     unmount();
