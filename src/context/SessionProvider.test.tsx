@@ -144,7 +144,10 @@ describe('SessionProvider', () => {
   });
 
   it('shows error state when signInAnonymously fails and no user arrives', async () => {
-    signInAnonymously.mockRejectedValueOnce(new Error('Network error'));
+    const networkError = new Error('Network error');
+    signInAnonymously.mockRejectedValueOnce(networkError);
+
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     render(
       <SessionProvider>
@@ -157,6 +160,9 @@ describe('SessionProvider', () => {
     await waitFor(() => {
       expect(screen.getByText(/Initialization Error/i)).toBeInTheDocument();
     });
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to sign in anonymously', networkError);
+    consoleErrorSpy.mockRestore();
   });
 
   it('unsubscribes from auth listener on unmount', () => {
@@ -201,7 +207,10 @@ describe('SessionProvider', () => {
   });
 
   it('creates session with empty games when Firestore load fails', async () => {
-    loadAllGames.mockRejectedValueOnce(new Error('Firestore unavailable'));
+    const firestoreError = new Error('Firestore unavailable');
+    loadAllGames.mockRejectedValueOnce(firestoreError);
+
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     function GameCountConsumer() {
       const { session } = useSession();
@@ -225,5 +234,8 @@ describe('SessionProvider', () => {
     await waitFor(() => {
       expect(screen.getByTestId('game-count')).toHaveTextContent('0');
     });
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to load saved games', firestoreError);
+    consoleErrorSpy.mockRestore();
   });
 });
