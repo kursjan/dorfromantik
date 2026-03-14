@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { GameCard } from '../components/GameCard';
 import { SettingsModal } from '../components/SettingsModal';
 import { useSession } from '../context/SessionContext';
-import { AuthService } from '../services/AuthService';
+import { useAuthService } from '../services/hooks/useServices';
 import { RegisteredUser } from '../models/User';
 import './MainMenu.css';
 
 const MainMenu: React.FC = () => {
+  const authService = useAuthService();
   const navigate = useNavigate();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { session, startNewStandardGame, startNewTestGame, continueGame } = useSession();
@@ -30,7 +31,7 @@ const MainMenu: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await AuthService.signOut();
+      await authService.signOut();
     } catch (error) {
       console.error("Logout failed", error);
     }

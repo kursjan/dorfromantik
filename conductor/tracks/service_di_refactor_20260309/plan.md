@@ -30,7 +30,7 @@
 - [x] 3.3 Migrate `SessionProvider` — replace static `AuthService` / `FirestoreService` calls with context hooks.
 - [x] 3.4 Migrate `UserAccount` — replace static `AuthService` calls with `useAuthService()`.
 - [x] 3.5 Migrate `CanvasView` — replace static `FirestoreService` calls with `useFirestoreService()`.
-- [ ] 3.6 Migrate `MainMenu` — if it references services directly.
+- [x] 3.6 Migrate `MainMenu` — if it references services directly.
 - [ ] **Phase Gate** using **project-orchestrator** skill.
 
 ## Phase 4: Cleanup & Final Verification
