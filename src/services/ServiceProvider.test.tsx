@@ -3,6 +3,8 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ServiceProvider } from './ServiceProvider';
 import { useAuthService, useFirestoreService } from './hooks/useServices';
+import { InMemoryAuthService } from './auth/InMemoryAuthService';
+import { InMemoryFirestoreService } from './firestore/InMemoryFirestoreService';
 
 // Test component that uses the hooks
 function TestComponent() {
@@ -89,5 +91,19 @@ describe('ServiceProvider', () => {
 
     expect(screen.getByTestId('auth-service').textContent).toContain('Firebase');
     expect(screen.getByTestId('firestore-service').textContent).toContain('Firebase');
+  });
+
+  it('uses injected authService and firestoreService when provided', () => {
+    const authService = new InMemoryAuthService();
+    const firestoreService = new InMemoryFirestoreService();
+
+    render(
+      <ServiceProvider authService={authService} firestoreService={firestoreService}>
+        <TestComponent />
+      </ServiceProvider>
+    );
+
+    expect(screen.getByTestId('auth-service')).toHaveTextContent('InMemoryAuthService');
+    expect(screen.getByTestId('firestore-service')).toHaveTextContent('InMemoryFirestoreService');
   });
 });

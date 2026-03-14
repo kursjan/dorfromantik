@@ -4,19 +4,20 @@ import { Session } from '../models/Session';
 import { AnonymousUser, RegisteredUser } from '../models/User';
 import { Game } from '../models/Game';
 import { GameRules } from '../models/GameRules';
-import { AuthService } from '../services/AuthService';
-import { FirestoreService } from '../services/FirestoreService';
+import { useAuthService, useFirestoreService } from '../services/hooks/useServices';
 import { SessionContext } from './SessionContext';
 
 export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const authService = useAuthService();
+  const firestoreService = useFirestoreService();
   const [session, setSession] = useState<Session | null>(null);
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
 
   useEffect(() => {
-    const unsubscribe = AuthService.onAuthStateChanged((firebaseUser) => {
+    const unsubscribe = authService.onAuthStateChanged((firebaseUser) => {
       if (!firebaseUser) {
         // Automatically sign in anonymously if there is no user
-        AuthService.signInAnonymously().catch((error) => {
+        authService.signInAnonymously().catch((error) => {
           console.error("Failed to sign in anonymously", error);
           setIsInitializing(false);
         });
@@ -27,7 +28,7 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
         ? new AnonymousUser(firebaseUser.uid)
         : new RegisteredUser(firebaseUser.uid, firebaseUser.displayName || firebaseUser.uid);
 
-      FirestoreService.loadAllGames(firebaseUser.uid)
+      firestoreService.loadAllGames(firebaseUser.uid)
         .then((games) => {
           const newSession = new Session(`session-${firebaseUser.uid}`, user);
           newSession.games = games;
@@ -43,7 +44,7 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
     });
 
     return unsubscribe;
-  }, []);
+  }, [authService, firestoreService]);
   
   // Wait for auth to initialize before rendering children
   if (isInitializing) {

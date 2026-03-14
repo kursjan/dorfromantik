@@ -38,25 +38,27 @@ describe('FirebaseAuthService', () => {
     mockAuth.currentUser = null;
   });
 
-  it('signs in anonymously and returns uid', async () => {
-    const mockUser = { uid: 'anonymous-uid' };
+  it('signs in anonymously and returns AuthUser', async () => {
+    const mockUser = { uid: 'anonymous-uid', isAnonymous: true, displayName: null };
     (signInAnonymously as any).mockResolvedValue({ user: mockUser });
 
-    const uid = await authService.signInAnonymously();
+    const user = await authService.signInAnonymously();
 
     expect(signInAnonymously).toHaveBeenCalledWith(mockAuth);
-    expect(uid).toBe('anonymous-uid');
+    expect(user.uid).toBe('anonymous-uid');
+    expect(user.isAnonymous).toBe(true);
   });
 
-  it('signs in with Google and returns uid', async () => {
-    const mockUser = { uid: 'google-uid', displayName: 'Test User' };
+  it('signs in with Google and returns AuthUser', async () => {
+    const mockUser = { uid: 'google-uid', isAnonymous: false, displayName: 'Test User' };
     (signInWithPopup as any).mockResolvedValue({ user: mockUser });
 
-    const uid = await authService.signInWithGoogle();
+    const user = await authService.signInWithGoogle();
 
     expect(GoogleAuthProvider).toHaveBeenCalledTimes(1);
     expect(signInWithPopup).toHaveBeenCalled();
-    expect(uid).toBe('google-uid');
+    expect(user.uid).toBe('google-uid');
+    expect(user.displayName).toBe('Test User');
   });
 
   it('signs out current user', async () => {
@@ -69,8 +71,8 @@ describe('FirebaseAuthService', () => {
 
   it('registers auth state changed listener', () => {
     const callback = vi.fn();
-    (onAuthStateChanged as any).mockImplementation((_auth: any, cb: (user: { uid: string }) => void) => {
-      cb({ uid: 'test-uid' });
+    (onAuthStateChanged as any).mockImplementation((_auth: any, cb: (user: { uid: string; isAnonymous: boolean; displayName: string | null } | null) => void) => {
+      cb({ uid: 'test-uid', isAnonymous: true, displayName: null });
       return () => {};
     });
 
@@ -78,18 +80,18 @@ describe('FirebaseAuthService', () => {
     unsubscribe();
 
     expect(onAuthStateChanged).toHaveBeenCalled();
-    expect(callback).toHaveBeenCalledWith('test-uid');
+    expect(callback).toHaveBeenCalledWith(expect.objectContaining({ uid: 'test-uid' }));
   });
 
-  it('returns current user uid when logged in', async () => {
-    mockAuth.currentUser = { uid: 'test-uid' };
-    const uid = await authService.getCurrentUser();
-    expect(uid).toBe('test-uid');
+  it('returns current user when logged in', async () => {
+    mockAuth.currentUser = { uid: 'test-uid', isAnonymous: true, displayName: null };
+    const user = await authService.getCurrentUser();
+    expect(user?.uid).toBe('test-uid');
   });
 
   it('returns null when no current user', async () => {
     mockAuth.currentUser = null;
-    const uid = await authService.getCurrentUser();
-    expect(uid).toBeNull();
+    const user = await authService.getCurrentUser();
+    expect(user).toBeNull();
   });
 });
