@@ -31,11 +31,11 @@
 - [x] 3.4 Migrate `UserAccount` — replace static `AuthService` calls with `useAuthService()`.
 - [x] 3.5 Migrate `CanvasView` — replace static `FirestoreService` calls with `useFirestoreService()`.
 - [x] 3.6 Migrate `MainMenu` — if it references services directly.
-- [ ] **Phase Gate** using **project-orchestrator** skill. [checkpoint: 7667310]
+- [x] **Phase Gate** using **project-orchestrator** skill. [checkpoint: 7667310]
 
 ## Phase 4: Cleanup & Final Verification
 
-- [ ] 4.1 Delete old monolithic `src/services/AuthService.ts` and `src/services/FirestoreService.ts`.
+- [x] 4.1 Delete old monolithic `src/services/AuthService.ts` and `src/services/FirestoreService.ts`.
 - [ ] 4.2 Update all test files that mock the old static services to use the new DI pattern.
 - [ ] 4.3 Update `src/services/ARCHITECTURE.md` to reflect the new structure.
 - [ ] 4.4 Full verification: `npm run typecheck`, `npm run test:unit`, `npm run test:e2e:ci`.
