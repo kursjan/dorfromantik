@@ -19,7 +19,7 @@ This document defines the core technologies, architectural patterns, and quality
 
 ### Persistence & Serialization
 - **GameSerializer:** A specialized utility to convert complex class-based game state (Game, Board, Tile, HexCoordinate) into plain JSON for Firebase storage and back into class instances.
-- **Firebase Auth:** Handles anonymous and permanent user authentication.
+- **Auth & Firestore (DI):** Auth and Firestore are accessed only via React context. `ServiceProvider` supplies `IAuthService` and `IFirestoreService` implementations; components use `useAuthService()` and `useFirestoreService()`. Real implementations use Firebase; in-memory implementations support tests and CI/E2E.
 - **Firestore:** Persistent storage for user profiles and saved game states.
 
 ### Canvas Controller Pattern

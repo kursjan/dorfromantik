@@ -39,4 +39,4 @@
 - [x] 4.2 Update all test files that mock the old static services to use the new DI pattern. (No changes needed — already migrated in Phase 3.)
 - [x] 4.3 Update `src/services/ARCHITECTURE.md` to reflect the new structure.
 - [x] 4.4 Full verification: `npm run typecheck`, `npm run test:unit`, `npm run test:e2e:ci`.
-- [ ] **Final Track Gate** using **project-orchestrator** skill.
+- [x] **Final Track Gate** using **project-orchestrator** skill.

@@ -22,8 +22,8 @@ This directory contains the core data structures and business logic for the Dorf
 - **`Session`**: Manages a user's game lifecycle, including their current `activeGame` and a history of finished `games`.
 
 ### 4. Services & Providers
-- **`AuthService.ts`**: A stateless wrapper around the Firebase Authentication SDK. It provides unified methods for anonymous login, Google sign-in, and auth state monitoring.
-- **`SessionProvider`**: A React context provider that orchestrates the user's session. It listens to `AuthService` changes, initializes the `User` model, and manages the transition between guest and permanent account states.
+- **Auth / Firestore**: Accessed only via React context. `ServiceProvider` (see `src/services/ARCHITECTURE.md`) supplies `IAuthService` and `IFirestoreService` implementations; components use `useAuthService()` and `useFirestoreService()`.
+- **`SessionProvider`**: A React context provider that orchestrates the user's session. It uses the injected auth and firestore services to listen to auth changes, initialize the `User` model, and manage the transition between guest and permanent account states.
 
 ### 5. Game Engine (`Game.ts`)
 The `Game` class is the central orchestrator of an active session.
