@@ -6,6 +6,12 @@ import { AnonymousUser, RegisteredUser } from '../models/User';
 import { Game } from '../models/Game';
 import { Board } from '../models/Board';
 import { GameRules } from '../models/GameRules';
+import { ServiceProvider } from '../services/ServiceProvider';
+import { InMemoryAuthService } from '../services/auth/InMemoryAuthService';
+import { InMemoryFirestoreService } from '../services/firestore/InMemoryFirestoreService';
+
+const storyAuthService = new InMemoryAuthService();
+const storyFirestoreService = new InMemoryFirestoreService();
 
 const mockUser = new AnonymousUser('mock-user-123');
 const mockSession = new Session('mock-session-123', mockUser);
@@ -28,16 +34,18 @@ const meta = {
   tags: ['autodocs'],
   decorators: [
     (Story) => (
-      <SessionContext.Provider
-        value={{
-          session: mockSession,
-          startNewStandardGame: () => {},
-          startNewTestGame: () => {},
-          continueGame: () => {},
-        }}
-      >
-        <Story />
-      </SessionContext.Provider>
+      <ServiceProvider authService={storyAuthService} firestoreService={storyFirestoreService}>
+        <SessionContext.Provider
+          value={{
+            session: mockSession,
+            startNewStandardGame: () => {},
+            startNewTestGame: () => {},
+            continueGame: () => {},
+          }}
+        >
+          <Story />
+        </SessionContext.Provider>
+      </ServiceProvider>
     ),
   ],
   argTypes: {
@@ -65,16 +73,18 @@ export const PermanentAccount: Story = {
       const permanentUser = new RegisteredUser('permanent-user-456', 'Jane Doe');
       const permanentSession = new Session('perm-session-456', permanentUser);
       return (
-        <SessionContext.Provider
-          value={{
-            session: permanentSession,
-            startNewStandardGame: () => {},
-            startNewTestGame: () => {},
-            continueGame: () => {},
-          }}
-        >
-          <Story />
-        </SessionContext.Provider>
+        <ServiceProvider authService={storyAuthService} firestoreService={storyFirestoreService}>
+          <SessionContext.Provider
+            value={{
+              session: permanentSession,
+              startNewStandardGame: () => {},
+              startNewTestGame: () => {},
+              continueGame: () => {},
+            }}
+          >
+            <Story />
+          </SessionContext.Provider>
+        </ServiceProvider>
       );
     },
   ],
