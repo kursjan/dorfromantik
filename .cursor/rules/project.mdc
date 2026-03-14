@@ -23,6 +23,7 @@ alwaysApply: true
   - Also run `npm run test:ui` when practical.
 - For Conductor **phase or track completion**, and other major milestones:
   - Run end-to-end checks (e.g. `npm run test:e2e` or targeted Playwright tests) as described in project docs.
+  - Before creating or updating the PR, run `npm run test:ci` and `npm run test:e2e:ci` and ensure both pass (see project-orchestrator skill).
 - If tests or typecheck fail:
   - Fix the issues where possible instead of ignoring them.
   - If you must stop with a failing state, clearly report why and where it fails.
@@ -31,6 +32,7 @@ alwaysApply: true
 # Git & Branching
 
 - Do **not** develop directly on `main` for feature work; use a dedicated branch (e.g. `coding-agent/worker1` or a track-specific branch).
+- When working on `main` for small changes (docs, cursor rules, config tweaks, minor fixes), **pushing directly to `main` is acceptable**; a PR is not required.
 - Keep commits **small and focused**:
   - One Conductor task → one verified commit, whenever practical.
 - Commit messages should follow the pattern:
@@ -49,6 +51,10 @@ alwaysApply: true
     - Moving to the next Conductor task,
     - Or making further non-trivial edits.
 - Respect phrases like "lgtm", "sgtm", "approved" as signals that the user is satisfied.
+
+# Terminal & Working Directory
+
+- **Do not use `cd` in terminal commands** unless the task explicitly requires running a command from a different directory. The shell already starts in the **project root** (workspace path: e.g. `/home/.../dorfromantik` or the worktree root). Run commands directly, e.g. `npm run typecheck`, `npm run test:unit`. When a path is needed, use paths **relative to the project root** (e.g. `npx playwright test e2e/foo.spec.ts`) or the absolute workspace path. This keeps all work inside the project and reduces unnecessary commands.
 
 # Environment & Tooling
 

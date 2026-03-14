@@ -129,6 +129,11 @@ Also interesting, when I think about analogy of AI coding, only artistic analogi
 # 2026-03-09
 Today I switched from Gemin CLI to cursor CLI, because Gemini kept throttling me and no matter how much money I wanted to pay, limits said: no quota, QPD. I have to say, the monitoring is terrible, the graphs are delayed and I based on historical data in graphs, I was throttled even before reaching 250QPD.
 
+# 2026-03-14
+Today I really see difference between some models. The Mistral Large task for https://github.com/kursjan/dorfromantik/issues/50 didn't really work, it was lots of pain. I gave up and gave the task to Opus 4.6 and the code looks much better, much more decisions are made and it even fixed sub-optimal issues create by Mistral. TLDR for me: use the latest and greatest model, it is not worth the frustration with lower models.
+
+Opus 4.6 can even have a decent discussion with me about good testing strategy, mocking, faking etc. Mistral did quite some uninformed decisions, added methods that were not needed and brought the repository to a state, when I have to revert back and start from scratch. Also it was slow.
+
 # Graveyard
 
 Notes to add somewhere
@@ -192,8 +197,3 @@ Notes to add somewhere
 - Continue.dev and Mistral was OK-ish, but it didn't follow protocol
   - it created new uinimplemented methods during refactoring
   - it made a bit messy tests (auth and mock service in one test file)
-- Today I tried Mistral and Vibe, but I gave up
-  - coding performance was mediocre and super slow
-  - I tried to setup skills, but I didn't manage, it did something, but ignored most of my instructions after some
-  - then I discovered it supports skills: https://docs.mistral.ai/mistral-vibe/agents-skills but was not able to set it up
-  - so I gave up, I don't have enough patience to make it working :(

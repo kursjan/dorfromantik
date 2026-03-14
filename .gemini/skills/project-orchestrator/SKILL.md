@@ -8,8 +8,9 @@ description: Use this skill when transitioning between phases or finalizing a tr
 ### Phase Completion Protocol
 1. **Consistency Check**: Review all modified files against and update `ARCHITECTURE.md`, `change-log.md`, `tech-stack.md` and other relevant documentation to ensure they reflect the current state of the project.
 2. **Verify Tasks**: Ensure all tasks in the current phase are marked as done.
-3. **Test Plan**: Propose a detailed manual test plan for user review.
-4. **Checkpoint Commit**: Create a final commit to finalize the phase and push it to the remote repository.
+3. **CI verification (before checkpoint / PR)**: Run `npm run test:ci`, then `npm run test:e2e:ci`. If either fails, do not proceed to checkpoint or PR; report the failure and stop. Only after both pass, continue.
+4. **Test Plan**: Propose a detailed manual test plan for user review.
+5. **Checkpoint Commit**: Create a final commit to finalize the phase and push it to the remote repository.
    - Execute the following exact commands to create and push the checkpoint:
      ```bash
      git add .
@@ -21,14 +22,14 @@ description: Use this skill when transitioning between phases or finalizing a tr
      git commit --allow-empty -m "Checkpoint end of Phase X: [summary of changes]"
      git push origin HEAD
      ```
-5. **Draft PR Strategy**: Ensure a Pull Request exists for the current branch to allow for immediate review in Reviewable.
+6. **Draft PR Strategy**: Ensure a Pull Request exists for the current branch to allow for immediate review in Reviewable.
    - Check for an existing PR: `gh pr view`
    - If no PR exists, create a Draft PR: `gh pr create --draft --title "WIP: [Track Name]" --body "Tracking progress for [Track ID]"`
-6. **Verification Report**: Attach the results of auto-tests + manual plan + user confirmation to the checkpoint commit using `git notes add -m "<report>"`.
-7. **State Sync**: 
+7. **Verification Report**: In the report, state that `npm run test:ci` and `npm run test:e2e:ci` were run and both passed. Attach the results of auto-tests + manual plan + user confirmation to the checkpoint commit using `git notes add -m "<report>"`.
+8. **State Sync**: 
    - Update the `plan.md` or track file to reflect the completed phase.
    - Mark the phase as complete with `[checkpoint: <sha>]`.
-8. **Phase Gate**: Inform the user: "Phase X is pushed. You can now review the incremental changes in Reviewable."
+9. **Phase Gate**: Inform the user: "Phase X is pushed. You can now review the incremental changes in Reviewable."
    - End the response with: "STATUS: PHASE_COMPLETED_WAITING_FOR_REVIEW".
 
 ### Track Completion Protocol (Only if all phases are done)

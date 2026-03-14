@@ -25,11 +25,16 @@ Use this skill when **transitioning between phases** or **finalizing a Conductor
    - Confirm that **all tasks in the current phase** are marked as done (`[x]`).
    - If any tasks remain unchecked, do **not** run this protocol; instead, return to task execution (using `task-conductor`).
 
-3. **Test Plan**
+3. **CI verification (before checkpoint / PR)**
+   - Run `npm run test:ci`. If it fails, do not proceed to checkpoint or PR; report the failure and stop.
+   - Run `npm run test:e2e:ci`. If it fails, do not proceed; report the failure and stop.
+   - Only after both pass, continue to the next step.
+
+4. **Test Plan**
    - Propose a **manual test plan** summarizing key flows that should be tested by the user.
    - Focus on areas touched in this phase (auth, canvas, routing, etc.).
 
-4. **Checkpoint Commit**
+5. **Checkpoint Commit**
    - Create a final commit marking the end of this phase and push it to the remote.
    - Use commands like:
      ```bash
@@ -43,7 +48,7 @@ Use this skill when **transitioning between phases** or **finalizing a Conductor
      git push origin HEAD
      ```
 
-5. **Draft PR Strategy**
+6. **Draft PR Strategy**
    - Ensure a Pull Request exists for the current branch:
      - Check: `gh pr view`
      - If no PR exists, create a **Draft PR**:
@@ -51,18 +56,19 @@ Use this skill when **transitioning between phases** or **finalizing a Conductor
        gh pr create --draft --title "WIP: <Track Name>" --body "Tracking progress for <Track ID>"
        ```
 
-6. **Verification Report**
+7. **Verification Report**
    - Prepare a short report summarizing:
-     - Automated tests run and their results.
+     - That `npm run test:ci` and `npm run test:e2e:ci` were run and both passed (or which failed and that the phase was not completed until fixed).
+     - Other automated tests run and their results.
      - Manual test plan and any findings.
      - Notable architecture or API changes.
    - Attach this report to the checkpoint commit using `git notes` if the user wants that convention preserved (e.g. `git notes add -m "<report>" <sha>`).
 
-7. **State Sync**
+8. **State Sync**
    - Update the track’s `plan.md` to indicate the phase boundary:
      - Optionally annotate the phase with `[checkpoint: <sha>]` if that pattern is in use.
 
-8. **Phase Gate**
+9. **Phase Gate**
    - Inform the user that the phase is ready for review and include:
      - The branch name.
      - The PR link (if any).
