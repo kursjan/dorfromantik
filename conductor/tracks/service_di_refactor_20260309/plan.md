@@ -29,7 +29,7 @@
 - [x] 3.2 Wire `ServiceProvider` into `App.tsx` (wrap app tree).
 - [x] 3.3 Migrate `SessionProvider` — replace static `AuthService` / `FirestoreService` calls with context hooks.
 - [x] 3.4 Migrate `UserAccount` — replace static `AuthService` calls with `useAuthService()`.
-- [ ] 3.5 Migrate `CanvasView` — replace static `FirestoreService` calls with `useFirestoreService()`.
+- [x] 3.5 Migrate `CanvasView` — replace static `FirestoreService` calls with `useFirestoreService()`.
 - [ ] 3.6 Migrate `MainMenu` — if it references services directly.
 - [ ] **Phase Gate** using **project-orchestrator** skill.
 
