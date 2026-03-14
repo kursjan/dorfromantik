@@ -26,6 +26,7 @@ Use this skill for any **coding or implementation task** defined in a Conductor 
    - Minimize file touches and avoid opportunistic refactors unless the plan or user explicitly asks for them.
 
 2. **Quality Gate Verification**
+   - Run commands from the **project root**; do not use `cd` (shell is already there). Use e.g. `npm run test:unit`, `npm run typecheck`, `npm run lint`.
    - Run **Unit Tests**:
      - Prefer `npm run test:unit` or the project’s documented unit-test command.
    - Run **Type Check**:

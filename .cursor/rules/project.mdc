@@ -50,6 +50,10 @@ alwaysApply: true
     - Or making further non-trivial edits.
 - Respect phrases like "lgtm", "sgtm", "approved" as signals that the user is satisfied.
 
+# Terminal & Working Directory
+
+- **Do not use `cd` in terminal commands** unless the task explicitly requires running a command from a different directory. The shell already starts in the **project root** (workspace path: e.g. `/home/.../dorfromantik` or the worktree root). Run commands directly, e.g. `npm run typecheck`, `npm run test:unit`. When a path is needed, use paths **relative to the project root** (e.g. `npx playwright test e2e/foo.spec.ts`) or the absolute workspace path. This keeps all work inside the project and reduces unnecessary commands.
+
 # Environment & Tooling
 
 - Assume a Vite + React + Firebase project with Node 20+.
