@@ -31,7 +31,7 @@
 - [x] 3.4 Migrate `UserAccount` — replace static `AuthService` calls with `useAuthService()`.
 - [x] 3.5 Migrate `CanvasView` — replace static `FirestoreService` calls with `useFirestoreService()`.
 - [x] 3.6 Migrate `MainMenu` — if it references services directly.
-- [ ] **Phase Gate** using **project-orchestrator** skill.
+- [ ] **Phase Gate** using **project-orchestrator** skill. [checkpoint: 7667310]
 
 ## Phase 4: Cleanup & Final Verification
 

@@ -9,9 +9,9 @@ This directory contains services that handle external integrations (Firebase, Au
 
 - **Mock Mode**: Controlled by the `VITE_USE_MOCK_AUTH` environment variable. When enabled, it bypasses the real Firebase SDK and returns mock user objects. This is critical for stable E2E testing in CI without needing real API keys.
 - **State Management**: While it interacts with Firebase's internal state, the primary way the app consumes auth state is via `AuthService.onAuthStateChanged`.
-- **Deprecation**: This service will be replaced by the new DI architecture in Phase 3.
+- **Deprecation**: This service will be replaced by the new DI architecture (Phase 4 cleanup).
 
-### New DI Architecture (Phase 2 Complete)
+### New DI Architecture (Phase 3 consumer migration complete)
 
 #### IAuthService Interface (`src/services/auth/IAuthService.ts`)
 Clean interface defining authentication operations without implementation details:
@@ -31,6 +31,8 @@ Production implementation using real Firebase SDK.
 #### InMemoryAuthService (`src/services/auth/InMemoryAuthService.ts`)
 Lightweight fake implementation for non-Firebase environments (CI/E2E/testing).
 
+**ServiceProvider** (`ServiceProvider.tsx`) wires implementations via React context (from `VITE_USE_MOCK_AUTH` or optional injected instances for tests). **Hooks** `useAuthService()` and `useFirestoreService()` (`hooks/useServices.ts`) are the only way app code should access these services. SessionProvider, UserAccount, CanvasView, and MainMenu all use these hooks.
+
 ### FirestoreService (`src/services/FirestoreService.ts`)
 **Legacy monolithic service** being refactored. Currently handles persisting and loading game state to/from Firestore.
 
@@ -38,7 +40,7 @@ Lightweight fake implementation for non-Firebase environments (CI/E2E/testing).
 - **Versioning**: Each saved document includes a `version` field (`SAVED_GAME_VERSION`) to support future data migrations.
 - **Mock Mode**: Same `VITE_USE_MOCK_AUTH` gate as `AuthService`. Uses an in-memory `Map` store for CI/E2E testing.
 - **Integration Points**: `CanvasView` triggers debounced saves (2s) via `CanvasController.onTilePlaced`; `SessionProvider` loads games on auth initialization.
-- **Deprecation**: This service will be replaced by the new DI architecture in Phase 3.
+- **Deprecation**: This service will be replaced by the new DI architecture (Phase 4 cleanup).
 
 #### IFirestoreService Interface (`src/services/firestore/IFirestoreService.ts`)
 Clean interface defining game state persistence operations:
