@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-import { InMemoryAuthService } from './auth/InMemoryAuthService';
+import { InMemoryAuthService } from './InMemoryAuthService';
 
 describe('InMemoryAuthService (Fake Implementation)', () => {
   const inMemoryAuthService = new InMemoryAuthService();
