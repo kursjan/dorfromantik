@@ -1,18 +1,18 @@
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { CanvasController } from '../engine/CanvasController';
 import { ResetViewButton } from './ResetViewButton';
 import { GameHUD } from './GameHUD';
 import { DebugOverlay } from './DebugOverlay';
 import { Session } from '../../models/Session';
-import { useFirestoreService } from '../../services/hooks/useServices';
 import type { Tile } from '../../models/Tile';
 
 interface CanvasViewProps {
   session: Session;
+  /** Called when a tile is placed; e.g. parent may debounce and persist game state. */
+  onTilePlaced?: () => void;
 }
 
-export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
-  const firestoreService = useFirestoreService();
+export const CanvasView: React.FC<CanvasViewProps> = ({ session, onTilePlaced }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const controllerRef = useRef<CanvasController | null>(null);
   const activeGame = session.activeGame;
@@ -27,17 +27,6 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
   const [nextTile, setNextTile] = useState<Tile | null>(activeGame.peek() ?? null);
   const [controller, setController] = useState<CanvasController | null>(null);
   const [debugOverlayVisible, setDebugOverlayVisible] = useState(false);
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const debouncedSave = useCallback(() => {
-    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => {
-      if (!activeGame) return;
-      firestoreService.saveGameState(session.user.id, activeGame).catch((err) =>
-        console.error('Failed to save game state', err)
-      );
-    }, 2000);
-  }, [session, activeGame, firestoreService]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -54,7 +43,9 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
       setNextTile(newNextTile);
     };
 
-    newController.onTilePlaced = debouncedSave;
+    if (onTilePlaced) {
+      newController.onTilePlaced = onTilePlaced;
+    }
 
     controllerRef.current = newController;
 
@@ -62,9 +53,8 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
       newController.destroy();
       controllerRef.current = null;
       setController(null);
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
-  }, [session, activeGame, debouncedSave]);
+  }, [session, activeGame, onTilePlaced]);
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
