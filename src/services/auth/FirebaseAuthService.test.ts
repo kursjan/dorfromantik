@@ -4,7 +4,7 @@ vi.hoisted(() => {
   vi.stubEnv('VITE_USE_MOCK_AUTH', '');
 });
 
-import { FirebaseAuthService } from './auth/FirebaseAuthService';
+import { FirebaseAuthService } from './FirebaseAuthService';
 import {
   signInAnonymously,
   signInWithPopup,
@@ -26,7 +26,7 @@ vi.mock('firebase/auth', () => ({
 
 // Mock our local firebase initialization to avoid actual side effects
 const mockAuth = vi.hoisted(() => ({ currentUser: null as any }));
-vi.mock('./firebase', () => ({
+vi.mock('../firebase', () => ({
   auth: mockAuth,
 }));
 
