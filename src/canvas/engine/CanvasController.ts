@@ -42,7 +42,7 @@ export class CanvasController {
   private fps: number = 0;
   private lastDebugUpdateTime: number = 0;
 
-  constructor(canvas: HTMLCanvasElement, session: Session) {
+  constructor(canvas: HTMLCanvasElement, session: Session, options?: { onToggleDebugOverlay?: () => void }) {
     this.canvas = canvas;
     this.session = session;
     const ctx = canvas.getContext('2d');
@@ -63,6 +63,7 @@ export class CanvasController {
       onRotateCounterClockwise: () => this.handleRotateCounterClockwise(),
       onLeave: () => this.handleLeave(),
       onResize: () => this.handleResize(),
+      onToggleDebugOverlay: options?.onToggleDebugOverlay,
     });
 
     // Handle Resize (Initial)
@@ -168,8 +169,8 @@ export class CanvasController {
   }
 
   private notifyStatsChange() {
-    const activeGame = this.session.activeGame;
-    if (activeGame && this.onStatsChange) {
+    const activeGame = this.session.activeGame!;
+    if (this.onStatsChange) {
       this.onStatsChange(activeGame.score, activeGame.remainingTurns, activeGame.peek() || null);
     }
   }

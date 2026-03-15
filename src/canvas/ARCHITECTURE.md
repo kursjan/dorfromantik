@@ -90,7 +90,7 @@ Manages the view transform.
 
 DOM abstraction layer.
 
-- **Role:** Translates raw DOM events (`mousedown`, `wheel`, `keydown`, etc.) into abstract Game Actions (`onPan`, `onZoom`, `onHover`, `getRotationDirection`, `onRotateClockwise`, `onRotateCounterClockwise`).
+- **Role:** Translates raw DOM events (`mousedown`, `wheel`, `keydown`, etc.) into abstract Game Actions (`onPan`, `onZoom`, `onHover`, `getRotationDirection`, `onRotateClockwise`, `onRotateCounterClockwise`, `onToggleDebugOverlay`). F3 is handled here and invokes the optional `onToggleDebugOverlay` callback (wired from `CanvasView` for the debug overlay).
 - **State Machine:** Uses an explicit state machine (`IDLE`, `MOUSE_DOWN_POTENTIAL_CLICK`, `PANNING`) to distinguish between clicks and pans. This centralizes transition logic and cursor management.
 - **Context Menu:** The browser's default context menu is disabled to support right-click-based tile rotation.
 - **Hygiene:** Explicitly attaches and detaches listeners to prevent memory leaks.

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import { DebugOverlay } from './DebugOverlay';
 import { CanvasController } from '../engine/CanvasController';
 import { HexCoordinate } from '../../models/HexCoordinate';
@@ -20,52 +20,44 @@ describe('DebugOverlay', () => {
     });
   });
 
-  it('should not be visible by default', () => {
-    render(<DebugOverlay controller={mockController} />);
+  it('should not render when isVisible is false', () => {
+    render(<DebugOverlay controller={mockController} isVisible={false} />);
     expect(screen.queryByTestId('debug-overlay')).not.toBeInTheDocument();
   });
 
-  it('should toggle visibility when F3 is pressed', () => {
-    render(<DebugOverlay controller={mockController} />);
-    
-    // Press F3
-    fireEvent.keyDown(window, { key: 'F3' });
-    
-    // Should still not be visible because we don't have stats yet
+  it('should not render when isVisible is true but stats not yet available', () => {
+    render(<DebugOverlay controller={mockController} isVisible={true} />);
     expect(screen.queryByTestId('debug-overlay')).not.toBeInTheDocument();
+  });
 
-    // Push some stats
+  it('should show overlay when isVisible is true and stats are available', () => {
+    render(<DebugOverlay controller={mockController} isVisible={true} />);
+
     act(() => {
       if (statsCallback) {
         statsCallback({
           fps: 60,
-          camera: { x: 10, y: 20, zoom: 1.5 },
+          camera: { x: 10, y: 20, zoom: 1.5, rotation: 0 },
           hoveredHex: new HexCoordinate(1, -1, 0)
         });
       }
     });
 
-    // Now it should be visible
     expect(screen.getByTestId('debug-overlay')).toBeInTheDocument();
     expect(screen.getByText(/FPS: 60/)).toBeInTheDocument();
     expect(screen.getByText(/Camera: \(10.0, 20.0\) Zoom: 1.50/)).toBeInTheDocument();
     expect(screen.getByText(/Hover: \(1, -1, 0\)/)).toBeInTheDocument();
-
-    // Toggle off
-    fireEvent.keyDown(window, { key: 'F3' });
-    expect(screen.queryByTestId('debug-overlay')).not.toBeInTheDocument();
   });
 
   it('should update stats when controller notifies change', () => {
-    render(<DebugOverlay controller={mockController} />);
-    fireEvent.keyDown(window, { key: 'F3' });
+    render(<DebugOverlay controller={mockController} isVisible={true} />);
 
     // Initial stats
     act(() => {
       if (statsCallback) {
         statsCallback({
           fps: 60,
-          camera: { x: 0, y: 0, zoom: 1.0 },
+          camera: { x: 0, y: 0, zoom: 1.0, rotation: 0 },
           hoveredHex: null
         });
       }
@@ -77,7 +69,7 @@ describe('DebugOverlay', () => {
       if (statsCallback) {
         statsCallback({
           fps: 30,
-          camera: { x: 100, y: -50, zoom: 2.0 },
+          camera: { x: 100, y: -50, zoom: 2.0, rotation: 0 },
           hoveredHex: new HexCoordinate(2, -3, 1)
         });
       }

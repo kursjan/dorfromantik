@@ -5,32 +5,18 @@ import './DebugOverlay.css';
 
 interface DebugOverlayProps {
   controller: CanvasController;
+  /** Visibility is toggled by F3 via InputManager. */
+  isVisible: boolean;
 }
 
-export const DebugOverlay: React.FC<DebugOverlayProps> = ({ controller }) => {
-  const [isVisible, setIsVisible] = useState(false);
+export const DebugOverlay: React.FC<DebugOverlayProps> = ({ controller, isVisible }) => {
   const [stats, setStats] = useState<DebugStats | null>(null);
 
   useEffect(() => {
-    // 1. Toggle visibility with F3
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'F3') {
-        event.preventDefault();
-        setIsVisible((prev) => !prev);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    // 2. Subscribe to debug stats
     const unsubscribe = controller.addDebugStatsListener((newStats: DebugStats) => {
       setStats(newStats);
     });
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      unsubscribe();
-    };
+    return () => unsubscribe();
   }, [controller]);
 
   if (!isVisible || !stats) {

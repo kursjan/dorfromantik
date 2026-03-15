@@ -111,6 +111,18 @@ describe('InputManager', () => {
     expect(callbacks.onPan).not.toHaveBeenCalled();
   });
 
+  it('calls onToggleDebugOverlay when F3 is pressed', () => {
+    callbacks.onToggleDebugOverlay = vi.fn();
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'F3' }));
+    expect(callbacks.onToggleDebugOverlay).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not call onToggleDebugOverlay when callback is not provided', () => {
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'F3' }));
+    expect(callbacks.onPan).not.toHaveBeenCalled();
+    expect(callbacks.onZoom).not.toHaveBeenCalled();
+  });
+
   it('detaches listeners on destroy', () => {
     const removeSpy = vi.spyOn(canvas, 'removeEventListener');
     inputManager.destroy();

@@ -26,6 +26,7 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
   const [remainingTurns, setRemainingTurns] = useState(activeGame.remainingTurns);
   const [nextTile, setNextTile] = useState<Tile | null>(activeGame.peek() ?? null);
   const [controller, setController] = useState<CanvasController | null>(null);
+  const [debugOverlayVisible, setDebugOverlayVisible] = useState(false);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const debouncedSave = useCallback(() => {
@@ -42,7 +43,9 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const newController = new CanvasController(canvas, session);
+    const newController = new CanvasController(canvas, session, {
+      onToggleDebugOverlay: () => setDebugOverlayVisible((v) => !v),
+    });
     setController(newController);
 
     newController.onStatsChange = (newScore: number, newTurns: number, newNextTile: Tile | null) => {
@@ -67,7 +70,7 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session }) => {
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
       <GameHUD score={score} remainingTurns={remainingTurns} nextTile={nextTile} />
       <ResetViewButton onClick={() => controllerRef.current?.resetCamera()} />
-      {controller && <DebugOverlay controller={controller} />}
+      {controller && <DebugOverlay controller={controller} isVisible={debugOverlayVisible} />}
       <canvas
         ref={canvasRef}
         style={{ display: 'block', width: '100%', height: '100%', touchAction: 'none' }}
