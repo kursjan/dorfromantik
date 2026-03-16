@@ -16,6 +16,7 @@ export const DebugOverlay: React.FC<DebugOverlayProps> = ({ controller, isVisibl
     const unsubscribe = controller.addDebugStatsListener((newStats: DebugStats) => {
       setStats(newStats);
     });
+
     return () => unsubscribe();
   }, [controller]);
 

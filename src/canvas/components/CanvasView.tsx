@@ -47,6 +47,7 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session, onTilePlaced })
 
     controllerRef.current = newController;
 
+    // Unsubscribe function
     return () => {
       newController.destroy();
       controllerRef.current = null;

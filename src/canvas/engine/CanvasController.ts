@@ -86,8 +86,18 @@ export class CanvasController {
     this.camera.reset();
   }
 
+
+  /**
+   * Registers a one-shot listener for debug stats updates.
+   * The callback will be notified until the returned unsubscribe function is called.
+   * Only one debug stats listener can be registered at a time; later registrations overwrite earlier ones.
+   * 
+   * @param callback - Function to call when debug stats are updated.
+   * @returns Unsubscribe function to remove the listener.
+   */
   public addDebugStatsListener(callback: (stats: DebugStats) => void): () => void {
     this.onDebugStatsChange = callback;
+    // Unsubscribe function
     return () => {
       if (this.onDebugStatsChange === callback) {
         this.onDebugStatsChange = undefined;
