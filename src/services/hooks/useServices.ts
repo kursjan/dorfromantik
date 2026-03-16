@@ -4,7 +4,7 @@ import type { IFirestoreService } from '../firestore/IFirestoreService';
 import { ServiceContext } from '../ServiceContext';
 
 export function useAuthService(): IAuthService {
-  const context = useContext(ServiceContext);
+  const context = useServiceContext();
   if (!context) {
     throw new Error('useAuthService must be used within a ServiceProvider');
   }
@@ -17,4 +17,8 @@ export function useFirestoreService(): IFirestoreService {
     throw new Error('useFirestoreService must be used within a ServiceProvider');
   }
   return context.firestoreService;
+}
+
+function useServiceContext() {
+  return useContext(ServiceContext);
 }

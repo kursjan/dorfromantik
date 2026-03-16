@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "Shell(cat)",
+      "Shell(cd)",
       "Shell(echo)",
       "Shell(git)",
       "Shell(grep)",

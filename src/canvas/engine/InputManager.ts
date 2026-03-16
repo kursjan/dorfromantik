@@ -7,6 +7,7 @@ export interface InputCallbacks {
   onRotateCounterClockwise: () => void;
   onLeave: () => void;
   onResize: () => void;
+  onToggleDebugOverlay?: () => void;
 }
 
 type InputState = 'IDLE' | 'MOUSE_DOWN_POTENTIAL_CLICK' | 'PANNING';
@@ -101,6 +102,13 @@ export class InputManager {
 
   private handleKeyDown = (e: KeyboardEvent) => {
     this.keys.add(e.key);
+
+    // Debug overlay (F3)
+    if (e.key === 'F3') {
+      e.preventDefault();
+      this.callbacks.onToggleDebugOverlay?.();
+      return;
+    }
 
     // Tile Rotation (R/F)
     if (e.key === 'r' || e.key === 'R') {

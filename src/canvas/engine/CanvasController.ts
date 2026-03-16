@@ -42,7 +42,7 @@ export class CanvasController {
   private fps: number = 0;
   private lastDebugUpdateTime: number = 0;
 
-  constructor(canvas: HTMLCanvasElement, session: Session) {
+  constructor(canvas: HTMLCanvasElement, session: Session, options?: { onToggleDebugOverlay?: () => void }) {
     this.canvas = canvas;
     this.session = session;
     const ctx = canvas.getContext('2d');
@@ -63,6 +63,7 @@ export class CanvasController {
       onRotateCounterClockwise: () => this.handleRotateCounterClockwise(),
       onLeave: () => this.handleLeave(),
       onResize: () => this.handleResize(),
+      onToggleDebugOverlay: options?.onToggleDebugOverlay,
     });
 
     // Handle Resize (Initial)
@@ -85,8 +86,18 @@ export class CanvasController {
     this.camera.reset();
   }
 
+
+  /**
+   * Registers a one-shot listener for debug stats updates.
+   * The callback will be notified until the returned unsubscribe function is called.
+   * Only one debug stats listener can be registered at a time; later registrations overwrite earlier ones.
+   * 
+   * @param callback - Function to call when debug stats are updated.
+   * @returns Unsubscribe function to remove the listener.
+   */
   public addDebugStatsListener(callback: (stats: DebugStats) => void): () => void {
     this.onDebugStatsChange = callback;
+    // Unsubscribe function
     return () => {
       if (this.onDebugStatsChange === callback) {
         this.onDebugStatsChange = undefined;
@@ -168,8 +179,8 @@ export class CanvasController {
   }
 
   private notifyStatsChange() {
-    const activeGame = this.session.activeGame;
-    if (activeGame && this.onStatsChange) {
+    const activeGame = this.session.activeGame!;
+    if (this.onStatsChange) {
       this.onStatsChange(activeGame.score, activeGame.remainingTurns, activeGame.peek() || null);
     }
   }
