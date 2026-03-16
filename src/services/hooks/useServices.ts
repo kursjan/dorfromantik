@@ -12,7 +12,7 @@ export function useAuthService(): IAuthService {
 }
 
 export function useFirestoreService(): IFirestoreService {
-  const context = useContext(ServiceContext);
+  const context = useServiceContext();
   if (!context) {
     throw new Error('useFirestoreService must be used within a ServiceProvider');
   }
