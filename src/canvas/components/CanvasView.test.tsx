@@ -48,8 +48,10 @@ describe('CanvasView', () => {
     );
   }
 
+  const noopOnTilePlaced = () => {};
+
   it('renders correctly with HUD and Canvas', () => {
-    renderWithProvider(<CanvasView session={session} />);
+    renderWithProvider(<CanvasView session={session} onTilePlaced={noopOnTilePlaced} />);
 
     // Check HUD is present with session values
     expect(screen.getByText(/Score/i)).toBeInTheDocument();
@@ -62,13 +64,15 @@ describe('CanvasView', () => {
   });
 
   it('initializes CanvasController on mount', () => {
-    renderWithProvider(<CanvasView session={session} />);
+    renderWithProvider(<CanvasView session={session} onTilePlaced={noopOnTilePlaced} />);
 
     expect(CanvasController).toHaveBeenCalled();
   });
 
   it('cleans up CanvasController on unmount', () => {
-    const { unmount } = renderWithProvider(<CanvasView session={session} />);
+    const { unmount } = renderWithProvider(
+      <CanvasView session={session} onTilePlaced={noopOnTilePlaced} />
+    );
 
     const controllerInstance = vi.mocked(CanvasController).mock.results[0].value;
     unmount();

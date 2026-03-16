@@ -9,7 +9,7 @@ import type { Tile } from '../../models/Tile';
 interface CanvasViewProps {
   session: Session;
   /** Called when a tile is placed; e.g. parent may debounce and persist game state. */
-  onTilePlaced?: () => void;
+  onTilePlaced: () => void;
 }
 
 export const CanvasView: React.FC<CanvasViewProps> = ({ session, onTilePlaced }) => {
@@ -43,9 +43,7 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session, onTilePlaced })
       setNextTile(newNextTile);
     };
 
-    if (onTilePlaced) {
-      newController.onTilePlaced = onTilePlaced;
-    }
+    newController.onTilePlaced = onTilePlaced;
 
     controllerRef.current = newController;
 
