@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, type Context } from 'react';
 import { Session } from '../models/Session';
 
 export interface SessionContextType {
@@ -8,9 +8,10 @@ export interface SessionContextType {
   continueGame: (gameId: string) => void;
 }
 
-export const SessionContext = createContext<SessionContextType | undefined>(undefined);
+export const SessionContext: Context<SessionContextType | undefined> =
+  createContext<SessionContextType | undefined>(undefined);
 
-export const useSession = () => {
+export const useSession = (): SessionContextType => {
   const context = useContext(SessionContext);
   if (context === undefined) {
     throw new Error('useSession must be used within a SessionProvider');

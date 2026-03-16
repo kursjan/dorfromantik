@@ -2,30 +2,32 @@ import React, { useRef, useCallback, useEffect } from 'react';
 import { CanvasView } from '../canvas/components/CanvasView';
 import { useSession } from '../context/SessionContext';
 import { useFirestoreService } from '../services/hooks/useServices';
+import { GameAutosaver } from '../canvas/services/GameAutosaver';
 
 const SAVE_DEBOUNCE_MS = 2000;
 
 export const GameBoard: React.FC = () => {
   const { session } = useSession();
   const firestoreService = useFirestoreService();
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autosaverRef = useRef<GameAutosaver | null>(null);
 
   const debouncedSave = useCallback(() => {
-    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => {
-      const game = session.activeGame;
-      if (!game) return;
-      firestoreService.saveGameState(session.user.id, game).catch((err) =>
-        console.error('Failed to save game state', err)
-      );
-    }, SAVE_DEBOUNCE_MS);
-  }, [session, firestoreService]);
+    autosaverRef.current?.handleTilePlaced();
+  }, []);
 
   useEffect(() => {
+    autosaverRef.current = new GameAutosaver({
+      firestoreService,
+      getUserId: () => session.user.id,
+      getActiveGame: () => session.activeGame,
+      debounceMs: SAVE_DEBOUNCE_MS,
+    });
+
     return () => {
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+      autosaverRef.current?.dispose();
+      autosaverRef.current = null;
     };
-  }, []);
+  }, [firestoreService, session]);
 
   if (!session.activeGame) {
     return (
