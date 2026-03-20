@@ -24,11 +24,13 @@ This file tracks all major tracks for the project. Each track has its own detail
   *Link: [./archive/debug_overlay_20260224/](./archive/debug_overlay_20260224/)*
 - [ ] **Track: Simple Test Game (#34)**
   *Link: [./tracks/simple_test_game_20260225/](./tracks/simple_test_game_20260225/)*
-- [ ] **Track: Thorough Review of src/models (#36)**
-  *Link: [./tracks/models_review_20260227/](./tracks/models_review_20260227/)*
+- [x] **Track: Thorough Review of src/models (#36)**
+  *Link: [./archive/models_review_20260227/](./archive/models_review_20260227/)*
 - [x] **Track: Main Menu UI and Routing (Issue #32)**
   *Link: [./archive/main_menu_routing_20260227/](./archive/main_menu_routing_20260227/)*
-- [~] **Track: Firebase Auth & Storage Integration (#41)**
-  *Link: [./tracks/firebase_integration_20260305/](./tracks/firebase_integration_20260305/)*
+- [x] **Track: Firebase Auth & Storage Integration (#41)**
+  *Link: [./archive/firebase_integration_20260305/](./archive/firebase_integration_20260305/)*
 - [x] **Track: Tech Debt: CanvasController Test Coverage (#43)**
   *Link: [./archive/canvas_controller_tests_20260305/](./archive/canvas_controller_tests_20260305/)*
+- [x] **Track: Service DI Refactor (#50)**
+  *Link: [./archive/service_di_refactor_20260309/](./archive/service_di_refactor_20260309/)*
