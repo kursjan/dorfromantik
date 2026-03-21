@@ -6,6 +6,14 @@ import { test, expect } from '@playwright/test';
 test.describe('Auth Flow (Mock Auth)', () => {
   test.describe.configure({ mode: 'serial' });
 
+  // Skip the entire block if we are not running the CI script that enables the Mock Auth environment.
+  // This prevents failures when running standard `npm run test:e2e` against the real Firebase project
+  // where Google popups are blocked by automated browsers.
+  test.skip(
+    process.env.TEST_ENV !== 'ci', 
+    'Auth tests only run in Mock Auth mode (npm run test:e2e:ci) to avoid real Google popups.'
+  );
+
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
   });
