@@ -14,7 +14,15 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
 
   useEffect(() => {
-    const unsubscribe = authService.onAuthStateChanged((firebaseUser) => {
+    let unsubscribeGames: (() => void) | null = null;
+
+    const unsubscribeAuth = authService.onAuthStateChanged((firebaseUser) => {
+      // Clean up previous games subscription if it exists
+      if (unsubscribeGames) {
+        unsubscribeGames();
+        unsubscribeGames = null;
+      }
+
       if (!firebaseUser) {
         // Automatically sign in anonymously if there is no user
         authService.signInAnonymously().catch((error) => {
@@ -28,20 +36,19 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
         ? new AnonymousUser(firebaseUser.uid)
         : new RegisteredUser(firebaseUser.uid, firebaseUser.displayName || firebaseUser.uid);
 
-      firestoreService.loadAllGames(firebaseUser.uid)
-        .then((loadedGames) => {
-          setUser(currentUser);
-          setGames(loadedGames);
-          setIsInitializing(false);
-        })
-        .catch((error) => {
-          console.error('Failed to load saved games', error);
-          setUser(currentUser);
-          setIsInitializing(false);
-        });
+      setUser(currentUser);
+
+      // Subscribe to games for the current user
+      unsubscribeGames = firestoreService.subscribeToGames(firebaseUser.uid, (loadedGames) => {
+        setGames(loadedGames);
+        setIsInitializing(false);
+      });
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeGames) unsubscribeGames();
+    };
   }, [authService, firestoreService]);
   
   // Wait for auth to initialize before rendering children

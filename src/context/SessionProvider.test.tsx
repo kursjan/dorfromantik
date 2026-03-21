@@ -6,7 +6,7 @@ import type { User as FirebaseUser } from 'firebase/auth';
 
 const mockOnAuthStateChanged = vi.fn();
 const mockSignInAnonymously = vi.fn();
-const mockLoadAllGames = vi.fn();
+const mockSubscribeToGames = vi.fn();
 
 vi.mock('../services/hooks/useServices', () => ({
   useAuthService: () => ({
@@ -14,13 +14,13 @@ vi.mock('../services/hooks/useServices', () => ({
     signInAnonymously: mockSignInAnonymously,
   }),
   useFirestoreService: () => ({
-    loadAllGames: mockLoadAllGames,
+    subscribeToGames: mockSubscribeToGames,
   }),
 }));
 
 const onAuthStateChanged = mockOnAuthStateChanged as Mock;
 const signInAnonymously = mockSignInAnonymously as Mock;
-const loadAllGames = mockLoadAllGames as Mock;
+const subscribeToGames = mockSubscribeToGames as Mock;
 
 function TestConsumer() {
   const { user } = useSession();
@@ -50,7 +50,10 @@ describe('SessionProvider', () => {
       displayName: null,
     } as unknown as FirebaseUser);
 
-    loadAllGames.mockResolvedValue([]);
+    subscribeToGames.mockImplementation((_uid, callback) => {
+      callback([]); // Trigger initialization completion
+      return vi.fn();
+    });
   });
 
   it('shows loading state before auth resolves', () => {
@@ -175,7 +178,10 @@ describe('SessionProvider', () => {
 
   it('loads saved games from Firestore on auth', async () => {
     const mockGames = [{ id: 'g1' }, { id: 'g2' }];
-    loadAllGames.mockResolvedValueOnce(mockGames);
+    subscribeToGames.mockImplementation((_uid, callback) => {
+      callback(mockGames);
+      return vi.fn();
+    });
 
     function GameCountConsumer() {
       const { games } = useSession();
@@ -199,39 +205,7 @@ describe('SessionProvider', () => {
     await waitFor(() => {
       expect(screen.getByTestId('game-count')).toHaveTextContent('2');
     });
-    expect(loadAllGames).toHaveBeenCalledWith('user-with-games');
+    expect(subscribeToGames).toHaveBeenCalledWith('user-with-games', expect.any(Function));
   });
 
-  it('creates session with empty games when Firestore load fails', async () => {
-    const firestoreError = new Error('Firestore unavailable');
-    loadAllGames.mockRejectedValueOnce(firestoreError);
-
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-    function GameCountConsumer() {
-      const { games } = useSession();
-      return <span data-testid="game-count">{games.length}</span>;
-    }
-
-    render(
-      <SessionProvider>
-        <GameCountConsumer />
-      </SessionProvider>
-    );
-
-    act(() => {
-      capturedCallback({
-        uid: 'offline-user',
-        isAnonymous: true,
-        displayName: null,
-      } as unknown as FirebaseUser);
-    });
-
-    await waitFor(() => {
-      expect(screen.getByTestId('game-count')).toHaveTextContent('0');
-    });
-
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to load saved games', firestoreError);
-    consoleErrorSpy.mockRestore();
-  });
 });
