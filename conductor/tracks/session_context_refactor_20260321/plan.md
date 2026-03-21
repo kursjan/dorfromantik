@@ -12,7 +12,11 @@
 - [x] Update `SettingsModal.stories.tsx` to provide the updated mock context using **task-conductor** skill.
 - [x] **Phase Gate**: Verify all unit, E2E, and UI tests pass using **project-orchestrator** skill. [checkpoint: b7a0e51]
 
-## Phase 3: Adversarial Review
+## Phase 3: Adversarial Review Fixes (Decouple activeGame)
 - [x] Perform a file-by-file adversarial review of the changes against `main` using **quick-review** skill.
-- [ ] Address any architectural or consistency issues found in `REVIEW_FEEDBACK.md` using **task-conductor** skill.
+- [ ] Refactor `SessionContextType` in `src/context/SessionContext.ts` to separate `user`, `games`, and `activeGame` using **task-conductor** skill.
+- [ ] Update `SessionProvider` in `src/context/SessionProvider.tsx` to use granular state hooks using **task-conductor** skill.
+- [ ] Update consuming components (`MainMenu.tsx`, `GameBoard.tsx`, `SettingsModal.tsx`) to match new context structure using **task-conductor** skill.
+- [ ] Fix tests (`SessionProvider.test.tsx`, `GameBoard.test.tsx`) and stories to align with the new Context shape using **task-conductor** skill.
+- [] Perform another file-by-file adversarial review of the changes against `main` using **quick-review** skill.
 - [ ] **Final Track Gate**: Final verification and Git commit using **project-orchestrator** skill.
