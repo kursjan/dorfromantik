@@ -29,8 +29,8 @@ test.describe('Real-time History Sync', () => {
 
     // 5. Wait for the game to auto-save
     // The GameAutosaver should trigger and the SaveStatusIndicator should show "Saved"
-    // The debounce is 2000ms, so we wait a bit longer just in case.
-    await expect(page.locator('text=Saved')).toBeVisible({ timeout: 10000 });
+    // Since we use 10ms in test mode, it should be near instant.
+    await expect(page.locator('text=Saved')).toBeVisible({ timeout: 5000 });
 
     // 6. Navigate back to Main Menu using browser history (simulating user going back)
     await page.goBack();

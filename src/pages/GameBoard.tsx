@@ -6,7 +6,7 @@ import { GameAutosaver } from '../canvas/services/GameAutosaver';
 import { SaveStatusIndicator, type SaveStatus } from '../canvas/components/SaveStatusIndicator';
 import './GameBoard.css';
 
-const SAVE_DEBOUNCE_MS = 2000;
+const SAVE_DEBOUNCE_MS = import.meta.env.MODE === 'test' ? 10 : 2000;
 const STATUS_CLEAR_TIMEOUT_MS = 1000;
 
 export const GameBoard: React.FC = () => {
