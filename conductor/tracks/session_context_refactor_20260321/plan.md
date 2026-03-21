@@ -3,7 +3,7 @@
 ## Phase 1: Context & Provider Lean-out
 - [x] Ensure we are on branch `worker1` and synchronized with `main` using **task-conductor** skill.
 - [x] Update `src/context/SessionContext.ts` to replace game initialization methods with a generic `setActiveGame(game: Game)` using **task-conductor** skill.
-- [ ] Update `src/context/SessionProvider.tsx` to implement `setActiveGame` and remove legacy orchestration logic using **task-conductor** skill.
+- [x] Update `src/context/SessionProvider.tsx` to implement `setActiveGame` and remove legacy orchestration logic using **task-conductor** skill.
 - [ ] **Phase Gate**: Verify architecture and test coverage using **project-orchestrator** skill.
 
 ## Phase 2: Migration & Implementation

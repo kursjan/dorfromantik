@@ -3,7 +3,6 @@ import type { ReactNode } from 'react';
 import { Session } from '../models/Session';
 import { AnonymousUser, RegisteredUser } from '../models/User';
 import { Game } from '../models/Game';
-import { GameRules } from '../models/GameRules';
 import { useAuthService, useFirestoreService } from '../services/hooks/useServices';
 import { SessionContext } from './SessionContext';
 
@@ -56,27 +55,13 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'red' }}>Initialization Error. Please Refresh.</div>;
   }
 
-  const startNewStandardGame = () => {
-    const game = Game.create(GameRules.createStandard());
-    const newSession = new Session(session.sessionId, session.user, game, [...session.games]);
-    setSession(newSession);
-  };
-
-  const startNewTestGame = () => {
-    const game = Game.create(GameRules.createTest());
-    const newSession = new Session(session.sessionId, session.user, game, [...session.games]);
-    setSession(newSession);
-  };
-
-  const continueGame = (gameId: string) => {
-    const game = session.games.find(g => g.id === gameId);
-    if (!game) throw new Error(`Cannot continue game: Game with id ${gameId} not found`);
+  const setActiveGame = (game: Game) => {
     const newSession = new Session(session.sessionId, session.user, game, [...session.games]);
     setSession(newSession);
   };
 
   return (
-    <SessionContext.Provider value={{ session, startNewStandardGame, startNewTestGame, continueGame }}>
+    <SessionContext.Provider value={{ session, setActiveGame }}>
       {children}
     </SessionContext.Provider>
   );
