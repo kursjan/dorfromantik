@@ -18,7 +18,7 @@
 - [x] Update `SessionProvider` in `src/context/SessionProvider.tsx` to use granular state hooks using **task-conductor** skill.
 - [x] Update consuming components (`MainMenu.tsx`, `GameBoard.tsx`, `SettingsModal.tsx`) to match new context structure using **task-conductor** skill.
 - [x] Fix tests (`SessionProvider.test.tsx`, `GameBoard.test.tsx`) and stories to align with the new Context shape using **task-conductor** skill.
-- [ ] Add `subscribeToGames` to `IFirestoreService` and implement in `InMemoryFirestoreService` and `FirebaseFirestoreService` using **task-conductor** skill.
+- [x] Add `subscribeToGames` to `IFirestoreService` and implement in `InMemoryFirestoreService` and `FirebaseFirestoreService` using **task-conductor** skill.
 - [ ] Update `SessionProvider` to use `subscribeToGames` instead of `loadAllGames` to enable real-time history sync using **task-conductor** skill.
 - [ ] Perform another file-by-file adversarial review of the changes against `main` using **quick-review** skill.
 - [ ] **Final Track Gate**: Final verification and Git commit using **project-orchestrator** skill.
