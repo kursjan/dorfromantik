@@ -21,6 +21,9 @@ src/canvas/
 │   ├── GameHUD.css         # HUD styling
 │   ├── ResetViewButton.tsx # UI Overlay for camera control
 │   └── ResetViewButton.css # Button styling
+├── services/          # Pure TS Logic
+│   ├── GameAutosaver.ts    # Manages debounced persistence to Firestore
+│   └── ARCHITECTURE.md     # Services architecture summary
 ├── engine/            # Core Game Loop & State
 │   ├── CanvasController.ts # The "Main Loop" & State Holder
 │   ├── Camera.ts        # Math for World <-> Screen transforms (Pan, Zoom, Rotate, Reset)
@@ -105,6 +108,15 @@ Stateless rendering utilities. They receive the `Context2D` and necessary data t
 - **HexRenderer:** Draws the game grid and debug highlights. It uses `HexStyles.ts` for configuration.
 - **TileRenderer:** Draws the 6-sided terrain wedges for placed tiles. It aligns the model's terrain mapping with the canvas orientation.
 - **(Deprecated) DebugRenderer:** Legacy canvas-based debug text. Replaced by `DebugOverlay` component.
+
+### Services (`services/*.ts`)
+
+Pure TypeScript logic for managing cross-cutting concerns.
+
+- **GameAutosaver:** A class that handles debouncing and executing the persistence of game state to Firestore.
+  - **Debouncing:** By default, saves are debounced by 2 seconds after a tile placement to prevent excessive writes.
+  - **Lifecycle Callbacks:** Supports `onSaveStart`, `onSaveSuccess`, and `onSaveError` to allow UI components (like `GameBoard`) to provide visual feedback to the player.
+  - **Reliability:** Implements `forceSaveAndDispose()`, which is called when a component unmounts to ensure any pending saves are immediately flushed to the server before the context is lost.
 
 ### Styles (`graphics/*Styles.ts`)
 

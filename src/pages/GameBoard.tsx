@@ -1,16 +1,27 @@
-import React, { useRef, useCallback, useEffect } from 'react';
+import React, { useRef, useCallback, useEffect, useState } from 'react';
 import { CanvasView } from '../canvas/components/CanvasView';
 import { useSession } from '../context/SessionContext';
 import { useFirestoreService } from '../services/hooks/useServices';
 import { GameAutosaver } from '../canvas/services/GameAutosaver';
+import { SaveStatusIndicator, type SaveStatus } from '../canvas/components/SaveStatusIndicator';
+import './GameBoard.css';
 
 const SAVE_DEBOUNCE_MS = 2000;
+const STATUS_CLEAR_TIMEOUT_MS = 1000;
 
 export const GameBoard: React.FC = () => {
+  // 1. Context & Services
   const { session } = useSession();
   const firestoreService = useFirestoreService();
-  const autosaverRef = useRef<GameAutosaver | null>(null);
 
+  // 2. Component State
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+
+  // 3. Mutable Refs
+  const autosaverRef = useRef<GameAutosaver | null>(null);
+  const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 4. Callbacks
   const debouncedSave = useCallback(() => {
     autosaverRef.current?.handleTilePlaced();
   }, []);
@@ -21,11 +32,26 @@ export const GameBoard: React.FC = () => {
       getUserId: () => session.user.id,
       getActiveGame: () => session.activeGame,
       debounceMs: SAVE_DEBOUNCE_MS,
+      onSaveStart: () => {
+        // Clear previous status immediately when a new save starts
+        if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
+        setSaveStatus('idle');
+      },
+      onSaveSuccess: () => {
+        setSaveStatus('saved');
+        statusTimerRef.current = setTimeout(() => {
+          setSaveStatus('idle');
+        }, STATUS_CLEAR_TIMEOUT_MS);
+      },
+      onSaveError: () => {
+        setSaveStatus('error');
+      },
     });
 
     return () => {
-      autosaverRef.current?.dispose();
+      autosaverRef.current?.forceSaveAndDispose();
       autosaverRef.current = null;
+      if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
     };
   }, [firestoreService, session]);
 
@@ -39,8 +65,9 @@ export const GameBoard: React.FC = () => {
   }
 
   return (
-    <main>
+    <main className="game-board">
       <CanvasView session={session} onTilePlaced={debouncedSave} />
+      <SaveStatusIndicator status={saveStatus} />
     </main>
   );
 };
