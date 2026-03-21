@@ -5,28 +5,35 @@ import { SettingsModal } from '../components/SettingsModal';
 import { useSession } from '../context/SessionContext';
 import { useAuthService } from '../services/hooks/useServices';
 import { RegisteredUser } from '../models/User';
+import { Game } from '../models/Game';
+import { GameRules } from '../models/GameRules';
 import './MainMenu.css';
 
 export const MainMenu: React.FC = () => {
   const authService = useAuthService();
   const navigate = useNavigate();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const { session, startNewStandardGame, startNewTestGame, continueGame } = useSession();
+  const { session, setActiveGame } = useSession();
   const { user } = session;
 
   const handleStartStandard = () => {
-    startNewStandardGame();
+    const game = Game.create(GameRules.createStandard());
+    setActiveGame(game);
     navigate('/game');
   };
 
   const handleStartTest = () => {
-    startNewTestGame();
+    const game = Game.create(GameRules.createTest());
+    setActiveGame(game);
     navigate('/game');
   };
 
   const handleContinue = (gameId: string) => {
-    continueGame(gameId);
-    navigate('/game');
+    const game = session.games.find(g => g.id === gameId);
+    if (game) {
+      setActiveGame(game);
+      navigate('/game');
+    }
   };
 
   const handleLogout = async () => {
