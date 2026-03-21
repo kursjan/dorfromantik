@@ -23,14 +23,14 @@ This directory contains the core data structures and business logic for the Dorf
 
 ### 4. Services & Providers
 - **Auth / Firestore**: Accessed only via React context. `ServiceProvider` (see `src/services/ARCHITECTURE.md`) supplies `IAuthService` and `IFirestoreService` implementations; components use `useAuthService()` and `useFirestoreService()`.
-- **`SessionProvider`**: A React context provider that orchestrates the user's session. It uses the injected auth and firestore services to listen to auth changes, initialize the `User` model, and manage the transition between guest and permanent account states.
+- **`SessionProvider`**: A React context provider that manages the user's current `Session`. It uses injected auth and firestore services to listen to auth changes, initialize the `User` model, and maintain the list of available saved games. It no longer handles game orchestration (logic moved to pages like `MainMenu`).
 
 ### 5. Game Engine (`Game.ts`)
 The `Game` class is the central orchestrator of an active session.
 - **State**: Tracks the `Board`, `Score`, and the `TileQueue`.
 - **Turns as Tiles**: The game follows a "Tiles are Turns" philosophy. `remainingTurns` is a derived property of `tileQueue.length`.
 - **Lifecycle**:
-  - **Start**: Typically created via static factory methods: `Game.create(rules)`. These methods handle initializing the `Board` and placing the initial "starter" tile at the origin `(0, 0, 0)`.
+  - **Start**: Typically created via static factory methods: `Game.create(rules)`. These methods handle initializing the `Board` and placing the initial "starter" tile at the origin `(0, 0, 0)`. In the current architecture, these factories are called by page components (e.g., `MainMenu`).
   - **Active**: Managed within a `Session`.
   - **Logic**:
     - **`isValidPlacement(coord)`**: Checks if a hex is empty and adjacent to at least one existing tile. Used for UI validation and Ghost Preview.

@@ -5,7 +5,8 @@ The `src/pages/` directory contains top-level route components for the applicati
 ## Structure
 - `MainMenu.tsx`: The entry point of the application (`/`).
   - **Layout:** Two-column design with a sidebar for new game actions and a main section for continuing saved journeys.
-  - **State:** Manages UI state for the `SettingsModal` and placeholder data for `GameCard` lists.
+  - **State:** Manages UI state for the `SettingsModal`.
+  - **Orchestration:** Responsible for instantiating `GameRules` and `Game` before starting a new session via `setActiveGame`. It also handles continuing existing games by selecting them from the session's game history.
 - `GameBoard.tsx`: The game session view (`/game`), wrapping the `CanvasView` and its associated state.
   - **State Management:** Uses React state to track the `saveStatus` (idle, saved, error) based on `GameAutosaver` callbacks.
   - **Save Status UI:** Renders a minimalist, non-intrusive status overlay in the bottom-right corner when a save completes or fails.
