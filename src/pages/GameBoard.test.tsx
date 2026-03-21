@@ -56,9 +56,7 @@ describe('GameBoard', () => {
         <SessionContext.Provider
           value={{
             session,
-            startNewStandardGame: vi.fn(),
-            startNewTestGame: vi.fn(),
-            continueGame: vi.fn(),
+            setActiveGame: vi.fn(),
           }}
         >
           <GameBoard />
