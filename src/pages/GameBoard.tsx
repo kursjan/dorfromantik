@@ -10,12 +10,18 @@ const SAVE_DEBOUNCE_MS = 2000;
 const STATUS_CLEAR_TIMEOUT_MS = 1000;
 
 export const GameBoard: React.FC = () => {
+  // 1. Context & Services
   const { session } = useSession();
   const firestoreService = useFirestoreService();
-  const autosaverRef = useRef<GameAutosaver | null>(null);
+
+  // 2. Component State
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+
+  // 3. Mutable Refs
+  const autosaverRef = useRef<GameAutosaver | null>(null);
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // 4. Callbacks
   const debouncedSave = useCallback(() => {
     autosaverRef.current?.handleTilePlaced();
   }, []);
