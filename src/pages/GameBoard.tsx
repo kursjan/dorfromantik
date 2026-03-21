@@ -3,12 +3,11 @@ import { CanvasView } from '../canvas/components/CanvasView';
 import { useSession } from '../context/SessionContext';
 import { useFirestoreService } from '../services/hooks/useServices';
 import { GameAutosaver } from '../canvas/services/GameAutosaver';
+import { SaveStatusIndicator, type SaveStatus } from '../components/SaveStatusIndicator';
 import './GameBoard.css';
 
 const SAVE_DEBOUNCE_MS = 2000;
 const STATUS_CLEAR_TIMEOUT_MS = 1000;
-
-type SaveStatus = 'idle' | 'saved' | 'error';
 
 export const GameBoard: React.FC = () => {
   const { session } = useSession();
@@ -62,15 +61,7 @@ export const GameBoard: React.FC = () => {
   return (
     <main className="game-board">
       <CanvasView session={session} onTilePlaced={debouncedSave} />
-      {saveStatus !== 'idle' && (
-        <div 
-          className={`save-status save-status--${saveStatus}`}
-          data-testid="save-status"
-        >
-          {saveStatus === 'saved' && 'Saved'}
-          {saveStatus === 'error' && 'Save Failed (Offline?)'}
-        </div>
-      )}
+      <SaveStatusIndicator status={saveStatus} />
     </main>
   );
 };
