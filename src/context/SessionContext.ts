@@ -1,10 +1,12 @@
 import { createContext, useContext, type Context } from 'react';
-import { Session } from '../models/Session';
+import { User } from '../models/User';
 import { Game } from '../models/Game';
 
 export interface SessionContextType {
-  session: Session;
-  setActiveGame: (game: Game) => void;
+  user: User;
+  games: Game[];
+  activeGame?: Game;
+  setActiveGame: (game: Game | undefined) => void;
 }
 
 export const SessionContext: Context<SessionContextType | undefined> =

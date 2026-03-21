@@ -14,7 +14,7 @@
 
 ## Phase 3: Adversarial Review Fixes (Decouple activeGame)
 - [x] Perform a file-by-file adversarial review of the changes against `main` using **quick-review** skill.
-- [ ] Refactor `SessionContextType` in `src/context/SessionContext.ts` to separate `user`, `games`, and `activeGame` using **task-conductor** skill.
+- [x] Refactor `SessionContextType` in `src/context/SessionContext.ts` to separate `user`, `games`, and `activeGame` using **task-conductor** skill.
 - [ ] Update `SessionProvider` in `src/context/SessionProvider.tsx` to use granular state hooks using **task-conductor** skill.
 - [ ] Update consuming components (`MainMenu.tsx`, `GameBoard.tsx`, `SettingsModal.tsx`) to match new context structure using **task-conductor** skill.
 - [ ] Fix tests (`SessionProvider.test.tsx`, `GameBoard.test.tsx`) and stories to align with the new Context shape using **task-conductor** skill.
