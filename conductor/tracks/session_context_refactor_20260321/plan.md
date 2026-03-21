@@ -22,5 +22,5 @@
 - [x] Update `SessionProvider` to use `subscribeToGames` instead of `loadAllGames` to enable real-time history sync using **task-conductor** skill.
 - [x] Remove complex lightweight integration test in favor of E2E using **task-conductor** skill.
 - [x] Create `e2e/history-sync.spec.ts` and optimize `SAVE_DEBOUNCE_MS` for testing using **task-conductor** skill.
-- [ ] Perform another file-by-file adversarial review of the changes against `main` using **quick-review** skill.
-- [ ] **Final Track Gate**: Final verification and Git commit using **project-orchestrator** skill.
+- [x] Perform another file-by-file adversarial review of the changes against `main` using **quick-review** skill.
+- [x] **Final Track Gate**: Final verification and Git commit using **project-orchestrator** skill. [checkpoint: 37fbb7d]
