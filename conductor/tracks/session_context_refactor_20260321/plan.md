@@ -8,7 +8,7 @@
 
 ## Phase 2: Migration & Implementation
 - [x] Update `src/pages/MainMenu.tsx` to handle game orchestration (instantiating `GameRules`, calling `Game.create`, and invoking `setActiveGame`) using **task-conductor** skill.
-- [ ] Update tests in `SessionProvider.test.tsx` and `GameBoard.test.tsx` to align with the new `setActiveGame` interface using **task-conductor** skill.
+- [x] Update tests in `SessionProvider.test.tsx` and `GameBoard.test.tsx` to align with the new `setActiveGame` interface using **task-conductor** skill.
 - [ ] Update `SettingsModal.stories.tsx` to provide the updated mock context using **task-conductor** skill.
 - [ ] **Phase Gate**: Verify all unit, E2E, and UI tests pass using **project-orchestrator** skill.
 

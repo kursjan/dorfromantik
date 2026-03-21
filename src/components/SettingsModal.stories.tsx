@@ -38,9 +38,7 @@ const meta = {
         <SessionContext.Provider
           value={{
             session: mockSession,
-            startNewStandardGame: () => {},
-            startNewTestGame: () => {},
-            continueGame: () => {},
+            setActiveGame: () => {},
           }}
         >
           <Story />
@@ -77,9 +75,7 @@ export const PermanentAccount: Story = {
           <SessionContext.Provider
             value={{
               session: permanentSession,
-              startNewStandardGame: () => {},
-              startNewTestGame: () => {},
-              continueGame: () => {},
+              setActiveGame: () => {},
             }}
           >
             <Story />
