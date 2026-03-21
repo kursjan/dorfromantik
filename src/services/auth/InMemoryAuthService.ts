@@ -45,7 +45,7 @@ export class InMemoryAuthService implements IAuthService {
   onAuthStateChanged(callback: (user: AuthUser | null) => void): () => void {
     authListeners.push(callback);
     // Trigger immediately like Firebase does
-    setTimeout(() => callback(mockUser), 0);
+    callback(mockUser);
     return () => {
       authListeners = authListeners.filter((l) => l !== callback);
     };

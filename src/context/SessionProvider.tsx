@@ -27,6 +27,7 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
         // Automatically sign in anonymously if there is no user
         authService.signInAnonymously().catch((error) => {
           console.error("Failed to sign in anonymously", error);
+          // Only stop initializing if we are actually stuck
           setIsInitializing(false);
         });
         return;

@@ -6,14 +6,6 @@ import { test, expect } from '@playwright/test';
 test.describe('Auth Flow (Mock Auth)', () => {
   test.describe.configure({ mode: 'serial' });
 
-  // Skip the entire block if we are not running the CI script that enables the Mock Auth environment.
-  // This prevents failures when running standard `npm run test:e2e` against the real Firebase project
-  // where Google popups are blocked by automated browsers.
-  test.skip(
-    process.env.TEST_ENV !== 'ci', 
-    'Auth tests only run in Mock Auth mode (npm run test:e2e:ci) to avoid real Google popups.'
-  );
-
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
   });
@@ -36,6 +28,7 @@ test.describe('Auth Flow (Mock Auth)', () => {
   });
 
   test('Link Google Account upgrades to registered user', async ({ page }) => {
+    test.skip(process.env.VITE_USE_MOCK_AUTH !== 'true', 'Skipping real Google popup test locally');
     await page.getByRole('button', { name: /Settings/i }).click();
 
     const modal = page.locator('.settings-modal');
@@ -48,6 +41,7 @@ test.describe('Auth Flow (Mock Auth)', () => {
   });
 
   test('main menu updates after Google sign-in', async ({ page }) => {
+    test.skip(process.env.VITE_USE_MOCK_AUTH !== 'true', 'Skipping real Google popup test locally');
     await page.getByRole('button', { name: /Settings/i }).click();
 
     const modal = page.locator('.settings-modal');
@@ -63,6 +57,7 @@ test.describe('Auth Flow (Mock Auth)', () => {
   });
 
   test('Logout button appears for registered users and signs out', async ({ page }) => {
+    test.skip(process.env.VITE_USE_MOCK_AUTH !== 'true', 'Skipping real Google popup test locally');
     // Sign in with Google first
     await page.getByRole('button', { name: /Settings/i }).click();
     const modal = page.locator('.settings-modal');
@@ -83,6 +78,7 @@ test.describe('Auth Flow (Mock Auth)', () => {
   });
 
   test('Sign Out in settings returns to anonymous state', async ({ page }) => {
+    test.skip(process.env.VITE_USE_MOCK_AUTH !== 'true', 'Skipping real Google popup test locally');
     // Sign in with Google
     await page.getByRole('button', { name: /Settings/i }).click();
     const modal = page.locator('.settings-modal');
@@ -104,6 +100,7 @@ test.describe('Auth Flow (Mock Auth)', () => {
   // Regression: re-auth after sign-out must work.
   // linkWithPopup was disabled because this cycle threw credential-already-in-use.
   test('can sign in with Google again after signing out', async ({ page }) => {
+    test.skip(process.env.VITE_USE_MOCK_AUTH !== 'true', 'Skipping real Google popup test locally');
     // First sign-in
     await page.getByRole('button', { name: /Settings/i }).click();
     const modal = page.locator('.settings-modal');

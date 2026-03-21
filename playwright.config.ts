@@ -1,5 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 import { execSync } from 'child_process';
+import dotenv from 'dotenv';
+
+/**
+ * Read environment variables from file.
+ * https://github.com/motdotla/dotenv
+ */
+dotenv.config({ path: process.env.TEST_ENV === 'ci' ? '.env.ci' : '.env' });
 
 // Function to find chromium executable in the system path
 const findChromium = () => {
