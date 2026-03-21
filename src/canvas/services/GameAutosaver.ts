@@ -49,8 +49,9 @@ export class GameAutosaver {
     this.onSaveStart?.();
 
     // Create a 5-second timeout promise to catch hanging offline saves
+    let timeoutId: ReturnType<typeof setTimeout>;
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('Save timeout (Offline)')), 5000);
+      timeoutId = setTimeout(() => reject(new Error('Save timeout (Offline)')), 5000);
     });
 
     Promise.race([
@@ -63,6 +64,9 @@ export class GameAutosaver {
       .catch((err) => {
         console.error('Failed to save game state', err);
         this.onSaveError?.(err);
+      })
+      .finally(() => {
+        clearTimeout(timeoutId);
       });
   };
 
