@@ -3,23 +3,18 @@ import { CanvasController } from '../engine/CanvasController';
 import { ResetViewButton } from './ResetViewButton';
 import { GameHUD } from './GameHUD';
 import { DebugOverlay } from './DebugOverlay';
-import { Session } from '../../models/Session';
+import { Game } from '../../models/Game';
 import type { Tile } from '../../models/Tile';
 
 interface CanvasViewProps {
-  session: Session;
+  activeGame: Game;
   /** Called when a tile is placed; e.g. parent may debounce and persist game state. */
   onTilePlaced: () => void;
 }
 
-export const CanvasView: React.FC<CanvasViewProps> = ({ session, onTilePlaced }) => {
+export const CanvasView: React.FC<CanvasViewProps> = ({ activeGame, onTilePlaced }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const controllerRef = useRef<CanvasController | null>(null);
-  const activeGame = session.activeGame;
-
-  if (!activeGame) {
-    throw new Error('CanvasView requires an active game in the session.');
-  }
 
   // State for game stats to ensure React updates when they change
   const [score, setScore] = useState(activeGame.score);
@@ -32,7 +27,7 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session, onTilePlaced })
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const newController = new CanvasController(canvas, session, {
+    const newController = new CanvasController(canvas, activeGame, {
       onToggleDebugOverlay: () => setDebugOverlayVisible((v) => !v),
     });
     setController(newController);
@@ -53,7 +48,7 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ session, onTilePlaced })
       controllerRef.current = null;
       setController(null);
     };
-  }, [session, activeGame, onTilePlaced]);
+  }, [activeGame, onTilePlaced]);
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
