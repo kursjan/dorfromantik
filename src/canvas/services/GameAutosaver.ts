@@ -48,25 +48,26 @@ export class GameAutosaver {
 
     this.onSaveStart?.();
 
-    // Create a 5-second timeout promise to catch hanging offline saves
-    let timeoutId: ReturnType<typeof setTimeout>;
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      timeoutId = setTimeout(() => reject(new Error('Save timeout (Offline)')), 5000);
-    });
+    let isSettled = false;
+    const timeoutId = setTimeout(() => {
+      if (!isSettled) {
+        const error = new Error('Save timeout (Offline)');
+        console.error('Failed to save game state', error);
+        this.onSaveError?.(error);
+      }
+    }, 5000);
 
-    Promise.race([
-      this.firestoreService.saveGameState(this.getUserId(), game),
-      timeoutPromise
-    ])
+    this.firestoreService.saveGameState(this.getUserId(), game)
       .then(() => {
+        isSettled = true;
+        clearTimeout(timeoutId);
         this.onSaveSuccess?.();
       })
       .catch((err) => {
+        isSettled = true;
+        clearTimeout(timeoutId);
         console.error('Failed to save game state', err);
         this.onSaveError?.(err);
-      })
-      .finally(() => {
-        clearTimeout(timeoutId);
       });
   };
 

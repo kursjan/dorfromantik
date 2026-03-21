@@ -139,6 +139,32 @@ describe('GameAutosaver', () => {
     expect(onSaveErrorSpy.mock.calls[0][0].message).toMatch(/Save timeout/i);
   });
 
+  it('recovers and calls onSaveSuccess when a hung save eventually succeeds', async () => {
+    let resolveSave: () => void;
+    const hangingPromise = new Promise<void>((resolve) => {
+      resolveSave = resolve;
+    });
+    saveGameStateSpy.mockReturnValueOnce(hangingPromise);
+
+    autosaver.handleTilePlaced();
+    
+    // Advance past the 2-second debounce to start the save
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(onSaveStartSpy).toHaveBeenCalledTimes(1);
+
+    // Advance past the 5-second timeout
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(onSaveErrorSpy).toHaveBeenCalledTimes(1);
+
+    // Now simulate the network returning and the save succeeding
+    resolveSave!();
+    // allow microtasks to resolve
+    await vi.advanceTimersByTimeAsync(100);
+
+    // The UI should be notified that the save finally succeeded
+    expect(onSaveSuccessSpy).toHaveBeenCalledTimes(1);
+  });
+
   it('forces save and clears timer on forceSaveAndDispose', () => {
     autosaver.handleTilePlaced();
 
