@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import MainMenu from './pages/MainMenu';
+import { MainMenu } from './pages/MainMenu';
 import { GameBoard } from './pages/GameBoard';
 import { SessionProvider } from './context/SessionProvider';
 import { ServiceProvider } from './services/ServiceProvider';
