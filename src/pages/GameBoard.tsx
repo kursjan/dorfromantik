@@ -1,15 +1,21 @@
-import React, { useRef, useCallback, useEffect } from 'react';
+import React, { useRef, useCallback, useEffect, useState } from 'react';
 import { CanvasView } from '../canvas/components/CanvasView';
 import { useSession } from '../context/SessionContext';
 import { useFirestoreService } from '../services/hooks/useServices';
 import { GameAutosaver } from '../canvas/services/GameAutosaver';
+import './GameBoard.css';
 
 const SAVE_DEBOUNCE_MS = 2000;
+const STATUS_CLEAR_TIMEOUT_MS = 3000;
+
+type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
 export const GameBoard: React.FC = () => {
   const { session } = useSession();
   const firestoreService = useFirestoreService();
   const autosaverRef = useRef<GameAutosaver | null>(null);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const debouncedSave = useCallback(() => {
     autosaverRef.current?.handleTilePlaced();
@@ -21,11 +27,25 @@ export const GameBoard: React.FC = () => {
       getUserId: () => session.user.id,
       getActiveGame: () => session.activeGame,
       debounceMs: SAVE_DEBOUNCE_MS,
+      onSaveStart: () => {
+        if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
+        setSaveStatus('saving');
+      },
+      onSaveSuccess: () => {
+        setSaveStatus('saved');
+        statusTimerRef.current = setTimeout(() => {
+          setSaveStatus('idle');
+        }, STATUS_CLEAR_TIMEOUT_MS);
+      },
+      onSaveError: () => {
+        setSaveStatus('error');
+      },
     });
 
     return () => {
-      autosaverRef.current?.dispose();
+      autosaverRef.current?.forceSaveAndDispose();
       autosaverRef.current = null;
+      if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
     };
   }, [firestoreService, session]);
 
@@ -39,8 +59,19 @@ export const GameBoard: React.FC = () => {
   }
 
   return (
-    <main>
+    <main className="game-board">
       <CanvasView session={session} onTilePlaced={debouncedSave} />
+      {saveStatus !== 'idle' && (
+        <div 
+          className={`save-status save-status--${saveStatus}`}
+          data-testid="save-status"
+        >
+          {saveStatus === 'saving' && <div className="save-status__spinner" />}
+          {saveStatus === 'saving' && 'Saving Journey...'}
+          {saveStatus === 'saved' && 'Journey Saved'}
+          {saveStatus === 'error' && 'Save Failed (Offline?)'}
+        </div>
+      )}
     </main>
   );
 };

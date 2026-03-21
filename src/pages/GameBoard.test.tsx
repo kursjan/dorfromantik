@@ -1,5 +1,5 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { GameBoard } from './GameBoard';
 import { SessionContext } from '../context/SessionContext';
 import { ServiceProvider } from '../services/ServiceProvider';
@@ -15,9 +15,11 @@ import { GameAutosaver } from '../canvas/services/GameAutosaver';
 
 vi.mock('../canvas/services/GameAutosaver', () => {
   return {
-    GameAutosaver: vi.fn().mockImplementation(function(this: any) {
+    GameAutosaver: vi.fn().mockImplementation(function(this: any, options: any) {
       this.handleTilePlaced = vi.fn();
       this.dispose = vi.fn();
+      this.forceSaveAndDispose = vi.fn();
+      this.options = options;
     }),
   };
 });
@@ -41,6 +43,11 @@ describe('GameBoard', () => {
   beforeEach(() => {
     user = new AnonymousUser('test-user');
     vi.clearAllMocks();
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   function renderWithProviders(session: Session) {
@@ -104,15 +111,15 @@ describe('GameBoard', () => {
 
     // Simulate placing a tile via the mock CanvasView
     const placeTileButton = screen.getByTestId('trigger-tile-placed');
-    placeTileButton.click();
+    act(() => {
+      placeTileButton.click();
+    });
 
     // Verify the debounced save method was called on the autosaver
-    await waitFor(() => {
-      expect(autosaverMockInstance.handleTilePlaced).toHaveBeenCalledTimes(1);
-    });
+    expect(autosaverMockInstance.handleTilePlaced).toHaveBeenCalledTimes(1);
   });
 
-  it('cleans up GameAutosaver on unmount', () => {
+  it('cleans up GameAutosaver on unmount using forceSaveAndDispose', () => {
     const game = new Game({
       board: new Board(),
       rules: new GameRules(),
@@ -126,7 +133,48 @@ describe('GameBoard', () => {
     const autosaverMockInstance = vi.mocked(GameAutosaver).mock.results[0].value;
     unmount();
 
-    // Verify dispose was called
-    expect(autosaverMockInstance.dispose).toHaveBeenCalledTimes(1);
+    // Verify forceSaveAndDispose was called instead of just dispose
+    expect(autosaverMockInstance.forceSaveAndDispose).toHaveBeenCalledTimes(1);
+  });
+
+  it('displays save status feedback', async () => {
+    const game = new Game({
+      board: new Board(),
+      rules: new GameRules(),
+      tileQueue: [new Tile()],
+      score: 0,
+    });
+    const session = new Session('test-session', user, game);
+
+    renderWithProviders(session);
+    const autosaverMockInstance = vi.mocked(GameAutosaver).mock.results[0].value;
+    const { onSaveStart, onSaveSuccess, onSaveError } = autosaverMockInstance.options;
+
+    // Test Saving status
+    act(() => {
+      onSaveStart();
+    });
+    expect(screen.getByText(/Saving Journey.../i)).toBeInTheDocument();
+    expect(screen.getByTestId('save-status')).toHaveClass('save-status--saving');
+
+    // Test Saved status
+    act(() => {
+      onSaveSuccess();
+    });
+    expect(screen.getByText(/Journey Saved/i)).toBeInTheDocument();
+    expect(screen.getByTestId('save-status')).toHaveClass('save-status--saved');
+
+    // Test status cleared after timeout
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(screen.queryByTestId('save-status')).not.toBeInTheDocument();
+
+    // Test Error status
+    act(() => {
+      onSaveError();
+    });
+    expect(screen.getByText(/Save Failed/i)).toBeInTheDocument();
+    expect(screen.getByTestId('save-status')).toHaveClass('save-status--error');
   });
 });
