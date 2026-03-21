@@ -6,9 +6,9 @@ import { GameAutosaver } from '../canvas/services/GameAutosaver';
 import './GameBoard.css';
 
 const SAVE_DEBOUNCE_MS = 2000;
-const STATUS_CLEAR_TIMEOUT_MS = 3000;
+const STATUS_CLEAR_TIMEOUT_MS = 1000;
 
-type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+type SaveStatus = 'idle' | 'saved' | 'error';
 
 export const GameBoard: React.FC = () => {
   const { session } = useSession();
@@ -28,8 +28,9 @@ export const GameBoard: React.FC = () => {
       getActiveGame: () => session.activeGame,
       debounceMs: SAVE_DEBOUNCE_MS,
       onSaveStart: () => {
+        // Clear previous status immediately when a new save starts
         if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
-        setSaveStatus('saving');
+        setSaveStatus('idle');
       },
       onSaveSuccess: () => {
         setSaveStatus('saved');
@@ -66,9 +67,7 @@ export const GameBoard: React.FC = () => {
           className={`save-status save-status--${saveStatus}`}
           data-testid="save-status"
         >
-          {saveStatus === 'saving' && <div className="save-status__spinner" />}
-          {saveStatus === 'saving' && 'Saving Journey...'}
-          {saveStatus === 'saved' && 'Journey Saved'}
+          {saveStatus === 'saved' && 'Saved'}
           {saveStatus === 'error' && 'Save Failed (Offline?)'}
         </div>
       )}

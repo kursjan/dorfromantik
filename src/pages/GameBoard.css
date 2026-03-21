@@ -9,23 +9,19 @@
   position: absolute;
   bottom: 20px;
   right: 20px;
-  padding: 8px 12px;
+  padding: 4px 10px;
   border-radius: 4px;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.4);
   color: white;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   pointer-events: none;
   z-index: 1000;
   display: flex;
   align-items: center;
   gap: 8px;
   transition: opacity 0.3s ease;
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.save-status--saving {
-  opacity: 1;
+  backdrop-filter: blur(2px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .save-status--saved {
@@ -39,15 +35,3 @@
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-.save-status__spinner {
-  width: 12px;
-  height: 12px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: save-status-spin 0.8s linear infinite;
-}
-
-@keyframes save-status-spin {
-  to { transform: rotate(360deg); }
-}

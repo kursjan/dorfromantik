@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 
+- **Autosaver Reliability:** Improved the reliability and visibility of the game's auto-save functionality.
+  - **Save on Unmount:** `GameAutosaver` now immediately flushes any pending saves when the user navigates away from the game board, preventing data loss.
+  - **Status UI:** Added a non-intrusive status indicator to `GameBoard` (Saving..., Saved, Error) that responds to new lifecycle callbacks in `GameAutosaver`.
+
 - **Service DI Refactor (#50):** Replaced legacy monolithic `AuthService` and `FirestoreService` with a React DI pattern.
   - **Interfaces:** `IAuthService` (with `AuthUser` DTO) and `IFirestoreService`; implementations: `FirebaseAuthService` / `InMemoryAuthService`, `FirebaseFirestoreService` / `InMemoryFirestoreService`.
   - **Wiring:** `ServiceProvider` provides implementations (from `VITE_USE_MOCK_AUTH` or optional injection for tests); `useAuthService()` and `useFirestoreService()` are the only way app code accesses these services.

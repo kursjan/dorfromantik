@@ -150,27 +150,26 @@ describe('GameBoard', () => {
     const autosaverMockInstance = vi.mocked(GameAutosaver).mock.results[0].value;
     const { onSaveStart, onSaveSuccess, onSaveError } = autosaverMockInstance.options;
 
-    // Test Saving status
+    // 1. Test Saving status (Minimalist: should show nothing)
     act(() => {
       onSaveStart();
     });
-    expect(screen.getByText(/Saving Journey.../i)).toBeInTheDocument();
-    expect(screen.getByTestId('save-status')).toHaveClass('save-status--saving');
+    expect(screen.queryByTestId('save-status')).not.toBeInTheDocument();
 
-    // Test Saved status
+    // 2. Test Saved status
     act(() => {
       onSaveSuccess();
     });
-    expect(screen.getByText(/Journey Saved/i)).toBeInTheDocument();
+    expect(screen.getByText('Saved')).toBeInTheDocument();
     expect(screen.getByTestId('save-status')).toHaveClass('save-status--saved');
 
-    // Test status cleared after timeout
+    // 3. Test status cleared after 1000ms
     act(() => {
-      vi.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(1000);
     });
     expect(screen.queryByTestId('save-status')).not.toBeInTheDocument();
 
-    // Test Error status
+    // 4. Test Error status
     act(() => {
       onSaveError();
     });
