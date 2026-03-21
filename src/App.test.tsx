@@ -33,15 +33,12 @@ describe('App', () => {
     await waitFor(
       () => {
         const canvas = screen.queryByTestId('game-canvas');
-        const noGame = screen.queryByText(/No active game session/i);
-        expect(canvas ?? noGame).toBeInTheDocument();
+        expect(canvas).toBeInTheDocument();
       },
       { timeout: 2000 }
     );
-    const canvasElement = screen.queryByTestId('game-canvas');
-    if (canvasElement) {
-      expect(canvasElement).toHaveAttribute('role', 'img');
-      expect(canvasElement).toHaveAttribute('aria-label', 'Game Board');
-    }
+    const canvasElement = screen.getByTestId('game-canvas');
+    expect(canvasElement).toHaveAttribute('role', 'img');
+    expect(canvasElement).toHaveAttribute('aria-label', 'Game Board');
   });
 });
