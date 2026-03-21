@@ -1,11 +1,10 @@
 import { createContext, useContext, type Context } from 'react';
 import { Session } from '../models/Session';
+import { Game } from '../models/Game';
 
 export interface SessionContextType {
   session: Session;
-  startNewStandardGame: () => void;
-  startNewTestGame: () => void;
-  continueGame: (gameId: string) => void;
+  setActiveGame: (game: Game) => void;
 }
 
 export const SessionContext: Context<SessionContextType | undefined> =
