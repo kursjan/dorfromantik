@@ -3,7 +3,7 @@ import { CanvasView } from '../canvas/components/CanvasView';
 import { useSession } from '../context/SessionContext';
 import { useFirestoreService } from '../services/hooks/useServices';
 import { GameAutosaver } from '../canvas/services/GameAutosaver';
-import { SaveStatusIndicator, type SaveStatus } from '../components/SaveStatusIndicator';
+import { SaveStatusIndicator, type SaveStatus } from '../canvas/components/SaveStatusIndicator';
 import './GameBoard.css';
 
 const SAVE_DEBOUNCE_MS = 2000;

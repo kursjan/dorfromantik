@@ -115,6 +115,30 @@ describe('GameAutosaver', () => {
     expect(onSaveErrorSpy).toHaveBeenCalledWith(error);
   });
 
+  it('triggers onSaveError if save hangs for more than 5 seconds', async () => {
+    // Mock saveGameState to return a promise that never resolves
+    saveGameStateSpy.mockReturnValueOnce(new Promise(() => {}));
+
+    autosaver.handleTilePlaced();
+    
+    // Advance past the 2-second debounce to start the save
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(onSaveStartSpy).toHaveBeenCalledTimes(1);
+    expect(onSaveErrorSpy).not.toHaveBeenCalled();
+
+    // Advance 4.9 seconds into the save (total 6.9s)
+    await vi.advanceTimersByTimeAsync(4900);
+    expect(onSaveErrorSpy).not.toHaveBeenCalled();
+
+    // Advance past the 5-second timeout (total 7s+)
+    await vi.advanceTimersByTimeAsync(100);
+    
+    expect(onSaveSuccessSpy).not.toHaveBeenCalled();
+    expect(onSaveErrorSpy).toHaveBeenCalledTimes(1);
+    expect(onSaveErrorSpy).toHaveBeenCalledWith(expect.any(Error));
+    expect(onSaveErrorSpy.mock.calls[0][0].message).toMatch(/Save timeout/i);
+  });
+
   it('forces save and clears timer on forceSaveAndDispose', () => {
     autosaver.handleTilePlaced();
 
