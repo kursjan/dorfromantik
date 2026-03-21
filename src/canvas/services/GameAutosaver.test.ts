@@ -9,6 +9,9 @@ describe('GameAutosaver', () => {
   let getUserId: () => string;
   let getActiveGame: () => Game | undefined;
   let autosaver: GameAutosaver;
+  let onSaveStartSpy: ReturnType<typeof vi.fn>;
+  let onSaveSuccessSpy: ReturnType<typeof vi.fn>;
+  let onSaveErrorSpy: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -22,12 +25,18 @@ describe('GameAutosaver', () => {
 
     getUserId = () => 'user-1';
     getActiveGame = vi.fn(() => ({ id: 'game-1' } as unknown as Game));
+    onSaveStartSpy = vi.fn();
+    onSaveSuccessSpy = vi.fn();
+    onSaveErrorSpy = vi.fn();
 
     autosaver = new GameAutosaver({
       firestoreService,
       getUserId,
       getActiveGame,
       debounceMs: 2000,
+      onSaveStart: onSaveStartSpy as any,
+      onSaveSuccess: onSaveSuccessSpy as any,
+      onSaveError: onSaveErrorSpy as any,
     });
   });
 
@@ -81,6 +90,46 @@ describe('GameAutosaver', () => {
 
     vi.advanceTimersByTime(2000);
 
+    expect(saveGameStateSpy).not.toHaveBeenCalled();
+  });
+
+  it('invokes callbacks on successful save', async () => {
+    autosaver.handleTilePlaced();
+    await vi.advanceTimersByTimeAsync(2000);
+
+    expect(onSaveStartSpy).toHaveBeenCalledTimes(1);
+    expect(onSaveSuccessSpy).toHaveBeenCalledTimes(1);
+    expect(onSaveErrorSpy).not.toHaveBeenCalled();
+  });
+
+  it('invokes error callback on failed save', async () => {
+    const error = new Error('Save failed');
+    saveGameStateSpy.mockRejectedValueOnce(error);
+
+    autosaver.handleTilePlaced();
+    await vi.advanceTimersByTimeAsync(2000);
+
+    expect(onSaveStartSpy).toHaveBeenCalledTimes(1);
+    expect(onSaveSuccessSpy).not.toHaveBeenCalled();
+    expect(onSaveErrorSpy).toHaveBeenCalledTimes(1);
+    expect(onSaveErrorSpy).toHaveBeenCalledWith(error);
+  });
+
+  it('forces save and clears timer on forceSaveAndDispose', () => {
+    autosaver.handleTilePlaced();
+
+    // Do not advance timers; call forceSaveAndDispose directly
+    autosaver.forceSaveAndDispose();
+
+    expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
+    
+    // Timer should be cleared so moving time forward shouldn't trigger another save
+    vi.advanceTimersByTime(2000);
+    expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not save on forceSaveAndDispose if no timer is pending', () => {
+    autosaver.forceSaveAndDispose();
     expect(saveGameStateSpy).not.toHaveBeenCalled();
   });
 });
