@@ -22,8 +22,8 @@ This file tracks all major tracks for the project. Each track has its own detail
   *Link: [./archive/perfect_placement_scoring_20260222/](./archive/perfect_placement_scoring_20260222/)*
 - [x] **Track: Debug Overlay (Issue #29)**
   *Link: [./archive/debug_overlay_20260224/](./archive/debug_overlay_20260224/)*
-- [ ] **Track: Simple Test Game (#34)**
-  *Link: [./tracks/simple_test_game_20260225/](./tracks/simple_test_game_20260225/)*
+- [x] **Track: Simple Test Game (#34)**
+  *Link: [./archive/simple_test_game_20260225/](./tracks/simple_test_game_20260225/)*
 - [x] **Track: Thorough Review of src/models (#36)**
   *Link: [./archive/models_review_20260227/](./archive/models_review_20260227/)*
 - [x] **Track: Main Menu UI and Routing (Issue #32)**
