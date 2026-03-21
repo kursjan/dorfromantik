@@ -55,7 +55,9 @@ describe('GameBoard', () => {
       <ServiceProvider authService={authService} firestoreService={firestoreService}>
         <SessionContext.Provider
           value={{
-            session,
+            user: session.user,
+            games: session.games,
+            activeGame: session.activeGame,
             setActiveGame: vi.fn(),
           }}
         >

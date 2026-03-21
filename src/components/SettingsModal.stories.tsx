@@ -37,7 +37,9 @@ const meta = {
       <ServiceProvider authService={storyAuthService} firestoreService={storyFirestoreService}>
         <SessionContext.Provider
           value={{
-            session: mockSession,
+            user: mockSession.user,
+            games: mockSession.games,
+            activeGame: mockSession.activeGame,
             setActiveGame: () => {},
           }}
         >
@@ -69,12 +71,13 @@ export const PermanentAccount: Story = {
   decorators: [
     (Story) => {
       const permanentUser = new RegisteredUser('permanent-user-456', 'Jane Doe');
-      const permanentSession = new Session('perm-session-456', permanentUser);
       return (
         <ServiceProvider authService={storyAuthService} firestoreService={storyFirestoreService}>
           <SessionContext.Provider
             value={{
-              session: permanentSession,
+              user: permanentUser,
+              games: [],
+              activeGame: undefined,
               setActiveGame: () => {},
             }}
           >

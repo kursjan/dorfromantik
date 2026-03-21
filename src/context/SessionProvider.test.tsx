@@ -23,12 +23,11 @@ const signInAnonymously = mockSignInAnonymously as Mock;
 const loadAllGames = mockLoadAllGames as Mock;
 
 function TestConsumer() {
-  const { session } = useSession();
+  const { user } = useSession();
   return (
     <div>
-      <span data-testid="user-id">{session.user.id}</span>
-      <span data-testid="is-anonymous">{String(session.user.isAnonymous)}</span>
-      <span data-testid="session-id">{session.sessionId}</span>
+      <span data-testid="user-id">{user.id}</span>
+      <span data-testid="is-anonymous">{String(user.isAnonymous)}</span>
     </div>
   );
 }
@@ -96,7 +95,6 @@ describe('SessionProvider', () => {
       expect(screen.getByTestId('user-id')).toHaveTextContent('anon-123');
     });
     expect(screen.getByTestId('is-anonymous')).toHaveTextContent('true');
-    expect(screen.getByTestId('session-id')).toHaveTextContent('session-anon-123');
   });
 
   it('creates a RegisteredUser session for non-anonymous firebase user', async () => {
@@ -118,7 +116,6 @@ describe('SessionProvider', () => {
       expect(screen.getByTestId('user-id')).toHaveTextContent('registered-456');
     });
     expect(screen.getByTestId('is-anonymous')).toHaveTextContent('false');
-    expect(screen.getByTestId('session-id')).toHaveTextContent('session-registered-456');
   });
 
   it('uses uid as displayName fallback for registered users', async () => {
@@ -181,8 +178,8 @@ describe('SessionProvider', () => {
     loadAllGames.mockResolvedValueOnce(mockGames);
 
     function GameCountConsumer() {
-      const { session } = useSession();
-      return <span data-testid="game-count">{session.games.length}</span>;
+      const { games } = useSession();
+      return <span data-testid="game-count">{games.length}</span>;
     }
 
     render(
@@ -212,8 +209,8 @@ describe('SessionProvider', () => {
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     function GameCountConsumer() {
-      const { session } = useSession();
-      return <span data-testid="game-count">{session.games.length}</span>;
+      const { games } = useSession();
+      return <span data-testid="game-count">{games.length}</span>;
     }
 
     render(
