@@ -6,8 +6,8 @@ import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { pixelToHex } from '../utils/HexUtils';
 import { HEX_SIZE, DEFAULT_HEX_STYLE, VALID_PREVIEW_STYLE, INVALID_PREVIEW_STYLE } from '../graphics/HexStyles';
-import { Session } from '../../models/Session';
 import { Tile } from '../../models/Tile';
+import { Game } from '../../models/Game';
 
 export interface DebugStats {
   fps: number;
@@ -28,7 +28,7 @@ export class CanvasController {
   private readonly tileRenderer: TileRenderer;
   private readonly backgroundRenderer: BackgroundRenderer;
   private readonly inputManager: InputManager;
-  private readonly session: Session;
+  private readonly activeGame: Game;
 
   // Callbacks for React synchronization
   public onStatsChange?: (score: number, remainingTurns: number, nextTile: Tile | null) => void;
@@ -42,12 +42,11 @@ export class CanvasController {
   private fps: number = 0;
   private lastDebugUpdateTime: number = 0;
 
-  constructor(canvas: HTMLCanvasElement, session: Session, options?: { onToggleDebugOverlay?: () => void }) {
+  constructor(canvas: HTMLCanvasElement, activeGame: Game, options?: { onToggleDebugOverlay?: () => void }) {
     this.canvas = canvas;
-    this.session = session;
+    this.activeGame = activeGame;
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Could not get 2d context');
-    if (!session.activeGame) throw new Error("No active game found in session");
     this.ctx = ctx;
 
     this.camera = new Camera({ x: 0, y: 0, zoom: 1 });
@@ -127,7 +126,7 @@ export class CanvasController {
   }
 
   private render() {
-    const activeGame = this.session.activeGame;
+    const activeGame = this.activeGame;
     if (!activeGame) {
       throw new Error('No active game found in session');
     }
@@ -179,7 +178,7 @@ export class CanvasController {
   }
 
   private notifyStatsChange() {
-    const activeGame = this.session.activeGame!;
+    const activeGame = this.activeGame;
     if (this.onStatsChange) {
       this.onStatsChange(activeGame.score, activeGame.remainingTurns, activeGame.peek() || null);
     }
@@ -188,11 +187,11 @@ export class CanvasController {
   // --- Input Handlers ---
 
   private isValidPlacement(coord: HexCoordinate): boolean {
-    return this.session.activeGame!.isValidPlacement(coord);
+    return this.activeGame.isValidPlacement(coord);
   }
 
   private handleMouseClick(mouseX: number, mouseY: number) {
-    const activeGame = this.session.activeGame!;
+    const activeGame = this.activeGame;
 
     const worldPos = this.camera.screenToWorld(
       mouseX,
@@ -210,12 +209,12 @@ export class CanvasController {
   }
 
   private handleRotateClockwise() {
-    this.session.activeGame!.rotateQueuedTileClockwise();
+    this.activeGame.rotateQueuedTileClockwise();
     this.notifyStatsChange();
   }
 
   private handleRotateCounterClockwise() {
-    this.session.activeGame!.rotateQueuedTileCounterClockwise();
+    this.activeGame.rotateQueuedTileCounterClockwise();
     this.notifyStatsChange();
   }
 

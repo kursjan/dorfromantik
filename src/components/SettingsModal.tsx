@@ -9,7 +9,7 @@ export interface SettingsModalProps {
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
-  const { session } = useSession();
+  const { user } = useSession();
   
   if (!isOpen) return null;
 
@@ -23,7 +23,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         <div className="settings-modal__content">
           <div className="settings-modal__section">
             <span className="settings-modal__section-title">Profile & Account</span>
-            <UserAccount user={session.user} />
+            <UserAccount user={user} />
           </div>
 
           <div className="settings-modal__section">

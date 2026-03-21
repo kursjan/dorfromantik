@@ -13,8 +13,7 @@ export const MainMenu: React.FC = () => {
   const authService = useAuthService();
   const navigate = useNavigate();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const { session, setActiveGame } = useSession();
-  const { user } = session;
+  const { user, games, setActiveGame } = useSession();
 
   const handleStartStandard = () => {
     const game = Game.create(GameRules.createStandard());
@@ -29,7 +28,7 @@ export const MainMenu: React.FC = () => {
   };
 
   const handleContinue = (gameId: string) => {
-    const game = session.games.find(g => g.id === gameId);
+    const game = games.find(g => g.id === gameId);
     if (game) {
       setActiveGame(game);
       navigate('/game');
@@ -95,7 +94,7 @@ export const MainMenu: React.FC = () => {
           <div className="main-menu__games-section">
             <span className="main-menu__section-title">Continue Journey</span>
             <div className="main-menu__games-list">
-              {session.games.map(game => (
+              {games.map(game => (
                 <GameCard 
                   key={game.id}
                   id={game.id}
