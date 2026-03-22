@@ -1,6 +1,6 @@
 import React, { useRef, useCallback, useEffect, useState } from 'react';
 import { CanvasView } from '../canvas/components/CanvasView';
-import { useSession } from '../context/SessionContext';
+import { useUser, useActiveGame } from '../context/SessionContext';
 import { useFirestoreService } from '../services/hooks/useServices';
 import { GameAutosaver } from '../canvas/services/GameAutosaver';
 import { SaveStatusIndicator, type SaveStatus } from '../canvas/components/SaveStatusIndicator';
@@ -11,7 +11,8 @@ const STATUS_CLEAR_TIMEOUT_MS = 1000;
 
 export const GameBoard: React.FC = () => {
   // 1. Context & Services
-  const { user, activeGame } = useSession();
+  const { user } = useUser();
+  const { activeGame } = useActiveGame();
   const firestoreService = useFirestoreService();
 
   // 2. Component State

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import { User, AnonymousUser, RegisteredUser } from '../models/User';
 import { Game } from '../models/Game';
 import { useAuthService, useFirestoreService } from '../services/hooks/useServices';
-import { SessionContext } from './SessionContext';
+import { UserContext, GameHistoryContext, ActiveGameContext } from './SessionContext';
 
 export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const authService = useAuthService();
@@ -49,26 +49,28 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
     };
   }, [user, firestoreService]);
   
+  // Memoize values to prevent unnecessary re-renders if provider re-renders
+  const userValue = useMemo(() => user ? { user } : undefined, [user]);
+  const gameHistoryValue = useMemo(() => ({ games }), [games]);
+  const activeGameValue = useMemo(() => ({ activeGame, setActiveGame }), [activeGame]);
+
   // Wait for auth to initialize before rendering children
   if (isInitializing) {
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'white' }}>Loading Profile...</div>;
   }
 
   // Fallback for unexpected states
-  if (!user) {
+  if (!userValue) {
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'red' }}>Initialization Error. Please Refresh.</div>;
   }
 
   return (
-    <SessionContext.Provider 
-      value={{ 
-        user, 
-        games, 
-        activeGame, 
-        setActiveGame 
-      }}
-    >
-      {children}
-    </SessionContext.Provider>
+    <UserContext.Provider value={userValue}>
+      <GameHistoryContext.Provider value={gameHistoryValue}>
+        <ActiveGameContext.Provider value={activeGameValue}>
+          {children}
+        </ActiveGameContext.Provider>
+      </GameHistoryContext.Provider>
+    </UserContext.Provider>
   );
 };

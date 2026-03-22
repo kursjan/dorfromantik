@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GameCard } from '../components/GameCard';
 import { SettingsModal } from '../components/SettingsModal';
-import { useSession } from '../context/SessionContext';
+import { useUser, useGameHistory, useActiveGame } from '../context/SessionContext';
 import { useAuthService } from '../services/hooks/useServices';
 import { RegisteredUser } from '../models/User';
 import { Game } from '../models/Game';
@@ -12,7 +12,9 @@ import './MainMenu.css';
 export const MainMenu: React.FC = () => {
   const authService = useAuthService();
   const navigate = useNavigate();
-  const { user, games, setActiveGame } = useSession();
+  const { user } = useUser();
+  const { games } = useGameHistory();
+  const { setActiveGame } = useActiveGame();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleStartStandard = () => {

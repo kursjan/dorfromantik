@@ -28,8 +28,8 @@
 - [x] Fix state bleed in `src/services/firestore/InMemoryFirestoreService.ts` by removing global variables and correcting the file header comment using **task-conductor** skill.
 - [x] Fix inconsistent method binding in `CanvasController.ts` using **task-conductor** skill.
 - [x] Fix React hook ordering in `src/pages/MainMenu.tsx` and `src/canvas/components/CanvasView.tsx` using **task-conductor** skill.
-- [ ] Remove the unused `Session` model (`src/models/Session.ts` and its test) to prevent architectural confusion using **task-conductor** skill.
-- [ ] Decouple `SessionProvider` state to prevent unnecessary re-renders (e.g., separate `UserProvider` / `GameHistoryProvider` from active game state) using **task-conductor** skill.
+- [x] Remove the unused `Session` model (`src/models/Session.ts` and its test) to prevent architectural confusion using **task-conductor** skill.
+- [x] Decouple `SessionProvider` state to prevent unnecessary re-renders (e.g., separate `UserProvider` / `GameHistoryProvider` from active game state) using **task-conductor** skill.
 - [ ] Perform a file-by-file adversarial review of the rework changes against `main` using **quick-review** skill.
 - [ ] **Phase Gate**: Verify all unit, E2E, UI tests, and coverage using **project-orchestrator** skill.
 - [ ] **Final Track Gate**: Final verification, docs sync, and Git commit using **project-orchestrator** skill.

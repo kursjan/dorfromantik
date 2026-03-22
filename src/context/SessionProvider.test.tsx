@@ -1,7 +1,7 @@
 import { render, screen, act, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { SessionProvider } from './SessionProvider';
-import { useSession } from './SessionContext';
+import { useUser, useGameHistory } from './SessionContext';
 import type { User as FirebaseUser } from 'firebase/auth';
 
 const mockOnAuthStateChanged = vi.fn();
@@ -27,7 +27,7 @@ const signInAnonymously = mockSignInAnonymously as Mock;
 const subscribeToGames = mockSubscribeToGames as Mock;
 
 function TestConsumer() {
-  const { user } = useSession();
+  const { user } = useUser();
   return (
     <div>
       <span data-testid="user-id">{user.id}</span>
@@ -188,7 +188,7 @@ describe('SessionProvider', () => {
     });
 
     function GameCountConsumer() {
-      const { games } = useSession();
+      const { games } = useGameHistory();
       return <span data-testid="game-count">{games.length}</span>;
     }
 

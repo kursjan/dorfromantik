@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MainMenu } from './MainMenu';
-import { SessionContext } from '../context/SessionContext';
+import { UserContext, GameHistoryContext, ActiveGameContext } from '../context/SessionContext';
 import { ServiceProvider } from '../services/ServiceProvider';
 import { InMemoryAuthService } from '../services/auth/InMemoryAuthService';
 import { InMemoryFirestoreService } from '../services/firestore/InMemoryFirestoreService';
@@ -42,15 +42,17 @@ describe('MainMenu', () => {
     return render(
       <BrowserRouter>
         <ServiceProvider authService={authService} firestoreService={firestoreService}>
-          <SessionContext.Provider
-            value={{
-              user,
-              games,
-              setActiveGame: mockSetActiveGame,
-            }}
-          >
-            <MainMenu />
-          </SessionContext.Provider>
+          <UserContext.Provider value={{ user }}>
+            <GameHistoryContext.Provider value={{ games }}>
+              <ActiveGameContext.Provider
+                value={{
+                  setActiveGame: mockSetActiveGame,
+                }}
+              >
+                <MainMenu />
+              </ActiveGameContext.Provider>
+            </GameHistoryContext.Provider>
+          </UserContext.Provider>
         </ServiceProvider>
       </BrowserRouter>
     );

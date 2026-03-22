@@ -1,7 +1,7 @@
 import { render, screen, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { GameBoard } from './GameBoard';
-import { SessionContext } from '../context/SessionContext';
+import { UserContext, GameHistoryContext, ActiveGameContext } from '../context/SessionContext';
 import { ServiceProvider } from '../services/ServiceProvider';
 import { InMemoryAuthService } from '../services/auth/InMemoryAuthService';
 import { InMemoryFirestoreService } from '../services/firestore/InMemoryFirestoreService';
@@ -52,16 +52,18 @@ describe('GameBoard', () => {
   function renderWithProviders(activeGame?: Game, games: Game[] = []) {
     return render(
       <ServiceProvider authService={authService} firestoreService={firestoreService}>
-        <SessionContext.Provider
-          value={{
-            user,
-            games,
-            activeGame,
-            setActiveGame: vi.fn(),
-          }}
-        >
-          <GameBoard />
-        </SessionContext.Provider>
+        <UserContext.Provider value={{ user }}>
+          <GameHistoryContext.Provider value={{ games }}>
+            <ActiveGameContext.Provider
+              value={{
+                activeGame,
+                setActiveGame: vi.fn(),
+              }}
+            >
+              <GameBoard />
+            </ActiveGameContext.Provider>
+          </GameHistoryContext.Provider>
+        </UserContext.Provider>
       </ServiceProvider>
     );
   }

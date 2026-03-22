@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { SettingsModal } from './SettingsModal';
-import { SessionContext } from '../context/SessionContext';
+import { UserContext, GameHistoryContext, ActiveGameContext } from '../context/SessionContext';
 import { AnonymousUser, RegisteredUser } from '../models/User';
 import { Game } from '../models/Game';
 import { Board } from '../models/Board';
@@ -33,16 +33,18 @@ const meta = {
   decorators: [
     (Story) => (
       <ServiceProvider authService={storyAuthService} firestoreService={storyFirestoreService}>
-        <SessionContext.Provider
-          value={{
-            user: mockUser,
-            games: mockGames,
-            activeGame: undefined,
-            setActiveGame: () => {},
-          }}
-        >
-          <Story />
-        </SessionContext.Provider>
+        <UserContext.Provider value={{ user: mockUser }}>
+          <GameHistoryContext.Provider value={{ games: mockGames }}>
+            <ActiveGameContext.Provider
+              value={{
+                activeGame: undefined,
+                setActiveGame: () => {},
+              }}
+            >
+              <Story />
+            </ActiveGameContext.Provider>
+          </GameHistoryContext.Provider>
+        </UserContext.Provider>
       </ServiceProvider>
     ),
   ],
@@ -71,16 +73,18 @@ export const PermanentAccount: Story = {
       const permanentUser = new RegisteredUser('permanent-user-456', 'Jane Doe');
       return (
         <ServiceProvider authService={storyAuthService} firestoreService={storyFirestoreService}>
-          <SessionContext.Provider
-            value={{
-              user: permanentUser,
-              games: [],
-              activeGame: undefined,
-              setActiveGame: () => {},
-            }}
-          >
-            <Story />
-          </SessionContext.Provider>
+          <UserContext.Provider value={{ user: permanentUser }}>
+            <GameHistoryContext.Provider value={{ games: [] }}>
+              <ActiveGameContext.Provider
+                value={{
+                  activeGame: undefined,
+                  setActiveGame: () => {},
+                }}
+              >
+                <Story />
+              </ActiveGameContext.Provider>
+            </GameHistoryContext.Provider>
+          </UserContext.Provider>
         </ServiceProvider>
       );
     },

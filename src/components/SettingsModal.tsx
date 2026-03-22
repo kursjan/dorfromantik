@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSession } from '../context/SessionContext';
+import { useUser } from '../context/SessionContext';
 import { UserAccount } from './UserAccount';
 import './SettingsModal.css';
 
@@ -9,7 +9,7 @@ export interface SettingsModalProps {
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
-  const { user } = useSession();
+  const { user } = useUser();
   
   if (!isOpen) return null;
 
