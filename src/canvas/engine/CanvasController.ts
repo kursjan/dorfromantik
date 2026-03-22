@@ -218,12 +218,12 @@ export class CanvasController {
     this.notifyStatsChange();
   }
 
-  private handleResize = () => {
+  private handleResize() {
     if (this.canvas.width !== window.innerWidth || this.canvas.height !== window.innerHeight) {
       this.canvas.width = window.innerWidth;
       this.canvas.height = window.innerHeight;
     }
-  };
+  }
 
   private handleZoom(delta: number) {
     this.camera.zoomBy(
