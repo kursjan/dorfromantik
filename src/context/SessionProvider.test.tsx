@@ -8,14 +8,18 @@ const mockOnAuthStateChanged = vi.fn();
 const mockSignInAnonymously = vi.fn();
 const mockSubscribeToGames = vi.fn();
 
+/** Stable instances — mirrors `ServiceProvider` memoizing one auth/firestore per tree. */
+const mockAuthService = {
+  onAuthStateChanged: mockOnAuthStateChanged,
+  signInAnonymously: mockSignInAnonymously,
+};
+const mockFirestoreService = {
+  subscribeToGames: mockSubscribeToGames,
+};
+
 vi.mock('../services/hooks/useServices', () => ({
-  useAuthService: () => ({
-    onAuthStateChanged: mockOnAuthStateChanged,
-    signInAnonymously: mockSignInAnonymously,
-  }),
-  useFirestoreService: () => ({
-    subscribeToGames: mockSubscribeToGames,
-  }),
+  useAuthService: () => mockAuthService,
+  useFirestoreService: () => mockFirestoreService,
 }));
 
 const onAuthStateChanged = mockOnAuthStateChanged as Mock;

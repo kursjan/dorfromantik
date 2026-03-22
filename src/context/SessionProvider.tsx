@@ -13,21 +13,12 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [activeGame, setActiveGame] = useState<Game | undefined>(undefined);
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
 
+  // Auth: map Firebase user → domain User.
   useEffect(() => {
-    let unsubscribeGames: (() => void) | null = null;
-
-    const unsubscribeAuth = authService.onAuthStateChanged((firebaseUser) => {
-      // Clean up previous games subscription if it exists
-      if (unsubscribeGames) {
-        unsubscribeGames();
-        unsubscribeGames = null;
-      }
-
+    return authService.onAuthStateChanged((firebaseUser) => {
       if (!firebaseUser) {
-        // Automatically sign in anonymously if there is no user
         authService.signInAnonymously().catch((error) => {
           console.error("Failed to sign in anonymously", error);
-          // Only stop initializing if we are actually stuck
           setIsInitializing(false);
         });
         return;
@@ -38,19 +29,25 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
         : new RegisteredUser(firebaseUser.uid, firebaseUser.displayName || firebaseUser.uid);
 
       setUser(currentUser);
+    });
+  }, [authService]);
 
-      // Subscribe to games for the current user
-      unsubscribeGames = firestoreService.subscribeToGames(firebaseUser.uid, (loadedGames) => {
-        setGames(loadedGames);
-        setIsInitializing(false);
-      });
+  // Games: separate effect so React unsubscribes from Firestore when `user` changes or unmounts.
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    const unsubscribe = firestoreService.subscribeToGames(user.id, (loadedGames) => {
+      setGames(loadedGames);
+      setIsInitializing(false);
     });
 
     return () => {
-      unsubscribeAuth();
-      if (unsubscribeGames) unsubscribeGames();
+      unsubscribe();
+      setGames([]);
     };
-  }, [authService, firestoreService]);
+  }, [user, firestoreService]);
   
   // Wait for auth to initialize before rendering children
   if (isInitializing) {
