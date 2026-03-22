@@ -12,8 +12,8 @@ import './MainMenu.css';
 export const MainMenu: React.FC = () => {
   const authService = useAuthService();
   const navigate = useNavigate();
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { user, games, setActiveGame } = useSession();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleStartStandard = () => {
     const game = Game.create(GameRules.createStandard());
