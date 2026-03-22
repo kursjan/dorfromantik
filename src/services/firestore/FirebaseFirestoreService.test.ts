@@ -11,6 +11,8 @@ import {
   getDoc,
   collection,
   getDocs,
+  onSnapshot,
+  query,
 } from 'firebase/firestore';
 import { Game } from '../../models/Game';
 import { Board } from '../../models/Board';
@@ -34,6 +36,8 @@ vi.mock('firebase/firestore', () => ({
   getDoc: vi.fn(),
   collection: vi.fn(),
   getDocs: vi.fn(),
+  onSnapshot: vi.fn(),
+  query: vi.fn(),
 }));
 
 // Mock our local firebase initialization
@@ -110,5 +114,34 @@ describe('FirebaseFirestoreService (Real Implementation)', () => {
     expect(getDocs).toHaveBeenCalledWith('mock-col-ref');
     expect(results).toHaveLength(2);
     expect(results[0]).toBeInstanceOf(Game);
+  });
+
+  it('subscribes to games in Firestore', () => {
+    const mockUserId = 'test-user';
+    const callback = vi.fn();
+    const mockUnsubscribe = vi.fn();
+
+    (collection as any).mockReturnValue('mock-col-ref');
+    (query as any).mockReturnValue('mock-query');
+    (onSnapshot as any).mockImplementation((_q: any, onSuccess: any) => {
+      onSuccess({
+        docs: [
+          { data: () => ({ gameState: GameSerializer.serialize(createTestGame('g1')) }) }
+        ]
+      });
+      return mockUnsubscribe;
+    });
+
+    const unsubscribe = firestoreService.subscribeToGames(mockUserId, callback);
+
+    expect(collection).toHaveBeenCalledWith(mockDb, 'users', mockUserId, 'savedGames');
+    expect(query).toHaveBeenCalledWith('mock-col-ref');
+    expect(onSnapshot).toHaveBeenCalledWith('mock-query', expect.any(Function), expect.any(Function));
+    expect(callback).toHaveBeenCalledWith(expect.arrayContaining([
+      expect.objectContaining({ id: 'g1' })
+    ]));
+    
+    unsubscribe();
+    expect(mockUnsubscribe).toHaveBeenCalled();
   });
 });

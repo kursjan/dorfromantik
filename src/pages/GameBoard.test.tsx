@@ -1,11 +1,10 @@
 import { render, screen, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { GameBoard } from './GameBoard';
-import { SessionContext } from '../context/SessionContext';
+import { UserContext, GameHistoryContext, ActiveGameContext } from '../context/SessionContext';
 import { ServiceProvider } from '../services/ServiceProvider';
 import { InMemoryAuthService } from '../services/auth/InMemoryAuthService';
 import { InMemoryFirestoreService } from '../services/firestore/InMemoryFirestoreService';
-import { Session } from '../models/Session';
 import { AnonymousUser } from '../models/User';
 import { Game } from '../models/Game';
 import { Board } from '../models/Board';
@@ -50,27 +49,27 @@ describe('GameBoard', () => {
     vi.useRealTimers();
   });
 
-  function renderWithProviders(session: Session) {
+  function renderWithProviders(activeGame?: Game, games: Game[] = []) {
     return render(
       <ServiceProvider authService={authService} firestoreService={firestoreService}>
-        <SessionContext.Provider
-          value={{
-            session,
-            startNewStandardGame: vi.fn(),
-            startNewTestGame: vi.fn(),
-            continueGame: vi.fn(),
-          }}
-        >
-          <GameBoard />
-        </SessionContext.Provider>
+        <UserContext.Provider value={{ user }}>
+          <GameHistoryContext.Provider value={{ games }}>
+            <ActiveGameContext.Provider
+              value={{
+                activeGame,
+                setActiveGame: vi.fn(),
+              }}
+            >
+              <GameBoard />
+            </ActiveGameContext.Provider>
+          </GameHistoryContext.Provider>
+        </UserContext.Provider>
       </ServiceProvider>
     );
   }
 
   it('renders "No active game session" when there is no active game', () => {
-    const session = new Session('test-session', user); // No active game
-
-    renderWithProviders(session);
+    renderWithProviders();
 
     expect(screen.getByText(/No active game session/i)).toBeInTheDocument();
     expect(screen.getByText(/Please return to the main menu/i)).toBeInTheDocument();
@@ -84,9 +83,8 @@ describe('GameBoard', () => {
       tileQueue: [new Tile()],
       score: 0,
     });
-    const session = new Session('test-session', user, game);
 
-    renderWithProviders(session);
+    renderWithProviders(game);
 
     expect(screen.getByTestId('mock-canvas-view')).toBeInTheDocument();
     expect(screen.queryByText(/No active game session/i)).not.toBeInTheDocument();
@@ -99,9 +97,8 @@ describe('GameBoard', () => {
       tileQueue: [new Tile()],
       score: 0,
     });
-    const session = new Session('test-session', user, game);
 
-    renderWithProviders(session);
+    renderWithProviders(game);
 
     // Verify autosaver was instantiated
     expect(GameAutosaver).toHaveBeenCalledTimes(1);
@@ -126,9 +123,8 @@ describe('GameBoard', () => {
       tileQueue: [new Tile()],
       score: 0,
     });
-    const session = new Session('test-session', user, game);
 
-    const { unmount } = renderWithProviders(session);
+    const { unmount } = renderWithProviders(game);
 
     const autosaverMockInstance = vi.mocked(GameAutosaver).mock.results[0].value;
     unmount();
@@ -144,9 +140,8 @@ describe('GameBoard', () => {
       tileQueue: [new Tile()],
       score: 0,
     });
-    const session = new Session('test-session', user, game);
 
-    renderWithProviders(session);
+    renderWithProviders(game);
     const autosaverMockInstance = vi.mocked(GameAutosaver).mock.results[0].value;
     const { onSaveStart, onSaveSuccess, onSaveError } = autosaverMockInstance.options;
 

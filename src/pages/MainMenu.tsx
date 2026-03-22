@@ -2,31 +2,39 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GameCard } from '../components/GameCard';
 import { SettingsModal } from '../components/SettingsModal';
-import { useSession } from '../context/SessionContext';
+import { useUser, useGameHistory, useActiveGame } from '../context/SessionContext';
 import { useAuthService } from '../services/hooks/useServices';
 import { RegisteredUser } from '../models/User';
+import { Game } from '../models/Game';
+import { GameRules } from '../models/GameRules';
 import './MainMenu.css';
 
 export const MainMenu: React.FC = () => {
   const authService = useAuthService();
   const navigate = useNavigate();
+  const { user } = useUser();
+  const { games } = useGameHistory();
+  const { setActiveGame } = useActiveGame();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const { session, startNewStandardGame, startNewTestGame, continueGame } = useSession();
-  const { user } = session;
 
   const handleStartStandard = () => {
-    startNewStandardGame();
+    const game = Game.create(GameRules.createStandard());
+    setActiveGame(game);
     navigate('/game');
   };
 
   const handleStartTest = () => {
-    startNewTestGame();
+    const game = Game.create(GameRules.createTest());
+    setActiveGame(game);
     navigate('/game');
   };
 
   const handleContinue = (gameId: string) => {
-    continueGame(gameId);
-    navigate('/game');
+    const game = games.find(g => g.id === gameId);
+    if (game) {
+      setActiveGame(game);
+      navigate('/game');
+    }
   };
 
   const handleLogout = async () => {
@@ -88,7 +96,7 @@ export const MainMenu: React.FC = () => {
           <div className="main-menu__games-section">
             <span className="main-menu__section-title">Continue Journey</span>
             <div className="main-menu__games-list">
-              {session.games.map(game => (
+              {games.map(game => (
                 <GameCard 
                   key={game.id}
                   id={game.id}

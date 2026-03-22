@@ -1,8 +1,6 @@
 import { Tile } from '../../models/Tile';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { HexCoordinate } from '../../models/HexCoordinate';
-import { Session } from '../../models/Session';
-import { AnonymousUser } from '../../models/User';
 import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexRenderer } from '../graphics/HexRenderer';
 import { TileRenderer } from '../graphics/TileRenderer';
@@ -37,7 +35,7 @@ vi.mock('./Camera', () => {
 describe('CanvasController', () => {
   let canvas: HTMLCanvasElement;
   let controller: CanvasController;
-  let session: Session;
+  let activeGame: Game;
 
   beforeEach(() => {
     // Set up a basic DOM environment for the canvas element
@@ -55,16 +53,14 @@ describe('CanvasController', () => {
     document.body.appendChild(canvasElement);
     canvas = canvasElement;
 
-    // Create a minimal session with an active game
-    const user = new AnonymousUser('user-1');
-    session = new Session('session-1', user);
-    session.activeGame = Game.create(GameRules.createTest());
+    // Create a minimal active game
+    activeGame = Game.create(GameRules.createTest());
 
     vi.clearAllMocks();
   });
 
   it('should initialize successfully', () => {
-    controller = new CanvasController(canvas, session);
+    controller = new CanvasController(canvas, activeGame);
     expect((controller as any).ctx).toBeDefined();
     expect((controller as any).renderer).toBeInstanceOf(HexRenderer);
     expect((controller as any).tileRenderer).toBeInstanceOf(TileRenderer);
@@ -78,7 +74,7 @@ describe('CanvasController', () => {
       .spyOn(window, 'requestAnimationFrame')
       .mockImplementation(() => 0);
 
-    controller = new CanvasController(canvas, session);
+    controller = new CanvasController(canvas, activeGame);
 
     expect(requestAnimationFrameSpy).toHaveBeenCalled();
     const renderer = (controller as any).renderer as any;
@@ -92,9 +88,9 @@ describe('CanvasController', () => {
   it('should render tiles from the board', () => {
     const tile = new Tile({ id: 't1' });
     const coord = new HexCoordinate(-1, 0, 1);
-    session.activeGame!.board.place(tile, coord);
+    activeGame.board.place(tile, coord);
 
-    controller = new CanvasController(canvas, session);
+    controller = new CanvasController(canvas, activeGame);
     const tileRenderer = (controller as any).tileRenderer as any;
 
     // Manually trigger a render
@@ -107,16 +103,10 @@ describe('CanvasController', () => {
     );
   });
 
-  it('should throw error if no active game found in session on construction', () => {
-    session.activeGame = undefined;
-
-    expect(() => new CanvasController(canvas, session)).toThrow('No active game found in session');
-  });
-
   it('should clean up all resources on destroy', () => {
     const cancelAnimationFrameSpy = vi.spyOn(window, 'cancelAnimationFrame');
 
-    controller = new CanvasController(canvas, session);
+    controller = new CanvasController(canvas, activeGame);
     const inputManager = (controller as any).inputManager as any;
     inputManager.destroy = vi.fn();
 
@@ -129,7 +119,7 @@ describe('CanvasController', () => {
   it('should notify debug stats change and respect throttling', () => {
     vi.useFakeTimers();
 
-    controller = new CanvasController(canvas, session);
+    controller = new CanvasController(canvas, activeGame);
     const callback = vi.fn();
     controller.addDebugStatsListener(callback);
 
@@ -166,14 +156,14 @@ describe('CanvasController', () => {
   });
 
   it('should handle camera reset', () => {
-    controller = new CanvasController(canvas, session);
+    controller = new CanvasController(canvas, activeGame);
     const camera = (controller as any).camera;
     controller.resetCamera();
     expect(camera.reset).toHaveBeenCalled();
   });
 
   it('should allow removing debug stats listener', () => {
-    controller = new CanvasController(canvas, session);
+    controller = new CanvasController(canvas, activeGame);
     const callback = vi.fn();
     const removeListener = controller.addDebugStatsListener(callback);
     
@@ -183,13 +173,13 @@ describe('CanvasController', () => {
   });
 
   it('should throw error in render if active game is missing', () => {
-    controller = new CanvasController(canvas, session);
-    session.activeGame = undefined;
+    controller = new CanvasController(canvas, activeGame);
+    (controller as any).activeGame = undefined;
     expect(() => (controller as any).render()).toThrow('No active game found in session');
   });
 
   it('should render ghost preview when hovering over a hex', () => {
-    controller = new CanvasController(canvas, session);
+    controller = new CanvasController(canvas, activeGame);
     (controller as any).hoveredHex = new HexCoordinate(1, 0, -1);
     
     const tileRenderer = (controller as any).tileRenderer as any;
@@ -203,7 +193,7 @@ describe('CanvasController', () => {
   });
 
   it('should update camera rotation based on input manager continuous rotation', () => {
-    controller = new CanvasController(canvas, session);
+    controller = new CanvasController(canvas, activeGame);
     const inputManager = (controller as any).inputManager as any;
     const camera = (controller as any).camera;
     
@@ -227,7 +217,7 @@ describe('CanvasController', () => {
       return this;
     } as any);
 
-    controller = new CanvasController(canvas, session);
+    controller = new CanvasController(canvas, activeGame);
     const camera = (controller as any).camera;
     const zoomSpy = vi.spyOn(controller as any, 'handleZoom');
     const hoverSpy = vi.spyOn(controller as any, 'handleHover');
@@ -273,7 +263,7 @@ describe('CanvasController', () => {
 
   describe('Input Handlers', () => {
     beforeEach(() => {
-      controller = new CanvasController(canvas, session);
+      controller = new CanvasController(canvas, activeGame);
     });
 
     it('should handle zoom and respect sensitivity bounds', () => {
@@ -312,7 +302,6 @@ describe('CanvasController', () => {
     });
 
     it('should handle rotate clockwise and notify stats change', () => {
-      const activeGame = session.activeGame!;
       const rotateSpy = vi.spyOn(activeGame, 'rotateQueuedTileClockwise');
       const notifySpy = vi.fn();
       controller.onStatsChange = notifySpy;
@@ -328,7 +317,6 @@ describe('CanvasController', () => {
     });
 
     it('should handle rotate counter-clockwise and notify stats change', () => {
-      const activeGame = session.activeGame!;
       const rotateSpy = vi.spyOn(activeGame, 'rotateQueuedTileCounterClockwise');
       const notifySpy = vi.fn();
       controller.onStatsChange = notifySpy;
@@ -344,7 +332,6 @@ describe('CanvasController', () => {
     });
 
     it('should handle mouse click and place tile if placement is valid', () => {
-      const activeGame = session.activeGame!;
       const placeTileSpy = vi.spyOn(activeGame, 'placeTile');
       const notifySpy = vi.fn();
       controller.onStatsChange = notifySpy;
@@ -368,7 +355,6 @@ describe('CanvasController', () => {
     });
 
     it('should not place tile on mouse click if placement is invalid', () => {
-      const activeGame = session.activeGame!;
       const placeTileSpy = vi.spyOn(activeGame, 'placeTile');
       const notifySpy = vi.fn();
       controller.onStatsChange = notifySpy;

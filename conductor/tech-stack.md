@@ -6,7 +6,7 @@ This document defines the core technologies, architectural patterns, and quality
 - **Language:** [TypeScript](https://www.typescriptlang.org/) (Strict Mode enabled)
 - **Frontend Framework:** [React 19](https://react.dev/) (Functional components with Hooks)
 - **Routing:** [React Router 7](https://reactrouter.com/)
-- **State Management:** React Context API (Centralized Session management)
+- **State Management:** React Context API (Granular contexts: User, GameHistory, ActiveGame)
 - **Runtime Optimization:** React Compiler (Enabled by default for automatic memoization)
 - **Build Tool:** [Vite](https://vitejs.dev/)
 
@@ -31,7 +31,7 @@ This document defines the core technologies, architectural patterns, and quality
 - **"Tiles are Turns" Philosophy:** `remainingTurns` is a derived property (getter) of `tileQueue.length`.
 - **Geometric Logic Centralization:** All directional logic (neighbors, opposite sides) must reside in the `Navigation` service.
 - **Explicit Domain Accessors:** Prefer explicit methods like `Tile.getTerrain(direction)` over direct property access.
-- **Fail-Fast Session State:** The `CanvasController` throws an error if `session.activeGame` is missing.
+- **Fail-Fast State:** The `CanvasController` throws an error if `activeGame` is missing.
 
 ### Graphics & Rendering
 - **Rotated Hexagonal Coordinate System:** "Flat-Top" orientation where North is `(-1, 0, 1)`.

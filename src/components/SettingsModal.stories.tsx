@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { SettingsModal } from './SettingsModal';
-import { SessionContext } from '../context/SessionContext';
-import { Session } from '../models/Session';
+import { UserContext, GameHistoryContext, ActiveGameContext } from '../context/SessionContext';
 import { AnonymousUser, RegisteredUser } from '../models/User';
 import { Game } from '../models/Game';
 import { Board } from '../models/Board';
@@ -14,8 +13,7 @@ const storyAuthService = new InMemoryAuthService();
 const storyFirestoreService = new InMemoryFirestoreService();
 
 const mockUser = new AnonymousUser('mock-user-123');
-const mockSession = new Session('mock-session-123', mockUser);
-mockSession.games.push(
+const mockGames = [
   new Game({
     id: '1',
     name: 'Saved Adventure',
@@ -23,7 +21,7 @@ mockSession.games.push(
     board: new Board(),
     rules: GameRules.createStandard(),
   })
-);
+];
 
 const meta = {
   title: 'MainMenu/SettingsModal',
@@ -35,16 +33,18 @@ const meta = {
   decorators: [
     (Story) => (
       <ServiceProvider authService={storyAuthService} firestoreService={storyFirestoreService}>
-        <SessionContext.Provider
-          value={{
-            session: mockSession,
-            startNewStandardGame: () => {},
-            startNewTestGame: () => {},
-            continueGame: () => {},
-          }}
-        >
-          <Story />
-        </SessionContext.Provider>
+        <UserContext.Provider value={{ user: mockUser }}>
+          <GameHistoryContext.Provider value={{ games: mockGames }}>
+            <ActiveGameContext.Provider
+              value={{
+                activeGame: undefined,
+                setActiveGame: () => {},
+              }}
+            >
+              <Story />
+            </ActiveGameContext.Provider>
+          </GameHistoryContext.Provider>
+        </UserContext.Provider>
       </ServiceProvider>
     ),
   ],
@@ -71,19 +71,20 @@ export const PermanentAccount: Story = {
   decorators: [
     (Story) => {
       const permanentUser = new RegisteredUser('permanent-user-456', 'Jane Doe');
-      const permanentSession = new Session('perm-session-456', permanentUser);
       return (
         <ServiceProvider authService={storyAuthService} firestoreService={storyFirestoreService}>
-          <SessionContext.Provider
-            value={{
-              session: permanentSession,
-              startNewStandardGame: () => {},
-              startNewTestGame: () => {},
-              continueGame: () => {},
-            }}
-          >
-            <Story />
-          </SessionContext.Provider>
+          <UserContext.Provider value={{ user: permanentUser }}>
+            <GameHistoryContext.Provider value={{ games: [] }}>
+              <ActiveGameContext.Provider
+                value={{
+                  activeGame: undefined,
+                  setActiveGame: () => {},
+                }}
+              >
+                <Story />
+              </ActiveGameContext.Provider>
+            </GameHistoryContext.Provider>
+          </UserContext.Provider>
         </ServiceProvider>
       );
     },

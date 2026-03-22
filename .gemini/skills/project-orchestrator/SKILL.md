@@ -31,6 +31,7 @@ description: Use this skill when transitioning between phases or finalizing a tr
    - Mark the phase as complete with `[checkpoint: <sha>]`.
 9. **Phase Gate**: Inform the user: "Phase X is pushed. You can now review the incremental changes in Reviewable."
    - End the response with: "STATUS: PHASE_COMPLETED_WAITING_FOR_REVIEW".
+10. **Cleanup**: If a `REVIEW_FEEDBACK.md` file exists and all its issues have been addressed (verified by the completion of the corresponding Conductor task), delete the file and include this deletion in the checkpoint commit.
 
 ### Track Completion Protocol (Only if all phases are done)
 1. **Architecture Sync**: Update `ARCHITECTURE.md` across the project to reflect new models, patterns, and decisions.

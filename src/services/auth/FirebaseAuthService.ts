@@ -22,8 +22,13 @@ function toAuthUser(user: { uid: string; isAnonymous: boolean; displayName: stri
  */
 export class FirebaseAuthService implements IAuthService {
   async signInAnonymously(): Promise<AuthUser> {
-    const credential = await signInAnonymously(auth);
-    return toAuthUser(credential.user);
+    try {
+      const credential = await signInAnonymously(auth);
+      return toAuthUser(credential.user);
+    } catch (error) {
+      console.error("Firebase Anonymous Auth Error:", error);
+      throw error;
+    }
   }
 
   async signInWithGoogle(): Promise<AuthUser> {
