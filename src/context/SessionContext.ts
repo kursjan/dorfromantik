@@ -15,8 +15,6 @@ export interface ActiveGameContextType {
   setActiveGame: (game: Game | undefined) => void;
 }
 
-export interface SessionContextType extends UserContextType, GameHistoryContextType, ActiveGameContextType {}
-
 // Granular Contexts
 export const UserContext: Context<UserContextType | undefined> = 
   createContext<UserContextType | undefined>(undefined);
@@ -50,13 +48,4 @@ export const useActiveGame = (): ActiveGameContextType => {
     throw new Error('useActiveGame must be used within an ActiveGameProvider (SessionProvider)');
   }
   return context;
-};
-
-// Composite Hook (for backward compatibility)
-export const useSession = (): SessionContextType => {
-  const { user } = useUser();
-  const { games } = useGameHistory();
-  const { activeGame, setActiveGame } = useActiveGame();
-  
-  return { user, games, activeGame, setActiveGame };
 };
