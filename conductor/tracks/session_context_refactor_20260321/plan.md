@@ -32,5 +32,5 @@
 - [x] Decouple `SessionProvider` state to prevent unnecessary re-renders (e.g., separate `UserProvider` / `GameHistoryProvider` from active game state) using **task-conductor** skill.
 - [x] Perform a file-by-file adversarial review of the rework changes against `main` using **quick-review** skill.
 - [x] Address all issues identified in `REVIEW_FEEDBACK.md` using **task-conductor** skill.
-- [ ] **Phase Gate**: Verify all unit, E2E, UI tests, and coverage using **project-orchestrator** skill.
-- [ ] **Final Track Gate**: Final verification, docs sync, and Git commit using **project-orchestrator** skill.
+- [x] **Phase Gate**: Verify all unit, E2E, UI tests, and coverage using **project-orchestrator** skill.
+- [x] **Final Track Gate**: Final verification, docs sync, and Git commit using **project-orchestrator** skill.
