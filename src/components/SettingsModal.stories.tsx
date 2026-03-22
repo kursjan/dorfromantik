@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { SettingsModal } from './SettingsModal';
 import { SessionContext } from '../context/SessionContext';
-import { Session } from '../models/Session';
 import { AnonymousUser, RegisteredUser } from '../models/User';
 import { Game } from '../models/Game';
 import { Board } from '../models/Board';
@@ -14,8 +13,7 @@ const storyAuthService = new InMemoryAuthService();
 const storyFirestoreService = new InMemoryFirestoreService();
 
 const mockUser = new AnonymousUser('mock-user-123');
-const mockSession = new Session('mock-session-123', mockUser);
-mockSession.games.push(
+const mockGames = [
   new Game({
     id: '1',
     name: 'Saved Adventure',
@@ -23,7 +21,7 @@ mockSession.games.push(
     board: new Board(),
     rules: GameRules.createStandard(),
   })
-);
+];
 
 const meta = {
   title: 'MainMenu/SettingsModal',
@@ -37,9 +35,9 @@ const meta = {
       <ServiceProvider authService={storyAuthService} firestoreService={storyFirestoreService}>
         <SessionContext.Provider
           value={{
-            user: mockSession.user,
-            games: mockSession.games,
-            activeGame: mockSession.activeGame,
+            user: mockUser,
+            games: mockGames,
+            activeGame: undefined,
             setActiveGame: () => {},
           }}
         >
