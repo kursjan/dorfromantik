@@ -1,20 +1,19 @@
-### 🚨 Critical Logic Gaps
-- **Session State Mutation**: In `src/context/SessionProvider.tsx`, the `setActiveGame` method creates a completely new `Session` instance:
-  ```typescript
-  const setActiveGame = (game: Game) => {
-    const newSession = new Session(session.sessionId, session.user, game, [...session.games]);
-    setSession(newSession);
-  };
-  ```
-  While this ensures reactivity, the `Session` model itself is a class with mutable arrays (`games`). By spreading `session.games`, we only do a shallow copy. If any logic elsewhere relies on the reference of the `Session` instance (e.g., for identity checks), this frequent recreation could be problematic. However, the bigger issue is that `SessionProvider` state is the *entire* `Session` object. Any change to the active game causes the entire session to be "new", potentially triggering wide re-renders of components that only care about the user or game history.
+# Adversarial Review Feedback - Session Context Refactor
 
-### 🐢 Performance Warnings
-- **Unnecessary Session Recreation**: Every time a game is started or continued, the entire `Session` object is destroyed and recreated in `SessionProvider`. For a "Lean Refactor", we should consider if `activeGame` should be a separate piece of state in the provider, or if the `Session` class should have a `setActiveGame` method that we then use with a forced update/functional update pattern to minimize object allocation.
+## 🚨 Critical Logic Gaps
+* **`src/pages/MainMenu.tsx` (Missing Test Coverage):** The newly refactored orchestration logic (`handleStartStandard`, `handleStartTest`, `handleContinue`) that relies on the `setActiveGame` Context is completely uncovered by unit tests (currently ~48% statement coverage, 40% branch coverage). Since this is the primary entry point for starting a game, it requires rigorous test coverage.
+* **`src/services/firestore/InMemoryFirestoreService.ts` (State Bleed):** `mockSavedGames` and `listeners` are declared as global module variables. This will cause shared state across test runs and E2E specs if the environment persists (e.g., during `npm run dev`). These should be moved into the class instance or properly reset between tests via a static method.
 
-### 🧹 Cleanliness & Standards
-- **Missing JSDoc**: New methods in `src/pages/MainMenu.tsx` (`handleStartStandard`, `handleStartTest`, `handleContinue`) lack JSDoc explaining their orchestration role, as mandated by the `GEMINI.md` maintenance rules.
-- **Storybook Duplication**: `src/components/SettingsModal.stories.tsx` contains duplicated mock data initialization for `mockSession` and `permanentSession` which could be centralized.
-- **Import Ordering**: In `src/pages/MainMenu.tsx`, the new imports for `Game` and `GameRules` are added at the end of the block, but according to project standards (Context/Services, then Models), they should be grouped more strictly.
+## 🐢 Performance Warnings
+* **`src/context/SessionProvider.tsx` (Unnecessary Re-renders):** The `games` list (history) is bundled in the same context as `user` and `activeGame`. When a game auto-saves, the Firestore snapshot fires, updating the `games` array and triggering a re-render of ALL `useSession()` consumers—including the `GameBoard`, which does not use the `games` list. This is a potential performance bottleneck for long sessions.
 
-### 💡 Architectural Alternative
-- **Active Game State**: Instead of wrapping everything in a `Session` class and putting that class in React state, the `SessionProvider` could manage `user`, `games` (history), and `activeGame` as independent states (or a simpler state object). The `Session` class currently acts more like a Data Transfer Object (DTO) in this context; moving the lifecycle logic (starting/ending games) entirely to the `SessionProvider` or the `Game` model factory would truly "lean out" the context.
+## 🧹 Cleanliness & Standards
+* **`src/services/firestore/InMemoryFirestoreService.ts` (Wrong Header):** File header comment says `// src/services/firestore/MockFirestoreService.ts` but the file is `InMemoryFirestoreService.ts`.
+* **`src/pages/MainMenu.tsx` (Hook Order):** `useSession()` (Context) is placed after `useState()`. Per project standards, all Context/Services should be grouped at the top.
+* **`src/canvas/components/CanvasView.tsx` (Hook Order):** `useRef()` is placed before `useState()`. Grouping should be: Context/Services -> State -> Refs.
+* **`src/canvas/engine/CanvasController.ts` (Inconsistent Binding):** `handleResize` is an arrow property, while `handleZoom`, `handleHover`, etc., are regular methods. Use a consistent pattern for input handlers.
+* **`src/models/Session.ts` (Ghost Model):** The `Session` model class remains in the codebase and is tested, but it is not utilized by the `SessionProvider`. This creates confusion about whether the "Session" is a class instance or just a collection of context fields.
+
+## 💡 Architectural Alternative
+* **Split Contexts:** Decouple `SessionProvider` into `UserProvider` and `GameHistoryProvider`. This would isolate the high-frequency "history sync" updates from the core "active game" rendering loop in `GameBoard`.
+* **Centralized Input Logic:** Move `handleResize` and coordinate mapping into a `ViewportManager` class to keep `CanvasController` focused strictly on the render loop and game state orchestration.
