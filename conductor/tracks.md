@@ -35,4 +35,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: Service DI Refactor (#50)**
   *Link: [./archive/service_di_refactor_20260309/](./archive/service_di_refactor_20260309/)*
 - [x] **Track: Session Context Lean Refactor**
-  *Link: [./tracks/session_context_refactor_20260321/](./tracks/session_context_refactor_20260321/)*
+  *Link: [./archive/session_context_refactor_20260321/](./archive/session_context_refactor_20260321/)*
