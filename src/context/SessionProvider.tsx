@@ -5,13 +5,17 @@ import { Game } from '../models/Game';
 import { useAuthService, useFirestoreService } from '../services/hooks/useServices';
 import { UserContext, GameHistoryContext, ActiveGameContext } from './SessionContext';
 
+type AuthState =
+  | { status: 'initializing' }
+  | { status: 'authenticated'; user: User }
+  | { status: 'error' };
+
 export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const authService = useAuthService();
   const firestoreService = useFirestoreService();
-  const [user, setUser] = useState<User | null>(null);
+  const [authState, setAuthState] = useState<AuthState>({ status: 'initializing' });
   const [games, setGames] = useState<Game[]>([]);
   const [activeGame, setActiveGame] = useState<Game | undefined>(undefined);
-  const [isInitializing, setIsInitializing] = useState<boolean>(true);
 
   // Auth: map Firebase user → domain User.
   useEffect(() => {
@@ -19,7 +23,7 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
       if (!firebaseUser) {
         authService.signInAnonymously().catch((error) => {
           console.error("Failed to sign in anonymously", error);
-          setIsInitializing(false);
+          setAuthState({ status: 'error' });
         });
         return;
       }
@@ -28,44 +32,46 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children })
         ? new AnonymousUser(firebaseUser.uid)
         : new RegisteredUser(firebaseUser.uid, firebaseUser.displayName || firebaseUser.uid);
 
-      setUser(currentUser);
+      setAuthState({ status: 'authenticated', user: currentUser });
     });
   }, [authService]);
 
   // Games: separate effect so React unsubscribes from Firestore when `user` changes or unmounts.
   useEffect(() => {
-    if (!user) {
+    if (authState.status !== 'authenticated') {
       return;
     }
 
-    const unsubscribe = firestoreService.subscribeToGames(user.id, (loadedGames) => {
+    const unsubscribe = firestoreService.subscribeToGames(authState.user.id, (loadedGames) => {
       setGames(loadedGames);
-      setIsInitializing(false);
     });
 
     return () => {
       unsubscribe();
       setGames([]);
     };
-  }, [user, firestoreService]);
+  }, [authState, firestoreService]);
   
   // Memoize values to prevent unnecessary re-renders if provider re-renders
-  const userValue = useMemo(() => user ? { user } : undefined, [user]);
-  const gameHistoryValue = useMemo(() => ({ games }), [games]);
   const activeGameValue = useMemo(() => ({ activeGame, setActiveGame }), [activeGame]);
+  const gameHistoryValue = useMemo(() => ({ games }), [games]);
+  const userValue = useMemo(
+    () => authState.status === 'authenticated' ? { user: authState.user } : undefined,
+    [authState]
+  );
 
   // Wait for auth to initialize before rendering children
-  if (isInitializing) {
+  if (authState.status === 'initializing') {
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'white' }}>Loading Profile...</div>;
   }
 
-  // Fallback for unexpected states
-  if (!userValue) {
+  // Error state
+  if (authState.status === 'error') {
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'red' }}>Initialization Error. Please Refresh.</div>;
   }
 
   return (
-    <UserContext.Provider value={userValue}>
+    <UserContext.Provider value={userValue!}>
       <GameHistoryContext.Provider value={gameHistoryValue}>
         <ActiveGameContext.Provider value={activeGameValue}>
           {children}
