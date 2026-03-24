@@ -1,0 +1,1 @@
+Removed the unused getCurrentUser method from the IAuthService interface and its implementations (FirebaseAuthService, InMemoryAuthService). Updated documentation in ARCHITECTURE.md and cleaned up associated unit tests. Verified that all production code remains functional as auth state is managed via onAuthStateChanged.
