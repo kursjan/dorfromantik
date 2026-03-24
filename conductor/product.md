@@ -32,12 +32,11 @@ To create a relaxing, puzzle-like experience for casual gamers where they can bu
   - `Board`: Class encapsulating a `Map` of tiles, indexed by coordinate key. Prevents placement on occupied spots.
   - `User`: Basic user identity, compatible with Firebase UID.
   - `Game`: Central orchestrator of an active game, tracking board state, score, and the tile queue.
-  - `Session`: Manages a user's game lifecycle, including their current active game and a history of finished games.
 
 ### System Architecture
 - **Frontend:** React (Vite) + TypeScript.
 - **Routing:** Centralized navigation using `react-router-dom`.
-- **State Management:** Centralized `SessionContext` for cross-page data persistence.
+- **State Management:** Granular React Contexts (User, Game History, Active Game) provided by `SessionProvider`.
 - **Canvas Engine:** Custom Controller Pattern (Decoupled from React).
   - **Pattern:** `React Component` -> `CanvasController` -> `Renderers` / `InputManager`.
   - **Documentation:** See **[src/canvas/ARCHITECTURE.md](./src/canvas/ARCHITECTURE.md)**.

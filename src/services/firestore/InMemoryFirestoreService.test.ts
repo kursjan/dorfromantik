@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 import { InMemoryFirestoreService } from './InMemoryFirestoreService';
 import { Game } from '../../models/Game';
@@ -103,5 +103,32 @@ describe('InMemoryFirestoreService (Fake Implementation)', () => {
     expect(user2Games).toHaveLength(1);
     expect(user1Games[0].id).toBe(game1.id);
     expect(user2Games[0].id).toBe(game2.id);
+  });
+
+  it('notifies listeners when game state changes', async () => {
+    const mockUserId = 'test-user';
+    const callback = vi.fn();
+    
+    const unsubscribe = inMemoryFirestoreService.subscribeToGames(mockUserId, callback);
+    
+    // Should be called initially with current data (empty)
+    await vi.waitFor(() => {
+      expect(callback).toHaveBeenCalledWith([]);
+    });
+    
+    callback.mockClear();
+    
+    // Save a game
+    const game = createTestGame('real-time-game');
+    await inMemoryFirestoreService.saveGameState(mockUserId, game);
+    
+    // Should be called again with new data
+    await vi.waitFor(() => {
+      expect(callback).toHaveBeenCalledWith(expect.arrayContaining([
+        expect.objectContaining({ id: 'real-time-game' })
+      ]));
+    });
+    
+    unsubscribe();
   });
 });

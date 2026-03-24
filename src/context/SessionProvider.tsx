@@ -1,83 +1,82 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type { ReactNode } from 'react';
-import { Session } from '../models/Session';
-import { AnonymousUser, RegisteredUser } from '../models/User';
+import { User, AnonymousUser, RegisteredUser } from '../models/User';
 import { Game } from '../models/Game';
-import { GameRules } from '../models/GameRules';
 import { useAuthService, useFirestoreService } from '../services/hooks/useServices';
-import { SessionContext } from './SessionContext';
+import { UserContext, GameHistoryContext, ActiveGameContext } from './SessionContext';
+
+type AuthState =
+  | { status: 'initializing' }
+  | { status: 'authenticated'; user: User }
+  | { status: 'error' };
 
 export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const authService = useAuthService();
   const firestoreService = useFirestoreService();
-  const [session, setSession] = useState<Session | null>(null);
-  const [isInitializing, setIsInitializing] = useState<boolean>(true);
+  const [authState, setAuthState] = useState<AuthState>({ status: 'initializing' });
+  const [games, setGames] = useState<Game[]>([]);
+  const [activeGame, setActiveGame] = useState<Game | undefined>(undefined);
 
+  // Auth: map Firebase user → domain User.
   useEffect(() => {
-    const unsubscribe = authService.onAuthStateChanged((firebaseUser) => {
+    return authService.onAuthStateChanged((firebaseUser) => {
       if (!firebaseUser) {
-        // Automatically sign in anonymously if there is no user
         authService.signInAnonymously().catch((error) => {
           console.error("Failed to sign in anonymously", error);
-          setIsInitializing(false);
+          setAuthState({ status: 'error' });
         });
         return;
       }
 
-      const user = firebaseUser.isAnonymous
+      const currentUser = firebaseUser.isAnonymous
         ? new AnonymousUser(firebaseUser.uid)
         : new RegisteredUser(firebaseUser.uid, firebaseUser.displayName || firebaseUser.uid);
 
-      firestoreService.loadAllGames(firebaseUser.uid)
-        .then((games) => {
-          const newSession = new Session(`session-${firebaseUser.uid}`, user);
-          newSession.games = games;
-          setSession(newSession);
-          setIsInitializing(false);
-        })
-        .catch((error) => {
-          console.error('Failed to load saved games', error);
-          const newSession = new Session(`session-${firebaseUser.uid}`, user);
-          setSession(newSession);
-          setIsInitializing(false);
-        });
+      setAuthState({ status: 'authenticated', user: currentUser });
+    });
+  }, [authService]);
+
+  // Games: separate effect so React unsubscribes from Firestore when `user` changes or unmounts.
+  useEffect(() => {
+    if (authState.status !== 'authenticated') {
+      return;
+    }
+
+    const unsubscribe = firestoreService.subscribeToGames(authState.user.id, (loadedGames) => {
+      setGames(loadedGames);
     });
 
-    return unsubscribe;
-  }, [authService, firestoreService]);
+    return () => {
+      unsubscribe();
+      setGames([]);
+    };
+  }, [authState, firestoreService]);
   
+  // Memoize values to prevent unnecessary re-renders if provider re-renders
+  const activeGameValue = useMemo(() => ({ activeGame, setActiveGame }), [activeGame]);
+  const gameHistoryValue = useMemo(() => ({ games }), [games]);
+  const userValue = useMemo(
+    () => authState.status === 'authenticated' ? { user: authState.user } : undefined,
+    [authState]
+  );
+
   // Wait for auth to initialize before rendering children
-  if (isInitializing) {
+  if (authState.status === 'initializing') {
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'white' }}>Loading Profile...</div>;
   }
 
-  // Fallback for unexpected states
-  if (!session) {
+  // Error state
+  if (authState.status === 'error') {
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'red' }}>Initialization Error. Please Refresh.</div>;
   }
 
-  const startNewStandardGame = () => {
-    const game = Game.create(GameRules.createStandard());
-    const newSession = new Session(session.sessionId, session.user, game, [...session.games]);
-    setSession(newSession);
-  };
-
-  const startNewTestGame = () => {
-    const game = Game.create(GameRules.createTest());
-    const newSession = new Session(session.sessionId, session.user, game, [...session.games]);
-    setSession(newSession);
-  };
-
-  const continueGame = (gameId: string) => {
-    const game = session.games.find(g => g.id === gameId);
-    if (!game) throw new Error(`Cannot continue game: Game with id ${gameId} not found`);
-    const newSession = new Session(session.sessionId, session.user, game, [...session.games]);
-    setSession(newSession);
-  };
-
   return (
-    <SessionContext.Provider value={{ session, startNewStandardGame, startNewTestGame, continueGame }}>
-      {children}
-    </SessionContext.Provider>
+    <UserContext.Provider value={userValue!}>
+      <GameHistoryContext.Provider value={gameHistoryValue}>
+        <ActiveGameContext.Provider value={activeGameValue}>
+          {children}
+        </ActiveGameContext.Provider>
+      </GameHistoryContext.Provider>
+    </UserContext.Provider>
   );
 };

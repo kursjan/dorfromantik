@@ -21,7 +21,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:ci": "dotenv -e .env.ci -- vitest run",
-    "test:e2e:ci": "TEST_ENV=ci playwright test",
+    "test:e2e:ci": "CI=true PORT=5179 TEST_ENV=ci playwright test",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "prepare": "husky"

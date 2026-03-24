@@ -1,17 +1,18 @@
 import React, { useRef, useCallback, useEffect, useState } from 'react';
 import { CanvasView } from '../canvas/components/CanvasView';
-import { useSession } from '../context/SessionContext';
+import { useUser, useActiveGame } from '../context/SessionContext';
 import { useFirestoreService } from '../services/hooks/useServices';
 import { GameAutosaver } from '../canvas/services/GameAutosaver';
 import { SaveStatusIndicator, type SaveStatus } from '../canvas/components/SaveStatusIndicator';
 import './GameBoard.css';
 
-const SAVE_DEBOUNCE_MS = 2000;
+const SAVE_DEBOUNCE_MS = import.meta.env.MODE === 'test' ? 10 : 2000;
 const STATUS_CLEAR_TIMEOUT_MS = 1000;
 
 export const GameBoard: React.FC = () => {
   // 1. Context & Services
-  const { session } = useSession();
+  const { user } = useUser();
+  const { activeGame } = useActiveGame();
   const firestoreService = useFirestoreService();
 
   // 2. Component State
@@ -29,8 +30,8 @@ export const GameBoard: React.FC = () => {
   useEffect(() => {
     autosaverRef.current = new GameAutosaver({
       firestoreService,
-      getUserId: () => session.user.id,
-      getActiveGame: () => session.activeGame,
+      getUserId: () => user.id,
+      getActiveGame: () => activeGame,
       debounceMs: SAVE_DEBOUNCE_MS,
       onSaveStart: () => {
         // Clear previous status immediately when a new save starts
@@ -53,9 +54,9 @@ export const GameBoard: React.FC = () => {
       autosaverRef.current = null;
       if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
     };
-  }, [firestoreService, session]);
+  }, [firestoreService, user, activeGame]);
 
-  if (!session.activeGame) {
+  if (!activeGame) {
     return (
       <div style={{ padding: '20px', textAlign: 'center' }}>
         <h2>No active game session</h2>
@@ -66,7 +67,7 @@ export const GameBoard: React.FC = () => {
 
   return (
     <main className="game-board">
-      <CanvasView session={session} onTilePlaced={debouncedSave} />
+      <CanvasView activeGame={activeGame} onTilePlaced={debouncedSave} />
       <SaveStatusIndicator status={saveStatus} />
     </main>
   );

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
+- **Session Context Lean Refactor:**
+  - **Granular Contexts:** Decoupled the monolithic `SessionProvider` state into `UserContext`, `GameHistoryContext`, and `ActiveGameContext` to prevent unnecessary component re-renders (e.g., `GameBoard` no longer re-renders when a background auto-save updates the game history list).
+  - **Model Cleanup:** Removed the legacy `Session` domain model, migrating its orchestration logic directly to `MainMenu` and `SessionProvider`.
+  - **Orchestration Tests:** Added 100% test coverage for `MainMenu.tsx` game creation and orchestration logic.
+  - **E2E Synchronization:** Added E2E tests (`e2e/history-sync.spec.ts`) to verify that auto-saves correctly propagate to the main menu without regressions.
+  - **Service Isolation:** Fixed state bleed in `InMemoryFirestoreService` by moving mock state from global variables to class instance properties.
 
 - **Autosaver Reliability:** Improved the reliability and visibility of the game's auto-save functionality.
   - **Save on Unmount:** `GameAutosaver` now immediately flushes any pending saves when the user navigates away from the game board, preventing data loss.

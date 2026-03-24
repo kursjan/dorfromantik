@@ -11,7 +11,7 @@ test.describe('Rotation Logic', () => {
   test('should rotate the current tile clockwise when "R" is pressed', async ({ page }) => {
     // 1. Get initial tile state
     const initialTile = await page.evaluate(() => {
-      const game = (window as any).canvasCtrl.session.activeGame;
+      const game = (window as any).canvasCtrl.activeGame;
       const tile = game.tileQueue[0];
       return {
         north: tile.north,
@@ -23,7 +23,7 @@ test.describe('Rotation Logic', () => {
 
     // 3. Get new tile state
     const newTile = await page.evaluate(() => {
-      const game = (window as any).canvasCtrl.session.activeGame;
+      const game = (window as any).canvasCtrl.activeGame;
       const tile = game.tileQueue[0];
       return {
         northWest: tile.northWest
@@ -37,7 +37,7 @@ test.describe('Rotation Logic', () => {
   test('should rotate the current tile counter-clockwise when "F" is pressed', async ({ page }) => {
     // 1. Get initial tile state
     const initialTile = await page.evaluate(() => {
-      const game = (window as any).canvasCtrl.session.activeGame;
+      const game = (window as any).canvasCtrl.activeGame;
       const tile = game.tileQueue[0];
       return {
         north: tile.north,
@@ -49,7 +49,7 @@ test.describe('Rotation Logic', () => {
 
     // 3. Get new tile state
     const newTile = await page.evaluate(() => {
-      const game = (window as any).canvasCtrl.session.activeGame;
+      const game = (window as any).canvasCtrl.activeGame;
       const tile = game.tileQueue[0];
       return {
         northEast: tile.northEast
@@ -62,7 +62,7 @@ test.describe('Rotation Logic', () => {
   
   test('should rotate the current tile clockwise on Right Click', async ({ page }) => {
     const initialTile = await page.evaluate(() => {
-      const game = (window as any).canvasCtrl.session.activeGame;
+      const game = (window as any).canvasCtrl.activeGame;
       const tile = game.tileQueue[0];
       return { north: tile.north };
     });
@@ -75,7 +75,7 @@ test.describe('Rotation Logic', () => {
     await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2, { button: 'right' });
 
     const newTile = await page.evaluate(() => {
-      const game = (window as any).canvasCtrl.session.activeGame;
+      const game = (window as any).canvasCtrl.activeGame;
       const tile = game.tileQueue[0];
       return { northWest: tile.northWest };
     });
@@ -85,7 +85,7 @@ test.describe('Rotation Logic', () => {
 
   test('should rotate the current tile counter-clockwise on Shift + Right Click', async ({ page }) => {
     const initialTile = await page.evaluate(() => {
-      const game = (window as any).canvasCtrl.session.activeGame;
+      const game = (window as any).canvasCtrl.activeGame;
       const tile = game.tileQueue[0];
       return { north: tile.north };
     });
@@ -100,7 +100,7 @@ test.describe('Rotation Logic', () => {
     await page.keyboard.up('Shift');
 
     const newTile = await page.evaluate(() => {
-      const game = (window as any).canvasCtrl.session.activeGame;
+      const game = (window as any).canvasCtrl.activeGame;
       const tile = game.tileQueue[0];
       return { northEast: tile.northEast };
     });
