@@ -20,7 +20,6 @@ export interface IAuthService {
   signInAnonymously(): Promise<AuthUser>;
   signInWithGoogle(): Promise<AuthUser>;
   signOut(): Promise<void>;
-  getCurrentUser(): Promise<AuthUser | null>;
   onAuthStateChanged(callback: (user: AuthUser | null) => void): () => void;
 }
 ```
