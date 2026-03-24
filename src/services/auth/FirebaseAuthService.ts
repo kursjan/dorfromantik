@@ -1,4 +1,3 @@
-// src/services/auth/FirebaseAuthService.ts
 import {
   signInAnonymously,
   GoogleAuthProvider,
@@ -17,9 +16,6 @@ function toAuthUser(user: { uid: string; isAnonymous: boolean; displayName: stri
   };
 }
 
-/**
- * Firebase implementation of IAuthService.
- */
 export class FirebaseAuthService implements IAuthService {
   async signInAnonymously(): Promise<AuthUser> {
     const credential = await signInAnonymously(auth);
