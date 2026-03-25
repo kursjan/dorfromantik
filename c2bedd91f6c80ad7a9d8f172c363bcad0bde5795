@@ -1,0 +1,1 @@
+Implemented useSyncExternalStore hybrid model for CanvasController debug stats bridge. Added subscribeDebug and getDebugSnapshot. Created useCanvasControllerDebugStats hook. Refactored DebugOverlay to use the new hook. Verified unit and UI tests.
