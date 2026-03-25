@@ -132,7 +132,7 @@ While the Controller runs independently for performance, the React-based HUD nee
 - **Pattern:** `CanvasController` exposes an `onStatsChange` callback.
 - **Registration:** `CanvasView` (React) registers a listener in its `useEffect` hook.
 - **Execution:** When the game state changes (e.g., tile placed), the Controller invokes the callback, triggering a `useState` update in React.
-- **Debug Stats:** `CanvasController` also exposes `addDebugStatsListener` for high-frequency updates (FPS, Camera) used by `DebugOverlay`.
+- **Debug Stats:** `CanvasController` also exposes `subscribeDebug` and `getDebugSnapshot` for high-frequency updates (FPS, Camera) used by `DebugOverlay` via `useSyncExternalStore`.
 
 ## 6. Data Flow Example: Hovering
 

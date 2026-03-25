@@ -33,7 +33,6 @@ export class CanvasController {
   // Callbacks for React synchronization
   public onStatsChange?: (score: number, remainingTurns: number, nextTile: Tile | null) => void;
   public onTilePlaced?: () => void;
-  private onDebugStatsChange?: (stats: DebugStats) => void;
 
   // State
   private animationFrameId: number = 0;
@@ -41,6 +40,14 @@ export class CanvasController {
   private lastLoopTime: number = performance.now();
   private fps: number = 0;
   private lastDebugUpdateTime: number = 0;
+  
+  // Debug Stats State
+  private debugListeners = new Set<() => void>();
+  private debugSnapshot: DebugStats = {
+    fps: 0,
+    camera: { x: 0, y: 0, zoom: 1, rotation: 0 },
+    hoveredHex: null,
+  };
 
   constructor(canvas: HTMLCanvasElement, activeGame: Game, options?: { onToggleDebugOverlay?: () => void }) {
     this.canvas = canvas;
@@ -85,23 +92,15 @@ export class CanvasController {
     this.camera.reset();
   }
 
-
-  /**
-   * Registers a one-shot listener for debug stats updates.
-   * The callback will be notified until the returned unsubscribe function is called.
-   * Only one debug stats listener can be registered at a time; later registrations overwrite earlier ones.
-   * 
-   * @param callback - Function to call when debug stats are updated.
-   * @returns Unsubscribe function to remove the listener.
-   */
-  public addDebugStatsListener(callback: (stats: DebugStats) => void): () => void {
-    this.onDebugStatsChange = callback;
-    // Unsubscribe function
+  public subscribeDebug(listener: () => void): () => void {
+    this.debugListeners.add(listener);
     return () => {
-      if (this.onDebugStatsChange === callback) {
-        this.onDebugStatsChange = undefined;
-      }
+      this.debugListeners.delete(listener);
     };
+  }
+
+  public getDebugSnapshot(): DebugStats {
+    return this.debugSnapshot;
   }
 
   private loop() {
@@ -162,8 +161,8 @@ export class CanvasController {
 
     // 6. Push Debug Stats to React (throttled)
     const now = performance.now();
-    if (this.onDebugStatsChange && now - this.lastDebugUpdateTime > 500) {
-      this.onDebugStatsChange({
+    if (this.debugListeners.size > 0 && now - this.lastDebugUpdateTime > 500) {
+      this.debugSnapshot = {
         fps: Math.round(this.fps),
         camera: {
           x: this.camera.x,
@@ -172,8 +171,9 @@ export class CanvasController {
           rotation: this.camera.rotation,
         },
         hoveredHex: this.hoveredHex,
-      });
+      };
       this.lastDebugUpdateTime = now;
+      this.debugListeners.forEach((listener) => listener());
     }
   }
 

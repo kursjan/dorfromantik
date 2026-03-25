@@ -6,7 +6,8 @@ import { HexCoordinate } from '../../models/HexCoordinate';
 
 // Mock CanvasController
 const mockController = {
-  addDebugStatsListener: vi.fn(),
+  subscribeDebug: vi.fn(),
+  getDebugSnapshot: vi.fn(),
 } as unknown as CanvasController;
 
 describe('DebugOverlay', () => {
@@ -14,9 +15,14 @@ describe('DebugOverlay', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (mockController.addDebugStatsListener as any).mockImplementation((cb: any) => {
+    (mockController.subscribeDebug as any).mockImplementation((cb: any) => {
       statsCallback = cb;
       return vi.fn(); // Unsubscribe function
+    });
+    (mockController.getDebugSnapshot as any).mockReturnValue({
+      fps: 0,
+      camera: { x: 0, y: 0, zoom: 1.0, rotation: 0 },
+      hoveredHex: null
     });
   });
 
@@ -34,12 +40,13 @@ describe('DebugOverlay', () => {
     render(<DebugOverlay controller={mockController} isVisible={true} />);
 
     act(() => {
+      (mockController.getDebugSnapshot as any).mockReturnValue({
+        fps: 60,
+        camera: { x: 10, y: 20, zoom: 1.5, rotation: 0 },
+        hoveredHex: new HexCoordinate(1, -1, 0)
+      });
       if (statsCallback) {
-        statsCallback({
-          fps: 60,
-          camera: { x: 10, y: 20, zoom: 1.5, rotation: 0 },
-          hoveredHex: new HexCoordinate(1, -1, 0)
-        });
+        statsCallback();
       }
     });
 
@@ -54,24 +61,26 @@ describe('DebugOverlay', () => {
 
     // Initial stats
     act(() => {
+      (mockController.getDebugSnapshot as any).mockReturnValue({
+        fps: 60,
+        camera: { x: 0, y: 0, zoom: 1.0, rotation: 0 },
+        hoveredHex: null
+      });
       if (statsCallback) {
-        statsCallback({
-          fps: 60,
-          camera: { x: 0, y: 0, zoom: 1.0, rotation: 0 },
-          hoveredHex: null
-        });
+        statsCallback();
       }
     });
     expect(screen.getByText(/FPS: 60/)).toBeInTheDocument();
 
     // Updated stats
     act(() => {
+      (mockController.getDebugSnapshot as any).mockReturnValue({
+        fps: 30,
+        camera: { x: 100, y: -50, zoom: 2.0, rotation: 0 },
+        hoveredHex: new HexCoordinate(2, -3, 1)
+      });
       if (statsCallback) {
-        statsCallback({
-          fps: 30,
-          camera: { x: 100, y: -50, zoom: 2.0, rotation: 0 },
-          hoveredHex: new HexCoordinate(2, -3, 1)
-        });
+        statsCallback();
       }
     });
     expect(screen.getByText(/FPS: 30/)).toBeInTheDocument();

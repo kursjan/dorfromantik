@@ -121,7 +121,7 @@ describe('CanvasController', () => {
 
     controller = new CanvasController(canvas, activeGame);
     const callback = vi.fn();
-    controller.addDebugStatsListener(callback);
+    controller.subscribeDebug(callback);
 
     // Advance time to ensure now - lastDebugUpdateTime > 500
     vi.advanceTimersByTime(1000);
@@ -129,7 +129,7 @@ describe('CanvasController', () => {
     // First render - should notify
     (controller as any).render();
     expect(callback).toHaveBeenCalledTimes(1);
-    expect(callback).toHaveBeenCalledWith(
+    expect(controller.getDebugSnapshot()).toEqual(
       expect.objectContaining({
         fps: expect.any(Number),
         camera: expect.objectContaining({
@@ -165,11 +165,11 @@ describe('CanvasController', () => {
   it('should allow removing debug stats listener', () => {
     controller = new CanvasController(canvas, activeGame);
     const callback = vi.fn();
-    const removeListener = controller.addDebugStatsListener(callback);
+    const removeListener = controller.subscribeDebug(callback);
     
-    expect((controller as any).onDebugStatsChange).toBe(callback);
+    expect((controller as any).debugListeners.has(callback)).toBe(true);
     removeListener();
-    expect((controller as any).onDebugStatsChange).toBeUndefined();
+    expect((controller as any).debugListeners.has(callback)).toBe(false);
   });
 
   it('should throw error in render if active game is missing', () => {
