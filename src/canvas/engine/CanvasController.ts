@@ -15,39 +15,36 @@ export interface DebugStats {
   hoveredHex: HexCoordinate | null;
 }
 
+interface DebugState {
+  fps: number;
+  lastDebugUpdateTime: number;
+  lastLoopTime: number;
+  listeners: Set<() => void>;
+  snapshot: DebugStats;
+}
+
 export class CanvasController {
-  private static readonly ZOOM_SENSITIVITY = 0.001;
-  private static readonly ROTATION_SPEED = 0.05;
   private static readonly MIN_ZOOM = 0.5;
   private static readonly MAX_ZOOM = 3.0;
+  private static readonly ROTATION_SPEED = 0.05;
+  private static readonly ZOOM_SENSITIVITY = 0.001;
 
-  private readonly canvas: HTMLCanvasElement;
-  private readonly ctx: CanvasRenderingContext2D;
-  private readonly camera: Camera;
-  private readonly renderer: HexRenderer;
-  private readonly tileRenderer: TileRenderer;
-  private readonly backgroundRenderer: BackgroundRenderer;
-  private readonly inputManager: InputManager;
   private readonly activeGame: Game;
+  private readonly backgroundRenderer: BackgroundRenderer;
+  private readonly canvas: HTMLCanvasElement;
+  private readonly camera: Camera;
+  private readonly ctx: CanvasRenderingContext2D;
+  private readonly inputManager: InputManager;
+  private readonly hexRenderer: HexRenderer;
+  private readonly tileRenderer: TileRenderer;
+
+  private animationFrameId: number = 0;
+  private debugState: DebugState = CanvasController.createDefaultDebugState();
+  private hoveredHex: HexCoordinate | null = null;
 
   // Callbacks for React synchronization
   public onStatsChange?: (score: number, remainingTurns: number, nextTile: Tile | null) => void;
   public onTilePlaced?: () => void;
-
-  // State
-  private animationFrameId: number = 0;
-  private hoveredHex: HexCoordinate | null = null;
-  private lastLoopTime: number = performance.now();
-  private fps: number = 0;
-  private lastDebugUpdateTime: number = 0;
-  
-  // Debug Stats State
-  private debugListeners = new Set<() => void>();
-  private debugSnapshot: DebugStats = {
-    fps: 0,
-    camera: { x: 0, y: 0, zoom: 1, rotation: 0 },
-    hoveredHex: null,
-  };
 
   constructor(canvas: HTMLCanvasElement, activeGame: Game, options?: { onToggleDebugOverlay?: () => void }) {
     this.canvas = canvas;
@@ -58,16 +55,16 @@ export class CanvasController {
 
     this.camera = new Camera({ x: 0, y: 0, zoom: 1 });
     this.backgroundRenderer = new BackgroundRenderer(ctx);
-    this.renderer = new HexRenderer(ctx);
+    this.hexRenderer = new HexRenderer(ctx);
     this.tileRenderer = new TileRenderer(ctx);
     this.inputManager = new InputManager(canvas, {
       onPan: (dx, dy) => this.handlePan(dx, dy),
       onZoom: (delta) => this.handleZoom(delta),
       onHover: (x, y) => this.handleHover(x, y),
+      onLeave: () => this.handleLeave(),
       onClick: (x, y) => this.handleMouseClick(x, y),
       onRotateClockwise: () => this.handleRotateClockwise(),
       onRotateCounterClockwise: () => this.handleRotateCounterClockwise(),
-      onLeave: () => this.handleLeave(),
       onResize: () => this.handleResize(),
       onToggleDebugOverlay: options?.onToggleDebugOverlay,
     });
@@ -83,6 +80,20 @@ export class CanvasController {
     this.loop();
   }
 
+  private static createDefaultDebugState(): DebugState {
+    return {
+      fps: 0,
+      lastDebugUpdateTime: 0,
+      lastLoopTime: performance.now(),
+      listeners: new Set<() => void>(),
+      snapshot: {
+        fps: 0,
+        camera: { x: 0, y: 0, zoom: 1, rotation: 0 },
+        hoveredHex: null,
+      },
+    };
+  }
+
   public destroy() {
     cancelAnimationFrame(this.animationFrameId);
     this.inputManager.destroy();
@@ -93,31 +104,33 @@ export class CanvasController {
   }
 
   public subscribeDebug(listener: () => void): () => void {
-    this.debugListeners.add(listener);
+    this.debugState.listeners.add(listener);
     return () => {
-      this.debugListeners.delete(listener);
+      this.debugState.listeners.delete(listener);
     };
   }
 
   public getDebugSnapshot(): DebugStats {
-    return this.debugSnapshot;
+    return this.debugState.snapshot;
   }
 
   private loop() {
-    const now = performance.now();
-    const deltaTime = now - this.lastLoopTime;
-    this.lastLoopTime = now;
-    if (deltaTime > 0) {
-      this.fps = 1000 / deltaTime;
-    }
-
-    this.update();
+    this.updateFps();
+    this.processContinuousInput();
     this.render();
     this.animationFrameId = requestAnimationFrame(() => this.loop());
   }
 
-  private update() {
-    // 1. Handle Continuous Rotation Input
+  private updateFps() {
+    const now = performance.now();
+    const deltaTime = now - this.debugState.lastLoopTime;
+    this.debugState.lastLoopTime = now;
+    if (deltaTime > 0) {
+      this.debugState.fps = 1000 / deltaTime;
+    }
+  }
+
+  private processContinuousInput() {
     const rotationDir = this.inputManager.getRotationDirection();
     if (rotationDir !== 0) {
       this.camera.rotateBy(rotationDir * CanvasController.ROTATION_SPEED);
@@ -139,7 +152,7 @@ export class CanvasController {
 
     // 3. Draw World
     // Draw base grid (debug)
-    this.renderer.drawDebugGrid(5);
+    this.hexRenderer.drawDebugGrid(5);
 
     // Draw placed tiles from the board
     for (const boardTile of activeGame.board.getAll()) {
@@ -155,26 +168,29 @@ export class CanvasController {
     }
 
     // Draw highlight for current mouse position
-    this.renderer.drawHighlight(this.hoveredHex);
+    this.hexRenderer.drawHighlight(this.hoveredHex);
 
     this.ctx.restore();
+    this.publishDebugSnapshot();
+  }
 
-    // 6. Push Debug Stats to React (throttled)
+  private publishDebugSnapshot() {
     const now = performance.now();
-    if (this.debugListeners.size > 0 && now - this.lastDebugUpdateTime > 500) {
-      this.debugSnapshot = {
-        fps: Math.round(this.fps),
-        camera: {
-          x: this.camera.x,
-          y: this.camera.y,
-          zoom: this.camera.zoom,
-          rotation: this.camera.rotation,
-        },
-        hoveredHex: this.hoveredHex,
-      };
-      this.lastDebugUpdateTime = now;
-      this.debugListeners.forEach((listener) => listener());
+    if (this.debugState.listeners.size === 0 || now - this.debugState.lastDebugUpdateTime <= 500) {
+      return;
     }
+    this.debugState.snapshot = {
+      fps: Math.round(this.debugState.fps),
+      camera: {
+        x: this.camera.x,
+        y: this.camera.y,
+        zoom: this.camera.zoom,
+        rotation: this.camera.rotation,
+      },
+      hoveredHex: this.hoveredHex,
+    };
+    this.debugState.lastDebugUpdateTime = now;
+    this.debugState.listeners.forEach((listener) => listener());
   }
 
   private notifyStatsChange() {
@@ -188,6 +204,36 @@ export class CanvasController {
 
   private isValidPlacement(coord: HexCoordinate): boolean {
     return this.activeGame.isValidPlacement(coord);
+  }
+
+  private handlePan(dx: number, dy: number) {
+    this.camera.pan(dx, dy);
+  }
+
+  private handleZoom(delta: number) {
+    this.camera.zoomBy(
+      -delta * CanvasController.ZOOM_SENSITIVITY,
+      CanvasController.MIN_ZOOM,
+      CanvasController.MAX_ZOOM
+    );
+  }
+
+  private handleHover(mouseX: number, mouseY: number) {
+    const worldPos = this.camera.screenToWorld(
+      mouseX,
+      mouseY,
+      this.canvas.width,
+      this.canvas.height
+    );
+    const hex = pixelToHex(worldPos.x, worldPos.y, HEX_SIZE);
+
+    if (!this.hoveredHex || !this.hoveredHex.equals(hex)) {
+      this.hoveredHex = hex;
+    }
+  }
+
+  private handleLeave() {
+    this.hoveredHex = null;
   }
 
   private handleMouseClick(mouseX: number, mouseY: number) {
@@ -223,35 +269,5 @@ export class CanvasController {
       this.canvas.width = window.innerWidth;
       this.canvas.height = window.innerHeight;
     }
-  }
-
-  private handlePan(dx: number, dy: number) {
-    this.camera.pan(dx, dy);
-  }
-
-  private handleZoom(delta: number) {
-    this.camera.zoomBy(
-      -delta * CanvasController.ZOOM_SENSITIVITY,
-      CanvasController.MIN_ZOOM,
-      CanvasController.MAX_ZOOM
-    );
-  }
-
-  private handleHover(mouseX: number, mouseY: number) {
-    const worldPos = this.camera.screenToWorld(
-      mouseX,
-      mouseY,
-      this.canvas.width,
-      this.canvas.height
-    );
-    const hex = pixelToHex(worldPos.x, worldPos.y, HEX_SIZE);
-
-    if (!this.hoveredHex || !this.hoveredHex.equals(hex)) {
-      this.hoveredHex = hex;
-    }
-  }
-
-  private handleLeave() {
-    this.hoveredHex = null;
   }
 }
