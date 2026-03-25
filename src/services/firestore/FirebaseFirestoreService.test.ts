@@ -8,9 +8,7 @@ import { FirebaseFirestoreService } from './FirebaseFirestoreService';
 import {
   doc,
   setDoc,
-  getDoc,
   collection,
-  getDocs,
   onSnapshot,
   query,
 } from 'firebase/firestore';
@@ -33,9 +31,7 @@ function createTestGame(id = 'test-game-1'): Game {
 vi.mock('firebase/firestore', () => ({
   doc: vi.fn(),
   setDoc: vi.fn(),
-  getDoc: vi.fn(),
   collection: vi.fn(),
-  getDocs: vi.fn(),
   onSnapshot: vi.fn(),
   query: vi.fn(),
 }));
@@ -66,56 +62,6 @@ describe('FirebaseFirestoreService (Real Implementation)', () => {
     expect(setDoc).toHaveBeenCalledWith('mock-doc-ref', expect.any(Object));
   });
 
-  it('loads game state from Firestore', async () => {
-    const mockUserId = 'test-user';
-    const mockGameId = 'test-game';
-    const mockGameState = GameSerializer.serialize(createTestGame());
-
-    (doc as any).mockReturnValue('mock-doc-ref');
-    (getDoc as any).mockResolvedValue({
-      exists: () => true,
-      data: () => ({ gameState: mockGameState }),
-    });
-
-    const result = await firestoreService.loadGameState(mockUserId, mockGameId);
-
-    expect(doc).toHaveBeenCalledWith(mockDb, 'users', mockUserId, 'savedGames', mockGameId);
-    expect(getDoc).toHaveBeenCalledWith('mock-doc-ref');
-    expect(result).toBeInstanceOf(Game);
-  });
-
-  it('returns null when game does not exist', async () => {
-    const mockUserId = 'test-user';
-    const mockGameId = 'non-existent-game';
-
-    (doc as any).mockReturnValue('mock-doc-ref');
-    (getDoc as any).mockResolvedValue({ exists: () => false });
-
-    const result = await firestoreService.loadGameState(mockUserId, mockGameId);
-
-    expect(result).toBeNull();
-  });
-
-  it('loads all games for a user', async () => {
-    const mockUserId = 'test-user';
-    const mockGameState = GameSerializer.serialize(createTestGame());
-
-    (collection as any).mockReturnValue('mock-col-ref');
-    (getDocs as any).mockResolvedValue({
-      docs: [
-        { data: () => ({ gameState: mockGameState }) },
-        { data: () => ({ gameState: mockGameState }) },
-      ],
-    });
-
-    const results = await firestoreService.loadAllGames(mockUserId);
-
-    expect(collection).toHaveBeenCalledWith(mockDb, 'users', mockUserId, 'savedGames');
-    expect(getDocs).toHaveBeenCalledWith('mock-col-ref');
-    expect(results).toHaveLength(2);
-    expect(results[0]).toBeInstanceOf(Game);
-  });
-
   it('subscribes to games in Firestore', () => {
     const mockUserId = 'test-user';
     const callback = vi.fn();
@@ -140,7 +86,7 @@ describe('FirebaseFirestoreService (Real Implementation)', () => {
     expect(callback).toHaveBeenCalledWith(expect.arrayContaining([
       expect.objectContaining({ id: 'g1' })
     ]));
-    
+
     unsubscribe();
     expect(mockUnsubscribe).toHaveBeenCalled();
   });

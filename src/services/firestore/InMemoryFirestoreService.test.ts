@@ -22,69 +22,44 @@ describe('InMemoryFirestoreService (Fake Implementation)', () => {
     inMemoryFirestoreService._resetMockStore();
   });
 
-  it('saves game state to mock store', async () => {
+  it('persists saved games and exposes them via subscribeToGames', async () => {
     const mockUserId = 'test-user';
     const mockGame = createTestGame();
+    const callback = vi.fn();
 
     await inMemoryFirestoreService.saveGameState(mockUserId, mockGame);
+    inMemoryFirestoreService.subscribeToGames(mockUserId, callback);
 
-    const result = await inMemoryFirestoreService.loadGameState(mockUserId, mockGame.id);
-    expect(result).toBeInstanceOf(Game);
-    expect(result?.id).toBe(mockGame.id);
+    await vi.waitFor(() => {
+      expect(callback).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({ id: mockGame.id })])
+      );
+    });
   });
 
-  it('loads game state from mock store', async () => {
+  it('returns empty list for user with no saves (via subscribe)', async () => {
     const mockUserId = 'test-user';
-    const mockGame = createTestGame();
+    const callback = vi.fn();
 
-    await inMemoryFirestoreService.saveGameState(mockUserId, mockGame);
-    const result = await inMemoryFirestoreService.loadGameState(mockUserId, mockGame.id);
+    inMemoryFirestoreService.subscribeToGames(mockUserId, callback);
 
-    expect(result).toBeInstanceOf(Game);
-    expect(result?.id).toBe(mockGame.id);
-  });
-
-  it('returns null when game does not exist', async () => {
-    const mockUserId = 'test-user';
-    const mockGameId = 'non-existent-game';
-
-    const result = await inMemoryFirestoreService.loadGameState(mockUserId, mockGameId);
-
-    expect(result).toBeNull();
-  });
-
-  it('loads all games for a user', async () => {
-    const mockUserId = 'test-user';
-    const game1 = createTestGame('game-1');
-    const game2 = createTestGame('game-2');
-
-    await inMemoryFirestoreService.saveGameState(mockUserId, game1);
-    await inMemoryFirestoreService.saveGameState(mockUserId, game2);
-
-    const results = await inMemoryFirestoreService.loadAllGames(mockUserId);
-
-    expect(results).toHaveLength(2);
-    expect(results[0]).toBeInstanceOf(Game);
-    expect(results[1]).toBeInstanceOf(Game);
-  });
-
-  it('returns empty array when no games exist for user', async () => {
-    const mockUserId = 'test-user';
-
-    const results = await inMemoryFirestoreService.loadAllGames(mockUserId);
-
-    expect(results).toHaveLength(0);
+    await vi.waitFor(() => {
+      expect(callback).toHaveBeenCalledWith([]);
+    });
   });
 
   it('resets mock store', async () => {
     const mockUserId = 'test-user';
     const mockGame = createTestGame();
+    const callback = vi.fn();
 
     await inMemoryFirestoreService.saveGameState(mockUserId, mockGame);
     inMemoryFirestoreService._resetMockStore();
+    inMemoryFirestoreService.subscribeToGames(mockUserId, callback);
 
-    const result = await inMemoryFirestoreService.loadGameState(mockUserId, mockGame.id);
-    expect(result).toBeNull();
+    await vi.waitFor(() => {
+      expect(callback).toHaveBeenCalledWith([]);
+    });
   });
 
   it('handles multiple users independently', async () => {
@@ -92,43 +67,46 @@ describe('InMemoryFirestoreService (Fake Implementation)', () => {
     const user2 = 'user-2';
     const game1 = createTestGame('user1-game');
     const game2 = createTestGame('user2-game');
+    const cb1 = vi.fn();
+    const cb2 = vi.fn();
 
     await inMemoryFirestoreService.saveGameState(user1, game1);
     await inMemoryFirestoreService.saveGameState(user2, game2);
 
-    const user1Games = await inMemoryFirestoreService.loadAllGames(user1);
-    const user2Games = await inMemoryFirestoreService.loadAllGames(user2);
+    inMemoryFirestoreService.subscribeToGames(user1, cb1);
+    inMemoryFirestoreService.subscribeToGames(user2, cb2);
 
-    expect(user1Games).toHaveLength(1);
-    expect(user2Games).toHaveLength(1);
-    expect(user1Games[0].id).toBe(game1.id);
-    expect(user2Games[0].id).toBe(game2.id);
+    await vi.waitFor(() => {
+      expect(cb1).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({ id: game1.id })])
+      );
+      expect(cb2).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({ id: game2.id })])
+      );
+    });
   });
 
   it('notifies listeners when game state changes', async () => {
     const mockUserId = 'test-user';
     const callback = vi.fn();
-    
+
     const unsubscribe = inMemoryFirestoreService.subscribeToGames(mockUserId, callback);
-    
-    // Should be called initially with current data (empty)
+
     await vi.waitFor(() => {
       expect(callback).toHaveBeenCalledWith([]);
     });
-    
+
     callback.mockClear();
-    
-    // Save a game
+
     const game = createTestGame('real-time-game');
     await inMemoryFirestoreService.saveGameState(mockUserId, game);
-    
-    // Should be called again with new data
+
     await vi.waitFor(() => {
-      expect(callback).toHaveBeenCalledWith(expect.arrayContaining([
-        expect.objectContaining({ id: 'real-time-game' })
-      ]));
+      expect(callback).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({ id: 'real-time-game' })])
+      );
     });
-    
+
     unsubscribe();
   });
 });

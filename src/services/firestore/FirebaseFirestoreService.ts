@@ -1,10 +1,7 @@
-// src/services/firestore/FirebaseFirestoreService.ts
 import {
   doc,
   setDoc,
-  getDoc,
   collection,
-  getDocs,
   onSnapshot,
   query,
 } from 'firebase/firestore';
@@ -29,21 +26,6 @@ export class FirebaseFirestoreService implements IFirestoreService {
 
     const ref = doc(db, 'users', userId, 'savedGames', game.id);
     await setDoc(ref, savedGame);
-  }
-
-  async loadGameState(userId: string, gameId: string): Promise<Game | null> {
-    const ref = doc(db, 'users', userId, 'savedGames', gameId);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) return null;
-    return GameSerializer.deserialize((snap.data() as SavedGameDoc).gameState);
-  }
-
-  async loadAllGames(userId: string): Promise<Game[]> {
-    const colRef = collection(db, 'users', userId, 'savedGames');
-    const snapshot = await getDocs(colRef);
-    return snapshot.docs.map(d =>
-      GameSerializer.deserialize((d.data() as SavedGameDoc).gameState)
-    );
   }
 
   subscribeToGames(userId: string, callback: (games: Game[]) => void): () => void {
