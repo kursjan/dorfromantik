@@ -61,7 +61,7 @@ export class CanvasController {
     this.renderer = new HexRenderer(ctx);
     this.tileRenderer = new TileRenderer(ctx);
     this.inputManager = new InputManager(canvas, {
-      onPan: (dx, dy) => this.camera.pan(dx, dy),
+      onPan: (dx, dy) => this.handlePan(dx, dy),
       onZoom: (delta) => this.handleZoom(delta),
       onHover: (x, y) => this.handleHover(x, y),
       onClick: (x, y) => this.handleMouseClick(x, y),
@@ -223,6 +223,10 @@ export class CanvasController {
       this.canvas.width = window.innerWidth;
       this.canvas.height = window.innerHeight;
     }
+  }
+
+  private handlePan(dx: number, dy: number) {
+    this.camera.pan(dx, dy);
   }
 
   private handleZoom(delta: number) {
