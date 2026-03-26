@@ -2,6 +2,7 @@ import { Tile } from '../../models/Tile';
 import { getHexCorners, hexToPixel } from '../utils/HexUtils';
 import { type HexStyle, TERRAIN_COLORS, DEFAULT_HEX_STYLE } from './HexStyles';
 import { HexCoordinate } from '../../models/HexCoordinate';
+import { WaterTerrain } from '../../models/Terrain';
 
 export class TileRenderer {
   private ctx: CanvasRenderingContext2D;
@@ -28,13 +29,15 @@ export class TileRenderer {
 
     const corners = getHexCorners(x, y, style.size);
     const terrains = tile.getTerrains();
+    const waterSegments: { index: number; linkToCenter: boolean }[] = [];
 
     // Iterate through terrains in the order they are defined in the model (North, North-East, ...)
     // In our Flat-Top orientation:
     // Index 0 (North) corresponds to the wedge between Corner 4 (240°) and Corner 5 (300°).
     // We can use an offset of 4 to align the model sides with the canvas corners.
     Object.values(terrains).forEach((terrain, i) => {
-      const color = TERRAIN_COLORS[terrain];
+      const isWater = terrain.name === 'water';
+      const color = isWater ? TERRAIN_COLORS.pasture : TERRAIN_COLORS[terrain.name];
       const startCorner = (i + 4) % 6;
       const endCorner = (i + 5) % 6;
 
@@ -46,7 +49,17 @@ export class TileRenderer {
 
       this.ctx.fillStyle = color;
       this.ctx.fill();
+
+      if (isWater) {
+        waterSegments.push({
+          index: i,
+          linkToCenter: terrain instanceof WaterTerrain && terrain.linkToCenter,
+        });
+      }
     });
+
+    this.drawWaterSegments(corners, x, y, style, waterSegments);
+    this.drawWaterCenter(tile, x, y, style);
 
     // Draw hex outline
     this.ctx.beginPath();
@@ -61,5 +74,52 @@ export class TileRenderer {
     this.ctx.stroke();
 
     this.ctx.globalAlpha = originalAlpha;
+  }
+
+  private drawWaterSegments(
+    corners: { x: number; y: number }[],
+    centerX: number,
+    centerY: number,
+    style: HexStyle,
+    waterSegments: { index: number; linkToCenter: boolean }[],
+  ): void {
+    this.ctx.strokeStyle = TERRAIN_COLORS.water;
+    this.ctx.lineWidth = Math.max(3, style.size * 0.12);
+
+    for (const segment of waterSegments) {
+      const startCorner = (segment.index + 4) % 6;
+      const endCorner = (segment.index + 5) % 6;
+      const edgeMidpoint = {
+        x: (corners[startCorner].x + corners[endCorner].x) / 2,
+        y: (corners[startCorner].y + corners[endCorner].y) / 2,
+      };
+      const target = segment.linkToCenter
+        ? { x: centerX, y: centerY }
+        : {
+            x: (edgeMidpoint.x + centerX) / 2,
+            y: (edgeMidpoint.y + centerY) / 2,
+          };
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(edgeMidpoint.x, edgeMidpoint.y);
+      this.ctx.lineTo(target.x, target.y);
+      this.ctx.stroke();
+    }
+  }
+
+  private drawWaterCenter(tile: Tile, x: number, y: number, style: HexStyle): void {
+    if (tile.center?.name !== 'water') {
+      return;
+    }
+
+    const centerHexCorners = getHexCorners(x, y, style.size * 0.25);
+    this.ctx.beginPath();
+    this.ctx.moveTo(centerHexCorners[0].x, centerHexCorners[0].y);
+    for (let i = 1; i < 6; i++) {
+      this.ctx.lineTo(centerHexCorners[i].x, centerHexCorners[i].y);
+    }
+    this.ctx.closePath();
+    this.ctx.fillStyle = TERRAIN_COLORS.water;
+    this.ctx.fill();
   }
 }

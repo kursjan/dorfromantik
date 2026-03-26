@@ -3,6 +3,7 @@ import { TileRenderer } from './TileRenderer';
 import { Tile } from '../../models/Tile';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { DEFAULT_HEX_STYLE } from './HexStyles';
+import { WaterTerrain } from '../../models/Terrain';
 
 describe('TileRenderer', () => {
   let ctx: CanvasRenderingContext2D;
@@ -21,7 +22,7 @@ describe('TileRenderer', () => {
     renderer = new TileRenderer(ctx);
   });
 
-  it('draws a tile with 6 terrain sections and an outline', () => {
+  it('draws water overlays on top of pasture background', () => {
     const tile = new Tile({
       id: 'test-tile',
       north: 'tree',
@@ -34,21 +35,68 @@ describe('TileRenderer', () => {
 
     renderer.drawTile(tile, 0, 0, DEFAULT_HEX_STYLE);
 
-    // 6 terrains + 1 outline = 7 beginPath calls
-    expect(ctx.beginPath).toHaveBeenCalledTimes(7);
+    // 6 wedges + 1 water line + 1 outline
+    expect(ctx.beginPath).toHaveBeenCalledTimes(8);
     
-    // Each terrain section is a triangle (moveTo center, lineTo c1, lineTo c2, closePath)
-    // 6 terrains * 1 moveTo = 6 moveTo
-    // 1 outline * 1 moveTo = 1 moveTo
-    expect(ctx.moveTo).toHaveBeenCalledTimes(7);
+    // 6 wedges + 1 line + 1 outline
+    expect(ctx.moveTo).toHaveBeenCalledTimes(8);
 
-    // 6 terrains * 2 lineTo = 12 lineTo
-    // 1 outline * 5 lineTo = 5 lineTo
-    expect(ctx.lineTo).toHaveBeenCalledTimes(17);
+    // 6 wedges * 2 + 1 water line + 1 outline * 5
+    expect(ctx.lineTo).toHaveBeenCalledTimes(18);
 
     expect(ctx.fill).toHaveBeenCalledTimes(6);
-    expect(ctx.stroke).toHaveBeenCalledTimes(1);
+    expect(ctx.stroke).toHaveBeenCalledTimes(2);
     expect(ctx.closePath).toHaveBeenCalledTimes(7);
+  });
+
+  it('draws center water hex when center terrain is water', () => {
+    const tile = new Tile({
+      id: 'water-center',
+      center: 'water',
+      north: new WaterTerrain(true),
+      northEast: 'pasture',
+      southEast: 'pasture',
+      south: 'pasture',
+      southWest: 'pasture',
+      northWest: 'pasture',
+    });
+
+    renderer.drawTile(tile, 0, 0, DEFAULT_HEX_STYLE);
+
+    // 6 wedges + 1 water line + 1 center hex + 1 outline
+    expect(ctx.beginPath).toHaveBeenCalledTimes(9);
+    expect(ctx.fill).toHaveBeenCalledTimes(7);
+  });
+
+  it('draws linked water to center and unlinked water to mid-segment point', () => {
+    const tile = new Tile({
+      id: 'water-link-geometry',
+      center: 'water',
+      north: new WaterTerrain(true),
+      northEast: new WaterTerrain(false),
+      southEast: 'pasture',
+      south: 'pasture',
+      southWest: 'pasture',
+      northWest: 'pasture',
+    });
+
+    renderer.drawTile(tile, 0, 0, DEFAULT_HEX_STYLE);
+
+    const lineToCalls = (ctx.lineTo as ReturnType<typeof vi.fn>).mock.calls;
+    const waterLineCalls = lineToCalls.filter(([, y]) => Math.abs(y) <= DEFAULT_HEX_STYLE.size);
+
+    // North linked water should end exactly at tile center.
+    const hasCenterEndpoint = waterLineCalls.some(
+      ([x, y]) => Math.abs(x - 0) < 0.001 && Math.abs(y - 0) < 0.001,
+    );
+    expect(hasCenterEndpoint).toBe(true);
+
+    // NorthEast unlinked water should end halfway from edge midpoint to center.
+    // For size=40 and this orientation, that point is approximately (15, -8.6603).
+    const hasMidpointEndpoint = waterLineCalls.some(
+      ([x, y]) => Math.abs(x - 15) < 0.01 && Math.abs(y + 8.6603) < 0.01,
+    );
+    expect(hasMidpointEndpoint).toBe(true);
   });
 
   it('draws a tile at a specific hex coordinate', () => {

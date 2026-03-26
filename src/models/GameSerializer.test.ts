@@ -4,6 +4,7 @@ import { Game } from './Game';
 import { GameRules } from './GameRules';
 import { Tile } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
+import { Board } from './Board';
 
 describe('GameSerializer', () => {
   it('should accurately serialize and deserialize a new game', () => {
@@ -104,5 +105,36 @@ describe('GameSerializer', () => {
     
     // After placing another tile, board size should increase
     expect(Array.from(restoredGame.board.getAll()).length).toBe(6);
+  });
+
+  it('preserves optional center terrain on serialization', () => {
+    const board = new Board();
+    const centered = new Tile({
+      id: 'centered',
+      center: 'house',
+      north: 'tree',
+      northEast: 'water',
+      southEast: 'pasture',
+      south: 'field',
+      southWest: 'rail',
+      northWest: 'house',
+    });
+    board.place(centered, new HexCoordinate(0, 0, 0));
+
+    const game = new Game({
+      id: 'game-center',
+      name: 'Center Test',
+      board,
+      tileQueue: [centered],
+      rules: GameRules.createTest(),
+    });
+
+    const json = GameSerializer.serialize(game);
+    expect(json.board.tiles[0].tile.center).toBe('house');
+    expect(json.tileQueue[0].center).toBe('house');
+
+    const restored = GameSerializer.deserialize(json);
+    const restoredTile = restored.board.get(new HexCoordinate(0, 0, 0))?.tile;
+    expect(restoredTile?.center?.name).toBe('house');
   });
 });

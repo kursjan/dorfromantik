@@ -44,7 +44,7 @@ export class GameScorer {
       const oppositeSide = getOpposite(direction);
       const neighborTerrain = neighbor.tile.getTerrain(oppositeSide);
 
-      if (myTerrain === neighborTerrain) {
+      if (myTerrain.matchesForEdge(neighborTerrain)) {
         scoreAdded += this.rules.pointsPerMatch;
       }
     }
@@ -85,7 +85,7 @@ export class GameScorer {
       const oppositeSide = getOpposite(direction);
       const neighborTerrain = existingNeighbor.tile.getTerrain(oppositeSide);
 
-      if (myTerrain !== neighborTerrain) {
+      if (!myTerrain.matchesForEdge(neighborTerrain)) {
         return false; // All must match
       }
     }

@@ -12,6 +12,7 @@ export interface HexCoordinateJSON {
 
 export interface TileJSON {
   id: string;
+  center?: TerrainType;
   north: TerrainType;
   northEast: TerrainType;
   southEast: TerrainType;
@@ -109,18 +110,20 @@ export class GameSerializer {
   private static serializeTile(tile: Tile): TileJSON {
     return {
       id: tile.id,
-      north: tile.north,
-      northEast: tile.northEast,
-      southEast: tile.southEast,
-      south: tile.south,
-      southWest: tile.southWest,
-      northWest: tile.northWest,
+      center: tile.center?.name,
+      north: tile.north.name,
+      northEast: tile.northEast.name,
+      southEast: tile.southEast.name,
+      south: tile.south.name,
+      southWest: tile.southWest.name,
+      northWest: tile.northWest.name,
     };
   }
 
   private static deserializeTile(json: TileJSON): Tile {
     return new Tile({
       id: json.id,
+      center: json.center,
       north: json.north,
       northEast: json.northEast,
       southEast: json.southEast,

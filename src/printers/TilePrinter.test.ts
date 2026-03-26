@@ -197,4 +197,29 @@ describe('TilePrinter', () => {
 
     expect(canvas.toString()).toBe(expected);
   });
+
+  it('should print center terrain when present', () => {
+    const canvas = new Canvas({ topLeft: { x: 0, y: 0 }, bottomRight: { x: 8, y: 4 } });
+    const tile = new Tile({
+      id: 'center-test',
+      center: 'water',
+      north: 'tree',
+      northEast: 'house',
+      southEast: 'water',
+      south: 'pasture',
+      southWest: 'rail',
+      northWest: 'field',
+    });
+
+    const printer = new TilePrinter(canvas);
+    printer.print(tile, 0, 0);
+
+    const expected = String.raw`   _ _   
+ /  T  \ 
+/F  W  H\
+\R     W/
+ \ _P_ / `;
+
+    expect(canvas.toString()).toBe(expected);
+  });
 });

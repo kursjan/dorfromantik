@@ -1,4 +1,4 @@
-import { Tile, type TerrainType } from '../models/Tile';
+import { Tile, type TerrainEntity } from '../models/Tile';
 import { Canvas } from './Canvas';
 
 /**
@@ -9,11 +9,12 @@ import { Canvas } from './Canvas';
  *   012345678
  * 0    _ _
  * 1  /  N  \
- * 2 /W     E\
+ * 2 /W  C  E\
  * 3 \w     e/
  * 4  \ _S_ /
  *
  * Legend:
+ * C: Center terrain (optional)
  * N: North terrain
  * E: North-East terrain
  * e: South-East terrain
@@ -31,8 +32,8 @@ export class TilePrinter {
   }
 
   print(tile: Tile, topLeftX: number, topLeftY: number): void {
-    const getTerrainChar = (type: TerrainType): string => {
-      return type[0].toUpperCase();
+    const getTerrainChar = (terrain: TerrainEntity): string => {
+      return terrain.shortCode;
     };
 
     const draw = (dx: number, dy: number, char: string) => {
@@ -53,6 +54,9 @@ export class TilePrinter {
     // Row 2
     draw(0, 2, '/');
     draw(1, 2, getTerrainChar(t.northWest));
+    if (t.center) {
+      draw(4, 2, getTerrainChar(t.center));
+    }
     draw(7, 2, getTerrainChar(t.northEast));
     draw(8, 2, '\\');
 

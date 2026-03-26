@@ -57,12 +57,12 @@ describe('Game', () => {
 
       expect(placedTile).toBeDefined();
       const { tile } = placedTile!;
-      expect(tile.north).toBe('pasture');
-      expect(tile.northEast).toBe('pasture');
-      expect(tile.southEast).toBe('pasture');
-      expect(tile.south).toBe('pasture');
-      expect(tile.southWest).toBe('pasture');
-      expect(tile.northWest).toBe('pasture');
+      expect(tile.north.name).toBe('pasture');
+      expect(tile.northEast.name).toBe('pasture');
+      expect(tile.southEast.name).toBe('pasture');
+      expect(tile.south.name).toBe('pasture');
+      expect(tile.southWest.name).toBe('pasture');
+      expect(tile.northWest.name).toBe('pasture');
     });
   });
 
@@ -149,7 +149,7 @@ describe('Game', () => {
       game.rotateQueuedTileClockwise();
 
       const rotated = game.peek()!;
-      expect(rotated.north).toBe('house');
+      expect(rotated.north.name).toBe('house');
     });
 
     it('should rotate the next tile in the queue counter-clockwise', () => {
@@ -172,7 +172,7 @@ describe('Game', () => {
       game.rotateQueuedTileCounterClockwise();
 
       const rotated = game.peek()!;
-      expect(rotated.north).toBe('field');
+      expect(rotated.north.name).toBe('field');
     });
 
     it('should throw error if queue is empty', () => {
