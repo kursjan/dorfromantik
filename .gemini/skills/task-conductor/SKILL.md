@@ -21,12 +21,12 @@ description: Use this skill for any coding or implementation task defined in a C
    - Verification results (Test pass/fail, lint status).
    - Any new dependencies or side effects introduced.
 4. **Approval Gate**: You MUST end the response with the string: "STATUS: WAITING_FOR_APPROVAL".
-5. **Termination**: Do not proceed to any subsequent tasks or steps until the user responds with "APPROVED" or similar.
+5. **Termination**: Do not proceed to any subsequent tasks or steps until the user responds with exactly "LGTM" or "approved" (case-insensitive).
 6. **Mark as done**: Mark the task as done.
 
 ## Iteration Protocol
 - If the user requests changes, apply them, verify again, and provide an updated impact summary.
-- This loop continues until the user explicitly approves the implementation (`lgtm`, `sgtm`, etc.).
+- This loop continues until the user explicitly approves the implementation by saying "LGTM" or "approved".
 
 ## Constraints
 - Never combine multiple Conductor tasks into a single execution cycle.

@@ -51,7 +51,7 @@ If the user identifies **Major Issues** (architectural flaws, missing features, 
 ## Iteration Protocol
 - User can request changes at end of phase or track completion. 
 - If the user requests changes, apply them, verify again, and provide an updated impact summary.
-- This loop continues until the user explicitly approves the implementation (`lgtm`, `sgtm`, etc.).
+- This loop continues until the user explicitly approves the implementation by saying exactly "LGTM" or "approved" (case-insensitive).
 - Once approved, make sure all changes are amended to the checkpoint commit and [summary of changes] is updated. 
   - if at the end of track, make sure PR is ready for review with all changes included.
 
