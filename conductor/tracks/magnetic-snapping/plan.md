@@ -10,7 +10,7 @@ Fixes #59
 - [x] Switch to feature branch `worker1` using **task-conductor** skill.
 - [x] Add `getValidPlacementCoordinates()` method to `Board.ts` that returns all empty coordinates adjacent to at least one placed tile, and write unit tests for it in `Board.test.ts` using **task-conductor** skill.
 - [x] Add `distanceToHexCenter(hex: HexCoordinate, worldX: number, worldY: number, hexSize: number): number` utility to `HexUtils.ts` and write unit tests in `HexUtils.test.ts` using **task-conductor** skill.
-- [ ] **Phase Gate**: Verify all unit tests for the domain logic pass using **project-orchestrator** skill.
+- [x] **Phase Gate**: Verify all unit tests for the domain logic pass using **project-orchestrator** skill.
 
 ## Phase 2: Controller Integration & Validation
 - [ ] Refactor `CanvasController.ts` `handleHover` method:
