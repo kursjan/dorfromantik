@@ -10,6 +10,7 @@ import { TileValidator } from './TileValidator';
 export { TERRAIN_TYPES };
 export type TerrainType = TerrainName;
 export type TerrainEntity = Terrain;
+export type TileOptions = TileMixedTerrainOptions;
 
 export interface TileTerrainOptions {
   id?: string;
@@ -36,6 +37,20 @@ export interface TileTerrainNameOptions {
   northWest?: TerrainName;
 }
 
+/**
+ * @deprecated Compatibility overload for mixed terrain names and terrain instances.
+ */
+export interface TileMixedTerrainOptions {
+  id?: string;
+  center?: Terrain | TerrainName;
+  north?: Terrain | TerrainName;
+  northEast?: Terrain | TerrainName;
+  southEast?: Terrain | TerrainName;
+  south?: Terrain | TerrainName;
+  southWest?: Terrain | TerrainName;
+  northWest?: Terrain | TerrainName;
+}
+
 export class Tile {
   private static idCounter = 0;
   private static validator = new TileValidator();
@@ -55,7 +70,11 @@ export class Tile {
    * @deprecated Use `new Tile({ ...Terrain objects... })` instead of terrain names.
    */
   constructor(options?: TileTerrainNameOptions);
-  constructor(options: TileTerrainOptions | TileTerrainNameOptions = {}) {
+  /**
+   * @deprecated Use `new Tile({ ...Terrain objects... })` instead of mixed value types.
+   */
+  constructor(options?: TileMixedTerrainOptions);
+  constructor(options: TileTerrainOptions | TileTerrainNameOptions | TileMixedTerrainOptions = {}) {
     this.id = options.id ?? `tile-${Date.now()}-${Tile.idCounter++}`;
     this.center = this.toOptionalTerrain(options.center);
     this.north = this.toRequiredTerrain(options.north);
