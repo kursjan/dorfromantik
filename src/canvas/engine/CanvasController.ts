@@ -4,7 +4,7 @@ import { HexRenderer } from '../graphics/HexRenderer';
 import { TileRenderer } from '../graphics/TileRenderer';
 import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexCoordinate } from '../../models/HexCoordinate';
-import { pixelToHex } from '../utils/HexUtils';
+import { pixelToHex, distanceToHexCenter } from '../utils/HexUtils';
 import { HEX_SIZE, DEFAULT_HEX_STYLE, VALID_PREVIEW_STYLE, INVALID_PREVIEW_STYLE } from '../graphics/HexStyles';
 import { Tile } from '../../models/Tile';
 import { Game } from '../../models/Game';
@@ -41,6 +41,8 @@ export class CanvasController {
   private animationFrameId: number = 0;
   private debugState: DebugState = CanvasController.createDefaultDebugState();
   private hoveredHex: HexCoordinate | null = null;
+  private lastMouseX: number = 0;
+  private lastMouseY: number = 0;
 
   // Callbacks for React synchronization
   public onStatsChange?: (score: number, remainingTurns: number, nextTile: Tile | null) => void;
@@ -62,7 +64,7 @@ export class CanvasController {
       onZoom: (delta) => this.handleZoom(delta),
       onHover: (x, y) => this.handleHover(x, y),
       onLeave: () => this.handleLeave(),
-      onClick: (x, y) => this.handleMouseClick(x, y),
+      onClick: () => this.handleMouseClick(),
       onRotateClockwise: () => this.handleRotateClockwise(),
       onRotateCounterClockwise: () => this.handleRotateCounterClockwise(),
       onResize: () => this.handleResize(),
@@ -134,6 +136,7 @@ export class CanvasController {
     const rotationDir = this.inputManager.getRotationDirection();
     if (rotationDir !== 0) {
       this.camera.rotateBy(rotationDir * CanvasController.ROTATION_SPEED);
+      this.handleHover(this.lastMouseX, this.lastMouseY);
     }
   }
 
@@ -208,6 +211,7 @@ export class CanvasController {
 
   private handlePan(dx: number, dy: number) {
     this.camera.pan(dx, dy);
+    this.handleHover(this.lastMouseX, this.lastMouseY);
   }
 
   private handleZoom(delta: number) {
@@ -216,19 +220,44 @@ export class CanvasController {
       CanvasController.MIN_ZOOM,
       CanvasController.MAX_ZOOM
     );
+    this.handleHover(this.lastMouseX, this.lastMouseY);
   }
 
   private handleHover(mouseX: number, mouseY: number) {
+    this.lastMouseX = mouseX;
+    this.lastMouseY = mouseY;
+
     const worldPos = this.camera.screenToWorld(
       mouseX,
       mouseY,
       this.canvas.width,
       this.canvas.height
     );
-    const hex = pixelToHex(worldPos.x, worldPos.y, HEX_SIZE);
 
-    if (!this.hoveredHex || !this.hoveredHex.equals(hex)) {
-      this.hoveredHex = hex;
+    const validCoords = this.activeGame.board.getValidPlacementCoordinates();
+
+    if (validCoords.length > 0) {
+      // Find the nearest valid coordinate
+      let closestHex = validCoords[0];
+      let minDistance = distanceToHexCenter(closestHex, worldPos.x, worldPos.y, HEX_SIZE);
+
+      for (let i = 1; i < validCoords.length; i++) {
+        const dist = distanceToHexCenter(validCoords[i], worldPos.x, worldPos.y, HEX_SIZE);
+        if (dist < minDistance) {
+          minDistance = dist;
+          closestHex = validCoords[i];
+        }
+      }
+
+      if (!this.hoveredHex || !this.hoveredHex.equals(closestHex)) {
+        this.hoveredHex = closestHex;
+      }
+    } else {
+      // Fallback for an empty board, though Game.create handles initial tile
+      const hex = pixelToHex(worldPos.x, worldPos.y, HEX_SIZE);
+      if (!this.hoveredHex || !this.hoveredHex.equals(hex)) {
+        this.hoveredHex = hex;
+      }
     }
   }
 
@@ -236,21 +265,16 @@ export class CanvasController {
     this.hoveredHex = null;
   }
 
-  private handleMouseClick(mouseX: number, mouseY: number) {
+  private handleMouseClick() {
     const activeGame = this.activeGame;
 
-    const worldPos = this.camera.screenToWorld(
-      mouseX,
-      mouseY,
-      this.canvas.width,
-      this.canvas.height
-    );
-    const hex = pixelToHex(worldPos.x, worldPos.y, HEX_SIZE);
-
-    if (activeGame.inProgress() && this.isValidPlacement(hex)) {
-      activeGame.placeTile(hex);
+    if (activeGame.inProgress() && this.hoveredHex && this.isValidPlacement(this.hoveredHex)) {
+      activeGame.placeTile(this.hoveredHex);
       this.notifyStatsChange();
       this.onTilePlaced?.();
+
+      // Recalculate snap after placement since valid spots have changed
+      this.handleHover(this.lastMouseX, this.lastMouseY);
     }
   }
 

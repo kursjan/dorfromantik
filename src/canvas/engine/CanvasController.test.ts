@@ -137,7 +137,8 @@ describe('CanvasController', () => {
           y: expect.any(Number),
           zoom: expect.any(Number),
         }),
-        hoveredHex: null,
+        // On initialization, it snaps to nearest valid from (0,0)
+        hoveredHex: expect.any(HexCoordinate),
       })
     );
 
@@ -238,7 +239,7 @@ describe('CanvasController', () => {
     expect(hoverSpy).toHaveBeenCalledWith(50, 50);
 
     capturedCallbacks.onClick(50, 50);
-    expect(clickSpy).toHaveBeenCalledWith(50, 50);
+    expect(clickSpy).toHaveBeenCalled();
 
     capturedCallbacks.onRotateClockwise();
     expect(rotateCWSpy).toHaveBeenCalled();
@@ -290,7 +291,9 @@ describe('CanvasController', () => {
       (controller as any).handleHover(100, 100);
       
       // Based on pixelToHex(0, 0)
-      expect((controller as any).hoveredHex).toEqual(new HexCoordinate(0, 0, 0));
+      // Snaps to nearest valid coordinate, which is not (0, 0, 0) because it is occupied
+      expect((controller as any).hoveredHex).not.toEqual(new HexCoordinate(0, 0, 0));
+      expect(activeGame.isValidPlacement((controller as any).hoveredHex)).toBe(true);
     });
 
     it('should handle leave and clear hoveredHex', () => {
@@ -338,17 +341,14 @@ describe('CanvasController', () => {
 
       // Coordinate (1, 0, -1) is adjacent to (0, 0, 0) and likely empty initially
       const targetCoord = new HexCoordinate(1, 0, -1);
-
-      const camera = (controller as any).camera;
-      camera.screenToWorld = vi.fn().mockReturnValue({ x: 100, y: 100 });
       
-      // We need to mock pixelToHex to return our targetCoord
-      vi.mocked(pixelToHex).mockReturnValue(targetCoord);
+      // Set hoveredHex manually for the test
+      (controller as any).hoveredHex = targetCoord;
       
       // Mock isValidPlacement to return true
       vi.spyOn(activeGame, 'isValidPlacement').mockReturnValue(true);
 
-      (controller as any).handleMouseClick(100, 100);
+      (controller as any).handleMouseClick();
 
       expect(placeTileSpy).toHaveBeenCalledWith(targetCoord);
       expect(notifySpy).toHaveBeenCalled();

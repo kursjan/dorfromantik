@@ -13,11 +13,11 @@ Fixes #59
 - [x] **Phase Gate**: Verify all unit tests for the domain logic pass using **project-orchestrator** skill.
 
 ## Phase 2: Controller Integration & Validation
-- [ ] Refactor `CanvasController.ts` `handleHover` method:
+- [x] Refactor `CanvasController.ts` `handleHover` method:
     - Get all valid placement coordinates from the `Board`.
     - Find the coordinate with the minimum `distanceToHexCenter` from the mouse's world position.
     - Set that closest coordinate as `hoveredHex`.
-- [ ] Update `CanvasController.test.ts` to assert the new "nearest valid" hovering behavior using **task-conductor** skill.
+- [x] Update `CanvasController.test.ts` to assert the new "nearest valid" hovering behavior using **task-conductor** skill.
 - [ ] **Phase Gate**: Run E2E tests and perform visual verification of the snapping behavior in the browser using **project-orchestrator** skill.
 
 ## Phase 3: Adversarial Review
