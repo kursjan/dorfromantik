@@ -7,7 +7,7 @@ Implement "magnetic snapping" for the ghost tile preview in Dorfromantik. Instea
 Fixes #59
 
 ## Phase 1: Domain Logic & Mathematics
-- [ ] Create and switch to feature branch `feat/magnetic-snapping` using **task-conductor** skill.
+- [x] Switch to feature branch `worker1` using **task-conductor** skill.
 - [ ] Add `getValidPlacementCoordinates()` method to `Board.ts` that returns all empty coordinates adjacent to at least one placed tile, and write unit tests for it in `Board.test.ts` using **task-conductor** skill.
 - [ ] Add `distanceToHexCenter(hex: HexCoordinate, worldX: number, worldY: number, hexSize: number): number` utility to `HexUtils.ts` and write unit tests in `HexUtils.test.ts` using **task-conductor** skill.
 - [ ] **Phase Gate**: Verify all unit tests for the domain logic pass using **project-orchestrator** skill.
