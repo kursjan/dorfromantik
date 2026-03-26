@@ -42,11 +42,6 @@ export class FirebaseAuthService implements IAuthService {
     await signOut(auth);
   }
 
-  async getCurrentUser(): Promise<AuthUser | null> {
-    const user = auth.currentUser;
-    return user ? toAuthUser(user) : null;
-  }
-
   onAuthStateChanged(callback: (user: AuthUser | null) => void): () => void {
     return onAuthStateChanged(auth, (user) => {
       callback(user ? toAuthUser(user) : null);

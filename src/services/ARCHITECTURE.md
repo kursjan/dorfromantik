@@ -20,7 +20,6 @@ export interface IAuthService {
   signInAnonymously(): Promise<AuthUser>;
   signInWithGoogle(): Promise<AuthUser>;
   signOut(): Promise<void>;
-  getCurrentUser(): Promise<AuthUser | null>;
   onAuthStateChanged(callback: (user: AuthUser | null) => void): () => void;
 }
 ```
@@ -35,8 +34,7 @@ export interface IAuthService {
 ```typescript
 export interface IFirestoreService {
   saveGameState(userId: string, game: Game): Promise<void>;
-  loadGameState(userId: string, gameId: string): Promise<Game | null>;
-  loadAllGames(userId: string): Promise<Game[]>;
+  subscribeToGames(userId: string, callback: (games: Game[]) => void): () => void;
 }
 ```
 

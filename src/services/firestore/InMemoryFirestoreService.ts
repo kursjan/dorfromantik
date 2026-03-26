@@ -37,27 +37,14 @@ export class InMemoryFirestoreService implements IFirestoreService {
     this._notifyListeners(userId);
   }
 
-  async loadGameState(userId: string, gameId: string): Promise<Game | null> {
-    const saved = this.savedGames.get(userId)?.get(gameId);
-    return saved ? GameSerializer.deserialize(saved.gameState) : null;
-  }
-
-  async loadAllGames(userId: string): Promise<Game[]> {
-    const userGames = this.savedGames.get(userId);
-    if (!userGames) return [];
-    return Array.from(userGames.values()).map(d =>
-      GameSerializer.deserialize(d.gameState)
-    );
-  }
-
   subscribeToGames(userId: string, callback: (games: Game[]) => void): () => void {
     if (!this.listeners.has(userId)) {
       this.listeners.set(userId, new Set());
     }
     this.listeners.get(userId)!.add(callback);
 
-    // Initial call with current data
-    this.loadAllGames(userId).then(callback);
+    // Initial call with current data (async to mirror Firestore snapshot timing)
+    Promise.resolve().then(() => callback(this.getGamesSnapshot(userId)));
 
     return () => {
       this.listeners.get(userId)?.delete(callback);
@@ -67,11 +54,19 @@ export class InMemoryFirestoreService implements IFirestoreService {
     };
   }
 
-  private async _notifyListeners(userId: string): Promise<void> {
+  private getGamesSnapshot(userId: string): Game[] {
+    const userGames = this.savedGames.get(userId);
+    if (!userGames) return [];
+    return Array.from(userGames.values()).map(d =>
+      GameSerializer.deserialize(d.gameState)
+    );
+  }
+
+  private _notifyListeners(userId: string): void {
     const userListeners = this.listeners.get(userId);
     if (!userListeners) return;
 
-    const games = await this.loadAllGames(userId);
+    const games = this.getGamesSnapshot(userId);
     userListeners.forEach(callback => callback(games));
   }
 

@@ -38,10 +38,6 @@ export class InMemoryAuthService implements IAuthService {
     notifyListeners();
   }
 
-  async getCurrentUser(): Promise<AuthUser | null> {
-    return mockUser ?? null;
-  }
-
   onAuthStateChanged(callback: (user: AuthUser | null) => void): () => void {
     authListeners.push(callback);
     // Trigger immediately like Firebase does

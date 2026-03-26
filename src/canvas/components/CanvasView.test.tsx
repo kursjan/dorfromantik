@@ -12,10 +12,16 @@ import { InMemoryAuthService } from '../../services/auth/InMemoryAuthService';
 import { InMemoryFirestoreService } from '../../services/firestore/InMemoryFirestoreService';
 
 vi.mock('../engine/CanvasController', () => {
+  const mockSnapshot = {
+    fps: 0,
+    camera: { x: 0, y: 0, zoom: 1, rotation: 0 },
+    hoveredHex: null,
+  };
   const MockController = vi.fn();
   MockController.prototype.destroy = vi.fn();
   MockController.prototype.resetCamera = vi.fn();
-  MockController.prototype.addDebugStatsListener = vi.fn(() => vi.fn());
+  MockController.prototype.subscribeDebug = vi.fn(() => vi.fn());
+  MockController.prototype.getDebugSnapshot = vi.fn(() => mockSnapshot);
   return {
     CanvasController: MockController,
   };

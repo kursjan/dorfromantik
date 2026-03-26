@@ -23,9 +23,15 @@ describe('InMemoryAuthService (Fake Implementation)', () => {
 
   it('signs out and clears current user', async () => {
     await inMemoryAuthService.signInAnonymously();
+    
+    let observedUser: any = undefined;
+    const unsubscribe = inMemoryAuthService.onAuthStateChanged((user) => {
+      observedUser = user;
+    });
+    
     await inMemoryAuthService.signOut();
-    const user = await inMemoryAuthService.getCurrentUser();
-    expect(user).toBeNull();
+    expect(observedUser).toBeNull();
+    unsubscribe();
   });
 
   it('invokes auth state listener with current user', async () => {
@@ -37,11 +43,5 @@ describe('InMemoryAuthService (Fake Implementation)', () => {
     unsubscribe();
 
     expect(callback).toHaveBeenCalledWith(expect.objectContaining({ uid: 'mock-anon-123' }));
-  });
-
-  it('returns current user when logged in', async () => {
-    await inMemoryAuthService.signInAnonymously();
-    const user = await inMemoryAuthService.getCurrentUser();
-    expect(user?.uid).toBe('mock-anon-123');
   });
 });

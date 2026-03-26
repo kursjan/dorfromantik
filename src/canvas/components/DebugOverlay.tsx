@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import type { DebugStats } from '../engine/CanvasController';
+import React from 'react';
 import { CanvasController } from '../engine/CanvasController';
+import { useCanvasControllerDebugStats } from '../hooks/useCanvasControllerDebugStats';
 import './DebugOverlay.css';
 
 interface DebugOverlayProps {
@@ -10,21 +10,18 @@ interface DebugOverlayProps {
 }
 
 export const DebugOverlay: React.FC<DebugOverlayProps> = ({ controller, isVisible }) => {
-  const [stats, setStats] = useState<DebugStats | null>(null);
-
-  useEffect(() => {
-    const unsubscribe = controller.addDebugStatsListener((newStats: DebugStats) => {
-      setStats(newStats);
-    });
-
-    return () => unsubscribe();
-  }, [controller]);
+  const stats = useCanvasControllerDebugStats(controller);
 
   if (!isVisible || !stats) {
     return null;
   }
 
   const { fps, camera, hoveredHex } = stats;
+  // Don't render if it's the initial empty snapshot
+  if (fps === 0 && camera.zoom === 1 && hoveredHex === null && camera.x === 0 && camera.y === 0) {
+    return null;
+  }
+
   const rotationDeg = ((camera.rotation * 180) / Math.PI).toFixed(0);
 
   return (

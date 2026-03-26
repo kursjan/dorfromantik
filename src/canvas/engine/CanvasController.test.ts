@@ -62,7 +62,7 @@ describe('CanvasController', () => {
   it('should initialize successfully', () => {
     controller = new CanvasController(canvas, activeGame);
     expect((controller as any).ctx).toBeDefined();
-    expect((controller as any).renderer).toBeInstanceOf(HexRenderer);
+    expect((controller as any).hexRenderer).toBeInstanceOf(HexRenderer);
     expect((controller as any).tileRenderer).toBeInstanceOf(TileRenderer);
     // expect((controller as any).debugRenderer).toBeInstanceOf(DebugRenderer);
     expect((controller as any).backgroundRenderer).toBeInstanceOf(BackgroundRenderer);
@@ -77,8 +77,8 @@ describe('CanvasController', () => {
     controller = new CanvasController(canvas, activeGame);
 
     expect(requestAnimationFrameSpy).toHaveBeenCalled();
-    const renderer = (controller as any).renderer as any;
-    expect(renderer.drawDebugGrid).toHaveBeenCalled();
+    const hexRenderer = (controller as any).hexRenderer as any;
+    expect(hexRenderer.drawDebugGrid).toHaveBeenCalled();
     // Debug overlay is now handled by React
     // expect(debugRenderer.drawOverlay).toHaveBeenCalled();
 
@@ -121,7 +121,7 @@ describe('CanvasController', () => {
 
     controller = new CanvasController(canvas, activeGame);
     const callback = vi.fn();
-    controller.addDebugStatsListener(callback);
+    controller.subscribeDebug(callback);
 
     // Advance time to ensure now - lastDebugUpdateTime > 500
     vi.advanceTimersByTime(1000);
@@ -129,7 +129,7 @@ describe('CanvasController', () => {
     // First render - should notify
     (controller as any).render();
     expect(callback).toHaveBeenCalledTimes(1);
-    expect(callback).toHaveBeenCalledWith(
+    expect(controller.getDebugSnapshot()).toEqual(
       expect.objectContaining({
         fps: expect.any(Number),
         camera: expect.objectContaining({
@@ -165,11 +165,11 @@ describe('CanvasController', () => {
   it('should allow removing debug stats listener', () => {
     controller = new CanvasController(canvas, activeGame);
     const callback = vi.fn();
-    const removeListener = controller.addDebugStatsListener(callback);
+    const removeListener = controller.subscribeDebug(callback);
     
-    expect((controller as any).onDebugStatsChange).toBe(callback);
+    expect((controller as any).debugState.listeners.has(callback)).toBe(true);
     removeListener();
-    expect((controller as any).onDebugStatsChange).toBeUndefined();
+    expect((controller as any).debugState.listeners.has(callback)).toBe(false);
   });
 
   it('should throw error in render if active game is missing', () => {
@@ -200,7 +200,7 @@ describe('CanvasController', () => {
     // Simulate continuous rotation input (clockwise)
     inputManager.getRotationDirection.mockReturnValue(1);
     
-    (controller as any).update();
+    (controller as any).processContinuousInput();
     
     expect(camera.rotateBy).toHaveBeenCalledWith(0.05);
   });
