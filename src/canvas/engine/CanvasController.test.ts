@@ -137,8 +137,7 @@ describe('CanvasController', () => {
           y: expect.any(Number),
           zoom: expect.any(Number),
         }),
-        // On initialization, it snaps to nearest valid from (0,0)
-        hoveredHex: expect.any(HexCoordinate),
+        hoveredHex: null,
       })
     );
 
