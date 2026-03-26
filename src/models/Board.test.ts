@@ -74,4 +74,31 @@ describe('Board', () => {
     expect(Object.keys(neighbors).length).toBe(1);
     expect(neighbors.north?.coordinate.getKey()).toBe(neighborCoord.getKey());
   });
+
+  it('should return all valid placement coordinates around placed tiles', () => {
+    board.place(tile, coord); // (0,0,0)
+    const validCoords = board.getValidPlacementCoordinates();
+
+    // 6 neighbors of (0,0,0) should be valid
+    expect(validCoords.length).toBe(6);
+
+    const neighborKeys = new Set(validCoords.map((c) => c.getKey()));
+    expect(neighborKeys.has('0,1,-1')).toBe(true); // North (Actually North in this system is (-1, 0, 1)? Let's check Navigation)
+  });
+
+  it('should return unique placement coordinates when multiple tiles are placed', () => {
+    const coord2 = new HexCoordinate(1, -1, 0); // One neighbor of origin
+    board.place(tile, coord);
+    board.place(tile, coord2);
+
+    const validCoords = board.getValidPlacementCoordinates();
+    
+    // Origin has 6 neighbors. Neighbor (1,-1,0) is occupied.
+    // So 5 neighbors from origin + neighbors of (1,-1,0) that are not origin or occupied.
+    // Neighbors of (0,0,0): (0,1,-1), (1,0,-1), (1,-1,0) [OCCUPIED], (0,-1,1), (-1,0,1), (-1,1,0)
+    // Neighbors of (1,-1,0): (1,0,-1), (2,-1,-1), (2,-2,0), (1,-2,1), (0,-1,1), (0,0,0) [OCCUPIED]
+    // Unique valid: (0,1,-1), (1,0,-1), (0,-1,1), (-1,0,1), (-1,1,0), (2,-1,-1), (2,-2,0), (1,-2,1)
+    // Total 8
+    expect(validCoords.length).toBe(8);
+  });
 });

@@ -13,6 +13,13 @@ export function hexToPixel(hex: HexCoordinate, size: number): { x: number; y: nu
   return { x, y };
 }
 
+export function distanceToHexCenter(hex: HexCoordinate, worldX: number, worldY: number, hexSize: number): number {
+  const center = hexToPixel(hex, hexSize);
+  const dx = center.x - worldX;
+  const dy = center.y - worldY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
 export function pixelToHex(x: number, y: number, size: number): HexCoordinate {
   // Inverse flat-topped hex conversion
   // Adjusted for user coordinate system where (-1, 0, 1) is North.
