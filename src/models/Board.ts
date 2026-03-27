@@ -34,11 +34,15 @@ export class Board {
   }
 
   getValidPlacementCoordinates(): HexCoordinate[] {
-    return Array.from(new Map(
-        Array.from(this.tiles.values())
-          .flatMap((tile) => this.getValidNeighborsOf(tile))
-          .map((coord) => [coord.getKey(), coord])
-      ).values());
+    const uniqueCoords = new Map<string, HexCoordinate>();
+
+    for (const tile of this.tiles.values()) {
+      for (const coord of this.getValidNeighborsOf(tile)) {
+        uniqueCoords.set(coord.getKey(), coord);
+      }
+    }
+
+    return Array.from(uniqueCoords.values());
   }
 
   private getValidNeighborsOf(boardTile: BoardTile): HexCoordinate[] {
