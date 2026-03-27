@@ -55,7 +55,7 @@ export class Game {
   lastPlayed: string;
   score: number;
   tileQueue: Tile[];
-  hints: GameHints | null = null;
+  hints: GameHints;
 
   private scorer: GameScorer;
 
@@ -75,28 +75,11 @@ export class Game {
     this.score = props.score ?? 0;
     this.scorer = new GameScorer(this.rules);
     this.tileQueue = props.tileQueue ?? [];
+    this.hints = new GameHints(this.board, this.peek() || null);
 
     if (this.score < 0) {
       throw new Error('score must be non-negative');
     }
-    this.updateHints();
-  }
-
-  private updateHints(): void {
-    const currentTile = this.peek();
-    if (currentTile) {
-      if (this.hints) {
-        this.hints.updateState(this.board, currentTile);
-      } else {
-        this.hints = new GameHints(this.board, currentTile);
-      }
-    } else {
-      this.hints = null;
-    }
-  }
-
-  inProgress(): boolean {
-    return this.remainingTurns > 0;
   }
 
   /**
@@ -104,6 +87,10 @@ export class Game {
    */
   get remainingTurns(): number {
     return this.tileQueue.length;
+  }
+
+  inProgress(): boolean {
+    return this.remainingTurns > 0;
   }
 
   /**
@@ -182,5 +169,9 @@ export class Game {
     this.lastPlayed = new Date().toISOString();
     this.updateHints();
     return { scoreAdded, perfectCount };
+  }
+
+  private updateHints(): void {
+    this.hints = new GameHints(this.board, this.peek() || null);
   }
 }

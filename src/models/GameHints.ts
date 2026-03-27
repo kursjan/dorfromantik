@@ -3,47 +3,24 @@ import { HexCoordinate } from './HexCoordinate';
 import { Tile } from './Tile';
 
 /**
- * GameHints encapsulates memoized computations based on the current game state.
- * It provides performance-optimized hints (like valid placement coordinates)
- * that would otherwise be expensive to compute on the fly (e.g., during 60FPS render loops).
+ * GameHints encapsulates pre-computed calculations based on the current game state.
+ * It is an immutable data structure; a new instance is created whenever the game state changes.
  */
 export class GameHints {
-  private board: Board;
-  public currentTile: Tile;
+  public readonly board: Board;
+  public readonly currentTile: Tile | null;
+  public readonly validPlacements: readonly HexCoordinate[];
 
-  // Caches
-  private _validPlacements: HexCoordinate[] | null = null;
-
-  constructor(board: Board, currentTile: Tile) {
+  constructor(board: Board, currentTile: Tile | null) {
     this.board = board;
     this.currentTile = currentTile;
+    this.validPlacements = Object.freeze(this.computeValidPlacements());
   }
 
-  /**
-   * Returns a cached array of all valid empty coordinates adjacent to existing tiles.
-   * If the cache is empty, it computes the coordinates using the board.
-   */
-  get validPlacements(): HexCoordinate[] {
-    if (this._validPlacements === null) {
-      this._validPlacements = this.board.getValidPlacementCoordinates();
+  private computeValidPlacements(): HexCoordinate[] {
+    if (this.currentTile === null) {
+      return [];
     }
-    return this._validPlacements;
-  }
-
-  /**
-   * Invalidates the caches.
-   * This MUST be called whenever the game state (board or current queued tile) changes.
-   */
-  invalidate() {
-    this._validPlacements = null;
-  }
-
-  /**
-   * Updates the internal references and invalidates caches.
-   */
-  updateState(board: Board, currentTile: Tile) {
-    this.board = board;
-    this.currentTile = currentTile;
-    this.invalidate();
+    return this.board.getValidPlacementCoordinates();
   }
 }
