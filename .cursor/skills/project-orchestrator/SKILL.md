@@ -73,6 +73,30 @@ Use this skill when **transitioning between phases** or **finalizing a Conductor
      - The branch name.
      - The PR link (if any).
      - A brief summary of what the phase accomplished.
+   - Include a ready-to-send sync request so the user does not need to write it manually. Use this template and fill placeholders:
+
+     ```text
+     Please sync and review Phase <PHASE_NUMBER> for track <TRACK_ID>.
+     Branch: <BRANCH_NAME>
+     PR: <PR_URL_OR_NONE>
+     Checkpoint: <CHECKPOINT_SHA>
+
+     What changed:
+     - <BULLET_1>
+     - <BULLET_2>
+     - <BULLET_3>
+
+     Verification run:
+     - npm run test:ci: <PASS_OR_FAIL>
+     - npm run test:e2e:ci: <PASS_OR_FAIL>
+
+     Manual test focus:
+     - <MANUAL_TEST_ITEM_1>
+     - <MANUAL_TEST_ITEM_2>
+
+     Please comment "approved" or list requested changes.
+     ```
+
    - End the response with:
      - `STATUS: PHASE_COMPLETED_WAITING_FOR_REVIEW`
 
@@ -96,6 +120,26 @@ Use this once **all phases** in a track are complete.
 
 4. **Handover**
    - Once everything is synchronized and the PR is ready for review, clearly state that the track is ready for review and that no further changes will be made without user request.
+   - Include a ready-to-send track sync request so the user does not need to write one manually:
+
+     ```text
+     Please sync and review completed track <TRACK_ID>.
+     Branch: <BRANCH_NAME>
+     PR: <PR_URL>
+     Final checkpoint: <CHECKPOINT_SHA>
+
+     Track outcomes:
+     - <OUTCOME_1>
+     - <OUTCOME_2>
+     - <OUTCOME_3>
+
+     Final verification:
+     - npm run test:ci: <PASS_OR_FAIL>
+     - npm run test:e2e:ci: <PASS_OR_FAIL>
+
+     Please review in Reviewable/GitHub and share final approval.
+     ```
+
    - You may use a marker like:
      - `TRACK_COMPLETED: Ready for review`
 
@@ -115,4 +159,3 @@ Use this once **all phases** in a track are complete.
   - Documentation,
   - Verification,
   - Checkpoints and PR readiness.
-

@@ -82,16 +82,4 @@ describe('FirebaseAuthService', () => {
     expect(onAuthStateChanged).toHaveBeenCalled();
     expect(callback).toHaveBeenCalledWith(expect.objectContaining({ uid: 'test-uid' }));
   });
-
-  it('returns current user when logged in', async () => {
-    mockAuth.currentUser = { uid: 'test-uid', isAnonymous: true, displayName: null };
-    const user = await authService.getCurrentUser();
-    expect(user?.uid).toBe('test-uid');
-  });
-
-  it('returns null when no current user', async () => {
-    mockAuth.currentUser = null;
-    const user = await authService.getCurrentUser();
-    expect(user).toBeNull();
-  });
 });

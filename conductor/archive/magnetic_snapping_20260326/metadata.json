@@ -1,0 +1,8 @@
+{
+  "id": "magnetic-snapping",
+  "title": "Magnetic Snapping (Nearest Valid Hex)",
+  "description": "Implement magnetic snapping for the ghost tile preview so it snaps to the nearest valid placement spot.",
+  "status": "planned",
+  "issue": "#59",
+  "created_at": "2026-03-25"
+}

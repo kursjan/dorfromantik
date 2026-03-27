@@ -36,3 +36,6 @@ This file tracks all major tracks for the project. Each track has its own detail
   *Link: [./archive/service_di_refactor_20260309/](./archive/service_di_refactor_20260309/)*
 - [x] **Track: Session Context Lean Refactor**
   *Link: [./archive/session_context_refactor_20260321/](./archive/session_context_refactor_20260321/)*
+- [x] **Track: Magnetic Snapping (Nearest Valid Hex) (#59)**
+  *Link: [./archive/magnetic_snapping_20260326/](./archive/magnetic_snapping_20260326/)*
+

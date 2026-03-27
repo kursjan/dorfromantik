@@ -4,7 +4,7 @@ import { HexRenderer } from '../graphics/HexRenderer';
 import { TileRenderer } from '../graphics/TileRenderer';
 import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexCoordinate } from '../../models/HexCoordinate';
-import { pixelToHex } from '../utils/HexUtils';
+import { distanceToHex } from '../utils/HexUtils';
 import { HEX_SIZE, DEFAULT_HEX_STYLE, VALID_PREVIEW_STYLE, INVALID_PREVIEW_STYLE } from '../graphics/HexStyles';
 import { Tile } from '../../models/Tile';
 import { Game } from '../../models/Game';
@@ -15,32 +15,36 @@ export interface DebugStats {
   hoveredHex: HexCoordinate | null;
 }
 
+interface DebugState {
+  fps: number;
+  lastDebugUpdateTime: number;
+  lastLoopTime: number;
+  listeners: Set<() => void>;
+  snapshot: DebugStats;
+}
+
 export class CanvasController {
-  private static readonly ZOOM_SENSITIVITY = 0.001;
-  private static readonly ROTATION_SPEED = 0.05;
   private static readonly MIN_ZOOM = 0.5;
   private static readonly MAX_ZOOM = 3.0;
+  private static readonly ROTATION_SPEED = 0.05;
+  private static readonly ZOOM_SENSITIVITY = 0.001;
 
-  private readonly canvas: HTMLCanvasElement;
-  private readonly ctx: CanvasRenderingContext2D;
-  private readonly camera: Camera;
-  private readonly renderer: HexRenderer;
-  private readonly tileRenderer: TileRenderer;
-  private readonly backgroundRenderer: BackgroundRenderer;
-  private readonly inputManager: InputManager;
   private readonly activeGame: Game;
+  private readonly backgroundRenderer: BackgroundRenderer;
+  private readonly canvas: HTMLCanvasElement;
+  private readonly camera: Camera;
+  private readonly ctx: CanvasRenderingContext2D;
+  private readonly inputManager: InputManager;
+  private readonly hexRenderer: HexRenderer;
+  private readonly tileRenderer: TileRenderer;
+
+  private animationFrameId: number = 0;
+  private debugState: DebugState = CanvasController.createDefaultDebugState();
+  private hoveredHex: HexCoordinate | null = null;
 
   // Callbacks for React synchronization
   public onStatsChange?: (score: number, remainingTurns: number, nextTile: Tile | null) => void;
   public onTilePlaced?: () => void;
-  private onDebugStatsChange?: (stats: DebugStats) => void;
-
-  // State
-  private animationFrameId: number = 0;
-  private hoveredHex: HexCoordinate | null = null;
-  private lastLoopTime: number = performance.now();
-  private fps: number = 0;
-  private lastDebugUpdateTime: number = 0;
 
   constructor(canvas: HTMLCanvasElement, activeGame: Game, options?: { onToggleDebugOverlay?: () => void }) {
     this.canvas = canvas;
@@ -51,16 +55,16 @@ export class CanvasController {
 
     this.camera = new Camera({ x: 0, y: 0, zoom: 1 });
     this.backgroundRenderer = new BackgroundRenderer(ctx);
-    this.renderer = new HexRenderer(ctx);
+    this.hexRenderer = new HexRenderer(ctx);
     this.tileRenderer = new TileRenderer(ctx);
     this.inputManager = new InputManager(canvas, {
-      onPan: (dx, dy) => this.camera.pan(dx, dy),
+      onPan: (dx, dy) => this.handlePan(dx, dy),
       onZoom: (delta) => this.handleZoom(delta),
       onHover: (x, y) => this.handleHover(x, y),
-      onClick: (x, y) => this.handleMouseClick(x, y),
+      onLeave: () => this.handleLeave(),
+      onClick: () => this.handleMouseClick(),
       onRotateClockwise: () => this.handleRotateClockwise(),
       onRotateCounterClockwise: () => this.handleRotateCounterClockwise(),
-      onLeave: () => this.handleLeave(),
       onResize: () => this.handleResize(),
       onToggleDebugOverlay: options?.onToggleDebugOverlay,
     });
@@ -85,40 +89,34 @@ export class CanvasController {
     this.camera.reset();
   }
 
-
-  /**
-   * Registers a one-shot listener for debug stats updates.
-   * The callback will be notified until the returned unsubscribe function is called.
-   * Only one debug stats listener can be registered at a time; later registrations overwrite earlier ones.
-   * 
-   * @param callback - Function to call when debug stats are updated.
-   * @returns Unsubscribe function to remove the listener.
-   */
-  public addDebugStatsListener(callback: (stats: DebugStats) => void): () => void {
-    this.onDebugStatsChange = callback;
-    // Unsubscribe function
+  public subscribeDebug(listener: () => void): () => void {
+    this.debugState.listeners.add(listener);
     return () => {
-      if (this.onDebugStatsChange === callback) {
-        this.onDebugStatsChange = undefined;
-      }
+      this.debugState.listeners.delete(listener);
     };
   }
 
-  private loop() {
-    const now = performance.now();
-    const deltaTime = now - this.lastLoopTime;
-    this.lastLoopTime = now;
-    if (deltaTime > 0) {
-      this.fps = 1000 / deltaTime;
-    }
+  public getDebugSnapshot(): DebugStats {
+    return this.debugState.snapshot;
+  }
 
-    this.update();
+  private loop() {
+    this.updateFps();
+    this.processContinuousInput();
     this.render();
     this.animationFrameId = requestAnimationFrame(() => this.loop());
   }
 
-  private update() {
-    // 1. Handle Continuous Rotation Input
+  private updateFps() {
+    const now = performance.now();
+    const deltaTime = now - this.debugState.lastLoopTime;
+    this.debugState.lastLoopTime = now;
+    if (deltaTime > 0) {
+      this.debugState.fps = 1000 / deltaTime;
+    }
+  }
+
+  private processContinuousInput() {
     const rotationDir = this.inputManager.getRotationDirection();
     if (rotationDir !== 0) {
       this.camera.rotateBy(rotationDir * CanvasController.ROTATION_SPEED);
@@ -140,7 +138,7 @@ export class CanvasController {
 
     // 3. Draw World
     // Draw base grid (debug)
-    this.renderer.drawDebugGrid(5);
+    this.hexRenderer.drawDebugGrid(5);
 
     // Draw placed tiles from the board
     for (const boardTile of activeGame.board.getAll()) {
@@ -156,25 +154,29 @@ export class CanvasController {
     }
 
     // Draw highlight for current mouse position
-    this.renderer.drawHighlight(this.hoveredHex);
+    this.hexRenderer.drawHighlight(this.hoveredHex);
 
     this.ctx.restore();
+    this.publishDebugSnapshot();
+  }
 
-    // 6. Push Debug Stats to React (throttled)
+  private publishDebugSnapshot() {
     const now = performance.now();
-    if (this.onDebugStatsChange && now - this.lastDebugUpdateTime > 500) {
-      this.onDebugStatsChange({
-        fps: Math.round(this.fps),
-        camera: {
-          x: this.camera.x,
-          y: this.camera.y,
-          zoom: this.camera.zoom,
-          rotation: this.camera.rotation,
-        },
-        hoveredHex: this.hoveredHex,
-      });
-      this.lastDebugUpdateTime = now;
+    if (this.debugState.listeners.size === 0 || now - this.debugState.lastDebugUpdateTime <= 500) {
+      return;
     }
+    this.debugState.snapshot = {
+      fps: Math.round(this.debugState.fps),
+      camera: {
+        x: this.camera.x,
+        y: this.camera.y,
+        zoom: this.camera.zoom,
+        rotation: this.camera.rotation,
+      },
+      hoveredHex: this.hoveredHex,
+    };
+    this.debugState.lastDebugUpdateTime = now;
+    this.debugState.listeners.forEach((listener) => listener());
   }
 
   private notifyStatsChange() {
@@ -186,23 +188,49 @@ export class CanvasController {
 
   // --- Input Handlers ---
 
-  private isValidPlacement(coord: HexCoordinate): boolean {
-    return this.activeGame.isValidPlacement(coord);
+  private handlePan(dx: number, dy: number) {
+    this.camera.pan(dx, dy);
   }
 
-  private handleMouseClick(mouseX: number, mouseY: number) {
-    const activeGame = this.activeGame;
+  private handleZoom(delta: number) {
+    this.camera.zoomBy(
+      -delta * CanvasController.ZOOM_SENSITIVITY,
+      CanvasController.MIN_ZOOM,
+      CanvasController.MAX_ZOOM
+    );
+  }
 
+  private handleHover(mouseX: number, mouseY: number) {
     const worldPos = this.camera.screenToWorld(
       mouseX,
       mouseY,
       this.canvas.width,
       this.canvas.height
     );
-    const hex = pixelToHex(worldPos.x, worldPos.y, HEX_SIZE);
 
-    if (activeGame.inProgress() && this.isValidPlacement(hex)) {
-      activeGame.placeTile(hex);
+    const validCoords = this.activeGame.board.getValidPlacementCoordinates();
+
+    if (validCoords.length === 0) {
+      this.hoveredHex = null;
+      return;
+    }
+
+    this.hoveredHex = CanvasController.findClosestHexCoordinate(
+      validCoords,
+      worldPos.x,
+      worldPos.y
+    );
+  }
+
+  private handleLeave() {
+    this.hoveredHex = null;
+  }
+
+  private handleMouseClick() {
+    const activeGame = this.activeGame;
+
+    if (activeGame.inProgress() && this.hoveredHex && this.isValidPlacement(this.hoveredHex)) {
+      activeGame.placeTile(this.hoveredHex);
       this.notifyStatsChange();
       this.onTilePlaced?.();
     }
@@ -225,29 +253,29 @@ export class CanvasController {
     }
   }
 
-  private handleZoom(delta: number) {
-    this.camera.zoomBy(
-      -delta * CanvasController.ZOOM_SENSITIVITY,
-      CanvasController.MIN_ZOOM,
-      CanvasController.MAX_ZOOM
-    );
+  // --- Helpers ---
+
+  private isValidPlacement(coord: HexCoordinate): boolean {
+    return this.activeGame.isValidPlacement(coord);
   }
 
-  private handleHover(mouseX: number, mouseY: number) {
-    const worldPos = this.camera.screenToWorld(
-      mouseX,
-      mouseY,
-      this.canvas.width,
-      this.canvas.height
-    );
-    const hex = pixelToHex(worldPos.x, worldPos.y, HEX_SIZE);
-
-    if (!this.hoveredHex || !this.hoveredHex.equals(hex)) {
-      this.hoveredHex = hex;
-    }
+  private static createDefaultDebugState(): DebugState {
+    return {
+      fps: 0,
+      lastDebugUpdateTime: 0,
+      lastLoopTime: performance.now(),
+      listeners: new Set<() => void>(),
+      snapshot: {
+        fps: 0,
+        camera: { x: 0, y: 0, zoom: 1, rotation: 0 },
+        hoveredHex: null,
+      },
+    };
   }
 
-  private handleLeave() {
-    this.hoveredHex = null;
+  private static findClosestHexCoordinate(validCoords: HexCoordinate[], x: number, y: number): HexCoordinate {
+    return validCoords
+      .map((coord) => ({ coord, dist: distanceToHex(coord, x, y, HEX_SIZE) }))
+      .sort((a, b) => a.dist - b.dist)[0].coord;
   }
 }
