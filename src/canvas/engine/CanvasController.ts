@@ -146,11 +146,9 @@ export class CanvasController {
     }
 
     // Draw valid placement highlights
-    if (activeGame.inProgress()) {
       for (const coord of activeGame.board.getValidPlacementCoordinates()) {
         this.hexRenderer.drawHex(coord, VALID_PLACEMENT_STYLE);
       }
-    }
 
     // 4. Ghost Preview
     if (activeGame.inProgress() && this.hoveredHex) {
