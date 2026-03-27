@@ -5,7 +5,7 @@ import { TileRenderer } from '../graphics/TileRenderer';
 import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { distanceToHex } from '../utils/HexUtils';
-import { HEX_SIZE, DEFAULT_HEX_STYLE, VALID_PREVIEW_STYLE, INVALID_PREVIEW_STYLE } from '../graphics/HexStyles';
+import { HEX_SIZE, DEFAULT_HEX_STYLE, VALID_PREVIEW_STYLE, INVALID_PREVIEW_STYLE, VALID_PLACEMENT_STYLE } from '../graphics/HexStyles';
 import { Tile } from '../../models/Tile';
 import { Game } from '../../models/Game';
 
@@ -143,6 +143,13 @@ export class CanvasController {
     // Draw placed tiles from the board
     for (const boardTile of activeGame.board.getAll()) {
       this.tileRenderer.drawTileAtHex(boardTile.tile, boardTile.coordinate, DEFAULT_HEX_STYLE);
+    }
+
+    // Draw valid placement highlights
+    if (activeGame.inProgress()) {
+      for (const coord of activeGame.board.getValidPlacementCoordinates()) {
+        this.hexRenderer.drawHex(coord, VALID_PLACEMENT_STYLE);
+      }
     }
 
     // 4. Ghost Preview
