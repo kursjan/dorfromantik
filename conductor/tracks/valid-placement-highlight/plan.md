@@ -11,7 +11,7 @@
 - [x] **Final Track Gate**: Final verification and Git commit using **project-orchestrator** skill.
 
 ## Phase 3: GameHints Architecture
-- [ ] Implement `src/models/GameHints.ts` and write exhaustive tests in `GameHints.test.ts` using **task-conductor** skill.
+- [x] Implement `src/models/GameHints.ts` and write exhaustive tests in `GameHints.test.ts` using **task-conductor** skill.
 - [ ] Integrate `GameHints` into `src/models/Game.ts`. Ensure the cache is invalidated on `placeTile` and tile rotation using **task-conductor** skill.
 - [ ] Restore `VALID_PLACEMENT_STYLE` in `HexStyles.ts` and update `CanvasController.ts` to consume `activeGame.hints.validPlacements` for rendering and hovering using **task-conductor** skill.
 - [ ] **Phase Gate**: Verify the new architecture and run all unit tests using **project-orchestrator** skill.
