@@ -39,4 +39,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: Magnetic Snapping (Nearest Valid Hex) (#59)**
   *Link: [./archive/magnetic_snapping_20260326/](./archive/magnetic_snapping_20260326/)*
 
-- [Highlight Valid Placement Coordinates](tracks/valid-placement-highlight/)
+- [~] [Highlight Valid Placement Coordinates](tracks/valid-placement-highlight/)
