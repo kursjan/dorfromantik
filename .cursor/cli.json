@@ -13,6 +13,7 @@
       "Shell(npm)",
       "Shell(npx)",
       "Shell(pwd)",
+      "Shell(sed)",
       "Shell(tail)",
       "Shell(tsc)"
     ],
