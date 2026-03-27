@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { hexToPixel, pixelToHex, getHexCorners, distanceToHexCenter } from './HexUtils';
+import { hexToPixel, pixelToHex, getHexCorners, distanceToHex } from './HexUtils';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { north, northEast, southEast, south, southWest, northWest } from '../../models/Navigation';
 
@@ -8,16 +8,16 @@ describe('HexUtils', () => {
   const HEX_SIZE = 40;
   const SQRT3 = Math.sqrt(3);
 
-  describe('distanceToHexCenter', () => {
+  describe('distanceToHex', () => {
     it('returns 0 when point is exactly at hex center', () => {
       const { x, y } = hexToPixel(center, HEX_SIZE);
-      const dist = distanceToHexCenter(center, x, y, HEX_SIZE);
+      const dist = distanceToHex(center, x, y, HEX_SIZE);
       expect(dist).toBeCloseTo(0);
     });
 
     it('returns correct distance for a point offset from center', () => {
       const { x, y } = hexToPixel(center, HEX_SIZE);
-      const dist = distanceToHexCenter(center, x + 30, y + 40, HEX_SIZE);
+      const dist = distanceToHex(center, x + 30, y + 40, HEX_SIZE);
       expect(dist).toBeCloseTo(50); // 3-4-5 triangle
     });
 
@@ -25,10 +25,10 @@ describe('HexUtils', () => {
       const neighbor = north(center);
       const neighborPixel = hexToPixel(neighbor, HEX_SIZE);
       
-      const dist = distanceToHexCenter(neighbor, neighborPixel.x, neighborPixel.y, HEX_SIZE);
+      const dist = distanceToHex(neighbor, neighborPixel.x, neighborPixel.y, HEX_SIZE);
       expect(dist).toBeCloseTo(0);
       
-      const distToCenter = distanceToHexCenter(center, neighborPixel.x, neighborPixel.y, HEX_SIZE);
+      const distToCenter = distanceToHex(center, neighborPixel.x, neighborPixel.y, HEX_SIZE);
       expect(distToCenter).toBeCloseTo(HEX_SIZE * SQRT3);
     });
   });

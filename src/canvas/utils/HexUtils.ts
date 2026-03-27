@@ -13,7 +13,7 @@ export function hexToPixel(hex: HexCoordinate, size: number): { x: number; y: nu
   return { x, y };
 }
 
-export function distanceToHexCenter(hex: HexCoordinate, worldX: number, worldY: number, hexSize: number): number {
+export function distanceToHex(hex: HexCoordinate, worldX: number, worldY: number, hexSize: number): number {
   const center = hexToPixel(hex, hexSize);
   const dx = center.x - worldX;
   const dy = center.y - worldY;
