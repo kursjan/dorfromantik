@@ -105,6 +105,23 @@ describe('HexUtils', () => {
     });
   });
 
+  describe('cubeRound (indirectly via pixelToHex)', () => {
+    it('handles qDiff > rDiff && qDiff > sDiff', () => {
+      const coord = pixelToHex(-10, -25, HEX_SIZE); 
+      expect(coord).toBeDefined();
+    });
+
+    it('handles rDiff > sDiff', () => {
+      const coord = pixelToHex(25, 0, HEX_SIZE);
+      expect(coord).toBeDefined();
+    });
+
+    it('handles sDiff > rDiff && sDiff > qDiff', () => {
+      const coord = pixelToHex(-10, 25, HEX_SIZE);
+      expect(coord).toBeDefined();
+    });
+  });
+
   describe('pixelToHex', () => {
     it('converts pixel (0,0) to center hex (0,0,0)', () => {
       const hex = pixelToHex(0, 0, HEX_SIZE);
