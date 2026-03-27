@@ -115,6 +115,9 @@ Use this once **all phases** in a track are complete.
 
 3. **PR Creation / Finalization**
    - Ensure there is a PR for the track branch and that it includes all changes.
+   - For final review handoff, the PR must be **ready for review** (not Draft):
+     - If no PR exists, create a non-draft PR.
+     - If a Draft PR exists, publish it before handoff (e.g. `gh pr ready`).
    - Present the PR link to the user.
    - Do **not** merge the PR yourself; the user is responsible for final review and merge.
 

@@ -64,6 +64,9 @@ description: Use this skill when transitioning between phases or finalizing a tr
 1. **Architecture Sync**: Update `ARCHITECTURE.md` across the project to reflect new models, patterns, and decisions.
 2. **Final Approval**: Ask for explicit user approval and present a final project status summary.
 3. **PR Creation**: Create a Pull Request on GitHub and assign it to the user.
+   - For final review handoff, the PR must be **ready for review** (not Draft):
+     - If no PR exists, create a non-draft PR.
+     - If a Draft PR exists, publish it before handoff (e.g. `gh pr ready`).
 4. **Handover**: Present the link to the PR. You MUST NOT merge the PR yourself, user must do the code review.
    - Include a ready-to-send track sync request so the user does not need to write one manually:
 
