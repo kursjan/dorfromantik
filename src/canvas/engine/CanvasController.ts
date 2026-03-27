@@ -274,17 +274,8 @@ export class CanvasController {
   }
 
   private static findClosestHexCoordinate(validCoords: HexCoordinate[], x: number, y: number): HexCoordinate {
-    let closestHex = validCoords[0];
-    let minDistance = distanceToHex(closestHex, x, y, HEX_SIZE);
-
-    for (let i = 1; i < validCoords.length; i++) {
-      const dist = distanceToHex(validCoords[i], x, y, HEX_SIZE);
-      if (dist < minDistance) {
-        minDistance = dist;
-        closestHex = validCoords[i];
-      }
-    }
-
-    return closestHex;
+    return validCoords
+      .map((coord) => ({ coord, dist: distanceToHex(coord, x, y, HEX_SIZE) }))
+      .sort((a, b) => a.dist - b.dist)[0].coord;
   }
 }
