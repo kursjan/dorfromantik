@@ -5,7 +5,7 @@ import { TileRenderer } from '../graphics/TileRenderer';
 import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { distanceToHex } from '../utils/HexUtils';
-import { HEX_SIZE, DEFAULT_HEX_STYLE, VALID_PREVIEW_STYLE, INVALID_PREVIEW_STYLE } from '../graphics/HexStyles';
+import { HEX_SIZE, DEFAULT_HEX_STYLE, VALID_PREVIEW_STYLE, INVALID_PREVIEW_STYLE, VALID_PLACEMENT_STYLE } from '../graphics/HexStyles';
 import { Tile } from '../../models/Tile';
 import { Game } from '../../models/Game';
 
@@ -41,6 +41,7 @@ export class CanvasController {
   private animationFrameId: number = 0;
   private debugState: DebugState = CanvasController.createDefaultDebugState();
   private hoveredHex: HexCoordinate | null = null;
+  private cachedValidPlacements: HexCoordinate[] = [];
 
   // Callbacks for React synchronization
   public onStatsChange?: (score: number, remainingTurns: number, nextTile: Tile | null) => void;
@@ -68,6 +69,8 @@ export class CanvasController {
       onResize: () => this.handleResize(),
       onToggleDebugOverlay: options?.onToggleDebugOverlay,
     });
+
+    this.updateCachedValidPlacements();
 
     // Handle Resize (Initial)
     this.handleResize();
@@ -145,6 +148,13 @@ export class CanvasController {
       this.tileRenderer.drawTileAtHex(boardTile.tile, boardTile.coordinate, DEFAULT_HEX_STYLE);
     }
 
+    // Draw valid placement highlights
+    if (activeGame.inProgress()) {
+      for (const coord of this.cachedValidPlacements) {
+        this.hexRenderer.drawHex(coord, VALID_PLACEMENT_STYLE);
+      }
+    }
+
     // 4. Ghost Preview
     if (activeGame.inProgress() && this.hoveredHex) {
       const nextTile = activeGame.peek()!;
@@ -208,15 +218,13 @@ export class CanvasController {
       this.canvas.height
     );
 
-    const validCoords = this.activeGame.board.getValidPlacementCoordinates();
-
-    if (validCoords.length === 0) {
+    if (this.cachedValidPlacements.length === 0) {
       this.hoveredHex = null;
       return;
     }
 
     this.hoveredHex = CanvasController.findClosestHexCoordinate(
-      validCoords,
+      this.cachedValidPlacements,
       worldPos.x,
       worldPos.y
     );
@@ -231,6 +239,7 @@ export class CanvasController {
 
     if (activeGame.inProgress() && this.hoveredHex && this.isValidPlacement(this.hoveredHex)) {
       activeGame.placeTile(this.hoveredHex);
+      this.updateCachedValidPlacements();
       this.notifyStatsChange();
       this.onTilePlaced?.();
     }
@@ -257,6 +266,10 @@ export class CanvasController {
 
   private isValidPlacement(coord: HexCoordinate): boolean {
     return this.activeGame.isValidPlacement(coord);
+  }
+
+  private updateCachedValidPlacements() {
+    this.cachedValidPlacements = this.activeGame.board.getValidPlacementCoordinates();
   }
 
   private static createDefaultDebugState(): DebugState {
