@@ -4,7 +4,7 @@ import { HexRenderer } from '../graphics/HexRenderer';
 import { TileRenderer } from '../graphics/TileRenderer';
 import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexCoordinate } from '../../models/HexCoordinate';
-import { distanceToHexCenter } from '../utils/HexUtils';
+import { distanceToHex } from '../utils/HexUtils';
 import { HEX_SIZE, DEFAULT_HEX_STYLE, VALID_PREVIEW_STYLE, INVALID_PREVIEW_STYLE } from '../graphics/HexStyles';
 import { Tile } from '../../models/Tile';
 import { Game } from '../../models/Game';
@@ -78,35 +78,6 @@ export class CanvasController {
     }
 
     this.loop();
-  }
-
-  private static createDefaultDebugState(): DebugState {
-    return {
-      fps: 0,
-      lastDebugUpdateTime: 0,
-      lastLoopTime: performance.now(),
-      listeners: new Set<() => void>(),
-      snapshot: {
-        fps: 0,
-        camera: { x: 0, y: 0, zoom: 1, rotation: 0 },
-        hoveredHex: null,
-      },
-    };
-  }
-
-  private static findClosestHexCoordinate(validCoords: HexCoordinate[], x: number, y: number): HexCoordinate {
-    let closestHex = validCoords[0];
-    let minDistance = distanceToHexCenter(closestHex, x, y, HEX_SIZE);
-
-    for (let i = 1; i < validCoords.length; i++) {
-      const dist = distanceToHexCenter(validCoords[i], x, y, HEX_SIZE);
-      if (dist < minDistance) {
-        minDistance = dist;
-        closestHex = validCoords[i];
-      }
-    }
-
-    return closestHex;
   }
 
   public destroy() {
@@ -217,10 +188,6 @@ export class CanvasController {
 
   // --- Input Handlers ---
 
-  private isValidPlacement(coord: HexCoordinate): boolean {
-    return this.activeGame.isValidPlacement(coord);
-  }
-
   private handlePan(dx: number, dy: number) {
     this.camera.pan(dx, dy);
   }
@@ -284,5 +251,40 @@ export class CanvasController {
       this.canvas.width = window.innerWidth;
       this.canvas.height = window.innerHeight;
     }
+  }
+
+  // --- Helpers ---
+
+  private isValidPlacement(coord: HexCoordinate): boolean {
+    return this.activeGame.isValidPlacement(coord);
+  }
+
+  private static createDefaultDebugState(): DebugState {
+    return {
+      fps: 0,
+      lastDebugUpdateTime: 0,
+      lastLoopTime: performance.now(),
+      listeners: new Set<() => void>(),
+      snapshot: {
+        fps: 0,
+        camera: { x: 0, y: 0, zoom: 1, rotation: 0 },
+        hoveredHex: null,
+      },
+    };
+  }
+
+  private static findClosestHexCoordinate(validCoords: HexCoordinate[], x: number, y: number): HexCoordinate {
+    let closestHex = validCoords[0];
+    let minDistance = distanceToHex(closestHex, x, y, HEX_SIZE);
+
+    for (let i = 1; i < validCoords.length; i++) {
+      const dist = distanceToHex(validCoords[i], x, y, HEX_SIZE);
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestHex = validCoords[i];
+      }
+    }
+
+    return closestHex;
   }
 }
