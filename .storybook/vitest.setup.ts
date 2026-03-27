@@ -3,6 +3,39 @@ import { setProjectAnnotations } from '@storybook/react-vite';
 import * as projectAnnotations from './preview';
 import { vi } from 'vitest';
 
+// Canvas mock for Storybook interaction tests.
+// @ts-expect-error Test-time mock override.
+HTMLCanvasElement.prototype.getContext = vi.fn((contextId: string) => {
+  if (contextId === '2d') {
+    return {
+      fillStyle: '',
+      strokeStyle: '',
+      lineWidth: 1,
+      globalAlpha: 1,
+      fillRect: vi.fn(),
+      clearRect: vi.fn(),
+      save: vi.fn(),
+      restore: vi.fn(),
+      translate: vi.fn(),
+      scale: vi.fn(),
+      rotate: vi.fn(),
+      beginPath: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      quadraticCurveTo: vi.fn(),
+      closePath: vi.fn(),
+      fill: vi.fn(),
+      stroke: vi.fn(),
+      fillText: vi.fn(),
+      measureText: vi.fn(() => ({ width: 0 })),
+      font: '',
+      textAlign: '',
+      textBaseline: '',
+    } as unknown as CanvasRenderingContext2D;
+  }
+  return null;
+});
+
 // Mock Firebase services globally for Storybook tests
 vi.mock('../src/services/firebase', () => ({
   auth: {

@@ -84,7 +84,7 @@ export class TileRenderer {
     waterSegments: { index: number; linkToCenter: boolean }[],
   ): void {
     this.ctx.strokeStyle = TERRAIN_COLORS.water;
-    this.ctx.lineWidth = Math.max(3, style.size * 0.12);
+    this.ctx.lineWidth = Math.max(5, style.size * 0.24);
 
     for (const segment of waterSegments) {
       const startCorner = (segment.index + 4) % 6;
@@ -102,7 +102,13 @@ export class TileRenderer {
 
       this.ctx.beginPath();
       this.ctx.moveTo(edgeMidpoint.x, edgeMidpoint.y);
-      this.ctx.lineTo(target.x, target.y);
+      const dx = target.x - edgeMidpoint.x;
+      const dy = target.y - edgeMidpoint.y;
+      const length = Math.hypot(dx, dy) || 1;
+      const curveStrength = style.size * 0.08;
+      const controlX = (edgeMidpoint.x + target.x) / 2 + (-dy / length) * curveStrength;
+      const controlY = (edgeMidpoint.y + target.y) / 2 + (dx / length) * curveStrength;
+      this.ctx.quadraticCurveTo(controlX, controlY, target.x, target.y);
       this.ctx.stroke();
     }
   }

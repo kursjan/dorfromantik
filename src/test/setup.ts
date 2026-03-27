@@ -17,6 +17,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn((contextId: string) => {
       beginPath: vi.fn(),
       moveTo: vi.fn(),
       lineTo: vi.fn(),
+      quadraticCurveTo: vi.fn(),
       closePath: vi.fn(),
       fill: vi.fn(),
       stroke: vi.fn(),

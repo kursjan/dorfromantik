@@ -14,6 +14,7 @@ describe('TileRenderer', () => {
       beginPath: vi.fn(),
       moveTo: vi.fn(),
       lineTo: vi.fn(),
+      quadraticCurveTo: vi.fn(),
       closePath: vi.fn(),
       stroke: vi.fn(),
       fill: vi.fn(),
@@ -41,8 +42,9 @@ describe('TileRenderer', () => {
     // 6 wedges + 1 line + 1 outline
     expect(ctx.moveTo).toHaveBeenCalledTimes(8);
 
-    // 6 wedges * 2 + 1 water line + 1 outline * 5
-    expect(ctx.lineTo).toHaveBeenCalledTimes(18);
+    // 6 wedges * 2 + 1 outline * 5
+    expect(ctx.lineTo).toHaveBeenCalledTimes(17);
+    expect(ctx.quadraticCurveTo).toHaveBeenCalledTimes(1);
 
     expect(ctx.fill).toHaveBeenCalledTimes(6);
     expect(ctx.stroke).toHaveBeenCalledTimes(2);
@@ -82,18 +84,18 @@ describe('TileRenderer', () => {
 
     renderer.drawTile(tile, 0, 0, DEFAULT_HEX_STYLE);
 
-    const lineToCalls = (ctx.lineTo as ReturnType<typeof vi.fn>).mock.calls;
-    const waterLineCalls = lineToCalls.filter(([, y]) => Math.abs(y) <= DEFAULT_HEX_STYLE.size);
+    const curveCalls = (ctx.quadraticCurveTo as ReturnType<typeof vi.fn>).mock.calls;
+    const waterEndpoints = curveCalls.map(([, , x, y]) => [x, y]);
 
     // North linked water should end exactly at tile center.
-    const hasCenterEndpoint = waterLineCalls.some(
+    const hasCenterEndpoint = waterEndpoints.some(
       ([x, y]) => Math.abs(x - 0) < 0.001 && Math.abs(y - 0) < 0.001,
     );
     expect(hasCenterEndpoint).toBe(true);
 
     // NorthEast unlinked water should end halfway from edge midpoint to center.
     // For size=40 and this orientation, that point is approximately (15, -8.6603).
-    const hasMidpointEndpoint = waterLineCalls.some(
+    const hasMidpointEndpoint = waterEndpoints.some(
       ([x, y]) => Math.abs(x - 15) < 0.01 && Math.abs(y + 8.6603) < 0.01,
     );
     expect(hasMidpointEndpoint).toBe(true);
