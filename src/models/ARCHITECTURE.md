@@ -15,6 +15,8 @@ This directory contains the core data structures and business logic for the Dorf
 - **`Tile`**: Represents a single hexagonal tile with 6 sides of specific terrain types.
   - **`getTerrains()`**: Returns a `Record<Direction, TerrainType>` mapping all directions to their respective terrain types.
   - **`rotateClockwise()` / `rotateCounterClockwise()`**: Returns a *new* Tile instance with shifted terrain properties.
+- **`Board`**: Manages the placement of tiles on the grid.
+  - **`getValidPlacementCoordinates()`**: Returns all empty coordinates adjacent to at least one placed tile. Used primarily by the Canvas Controller to implement "magnetic snapping" for the ghost preview.
 
 ### 3. User & Rules (`User.ts`, `GameRules.ts`)
 - **`User`**: Represents a player identity. It supports both **Anonymous Guests** (auto-assigned on app load) and **Permanent Accounts** (linked via Google). It tracks `id`, `isAnonymous`, and `displayName`.
