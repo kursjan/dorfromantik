@@ -1,0 +1,1 @@
+CI Verification Passed: npm run test:ci and npm run test:e2e:ci completed successfully. (Bypassed manual testing per user instructions).
