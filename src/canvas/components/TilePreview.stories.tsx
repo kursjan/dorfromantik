@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { TilePreview } from './TilePreview';
 import { Tile } from '../../models/Tile';
-import { PastureTerrain, WaterTerrain } from '../../models/Terrain';
+import { PastureTerrain, WaterOrPastureTerrain, WaterTerrain } from '../../models/Terrain';
 
 const pasture = () => new PastureTerrain();
 
@@ -43,6 +43,38 @@ export const WaterNotLinkedToCenter: Story = {
       southWest: pasture(),
       northWest: pasture(),
     }),
+    size: 48,
+  },
+};
+
+export const WaterOrPastureNeighborWater: Story = {
+  args: {
+    tile: new Tile({
+      id: 'wop-n-water',
+      north: new WaterOrPastureTerrain(false),
+      northEast: pasture(),
+      southEast: pasture(),
+      south: pasture(),
+      southWest: pasture(),
+      northWest: pasture(),
+    }),
+    neighborEdgeTerrains: { north: new WaterTerrain() },
+    size: 48,
+  },
+};
+
+export const WaterOrPastureNeighborPasture: Story = {
+  args: {
+    tile: new Tile({
+      id: 'wop-n-pasture',
+      north: new WaterOrPastureTerrain(false),
+      northEast: pasture(),
+      southEast: pasture(),
+      south: pasture(),
+      southWest: pasture(),
+      northWest: pasture(),
+    }),
+    neighborEdgeTerrains: { north: pasture() },
     size: 48,
   },
 };

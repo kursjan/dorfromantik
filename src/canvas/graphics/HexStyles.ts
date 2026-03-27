@@ -67,6 +67,8 @@ export const TERRAIN_COLORS: Record<TerrainType, string> = {
   house: '#8B4513', // SaddleBrown
   water: '#00BFFF', // DeepSkyBlue
   pasture: '#7CFC00', // LawnGreen
+  /** Fallback only; `waterOrPasture` wedges resolve to water or pasture visually. */
+  waterOrPasture: '#7CFC00',
   rail: '#708090', // SlateGray
   field: '#FFD700', // Gold
 };

@@ -1,6 +1,13 @@
-import { Terrain, WaterTerrain } from './Terrain';
+import { Terrain, WaterOrPastureTerrain, WaterTerrain } from './Terrain';
 
-const REQUIRED_SIDES = ['north', 'northEast', 'southEast', 'south', 'southWest', 'northWest'] as const;
+const REQUIRED_SIDES = [
+  'north',
+  'northEast',
+  'southEast',
+  'south',
+  'southWest',
+  'northWest',
+] as const;
 type TileLike = {
   center?: Terrain;
   north: Terrain;
@@ -45,21 +52,24 @@ export class TileValidator {
 
   private assertLinkedWaterSideHasWaterCenter(
     tile: TileLike,
-    side: (typeof REQUIRED_SIDES)[number],
+    side: (typeof REQUIRED_SIDES)[number]
   ): void {
     const terrain = tile[side];
-    if (!this.isLinkedWater(terrain)) {
+    if (!this.isLinkedToCenterWaterSide(terrain)) {
       return;
     }
 
     if (tile.center?.name !== 'water') {
       throw new Error(
-        `Invalid tile: "${side}" water with linkToCenter=true requires center terrain to be water`,
+        `Invalid tile: "${side}" terrain with linkToCenter=true requires center terrain to be water`
       );
     }
   }
 
-  private isLinkedWater(terrain: Terrain): terrain is WaterTerrain {
-    return terrain instanceof WaterTerrain && terrain.linkToCenter;
+  private isLinkedToCenterWaterSide(terrain: Terrain): boolean {
+    return (
+      (terrain instanceof WaterTerrain && terrain.linkToCenter) ||
+      (terrain instanceof WaterOrPastureTerrain && terrain.linkToCenter)
+    );
   }
 }

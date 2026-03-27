@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Tile } from './Tile';
 import { TileValidator } from './TileValidator';
-import { WaterTerrain } from './Terrain';
+import { WaterOrPastureTerrain, WaterTerrain } from './Terrain';
 
 describe('TileValidator', () => {
   it('accepts a valid tile', () => {
@@ -26,7 +26,7 @@ describe('TileValidator', () => {
 
     const validator = new TileValidator();
     expect(() => validator.validate(tile as unknown as Tile)).toThrow(
-      'Invalid tile: "north" must be a terrain instance',
+      'Invalid tile: "north" must be a terrain instance'
     );
   });
 
@@ -36,7 +36,7 @@ describe('TileValidator', () => {
 
     const validator = new TileValidator();
     expect(() => validator.validate(tile as unknown as Tile)).toThrow(
-      'Invalid tile: "center" must be a terrain instance when provided',
+      'Invalid tile: "center" must be a terrain instance when provided'
     );
   });
 
@@ -52,9 +52,27 @@ describe('TileValidator', () => {
           south: 'pasture',
           southWest: 'rail',
           northWest: 'field',
-        }),
+        })
     ).toThrow(
-      'Invalid tile: "north" water with linkToCenter=true requires center terrain to be water',
+      'Invalid tile: "north" terrain with linkToCenter=true requires center terrain to be water'
+    );
+  });
+
+  it('throws when waterOrPasture has linkToCenter but center is not water', () => {
+    expect(
+      () =>
+        new Tile({
+          id: 'wop-linked',
+          center: 'pasture',
+          north: new WaterOrPastureTerrain(true),
+          northEast: 'house',
+          southEast: 'water',
+          south: 'pasture',
+          southWest: 'rail',
+          northWest: 'field',
+        })
+    ).toThrow(
+      'Invalid tile: "north" terrain with linkToCenter=true requires center terrain to be water'
     );
   });
 

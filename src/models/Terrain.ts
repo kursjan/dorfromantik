@@ -1,4 +1,12 @@
-export const TERRAIN_TYPES = ['tree', 'house', 'water', 'pasture', 'rail', 'field'] as const;
+export const TERRAIN_TYPES = [
+  'tree',
+  'house',
+  'water',
+  'pasture',
+  'waterOrPasture',
+  'rail',
+  'field',
+] as const;
 export type TerrainName = (typeof TERRAIN_TYPES)[number];
 
 export abstract class Terrain {
@@ -34,11 +42,38 @@ export class WaterTerrain extends Terrain {
     super('water', 'W');
     this.linkToCenter = linkToCenter;
   }
+
+  matchesForEdge(other: Terrain): boolean {
+    if (other.name === 'waterOrPasture') return true;
+    return super.matchesForEdge(other);
+  }
 }
 
 export class PastureTerrain extends Terrain {
   constructor() {
     super('pasture', 'P');
+  }
+
+  matchesForEdge(other: Terrain): boolean {
+    if (other.name === 'waterOrPasture') return true;
+    return super.matchesForEdge(other);
+  }
+}
+
+/**
+ * Matches both water and pasture edges for scoring.
+ * Rendering resolves per edge from the neighbor across that edge (see TileRenderer).
+ */
+export class WaterOrPastureTerrain extends Terrain {
+  readonly linkToCenter: boolean;
+
+  constructor(linkToCenter = false) {
+    super('waterOrPasture', 'O');
+    this.linkToCenter = linkToCenter;
+  }
+
+  matchesForEdge(other: Terrain): boolean {
+    return other.name === 'waterOrPasture' || other.name === 'water' || other.name === 'pasture';
   }
 }
 
@@ -70,6 +105,8 @@ export function toTerrain(input: TerrainInput): Terrain {
       return new WaterTerrain();
     case 'pasture':
       return new PastureTerrain();
+    case 'waterOrPasture':
+      return new WaterOrPastureTerrain();
     case 'rail':
       return new RailTerrain();
     case 'field':

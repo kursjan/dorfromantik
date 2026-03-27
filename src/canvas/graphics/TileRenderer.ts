@@ -2,7 +2,42 @@ import { Tile } from '../../models/Tile';
 import { getHexCorners, hexToPixel } from '../utils/HexUtils';
 import { type HexStyle, TERRAIN_COLORS, DEFAULT_HEX_STYLE } from './HexStyles';
 import { HexCoordinate } from '../../models/HexCoordinate';
-import { WaterTerrain } from '../../models/Terrain';
+import { Board } from '../../models/Board';
+import { directions, getNeighbor, getOpposite, type Direction } from '../../models/Navigation';
+import { WaterOrPastureTerrain, WaterTerrain, type Terrain } from '../../models/Terrain';
+
+export interface TileDrawOptions {
+  /** Terrain on the neighbor tile along the shared edge for each direction (see `neighborEdgeTerrainsFromBoard`). */
+  neighborEdgeTerrains?: Partial<Record<Direction, Terrain>>;
+}
+
+/**
+ * How to paint a `waterOrPasture` wedge: water-like vs pasture, from the neighbor across that edge.
+ */
+export function resolveWaterOrPastureVisual(
+  neighborTerrain: Terrain | undefined
+): 'water' | 'pasture' {
+  if (!neighborTerrain) return 'pasture';
+  if (neighborTerrain.name === 'water') return 'water';
+  if (neighborTerrain.name === 'pasture') return 'pasture';
+  if (neighborTerrain.name === 'waterOrPasture') return 'pasture';
+  return 'pasture';
+}
+
+export function neighborEdgeTerrainsFromBoard(
+  board: Board,
+  coord: HexCoordinate
+): Partial<Record<Direction, Terrain>> {
+  const out: Partial<Record<Direction, Terrain>> = {};
+  for (const d of directions) {
+    const nCoord = getNeighbor(coord, d);
+    const boardTile = board.get(nCoord);
+    if (boardTile) {
+      out[d] = boardTile.tile.getTerrain(getOpposite(d));
+    }
+  }
+  return out;
+}
 
 export class TileRenderer {
   private ctx: CanvasRenderingContext2D;
@@ -13,33 +48,64 @@ export class TileRenderer {
 
   /**
    * Draws a 6-sided tile at a specific hex coordinate.
+   * Pass `board` so `waterOrPasture` edges resolve against real neighbors.
    */
-  drawTileAtHex(tile: Tile, hex: HexCoordinate, style: HexStyle = DEFAULT_HEX_STYLE) {
+  drawTileAtHex(
+    tile: Tile,
+    hex: HexCoordinate,
+    style: HexStyle = DEFAULT_HEX_STYLE,
+    board?: Board
+  ) {
     const { x, y } = hexToPixel(hex, style.size);
-    this.drawTile(tile, x, y, style);
+    const neighborEdgeTerrains = board ? neighborEdgeTerrainsFromBoard(board, hex) : undefined;
+    this.drawTile(tile, x, y, style, { neighborEdgeTerrains });
   }
 
   /**
    * Draws a 6-sided tile with terrains represented by colors at pixel coordinates (x, y).
-   * Reuses the terrain mapping from the Tile model.
    */
-  drawTile(tile: Tile, x: number, y: number, style: HexStyle = DEFAULT_HEX_STYLE) {
+  drawTile(
+    tile: Tile,
+    x: number,
+    y: number,
+    style: HexStyle = DEFAULT_HEX_STYLE,
+    options?: TileDrawOptions
+  ) {
     const originalAlpha = this.ctx.globalAlpha;
     this.ctx.globalAlpha = style.opacity ?? 1;
 
     const corners = getHexCorners(x, y, style.size);
-    const terrains = tile.getTerrains();
+    const terrainsMap = tile.getTerrains();
     const waterSegments: { index: number; linkToCenter: boolean }[] = [];
 
-    // Iterate through terrains in the order they are defined in the model (North, North-East, ...)
-    // In our Flat-Top orientation:
-    // Index 0 (North) corresponds to the wedge between Corner 4 (240°) and Corner 5 (300°).
-    // We can use an offset of 4 to align the model sides with the canvas corners.
-    Object.values(terrains).forEach((terrain, i) => {
-      const isWater = terrain.name === 'water';
-      const color = isWater ? TERRAIN_COLORS.pasture : TERRAIN_COLORS[terrain.name];
+    for (let i = 0; i < directions.length; i++) {
+      const direction = directions[i];
+      const terrain = terrainsMap[direction];
       const startCorner = (i + 4) % 6;
       const endCorner = (i + 5) % 6;
+
+      let fillColor: string;
+      if (terrain.name === 'water') {
+        fillColor = TERRAIN_COLORS.pasture;
+        waterSegments.push({
+          index: i,
+          linkToCenter: terrain instanceof WaterTerrain && terrain.linkToCenter,
+        });
+      } else if (terrain.name === 'waterOrPasture') {
+        const neighbor = options?.neighborEdgeTerrains?.[direction];
+        const visual = resolveWaterOrPastureVisual(neighbor);
+        if (visual === 'water') {
+          fillColor = TERRAIN_COLORS.pasture;
+          waterSegments.push({
+            index: i,
+            linkToCenter: terrain instanceof WaterOrPastureTerrain && terrain.linkToCenter,
+          });
+        } else {
+          fillColor = TERRAIN_COLORS.pasture;
+        }
+      } else {
+        fillColor = TERRAIN_COLORS[terrain.name];
+      }
 
       this.ctx.beginPath();
       this.ctx.moveTo(x, y);
@@ -47,16 +113,9 @@ export class TileRenderer {
       this.ctx.lineTo(corners[endCorner].x, corners[endCorner].y);
       this.ctx.closePath();
 
-      this.ctx.fillStyle = color;
+      this.ctx.fillStyle = fillColor;
       this.ctx.fill();
-
-      if (isWater) {
-        waterSegments.push({
-          index: i,
-          linkToCenter: terrain instanceof WaterTerrain && terrain.linkToCenter,
-        });
-      }
-    });
+    }
 
     this.drawWaterSegments(corners, x, y, style, waterSegments);
     this.drawWaterCenter(tile, x, y, style);
@@ -81,7 +140,7 @@ export class TileRenderer {
     centerX: number,
     centerY: number,
     style: HexStyle,
-    waterSegments: { index: number; linkToCenter: boolean }[],
+    waterSegments: { index: number; linkToCenter: boolean }[]
   ): void {
     this.ctx.strokeStyle = TERRAIN_COLORS.water;
     this.ctx.lineWidth = Math.max(5, style.size * 0.24);
