@@ -62,6 +62,12 @@ Use this skill when the user requests a **non-trivial feature, refactor, or mult
      - `using **task-conductor** skill`
    - For each phase/track gate (checkpoint, finalization), append:
      - `using **project-orchestrator** skill`
+   - By default, append a final review phase after implementation phases:
+     - `## Phase <N>: Adversarial Review`
+     - `- [ ] Perform a rigorous file-by-file review of all changes in this branch against \`main\` using **quick-review** skill.`
+     - `- [ ] Address any feedback from \`REVIEW_FEEDBACK.md\` using **task-conductor** skill.`
+     - `- [ ] **Final Track Gate**: Final verification and Git commit using **project-orchestrator** skill.`
+   - This mirrors the Magnetic Snapping track pattern and should be included unless the user explicitly opts out.
 
 ## Phase 3: Plan Review & Refinement
 
@@ -108,4 +114,4 @@ Use this skill when the user requests a **non-trivial feature, refactor, or mult
   - Only read, plan, and create/update Conductor files.
 - Every phase in `plan.md` should end with a **project-orchestrator** task to handle checkpointing and phase transitions.
 - Ensure every task in `plan.md` clearly indicates which skill should execute it (e.g. `using **task-conductor** skill`).
-
+- Default all new plans to include a final **Adversarial Review** phase (`quick-review` -> feedback fixes -> final gate), unless the user asks to skip it.
