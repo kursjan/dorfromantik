@@ -6,7 +6,6 @@ import { Tile } from './Tile';
 
 describe('GameHints', () => {
   let board: Board;
-  let gameHints: GameHints;
   let mockTile: Tile;
 
   beforeEach(() => {
@@ -20,60 +19,28 @@ describe('GameHints', () => {
       southWest: 'rail',
       northWest: 'field',
     });
-    gameHints = new GameHints(board, mockTile);
   });
 
-  it('computes validPlacements on first access and caches the result', () => {
+  it('computes validPlacements on initialization and is immutable', () => {
     const mockValidPlacements = [new HexCoordinate(1, 0, -1)];
     const spy = vi.spyOn(board, 'getValidPlacementCoordinates').mockReturnValue(mockValidPlacements);
 
-    // First access - should compute
-    const firstResult = gameHints.validPlacements;
+    const gameHints = new GameHints(board, mockTile);
+    
     expect(spy).toHaveBeenCalledTimes(1);
-    expect(firstResult).toBe(mockValidPlacements);
-
-    // Second access - should return cached value
-    const secondResult = gameHints.validPlacements;
-    expect(spy).toHaveBeenCalledTimes(1); // Still 1
-    expect(secondResult).toBe(mockValidPlacements);
+    expect(gameHints.validPlacements).toEqual(mockValidPlacements);
+    
+    // Ensure array is frozen
+    expect(Object.isFrozen(gameHints.validPlacements)).toBe(true);
   });
 
-  it('recomputes validPlacements after invalidation', () => {
-    const mockValidPlacements1 = [new HexCoordinate(1, 0, -1)];
-    const mockValidPlacements2 = [new HexCoordinate(2, -1, -1)];
-    
+  it('returns empty array and does not query board when currentTile is null', () => {
     const spy = vi.spyOn(board, 'getValidPlacementCoordinates');
-    spy.mockReturnValueOnce(mockValidPlacements1);
-    spy.mockReturnValueOnce(mockValidPlacements2);
-
-    // First access
-    expect(gameHints.validPlacements).toBe(mockValidPlacements1);
-    expect(spy).toHaveBeenCalledTimes(1);
-
-    // Invalidate
-    gameHints.invalidate();
-
-    // Second access
-    expect(gameHints.validPlacements).toBe(mockValidPlacements2);
-    expect(spy).toHaveBeenCalledTimes(2);
-  });
-
-  it('invalidates cache when updateState is called', () => {
-    const mockValidPlacements1 = [new HexCoordinate(1, 0, -1)];
-    const mockValidPlacements2 = [new HexCoordinate(2, -1, -1)];
     
-    const spy = vi.spyOn(board, 'getValidPlacementCoordinates');
-    spy.mockReturnValueOnce(mockValidPlacements1);
-    spy.mockReturnValueOnce(mockValidPlacements2);
-
-    // First access
-    expect(gameHints.validPlacements).toBe(mockValidPlacements1);
+    const gameHints = new GameHints(board, null);
     
-    // Update state
-    gameHints.updateState(board, mockTile);
-
-    // Second access
-    expect(gameHints.validPlacements).toBe(mockValidPlacements2);
-    expect(spy).toHaveBeenCalledTimes(2);
+    expect(spy).not.toHaveBeenCalled();
+    expect(gameHints.validPlacements).toEqual([]);
+    expect(Object.isFrozen(gameHints.validPlacements)).toBe(true);
   });
 });

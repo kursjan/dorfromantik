@@ -146,9 +146,9 @@ export class CanvasController {
     }
 
     // Draw valid placement highlights
-      for (const coord of activeGame.board.getValidPlacementCoordinates()) {
-        this.hexRenderer.drawHex(coord, VALID_PLACEMENT_STYLE);
-      }
+    for (const coord of activeGame.hints.validPlacements) {
+      this.hexRenderer.drawHex(coord, VALID_PLACEMENT_STYLE);
+    }
 
     // 4. Ghost Preview
     if (activeGame.inProgress() && this.hoveredHex) {
@@ -213,7 +213,7 @@ export class CanvasController {
       this.canvas.height
     );
 
-    const validCoords = this.activeGame.board.getValidPlacementCoordinates();
+    const validCoords = this.activeGame.hints.validPlacements;
 
     if (validCoords.length === 0) {
       this.hoveredHex = null;
@@ -221,7 +221,7 @@ export class CanvasController {
     }
 
     this.hoveredHex = CanvasController.findClosestHexCoordinate(
-      validCoords,
+      [...validCoords],
       worldPos.x,
       worldPos.y
     );
