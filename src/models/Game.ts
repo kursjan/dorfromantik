@@ -4,6 +4,7 @@ import { Tile } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
 import { getNeighbors } from './Navigation';
 import { GameScorer } from './GameScorer';
+import { GameHints } from './GameHints';
 
 export interface GameProps {
   id?: string;
@@ -54,6 +55,7 @@ export class Game {
   lastPlayed: string;
   score: number;
   tileQueue: Tile[];
+  hints: GameHints | null = null;
 
   private scorer: GameScorer;
 
@@ -76,6 +78,20 @@ export class Game {
 
     if (this.score < 0) {
       throw new Error('score must be non-negative');
+    }
+    this.updateHints();
+  }
+
+  private updateHints(): void {
+    const currentTile = this.peek();
+    if (currentTile) {
+      if (this.hints) {
+        this.hints.updateState(this.board, currentTile);
+      } else {
+        this.hints = new GameHints(this.board, currentTile);
+      }
+    } else {
+      this.hints = null;
     }
   }
 
@@ -108,6 +124,7 @@ export class Game {
     }
 
     this.tileQueue[0] = tile.rotateClockwise();
+    this.updateHints();
   }
 
   /**
@@ -121,6 +138,7 @@ export class Game {
     }
 
     this.tileQueue[0] = tile.rotateCounterClockwise();
+    this.updateHints();
   }
 
   /**
@@ -162,6 +180,7 @@ export class Game {
 
     this.score += scoreAdded;
     this.lastPlayed = new Date().toISOString();
+    this.updateHints();
     return { scoreAdded, perfectCount };
   }
 }

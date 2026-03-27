@@ -2,14 +2,25 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { GameHints } from './GameHints';
 import { Board } from './Board';
 import { HexCoordinate } from './HexCoordinate';
+import { Tile } from './Tile';
 
 describe('GameHints', () => {
   let board: Board;
   let gameHints: GameHints;
+  let mockTile: Tile;
 
   beforeEach(() => {
     board = new Board();
-    gameHints = new GameHints(board);
+    mockTile = new Tile({
+      id: 'mock-tile',
+      north: 'tree',
+      northEast: 'house',
+      southEast: 'water',
+      south: 'pasture',
+      southWest: 'rail',
+      northWest: 'field',
+    });
+    gameHints = new GameHints(board, mockTile);
   });
 
   it('computes validPlacements on first access and caches the result', () => {
@@ -59,7 +70,7 @@ describe('GameHints', () => {
     expect(gameHints.validPlacements).toBe(mockValidPlacements1);
     
     // Update state
-    gameHints.updateState(board);
+    gameHints.updateState(board, mockTile);
 
     // Second access
     expect(gameHints.validPlacements).toBe(mockValidPlacements2);

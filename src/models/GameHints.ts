@@ -1,5 +1,6 @@
 import { Board } from './Board';
 import { HexCoordinate } from './HexCoordinate';
+import { Tile } from './Tile';
 
 /**
  * GameHints encapsulates memoized computations based on the current game state.
@@ -8,12 +9,14 @@ import { HexCoordinate } from './HexCoordinate';
  */
 export class GameHints {
   private board: Board;
+  public currentTile: Tile;
 
   // Caches
   private _validPlacements: HexCoordinate[] | null = null;
 
-  constructor(board: Board) {
+  constructor(board: Board, currentTile: Tile) {
     this.board = board;
+    this.currentTile = currentTile;
   }
 
   /**
@@ -38,8 +41,9 @@ export class GameHints {
   /**
    * Updates the internal references and invalidates caches.
    */
-  updateState(board: Board) {
+  updateState(board: Board, currentTile: Tile) {
     this.board = board;
+    this.currentTile = currentTile;
     this.invalidate();
   }
 }
