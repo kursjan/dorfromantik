@@ -1,6 +1,7 @@
 import { HexCoordinate } from './HexCoordinate';
 import { Tile } from './Tile';
 import { getNeighbors, type Direction } from './Navigation';
+import { isValidPlacement } from './PlacementValidator';
 
 export interface BoardTile {
   id: string; // "q,r,s"
@@ -12,18 +13,43 @@ export class Board {
   private tiles = new Map<string, BoardTile>();
 
   /**
-   * Returns a map of directions to existing neighbor tiles.
-   *
-   * Note: This intentionally accepts a BoardTile rather than a HexCoordinate
-   * to ensure we are finding neighbors relative to a fully contextualized tile
-   * that exists (or is being placed) on the board.
+   * Returns a map of directions to existing neighbor tiles from a given coordinate.
    */
-  getExistingNeighbors(tile: BoardTile): Partial<Record<Direction, BoardTile>> {
+  getExistingNeighborsAt(coord: HexCoordinate): Partial<Record<Direction, BoardTile>> {
     const results: Partial<Record<Direction, BoardTile>> = {};
-    for (const { direction, coordinate } of getNeighbors(tile.coordinate)) {
+    for (const { direction, coordinate } of getNeighbors(coord)) {
       const neighbor = this.get(coordinate);
       if (neighbor) {
         results[direction] = neighbor;
+      }
+    }
+    return results;
+  }
+
+  /**
+   * Returns a map of directions to existing neighbor tiles.
+   */
+  getExistingNeighbors(tile: BoardTile): Partial<Record<Direction, BoardTile>> {
+    return this.getExistingNeighborsAt(tile.coordinate);
+  }
+
+  getValidPlacementCoordinates(): HexCoordinate[] {
+    const uniqueCoords = new Map<string, HexCoordinate>();
+
+    for (const tile of this.tiles.values()) {
+      for (const coord of this.getValidNeighborsOf(tile)) {
+        uniqueCoords.set(coord.getKey(), coord);
+      }
+    }
+
+    return Array.from(uniqueCoords.values());
+  }
+
+  private getValidNeighborsOf(boardTile: BoardTile): HexCoordinate[] {
+    const results: HexCoordinate[] = [];
+    for (const { coordinate: neighborCoord } of getNeighbors(boardTile.coordinate)) {
+      if (isValidPlacement(this, neighborCoord)) {
+        results.push(neighborCoord);
       }
     }
     return results;

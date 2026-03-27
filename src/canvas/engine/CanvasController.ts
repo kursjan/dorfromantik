@@ -4,7 +4,7 @@ import { HexRenderer } from '../graphics/HexRenderer';
 import { TileRenderer } from '../graphics/TileRenderer';
 import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexCoordinate } from '../../models/HexCoordinate';
-import { pixelToHex } from '../utils/HexUtils';
+import { distanceToHex } from '../utils/HexUtils';
 import { HEX_SIZE, DEFAULT_HEX_STYLE, VALID_PREVIEW_STYLE, INVALID_PREVIEW_STYLE } from '../graphics/HexStyles';
 import { Tile } from '../../models/Tile';
 import { Game } from '../../models/Game';
@@ -62,7 +62,7 @@ export class CanvasController {
       onZoom: (delta) => this.handleZoom(delta),
       onHover: (x, y) => this.handleHover(x, y),
       onLeave: () => this.handleLeave(),
-      onClick: (x, y) => this.handleMouseClick(x, y),
+      onClick: () => this.handleMouseClick(),
       onRotateClockwise: () => this.handleRotateClockwise(),
       onRotateCounterClockwise: () => this.handleRotateCounterClockwise(),
       onResize: () => this.handleResize(),
@@ -78,20 +78,6 @@ export class CanvasController {
     }
 
     this.loop();
-  }
-
-  private static createDefaultDebugState(): DebugState {
-    return {
-      fps: 0,
-      lastDebugUpdateTime: 0,
-      lastLoopTime: performance.now(),
-      listeners: new Set<() => void>(),
-      snapshot: {
-        fps: 0,
-        camera: { x: 0, y: 0, zoom: 1, rotation: 0 },
-        hoveredHex: null,
-      },
-    };
   }
 
   public destroy() {
@@ -202,10 +188,6 @@ export class CanvasController {
 
   // --- Input Handlers ---
 
-  private isValidPlacement(coord: HexCoordinate): boolean {
-    return this.activeGame.isValidPlacement(coord);
-  }
-
   private handlePan(dx: number, dy: number) {
     this.camera.pan(dx, dy);
   }
@@ -225,30 +207,30 @@ export class CanvasController {
       this.canvas.width,
       this.canvas.height
     );
-    const hex = pixelToHex(worldPos.x, worldPos.y, HEX_SIZE);
 
-    if (!this.hoveredHex || !this.hoveredHex.equals(hex)) {
-      this.hoveredHex = hex;
+    const validCoords = this.activeGame.board.getValidPlacementCoordinates();
+
+    if (validCoords.length === 0) {
+      this.hoveredHex = null;
+      return;
     }
+
+    this.hoveredHex = CanvasController.findClosestHexCoordinate(
+      validCoords,
+      worldPos.x,
+      worldPos.y
+    );
   }
 
   private handleLeave() {
     this.hoveredHex = null;
   }
 
-  private handleMouseClick(mouseX: number, mouseY: number) {
+  private handleMouseClick() {
     const activeGame = this.activeGame;
 
-    const worldPos = this.camera.screenToWorld(
-      mouseX,
-      mouseY,
-      this.canvas.width,
-      this.canvas.height
-    );
-    const hex = pixelToHex(worldPos.x, worldPos.y, HEX_SIZE);
-
-    if (activeGame.inProgress() && this.isValidPlacement(hex)) {
-      activeGame.placeTile(hex);
+    if (activeGame.inProgress() && this.hoveredHex && this.isValidPlacement(this.hoveredHex)) {
+      activeGame.placeTile(this.hoveredHex);
       this.notifyStatsChange();
       this.onTilePlaced?.();
     }
@@ -269,5 +251,31 @@ export class CanvasController {
       this.canvas.width = window.innerWidth;
       this.canvas.height = window.innerHeight;
     }
+  }
+
+  // --- Helpers ---
+
+  private isValidPlacement(coord: HexCoordinate): boolean {
+    return this.activeGame.isValidPlacement(coord);
+  }
+
+  private static createDefaultDebugState(): DebugState {
+    return {
+      fps: 0,
+      lastDebugUpdateTime: 0,
+      lastLoopTime: performance.now(),
+      listeners: new Set<() => void>(),
+      snapshot: {
+        fps: 0,
+        camera: { x: 0, y: 0, zoom: 1, rotation: 0 },
+        hoveredHex: null,
+      },
+    };
+  }
+
+  private static findClosestHexCoordinate(validCoords: HexCoordinate[], x: number, y: number): HexCoordinate {
+    return validCoords
+      .map((coord) => ({ coord, dist: distanceToHex(coord, x, y, HEX_SIZE) }))
+      .sort((a, b) => a.dist - b.dist)[0].coord;
   }
 }

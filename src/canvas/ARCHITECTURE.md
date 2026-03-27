@@ -134,18 +134,19 @@ While the Controller runs independently for performance, the React-based HUD nee
 - **Execution:** When the game state changes (e.g., tile placed), the Controller invokes the callback, triggering a `useState` update in React.
 - **Debug Stats:** `CanvasController` also exposes `subscribeDebug` and `getDebugSnapshot` for high-frequency updates (FPS, Camera) used by `DebugOverlay` via `useSyncExternalStore`.
 
-## 6. Data Flow Example: Hovering
+## 6. Data Flow Example: Hovering (Magnetic Snapping)
 
 1.  **Browser:** User moves mouse to pixel `(500, 300)`.
 2.  **InputManager:** Catches `mousemove`, calls `callbacks.onHover(500, 300)`.
 3.  **CanvasController:**
     - Calls `camera.screenToWorld(500, 300)` -> applies Inverse Rotate, Inverse Scale, Inverse Translate -> gets World `(120.5, -40.2)`.
-    - Calls `pixelToHex(120.5, -40.2)` -> gets Hex `(2, -1, -1)`.
-    - Updates `this.hoveredHex`.
+    - Calls `activeGame.board.getValidPlacementCoordinates()` to get all currently legal placement spots.
+    - Finds the valid coordinate with the minimum `distanceToHex` from the World `(120.5, -40.2)`.
+    - Updates `this.hoveredHex` to that closest valid coordinate (snapping effect).
 4.  **Render Loop:**
     - Calls `backgroundRenderer.draw()`.
     - Calls `camera.applyTransform()` (Translate Center -> Rotate -> Scale -> Translate Camera).
     - Calls `hexRenderer.drawHighlight(this.hoveredHex)`.
     - Calls `ctx.restore()` (Reverts transform).
-    - Calls `debugRenderer.drawOverlay(...)`.
-5.  **Screen:** Hex at `(2, -1, -1)` glows yellow, correctly positioned even if rotated.
+    - Publishes debug snapshot.
+5.  **Screen:** The nearest valid Hex glows yellow, correctly positioned even if rotated.
