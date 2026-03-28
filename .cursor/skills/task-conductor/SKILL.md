@@ -12,7 +12,6 @@ Use this skill for any **coding or implementation task** defined in a Conductor 
 0. **Verify Git Branch**
    - Never develop on `main`.
    - Reuse a suitable feature/track branch or create a new one.
-   - If you create a new branch, **do not `git push`** from this skill; the branch stays local until **project-orchestrator** pushes at a **phase checkpoint** (or the user pushes manually).
 
 1. **Task Selection**
    - Open the relevant `conductor/tracks/<track_id>/plan.md`.
@@ -69,6 +68,5 @@ Use this skill for any **coding or implementation task** defined in a Conductor 
 ## Constraints
 
 - Never combine **multiple** Conductor tasks into a single execution cycle.
-- **Never run `git push`** as part of this skill. **`git push` to `origin` is performed by project-orchestrator** at **phase** checkpoints (unless the user explicitly instructs you to push).
 - Do not silently skip tests or typecheck; if they are slow or failing in ways you cannot fix, clearly explain the situation.
 - Keep changes scoped narrowly to the selected task unless the user explicitly allows a broader refactor.

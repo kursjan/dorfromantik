@@ -3,8 +3,6 @@ name: project-orchestrator
 description: Use this skill when transitioning between phases or finalizing a track.
 ---
 
-**Git push (Conductor):** **`task-conductor` does not run `git push`.** Per-task commits stay local until this skill runs a **phase** checkpoint; **Checkpoint Commit** (step 5) is where **`git push` to `origin`** happens for routine track work (unless the user explicitly pushes earlier).
-
 ## Methodology
 
 ### Phase Completion Protocol

@@ -5,7 +5,7 @@ description: Use this skill for any coding or implementation task defined in a C
 
 ## Methodology
 
-0. **Verify Git Branch**: Never develop on main. Reuse a suitable branch or create a new one. **Do not `git push` from this skill**; new branches stay local until **project-orchestrator** pushes at a **phase checkpoint** (or the user pushes manually).
+0. **Verify Git Branch**: Never develop on main. Reuse a suitable branch or create a new one.
 1. **Task Selection**: Always select the next uncompleted task from the current phase in `conductor/tracks/<track_id>/plan.md` and mark it as selected.
 2. **Execution**: Perform the requested code changes using available tools.
 3. **Quality Gate Verification**:
@@ -33,5 +33,4 @@ description: Use this skill for any coding or implementation task defined in a C
 ## Constraints
 
 - Never combine multiple Conductor tasks into a single execution cycle.
-- **Never run `git push`** as part of this skill; **`git push` is done by project-orchestrator** at **phase** checkpoints unless the user explicitly tells you to push.
 - If the workflow requires a test, wait for approval of the code before running the test.

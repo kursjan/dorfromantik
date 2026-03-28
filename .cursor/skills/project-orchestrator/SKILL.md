@@ -7,8 +7,6 @@ description: Handle Conductor phase and track completion in this repo, including
 
 Use this skill when **transitioning between phases** or **finalizing a Conductor track** defined under `conductor/tracks/**/plan.md`, especially when the plan says "using **project-orchestrator** skill" or the user asks to "complete the phase/track".
 
-**Git push (Conductor):** **`task-conductor` does not run `git push`.** Per-task commits stay local until this skill runs a **phase** checkpoint; **step 5 (Checkpoint Commit)** is where **`git push` to `origin`** happens for routine track work (unless the user explicitly pushes earlier).
-
 ## Methodology
 
 ### Phase Completion Protocol

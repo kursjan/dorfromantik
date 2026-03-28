@@ -47,19 +47,23 @@ Ad hoc task can be implement in main.
 - **Git Tracking (ad-hoc)**
   If the user asks you to commit changes:
   1. **Summary:** Attach task summary to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
-  2. **Persistence:** Commit verified changes locally. **Do not `git push` until the user explicitly approves the work** (`LGTM`, `approved`, `sgtm`, etc.) **or explicitly tells you to push.** After approval (or an explicit push request), push to `origin`; use `--no-verify` only if you ran the same checks successfully immediately before that push.
+  2. **Persistence:** Commit verified changes locally. Do not `git push` until the user explicitly approves the work (`LGTM`, `approved`, `sgtm`, etc.)
+     - After approval (or an explicit push request), push to `origin`; use `--no-verify` only if you ran the same checks successfully immediately before that push.
      - When staging changes, stage only changes the AI agent made; do not interfere with the user’s work, if possible.
 
 ### **Commit Strategy**
 
 - **Ad-Hoc Tasks:**
-  - After the user approves your changes (`LGTM`, `approved`, etc.), commit if appropriate. **Push only after that approval** (or if the user explicitly asked you to commit and push in one instruction).
+  - Suggest user to commit an ad-hoc tasks after you get explicit approval of your changes. If you can commit:
     1. **Summary:** Attach task summary to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
-    2. **Persistence:** Commit locally first; **`git push` only after approval** (or explicit push instruction). When staging, stage only changes the AI agent made; do not interfere with the user’s work, if possible.
+    2. **Persistence:** Committed and pushed all changes
+       - when staging changes, stage only changes AI agent did, do not interfere with users works, if possible
+       - push changes only after approval
+       - when pushing, use `--no-verify` if push is immediately after test were run.
 - **Conductor Tasks (Phase Workflow):**
   - Complete task -> Verify -> Update `plan.md` (mark `[x]`).
-  - **Task Commit:** Commit the individual task immediately after it is verified to prevent data loss. **Do not `git push` from task work**; **`git push` happens at phase checkpoints** via **project-orchestrator** (unless the user explicitly asks you to push).
-  - **Phase Completion:** Once a phase is completed, the **project-orchestrator** performs final verification, creates a **Phase Checkpoint** commit if necessary, and **pushes** to `origin` per that skill.
+  - **Task Commit:** Commit the individual task immediately after it is verified to prevent data loss.
+  - **Phase Completion:** Once a phase is completed, the **project-orchestrator** will perform a final verification and create a **Phase Checkpoint** commit if necessary.
 
 ### **GitHub Integration:**
 
