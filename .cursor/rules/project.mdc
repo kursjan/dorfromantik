@@ -32,16 +32,14 @@ alwaysApply: true
 # Git & Branching
 
 - Do **not** develop directly on `main` for feature work; use a dedicated branch (e.g. `coding-agent/worker1` or a track-specific branch).
-- When working on `main` for small changes (docs, cursor rules, config tweaks, minor fixes), **pushing directly to `main` is acceptable**; a PR is not required.
+- When working on `main` for small changes (docs, cursor rules, config tweaks, minor fixes), **pushing directly to `main` is acceptable** (no PR required), but **do not `git push` until the user explicitly approves** the change (e.g. `LGTM`, `approved`, `sgtm`) **unless they already said to commit and push in one instruction.**
 - Keep commits **small and focused**:
   - One Conductor task → one verified commit, whenever practical.
 - Commit messages should follow the pattern:
   - `<type>(<scope>): <description> (refs #issue)`
   - Example: `feat(auth): add anonymous session initialization (refs #42)`.
-- When asked to create phase or track checkpoints:
-  - Ensure all work is committed and pushed.
-  - Use `--no-verify` if tests were run immediately before push to avoid test re-runs.
-  - Use an explicit checkpoint commit message summarizing changes for that phase/track.
+- **Ad-hoc work:** After you commit, **wait for explicit user approval** (`LGTM`, `approved`, etc.) **before `git push`**, unless the user already asked you to commit and push together.
+- **Conductor:** **task-conductor** commits per task but **does not `git push`**. **project-orchestrator** **commits and pushes** at **phase** checkpoints (per that skill), including explicit checkpoint messages and optional `--no-verify` when pushing immediately after the same verification run.
 
 # User Approval & Iteration
 
@@ -50,7 +48,8 @@ alwaysApply: true
   - Report which verification steps were run and their results.
   - Then stop and wait for explicit user approval before:
     - Moving to the next Conductor task,
-    - Or making further non-trivial edits.
+    - Or making further non-trivial edits,
+    - Or **`git push`** on ad-hoc work (push only after approval unless the user already instructed commit-and-push).
 - Respect phrases like "lgtm", "sgtm", "approved" as signals that the user is satisfied.
 
 # Terminal & Working Directory

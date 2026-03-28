@@ -44,24 +44,22 @@ Ad hoc task can be implement in main.
      - If the user requests changes, apply them, verify them, and request approval again.
      - This loop continues until the user explicitly accepts the implementation (`lgtm`, `sgtm`, etc.).
 
-- **Git Tracking**
-  If user asks you to commit changes:
+- **Git Tracking (ad-hoc)**
+  If the user asks you to commit changes:
   1. **Summary:** Attach task summary to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
-  2. **Persistence:** Committed and pushed all changes
-     - when staging changes, stage only changes AI agent did, do not interfere with users works, if possible
-     - when pushing changes, use `--no-verify` if you ran tests successfully immediately before push
+  2. **Persistence:** Commit verified changes locally. **Do not `git push` until the user explicitly approves the work** (`LGTM`, `approved`, `sgtm`, etc.) **or explicitly tells you to push.** After approval (or an explicit push request), push to `origin`; use `--no-verify` only if you ran the same checks successfully immediately before that push.
+     - When staging changes, stage only changes the AI agent made; do not interfere with the user’s work, if possible.
 
 ### **Commit Strategy**
 
 - **Ad-Hoc Tasks:**
-  - Suggest user to commit an ad-hoc tasks after you get explicit approval of your changes. If you can commit:
+  - After the user approves your changes (`LGTM`, `approved`, etc.), commit if appropriate. **Push only after that approval** (or if the user explicitly asked you to commit and push in one instruction).
     1. **Summary:** Attach task summary to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
-    2. **Persistence:** Committed and pushed all changes
-       - when staging changes, stage only changes AI agent did, do not interfere with users works, if possible
+    2. **Persistence:** Commit locally first; **`git push` only after approval** (or explicit push instruction). When staging, stage only changes the AI agent made; do not interfere with the user’s work, if possible.
 - **Conductor Tasks (Phase Workflow):**
   - Complete task -> Verify -> Update `plan.md` (mark `[x]`).
-  - **Task Commit:** Commit the individual task immediately after it is verified to prevent data loss.
-  - **Phase Completion:** Once a phase is completed, the **project-orchestrator** will perform a final verification and create a **Phase Checkpoint** commit if necessary.
+  - **Task Commit:** Commit the individual task immediately after it is verified to prevent data loss. **Do not `git push` from task work**; **`git push` happens at phase checkpoints** via **project-orchestrator** (unless the user explicitly asks you to push).
+  - **Phase Completion:** Once a phase is completed, the **project-orchestrator** performs final verification, creates a **Phase Checkpoint** commit if necessary, and **pushes** to `origin` per that skill.
 
 ### **GitHub Integration:**
 
@@ -81,7 +79,7 @@ This project uses a "Track-Based" branching model to maintain focus and ensure a
   - **Merging:** When working in a branch, all PRs to sync with `main` MUST use a **rebase** strategy (no squash) to preserve a linear and detailed history. All PRs must be reviewed and approved by the user.
   - **Cross-Branch Synchronization:** When asked to implement a track or task from `main` while staying on a current working branch (e.g., `worker1`), ALWAYS synchronize the branch by running `git fetch origin main && git rebase origin/main`. NEVER surgically fetch or checkout specific files/folders from another branch, as this bypasses version control history and creates untracked file conflicts.
   - **Minor Fixes, Ad-hoc tasks & Chores:** For documentation updates, configuration tweaks, or minor verified bug fixes, you may work directly on the current branch (including `main`).
-- **Synchronization:** All changes intended for the codebase MUST be pushed to the remote repository (`origin`).
+- **Synchronization:** Changes must reach `origin` when appropriate. **Ad-hoc:** push only after user **LGTM** / **approved** (or explicit push instruction). **Conductor:** routine **`git push`** for the track happens at **phase checkpoints** through **project-orchestrator**, not after each task.
 
 ### **Core Engineering Mandates**
 
