@@ -59,7 +59,7 @@ export class TileValidator {
       return;
     }
 
-    if (tile.center?.name !== 'water') {
+    if (tile.center?.id !== 'water') {
       throw new Error(
         `Invalid tile: "${side}" terrain with linkToCenter=true requires center terrain to be water`
       );

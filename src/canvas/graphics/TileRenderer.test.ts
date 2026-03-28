@@ -1,15 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-  TileRenderer,
-  neighborEdgeTerrainsFromBoard,
-  resolveWaterOrPastureVisual,
-} from './TileRenderer';
+import { TileRenderer, neighborEdgeTerrainsFromBoard } from './TileRenderer';
+import { resolveEdgePaintTerrainType } from './segmentRenderers/WaterOrPastureSegmentRenderer';
 import { Tile } from '../../models/Tile';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { Board } from '../../models/Board';
 import { DEFAULT_HEX_STYLE } from './HexStyles';
 import {
   PastureTerrain,
+  toTerrain,
   TreeTerrain,
   WaterOrPastureTerrain,
   WaterTerrain,
@@ -36,12 +34,12 @@ describe('TileRenderer', () => {
   it('draws water overlays on top of pasture background', () => {
     const tile = new Tile({
       id: 'test-tile',
-      north: 'tree',
-      northEast: 'water',
-      southEast: 'house',
-      south: 'pasture',
-      southWest: 'rail',
-      northWest: 'field',
+      north: toTerrain('tree'),
+      northEast: toTerrain('water'),
+      southEast: toTerrain('house'),
+      south: toTerrain('pasture'),
+      southWest: toTerrain('rail'),
+      northWest: toTerrain('field'),
     });
 
     renderer.drawTile(tile, 0, 0, DEFAULT_HEX_STYLE);
@@ -62,15 +60,16 @@ describe('TileRenderer', () => {
   });
 
   it('draws center water hex when center terrain is water', () => {
+    const pasture = new PastureTerrain();
     const tile = new Tile({
       id: 'water-center',
-      center: 'water',
-      north: new WaterTerrain(true),
-      northEast: 'pasture',
-      southEast: 'pasture',
-      south: 'pasture',
-      southWest: 'pasture',
-      northWest: 'pasture',
+      center: toTerrain('water'),
+      north: new WaterTerrain({ linkToCenter: true }),
+      northEast: pasture,
+      southEast: pasture,
+      south: pasture,
+      southWest: pasture,
+      northWest: pasture,
     });
 
     renderer.drawTile(tile, 0, 0, DEFAULT_HEX_STYLE);
@@ -81,15 +80,16 @@ describe('TileRenderer', () => {
   });
 
   it('draws linked water to center and unlinked water to mid-segment point', () => {
+    const pasture = new PastureTerrain();
     const tile = new Tile({
       id: 'water-link-geometry',
-      center: 'water',
-      north: new WaterTerrain(true),
-      northEast: new WaterTerrain(false),
-      southEast: 'pasture',
-      south: 'pasture',
-      southWest: 'pasture',
-      northWest: 'pasture',
+      center: toTerrain('water'),
+      north: new WaterTerrain({ linkToCenter: true }),
+      northEast: new WaterTerrain({ linkToCenter: false }),
+      southEast: pasture,
+      south: pasture,
+      southWest: pasture,
+      northWest: pasture,
     });
 
     renderer.drawTile(tile, 0, 0, DEFAULT_HEX_STYLE);
@@ -127,32 +127,38 @@ describe('TileRenderer', () => {
     expect(y).toBeCloseTo(40 * Math.sqrt(3));
   });
 
-  it('resolves waterOrPasture visual from neighbor terrain', () => {
-    expect(resolveWaterOrPastureVisual(new WaterTerrain())).toBe('water');
-    expect(resolveWaterOrPastureVisual(new PastureTerrain())).toBe('pasture');
-    expect(resolveWaterOrPastureVisual(new WaterOrPastureTerrain())).toBe('pasture');
-    expect(resolveWaterOrPastureVisual(new TreeTerrain())).toBe('pasture');
-    expect(resolveWaterOrPastureVisual(undefined)).toBe('pasture');
+  it('resolves edge paint type from local match set and neighbor intersection', () => {
+    expect(resolveEdgePaintTerrainType(new TreeTerrain(), undefined)).toBe('tree');
+    expect(resolveEdgePaintTerrainType(new WaterTerrain(), new TreeTerrain())).toBe('water');
+    expect(resolveEdgePaintTerrainType(new PastureTerrain(), undefined)).toBe('pasture');
+
+    const wop = new WaterOrPastureTerrain();
+    expect(resolveEdgePaintTerrainType(wop, undefined)).toBe('pasture');
+    expect(resolveEdgePaintTerrainType(wop, new WaterTerrain())).toBe('water');
+    expect(resolveEdgePaintTerrainType(wop, new PastureTerrain())).toBe('pasture');
+    expect(resolveEdgePaintTerrainType(wop, new TreeTerrain())).toBe('pasture');
+    expect(resolveEdgePaintTerrainType(wop, new WaterOrPastureTerrain())).toBe('water');
   });
 
   it('builds neighbor edge terrains from board', () => {
     const board = new Board();
     const center = new HexCoordinate(0, 0, 0);
     const northN = new HexCoordinate(-1, 0, 1);
-    board.place(new Tile({ id: 'n', south: 'water' }), northN);
+    board.place(new Tile({ id: 'n', south: toTerrain('water') }), northN);
     const map = neighborEdgeTerrainsFromBoard(board, center);
-    expect(map.north?.name).toBe('water');
+    expect(map.north?.id).toBe('water');
   });
 
   it('draws waterOrPasture as water when neighbor across edge is water', () => {
+    const pasture = new PastureTerrain();
     const tile = new Tile({
       id: 'wop-water',
-      north: new WaterOrPastureTerrain(false),
-      northEast: 'pasture',
-      southEast: 'pasture',
-      south: 'pasture',
-      southWest: 'pasture',
-      northWest: 'pasture',
+      north: new WaterOrPastureTerrain({ linkToCenter: false }),
+      northEast: pasture,
+      southEast: pasture,
+      south: pasture,
+      southWest: pasture,
+      northWest: pasture,
     });
     renderer.drawTile(tile, 0, 0, DEFAULT_HEX_STYLE, {
       neighborEdgeTerrains: { north: new WaterTerrain() },
@@ -161,14 +167,15 @@ describe('TileRenderer', () => {
   });
 
   it('draws waterOrPasture as pasture when neighbor is tree', () => {
+    const pasture = new PastureTerrain();
     const tile = new Tile({
       id: 'wop-tree',
-      north: new WaterOrPastureTerrain(false),
-      northEast: 'pasture',
-      southEast: 'pasture',
-      south: 'pasture',
-      southWest: 'pasture',
-      northWest: 'pasture',
+      north: new WaterOrPastureTerrain({ linkToCenter: false }),
+      northEast: pasture,
+      southEast: pasture,
+      south: pasture,
+      southWest: pasture,
+      northWest: pasture,
     });
     renderer.drawTile(tile, 0, 0, DEFAULT_HEX_STYLE, {
       neighborEdgeTerrains: { north: new TreeTerrain() },

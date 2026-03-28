@@ -5,6 +5,7 @@ import { GameRules } from './GameRules';
 import { Tile } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
 import { Board } from './Board';
+import { toTerrain } from './Terrain';
 
 describe('GameSerializer', () => {
   it('should accurately serialize and deserialize a new game', () => {
@@ -85,7 +86,7 @@ describe('GameSerializer', () => {
 
     // 2. Serialize
     const json: GameJSON = GameSerializer.serialize(game);
-    
+
     // We expect 1 initial tile + 4 placed tiles
     expect(json.board.tiles.length).toBe(5);
 
@@ -102,7 +103,7 @@ describe('GameSerializer', () => {
     expect(() => {
       restoredGame.placeTile(new HexCoordinate(0, 1, -1));
     }).not.toThrow();
-    
+
     // After placing another tile, board size should increase
     expect(Array.from(restoredGame.board.getAll()).length).toBe(6);
   });
@@ -111,13 +112,13 @@ describe('GameSerializer', () => {
     const board = new Board();
     const centered = new Tile({
       id: 'centered',
-      center: 'house',
-      north: 'tree',
-      northEast: 'water',
-      southEast: 'pasture',
-      south: 'field',
-      southWest: 'rail',
-      northWest: 'house',
+      center: toTerrain('house'),
+      north: toTerrain('tree'),
+      northEast: toTerrain('water'),
+      southEast: toTerrain('pasture'),
+      south: toTerrain('field'),
+      southWest: toTerrain('rail'),
+      northWest: toTerrain('house'),
     });
     board.place(centered, new HexCoordinate(0, 0, 0));
 
@@ -135,6 +136,6 @@ describe('GameSerializer', () => {
 
     const restored = GameSerializer.deserialize(json);
     const restoredTile = restored.board.get(new HexCoordinate(0, 0, 0))?.tile;
-    expect(restoredTile?.center?.name).toBe('house');
+    expect(restoredTile?.center?.id).toBe('house');
   });
 });

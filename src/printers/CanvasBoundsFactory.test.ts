@@ -6,6 +6,7 @@ import {
 import { Board } from '../models/Board';
 import { Tile } from '../models/Tile';
 import { HexCoordinate } from '../models/HexCoordinate';
+import { toTerrain } from '../models/Terrain';
 
 describe('CanvasBoundsFactory', () => {
   describe('UninitializedCanvasBoundsFactory', () => {
@@ -19,14 +20,14 @@ describe('CanvasBoundsFactory', () => {
     it('stretch() should return an InitializedCanvasBoundsFactory with the bounds of the first tile', () => {
       const factory = new UninitializedCanvasBoundsFactory();
       const board = new Board();
-      const tile = new Tile({ 
+      const tile = new Tile({
         id: 'test',
-        north: 'pasture',
-        northEast: 'pasture',
-        southEast: 'pasture',
-        south: 'pasture',
-        southWest: 'pasture',
-        northWest: 'pasture',
+        north: toTerrain('pasture'),
+        northEast: toTerrain('pasture'),
+        southEast: toTerrain('pasture'),
+        south: toTerrain('pasture'),
+        southWest: toTerrain('pasture'),
+        northWest: toTerrain('pasture'),
       });
       const coord = new HexCoordinate(5, -10, 5);
       board.place(tile, coord);
@@ -61,14 +62,14 @@ describe('CanvasBoundsFactory', () => {
       const factory = new InitializedCanvasBoundsFactory(initialBounds);
 
       const board = new Board();
-      const tile = new Tile({ 
+      const tile = new Tile({
         id: 'test',
-        north: 'pasture',
-        northEast: 'pasture',
-        southEast: 'pasture',
-        south: 'pasture',
-        southWest: 'pasture',
-        northWest: 'pasture',
+        north: toTerrain('pasture'),
+        northEast: toTerrain('pasture'),
+        southEast: toTerrain('pasture'),
+        south: toTerrain('pasture'),
+        southWest: toTerrain('pasture'),
+        northWest: toTerrain('pasture'),
       });
       const coord = new HexCoordinate(1, 0, -1); // Placed to the south-east of the initial bounds
       board.place(tile, coord);
@@ -91,14 +92,14 @@ describe('CanvasBoundsFactory', () => {
       const factory = new InitializedCanvasBoundsFactory(initialBounds);
 
       const board = new Board();
-      const tile = new Tile({ 
+      const tile = new Tile({
         id: 'test',
-        north: 'pasture',
-        northEast: 'pasture',
-        southEast: 'pasture',
-        south: 'pasture',
-        southWest: 'pasture',
-        northWest: 'pasture',
+        north: toTerrain('pasture'),
+        northEast: toTerrain('pasture'),
+        southEast: toTerrain('pasture'),
+        south: toTerrain('pasture'),
+        southWest: toTerrain('pasture'),
+        northWest: toTerrain('pasture'),
       });
       const coord = new HexCoordinate(-1, 0, 1); // Placed to the north-west of the initial bounds
       board.place(tile, coord);

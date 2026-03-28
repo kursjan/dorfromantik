@@ -26,12 +26,12 @@ test.describe('Rotation Logic', () => {
       const game = (window as any).canvasCtrl.activeGame;
       const tile = game.tileQueue[0];
       return {
-        northWest: tile.northWest
+        northWest: tile.northWest,
       };
     });
 
     // Check rotation logic: Old North -> New NorthWest (Clockwise 60°)
-    expect(newTile.northWest).toBe(initialTile.north);
+    expect(newTile.northWest.id).toBe(initialTile.north.id);
   });
 
   test('should rotate the current tile counter-clockwise when "F" is pressed', async ({ page }) => {
@@ -52,14 +52,14 @@ test.describe('Rotation Logic', () => {
       const game = (window as any).canvasCtrl.activeGame;
       const tile = game.tileQueue[0];
       return {
-        northEast: tile.northEast
+        northEast: tile.northEast,
       };
     });
 
     // Check rotation logic: Old North -> New NorthEast (Counter-Clockwise 60°)
-    expect(newTile.northEast).toBe(initialTile.north);
+    expect(newTile.northEast.id).toBe(initialTile.north.id);
   });
-  
+
   test('should rotate the current tile clockwise on Right Click', async ({ page }) => {
     const initialTile = await page.evaluate(() => {
       const game = (window as any).canvasCtrl.activeGame;
@@ -70,7 +70,7 @@ test.describe('Rotation Logic', () => {
     const canvas = page.locator('canvas[data-testid="game-canvas"]');
     const box = await canvas.boundingBox();
     if (!box) throw new Error('Canvas not found');
-    
+
     // Right Click
     await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2, { button: 'right' });
 
@@ -80,10 +80,12 @@ test.describe('Rotation Logic', () => {
       return { northWest: tile.northWest };
     });
 
-    expect(newTile.northWest).toBe(initialTile.north);
+    expect(newTile.northWest.id).toBe(initialTile.north.id);
   });
 
-  test('should rotate the current tile counter-clockwise on Shift + Right Click', async ({ page }) => {
+  test('should rotate the current tile counter-clockwise on Shift + Right Click', async ({
+    page,
+  }) => {
     const initialTile = await page.evaluate(() => {
       const game = (window as any).canvasCtrl.activeGame;
       const tile = game.tileQueue[0];
@@ -93,7 +95,7 @@ test.describe('Rotation Logic', () => {
     const canvas = page.locator('canvas[data-testid="game-canvas"]');
     const box = await canvas.boundingBox();
     if (!box) throw new Error('Canvas not found');
-    
+
     // Shift + Right Click
     await page.keyboard.down('Shift');
     await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2, { button: 'right' });
@@ -105,6 +107,6 @@ test.describe('Rotation Logic', () => {
       return { northEast: tile.northEast };
     });
 
-    expect(newTile.northEast).toBe(initialTile.north);
+    expect(newTile.northEast.id).toBe(initialTile.north.id);
   });
 });

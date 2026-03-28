@@ -1,6 +1,7 @@
 import { Game } from './Game';
 import { Board } from './Board';
-import { Tile, type TerrainType } from './Tile';
+import { Tile, type TerrainId } from './Tile';
+import { toTerrain } from './Terrain';
 import { HexCoordinate } from './HexCoordinate';
 import { GameRules } from './GameRules';
 
@@ -12,13 +13,13 @@ export interface HexCoordinateJSON {
 
 export interface TileJSON {
   id: string;
-  center?: TerrainType;
-  north: TerrainType;
-  northEast: TerrainType;
-  southEast: TerrainType;
-  south: TerrainType;
-  southWest: TerrainType;
-  northWest: TerrainType;
+  center?: TerrainId;
+  north: TerrainId;
+  northEast: TerrainId;
+  southEast: TerrainId;
+  south: TerrainId;
+  southWest: TerrainId;
+  northWest: TerrainId;
 }
 
 export interface BoardTileJSON {
@@ -110,26 +111,26 @@ export class GameSerializer {
   private static serializeTile(tile: Tile): TileJSON {
     return {
       id: tile.id,
-      center: tile.center?.name,
-      north: tile.north.name,
-      northEast: tile.northEast.name,
-      southEast: tile.southEast.name,
-      south: tile.south.name,
-      southWest: tile.southWest.name,
-      northWest: tile.northWest.name,
+      center: tile.center?.id,
+      north: tile.north.id,
+      northEast: tile.northEast.id,
+      southEast: tile.southEast.id,
+      south: tile.south.id,
+      southWest: tile.southWest.id,
+      northWest: tile.northWest.id,
     };
   }
 
   private static deserializeTile(json: TileJSON): Tile {
     return new Tile({
       id: json.id,
-      center: json.center,
-      north: json.north,
-      northEast: json.northEast,
-      southEast: json.southEast,
-      south: json.south,
-      southWest: json.southWest,
-      northWest: json.northWest,
+      center: json.center !== undefined ? toTerrain(json.center) : undefined,
+      north: toTerrain(json.north),
+      northEast: toTerrain(json.northEast),
+      southEast: toTerrain(json.southEast),
+      south: toTerrain(json.south),
+      southWest: toTerrain(json.southWest),
+      northWest: toTerrain(json.northWest),
     });
   }
 

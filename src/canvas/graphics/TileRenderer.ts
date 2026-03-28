@@ -1,6 +1,8 @@
 import { Tile } from '../../models/Tile';
 import { getHexCorners, hexToPixel } from '../utils/HexUtils';
 import { type HexStyle, TERRAIN_COLORS, DEFAULT_HEX_STYLE } from './HexStyles';
+import type { WedgeDrawContext } from './segmentRenderers/WedgeDrawContext';
+import { TERRAIN_ID_SEGMENT_RENDERERS } from './segmentRenderers/terrainIdSegmentRenderers';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { Board } from '../../models/Board';
 import { directions, getNeighbor, getOpposite, type Direction } from '../../models/Navigation';
@@ -9,19 +11,6 @@ import { WaterOrPastureTerrain, WaterTerrain, type Terrain } from '../../models/
 export interface TileDrawOptions {
   /** Terrain on the neighbor tile along the shared edge for each direction (see `neighborEdgeTerrainsFromBoard`). */
   neighborEdgeTerrains?: Partial<Record<Direction, Terrain>>;
-}
-
-/**
- * How to paint a `waterOrPasture` wedge: water-like vs pasture, from the neighbor across that edge.
- */
-export function resolveWaterOrPastureVisual(
-  neighborTerrain: Terrain | undefined
-): 'water' | 'pasture' {
-  if (!neighborTerrain) return 'pasture';
-  if (neighborTerrain.name === 'water') return 'water';
-  if (neighborTerrain.name === 'pasture') return 'pasture';
-  if (neighborTerrain.name === 'waterOrPasture') return 'pasture';
-  return 'pasture';
 }
 
 export function neighborEdgeTerrainsFromBoard(
@@ -47,21 +36,6 @@ export class TileRenderer {
   }
 
   /**
-   * Draws a 6-sided tile at a specific hex coordinate.
-   * Pass `board` so `waterOrPasture` edges resolve against real neighbors.
-   */
-  drawTileAtHex(
-    tile: Tile,
-    hex: HexCoordinate,
-    style: HexStyle = DEFAULT_HEX_STYLE,
-    board?: Board
-  ) {
-    const { x, y } = hexToPixel(hex, style.size);
-    const neighborEdgeTerrains = board ? neighborEdgeTerrainsFromBoard(board, hex) : undefined;
-    this.drawTile(tile, x, y, style, { neighborEdgeTerrains });
-  }
-
-  /**
    * Draws a 6-sided tile with terrains represented by colors at pixel coordinates (x, y).
    */
   drawTile(
@@ -76,7 +50,6 @@ export class TileRenderer {
 
     const corners = getHexCorners(x, y, style.size);
     const terrainsMap = tile.getTerrains();
-    const waterSegments: { index: number; linkToCenter: boolean }[] = [];
 
     for (let i = 0; i < directions.length; i++) {
       const direction = directions[i];
@@ -84,40 +57,26 @@ export class TileRenderer {
       const startCorner = (i + 4) % 6;
       const endCorner = (i + 5) % 6;
 
-      let fillColor: string;
-      if (terrain.name === 'water') {
-        fillColor = TERRAIN_COLORS.pasture;
-        waterSegments.push({
-          index: i,
-          linkToCenter: terrain instanceof WaterTerrain && terrain.linkToCenter,
-        });
-      } else if (terrain.name === 'waterOrPasture') {
-        const neighbor = options?.neighborEdgeTerrains?.[direction];
-        const visual = resolveWaterOrPastureVisual(neighbor);
-        if (visual === 'water') {
-          fillColor = TERRAIN_COLORS.pasture;
-          waterSegments.push({
-            index: i,
-            linkToCenter: terrain instanceof WaterOrPastureTerrain && terrain.linkToCenter,
-          });
-        } else {
-          fillColor = TERRAIN_COLORS.pasture;
-        }
-      } else {
-        fillColor = TERRAIN_COLORS[terrain.name];
-      }
+      const linkWaterStrokeToCenter =
+        (terrain instanceof WaterTerrain || terrain instanceof WaterOrPastureTerrain) &&
+        terrain.linkToCenter;
 
-      this.ctx.beginPath();
-      this.ctx.moveTo(x, y);
-      this.ctx.lineTo(corners[startCorner].x, corners[startCorner].y);
-      this.ctx.lineTo(corners[endCorner].x, corners[endCorner].y);
-      this.ctx.closePath();
+      const wedgeContext: WedgeDrawContext = {
+        ctx: this.ctx,
+        centerX: x,
+        centerY: y,
+        corners,
+        segmentIndex: i,
+        startCorner,
+        endCorner,
+        style,
+        linkWaterStrokeToCenter,
+      };
 
-      this.ctx.fillStyle = fillColor;
-      this.ctx.fill();
+      const neighborAcrossEdge = options?.neighborEdgeTerrains?.[direction];
+      TERRAIN_ID_SEGMENT_RENDERERS[terrain.id].render(wedgeContext, neighborAcrossEdge);
     }
 
-    this.drawWaterSegments(corners, x, y, style, waterSegments);
     this.drawWaterCenter(tile, x, y, style);
 
     // Draw hex outline
@@ -135,45 +94,23 @@ export class TileRenderer {
     this.ctx.globalAlpha = originalAlpha;
   }
 
-  private drawWaterSegments(
-    corners: { x: number; y: number }[],
-    centerX: number,
-    centerY: number,
-    style: HexStyle,
-    waterSegments: { index: number; linkToCenter: boolean }[]
-  ): void {
-    this.ctx.strokeStyle = TERRAIN_COLORS.water;
-    this.ctx.lineWidth = Math.max(5, style.size * 0.24);
-
-    for (const segment of waterSegments) {
-      const startCorner = (segment.index + 4) % 6;
-      const endCorner = (segment.index + 5) % 6;
-      const edgeMidpoint = {
-        x: (corners[startCorner].x + corners[endCorner].x) / 2,
-        y: (corners[startCorner].y + corners[endCorner].y) / 2,
-      };
-      const target = segment.linkToCenter
-        ? { x: centerX, y: centerY }
-        : {
-            x: (edgeMidpoint.x + centerX) / 2,
-            y: (edgeMidpoint.y + centerY) / 2,
-          };
-
-      this.ctx.beginPath();
-      this.ctx.moveTo(edgeMidpoint.x, edgeMidpoint.y);
-      const dx = target.x - edgeMidpoint.x;
-      const dy = target.y - edgeMidpoint.y;
-      const length = Math.hypot(dx, dy) || 1;
-      const curveStrength = style.size * 0.08;
-      const controlX = (edgeMidpoint.x + target.x) / 2 + (-dy / length) * curveStrength;
-      const controlY = (edgeMidpoint.y + target.y) / 2 + (dx / length) * curveStrength;
-      this.ctx.quadraticCurveTo(controlX, controlY, target.x, target.y);
-      this.ctx.stroke();
-    }
+  /**
+   * Draws a 6-sided tile at a specific hex coordinate.
+   * Pass `board` so `waterOrPasture` edges resolve against real neighbors.
+   */
+  drawTileAtHex(
+    tile: Tile,
+    hex: HexCoordinate,
+    style: HexStyle = DEFAULT_HEX_STYLE,
+    board?: Board
+  ) {
+    const { x, y } = hexToPixel(hex, style.size);
+    const neighborEdgeTerrains = board ? neighborEdgeTerrainsFromBoard(board, hex) : undefined;
+    this.drawTile(tile, x, y, style, { neighborEdgeTerrains });
   }
 
   private drawWaterCenter(tile: Tile, x: number, y: number, style: HexStyle): void {
-    if (tile.center?.name !== 'water') {
+    if (tile.center?.id !== 'water') {
       return;
     }
 

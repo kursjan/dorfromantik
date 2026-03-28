@@ -3,6 +3,7 @@ import { Game } from './Game';
 import { Board } from './Board';
 import { GameRules, RandomTileGenerator, SequenceTileGenerator } from './GameRules';
 import { Tile } from './Tile';
+import { toTerrain } from './Terrain';
 import { HexCoordinate } from './HexCoordinate';
 import { GameScorer } from './GameScorer';
 // Add missing tests: https://github.com/kursjan/dorfromantik/issues/35
@@ -22,12 +23,12 @@ describe('Game', () => {
     it('should create a game with an initial tile placed at origin', () => {
       const startTile = new Tile({
         id: 'custom-start',
-        north: 'tree',
-        northEast: 'pasture',
-        southEast: 'pasture',
-        south: 'rail',
-        southWest: 'pasture',
-        northWest: 'pasture',
+        north: toTerrain('tree'),
+        northEast: toTerrain('pasture'),
+        southEast: toTerrain('pasture'),
+        south: toTerrain('rail'),
+        southWest: toTerrain('pasture'),
+        northWest: toTerrain('pasture'),
       });
 
       const customRules = new GameRules({
@@ -57,24 +58,25 @@ describe('Game', () => {
 
       expect(placedTile).toBeDefined();
       const { tile } = placedTile!;
-      expect(tile.north.name).toBe('pasture');
-      expect(tile.northEast.name).toBe('pasture');
-      expect(tile.southEast.name).toBe('pasture');
-      expect(tile.south.name).toBe('pasture');
-      expect(tile.southWest.name).toBe('pasture');
-      expect(tile.northWest.name).toBe('pasture');
+      expect(tile.north.id).toBe('pasture');
+      expect(tile.northEast.id).toBe('pasture');
+      expect(tile.southEast.id).toBe('pasture');
+      expect(tile.south.id).toBe('pasture');
+      expect(tile.southWest.id).toBe('pasture');
+      expect(tile.northWest.id).toBe('pasture');
     });
   });
 
   it('should peek the top of the queue without removing it', () => {
+    const tree = toTerrain('tree');
     const tile = new Tile({
       id: 't1',
-      north: 'tree',
-      northEast: 'tree',
-      southEast: 'tree',
-      south: 'tree',
-      southWest: 'tree',
-      northWest: 'tree',
+      north: tree,
+      northEast: tree,
+      southEast: tree,
+      south: tree,
+      southWest: tree,
+      northWest: tree,
     });
 
     const customRules = new GameRules({
@@ -132,12 +134,12 @@ describe('Game', () => {
     it('should rotate the next tile in the queue clockwise', () => {
       const tile = new Tile({
         id: 't1',
-        north: 'tree',
-        northEast: 'house',
-        southEast: 'water',
-        south: 'pasture',
-        southWest: 'rail',
-        northWest: 'field',
+        north: toTerrain('tree'),
+        northEast: toTerrain('house'),
+        southEast: toTerrain('water'),
+        south: toTerrain('pasture'),
+        southWest: toTerrain('rail'),
+        northWest: toTerrain('field'),
       });
 
       const customRules = new GameRules({
@@ -149,30 +151,30 @@ describe('Game', () => {
       game.rotateQueuedTileClockwise();
 
       const rotated = game.peek()!;
-      expect(rotated.north.name).toBe('house');
+      expect(rotated.north.id).toBe('house');
     });
 
     it('should rotate the next tile in the queue counter-clockwise', () => {
       const tile = new Tile({
         id: 't1',
-        north: 'tree',
-        northEast: 'house',
-        southEast: 'water',
-        south: 'pasture',
-        southWest: 'rail',
-        northWest: 'field',
+        north: toTerrain('tree'),
+        northEast: toTerrain('house'),
+        southEast: toTerrain('water'),
+        south: toTerrain('pasture'),
+        southWest: toTerrain('rail'),
+        northWest: toTerrain('field'),
       });
 
       const customRules = new GameRules({
         initialTurns: 1,
         tileGenerator: new SequenceTileGenerator([tile]),
       });
-      const game = Game.create(customRules)
+      const game = Game.create(customRules);
 
       game.rotateQueuedTileCounterClockwise();
 
       const rotated = game.peek()!;
-      expect(rotated.north.name).toBe('field');
+      expect(rotated.north.id).toBe('field');
     });
 
     it('should throw error if queue is empty', () => {
@@ -181,7 +183,7 @@ describe('Game', () => {
         tileGenerator: new SequenceTileGenerator([]),
       });
 
-      const game = Game.create(customRules)
+      const game = Game.create(customRules);
       expect(() => game.rotateQueuedTileClockwise()).toThrow('No tiles remaining in the queue');
     });
   });
@@ -193,7 +195,7 @@ describe('Game', () => {
         tileGenerator: new SequenceTileGenerator([]),
       });
 
-      const game = Game.create(customRules)
+      const game = Game.create(customRules);
 
       const coord = new HexCoordinate(1, 0, -1);
       expect(() => game.placeTile(coord)).toThrow('No tiles remaining in the queue');

@@ -1,18 +1,19 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Board } from './Board';
 import { Tile } from './Tile';
+import { toTerrain } from './Terrain';
 import { HexCoordinate } from './HexCoordinate';
 
 describe('Board', () => {
   let board: Board;
   const tile = new Tile({
     id: 'test-tile',
-    north: 'tree',
-    northEast: 'house',
-    southEast: 'water',
-    south: 'pasture',
-    southWest: 'rail',
-    northWest: 'field',
+    north: toTerrain('tree'),
+    northEast: toTerrain('house'),
+    southEast: toTerrain('water'),
+    south: toTerrain('pasture'),
+    southWest: toTerrain('rail'),
+    northWest: toTerrain('field'),
   });
   const coord = new HexCoordinate(0, 0, 0);
 
@@ -70,7 +71,7 @@ describe('Board', () => {
 
     const placedTile = board.get(coord)!;
     const neighbors = board.getExistingNeighbors(placedTile);
-    
+
     expect(Object.keys(neighbors).length).toBe(1);
     expect(neighbors.north?.coordinate.getKey()).toBe(neighborCoord.getKey());
   });
@@ -92,7 +93,7 @@ describe('Board', () => {
     board.place(tile, coord2);
 
     const validCoords = board.getValidPlacementCoordinates();
-    
+
     // Origin has 6 neighbors. Neighbor (1,-1,0) is occupied.
     // So 5 neighbors from origin + neighbors of (1,-1,0) that are not origin or occupied.
     // Neighbors of (0,0,0): (0,1,-1), (1,0,-1), (1,-1,0) [OCCUPIED], (0,-1,1), (-1,0,1), (-1,1,0)

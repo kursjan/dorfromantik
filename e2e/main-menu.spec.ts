@@ -8,7 +8,8 @@ test.describe('Main Menu', () => {
   test('renders the main menu correctly', async ({ page }) => {
     await expect(page.locator('h1', { hasText: 'Dorfromantik' })).toBeVisible();
     await expect(page.getByRole('button', { name: /Standard Game/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Test Game/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Test Game$/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Test Game 2/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /Settings/i })).toBeVisible();
     await expect(page.locator('text=Continue Journey')).toBeVisible();
   });

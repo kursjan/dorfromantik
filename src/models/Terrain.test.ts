@@ -8,12 +8,12 @@ describe('WaterTerrain', () => {
   });
 
   it('allows overriding linkToCenter', () => {
-    const terrain = new WaterTerrain(true);
+    const terrain = new WaterTerrain({ linkToCenter: true });
     expect(terrain.linkToCenter).toBe(true);
   });
 
   it('matches by terrain category for edge checks', () => {
-    expect(new WaterTerrain().matchesForEdge(new WaterTerrain(true))).toBe(true);
+    expect(new WaterTerrain().matchesForEdge(new WaterTerrain({ linkToCenter: true }))).toBe(true);
     expect(new WaterTerrain().matchesForEdge(new TreeTerrain())).toBe(false);
     expect(new WaterTerrain().matchesForEdge(new WaterOrPastureTerrain())).toBe(true);
   });

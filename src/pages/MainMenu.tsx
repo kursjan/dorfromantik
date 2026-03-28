@@ -29,8 +29,14 @@ export const MainMenu: React.FC = () => {
     navigate('/game');
   };
 
+  const handleStartTest2 = () => {
+    const game = Game.create(GameRules.createTest2());
+    setActiveGame(game);
+    navigate('/game');
+  };
+
   const handleContinue = (gameId: string) => {
-    const game = games.find(g => g.id === gameId);
+    const game = games.find((g) => g.id === gameId);
     if (game) {
       setActiveGame(game);
       navigate('/game');
@@ -41,7 +47,7 @@ export const MainMenu: React.FC = () => {
     try {
       await authService.signOut();
     } catch (error) {
-      console.error("Logout failed", error);
+      console.error('Logout failed', error);
     }
   };
 
@@ -51,7 +57,9 @@ export const MainMenu: React.FC = () => {
         <header className="main-menu__header">
           <h1 className="main-menu__title">Dorfromantik</h1>
           <div className="main-menu__profile">
-            <span className={`main-menu__profile-badge ${user.isAnonymous ? 'main-menu__profile-badge--anon' : 'main-menu__profile-badge--perm'}`}>
+            <span
+              className={`main-menu__profile-badge ${user.isAnonymous ? 'main-menu__profile-badge--anon' : 'main-menu__profile-badge--perm'}`}
+            >
               {user.isAnonymous ? 'Guest' : 'Player'}
             </span>
             <span className="main-menu__profile-name">
@@ -59,31 +67,34 @@ export const MainMenu: React.FC = () => {
             </span>
           </div>
         </header>
-        
+
         <div className="main-menu__content">
           <div className="main-menu__sidebar">
             <span className="main-menu__section-title">New Game</span>
             <div className="main-menu__actions">
-              <button 
-                className="main-menu__button"
-                onClick={handleStartStandard}
-              >
+              <button className="main-menu__button" onClick={handleStartStandard}>
                 Standard Game
               </button>
-              <button 
+              <button
                 className="main-menu__button main-menu__button--secondary"
                 onClick={handleStartTest}
               >
                 Test Game
               </button>
-              <button 
+              <button
+                className="main-menu__button main-menu__button--secondary"
+                onClick={handleStartTest2}
+              >
+                Test Game 2
+              </button>
+              <button
                 className="main-menu__button main-menu__button--secondary"
                 onClick={() => setIsSettingsOpen(true)}
               >
                 Settings
               </button>
               {!user.isAnonymous && (
-                <button 
+                <button
                   className="main-menu__button main-menu__button--danger"
                   onClick={handleLogout}
                 >
@@ -96,8 +107,8 @@ export const MainMenu: React.FC = () => {
           <div className="main-menu__games-section">
             <span className="main-menu__section-title">Continue Journey</span>
             <div className="main-menu__games-list">
-              {games.map(game => (
-                <GameCard 
+              {games.map((game) => (
+                <GameCard
                   key={game.id}
                   id={game.id}
                   name={game.name}
@@ -111,12 +122,7 @@ export const MainMenu: React.FC = () => {
         </div>
       </div>
 
-      <SettingsModal 
-        isOpen={isSettingsOpen} 
-        onClose={() => setIsSettingsOpen(false)} 
-      />
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 };
-
-

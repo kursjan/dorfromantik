@@ -1,16 +1,18 @@
 import type { Direction } from './Navigation';
 import {
+  PastureTerrain,
+  TERRAIN_IDS,
   TERRAIN_TYPES,
-  type TerrainName,
+  type TerrainId,
+  type TerrainType,
   Terrain,
-  toTerrain,
 } from './Terrain';
 import { TileValidator } from './TileValidator';
 
-export { TERRAIN_TYPES };
-export type TerrainType = TerrainName;
+export { TERRAIN_TYPES, TERRAIN_IDS };
+export type { TerrainId, TerrainType };
 export type TerrainEntity = Terrain;
-export type TileOptions = TileMixedTerrainOptions;
+export type TileOptions = TileTerrainOptions;
 
 export interface TileTerrainOptions {
   id?: string;
@@ -21,34 +23,6 @@ export interface TileTerrainOptions {
   south?: Terrain;
   southWest?: Terrain;
   northWest?: Terrain;
-}
-
-/**
- * @deprecated Use `TileTerrainOptions` and pass `Terrain` objects instead.
- */
-export interface TileTerrainNameOptions {
-  id?: string;
-  center?: TerrainName;
-  north?: TerrainName;
-  northEast?: TerrainName;
-  southEast?: TerrainName;
-  south?: TerrainName;
-  southWest?: TerrainName;
-  northWest?: TerrainName;
-}
-
-/**
- * @deprecated Compatibility overload for mixed terrain names and terrain instances.
- */
-export interface TileMixedTerrainOptions {
-  id?: string;
-  center?: Terrain | TerrainName;
-  north?: Terrain | TerrainName;
-  northEast?: Terrain | TerrainName;
-  southEast?: Terrain | TerrainName;
-  south?: Terrain | TerrainName;
-  southWest?: Terrain | TerrainName;
-  northWest?: Terrain | TerrainName;
 }
 
 export class Tile {
@@ -65,33 +39,19 @@ export class Tile {
   readonly southWest: Terrain;
   readonly northWest: Terrain;
 
-  constructor(options?: TileTerrainOptions);
-  /**
-   * @deprecated Use `new Tile({ ...Terrain objects... })` instead of terrain names.
-   */
-  constructor(options?: TileTerrainNameOptions);
-  /**
-   * @deprecated Use `new Tile({ ...Terrain objects... })` instead of mixed value types.
-   */
-  constructor(options?: TileMixedTerrainOptions);
-  constructor(options: TileTerrainOptions | TileTerrainNameOptions | TileMixedTerrainOptions = {}) {
+  constructor(options: TileTerrainOptions = {}) {
+    const defaultSide = () => new PastureTerrain();
+
     this.id = options.id ?? `tile-${Date.now()}-${Tile.idCounter++}`;
-    this.center = this.toOptionalTerrain(options.center);
-    this.north = this.toRequiredTerrain(options.north);
-    this.northEast = this.toRequiredTerrain(options.northEast);
-    this.southEast = this.toRequiredTerrain(options.southEast);
-    this.south = this.toRequiredTerrain(options.south);
-    this.southWest = this.toRequiredTerrain(options.southWest);
-    this.northWest = this.toRequiredTerrain(options.northWest);
+    this.center = options.center;
+    this.north = options.north ?? defaultSide();
+    this.northEast = options.northEast ?? defaultSide();
+    this.southEast = options.southEast ?? defaultSide();
+    this.south = options.south ?? defaultSide();
+    this.southWest = options.southWest ?? defaultSide();
+    this.northWest = options.northWest ?? defaultSide();
+
     Tile.validator.validate(this);
-  }
-
-  private toRequiredTerrain(input: Terrain | TerrainName | undefined): Terrain {
-    return toTerrain(input ?? 'pasture');
-  }
-
-  private toOptionalTerrain(input: Terrain | TerrainName | undefined): Terrain | undefined {
-    return input ? toTerrain(input) : undefined;
   }
 
   /**

@@ -1,19 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { Tile } from './Tile';
 import { TileValidator } from './TileValidator';
-import { WaterOrPastureTerrain, WaterTerrain } from './Terrain';
+import { toTerrain, WaterOrPastureTerrain, WaterTerrain } from './Terrain';
 
 describe('TileValidator', () => {
   it('accepts a valid tile', () => {
     const tile = new Tile({
       id: 'valid-tile',
-      center: 'water',
-      north: 'tree',
-      northEast: 'house',
-      southEast: 'water',
-      south: 'pasture',
-      southWest: 'rail',
-      northWest: 'field',
+      center: toTerrain('water'),
+      north: toTerrain('tree'),
+      northEast: toTerrain('house'),
+      southEast: toTerrain('water'),
+      south: toTerrain('pasture'),
+      southWest: toTerrain('rail'),
+      northWest: toTerrain('field'),
     });
 
     const validator = new TileValidator();
@@ -45,13 +45,13 @@ describe('TileValidator', () => {
       () =>
         new Tile({
           id: 'linked-water-invalid',
-          center: 'tree',
-          north: new WaterTerrain(true),
-          northEast: 'house',
-          southEast: 'water',
-          south: 'pasture',
-          southWest: 'rail',
-          northWest: 'field',
+          center: toTerrain('tree'),
+          north: new WaterTerrain({ linkToCenter: true }),
+          northEast: toTerrain('house'),
+          southEast: toTerrain('water'),
+          south: toTerrain('pasture'),
+          southWest: toTerrain('rail'),
+          northWest: toTerrain('field'),
         })
     ).toThrow(
       'Invalid tile: "north" terrain with linkToCenter=true requires center terrain to be water'
@@ -63,13 +63,13 @@ describe('TileValidator', () => {
       () =>
         new Tile({
           id: 'wop-linked',
-          center: 'pasture',
-          north: new WaterOrPastureTerrain(true),
-          northEast: 'house',
-          southEast: 'water',
-          south: 'pasture',
-          southWest: 'rail',
-          northWest: 'field',
+          center: toTerrain('pasture'),
+          north: new WaterOrPastureTerrain({ linkToCenter: true }),
+          northEast: toTerrain('house'),
+          southEast: toTerrain('water'),
+          south: toTerrain('pasture'),
+          southWest: toTerrain('rail'),
+          northWest: toTerrain('field'),
         })
     ).toThrow(
       'Invalid tile: "north" terrain with linkToCenter=true requires center terrain to be water'
@@ -80,13 +80,13 @@ describe('TileValidator', () => {
     const validator = new TileValidator();
     const tile = new Tile({
       id: 'linked-water-valid',
-      center: 'water',
-      north: new WaterTerrain(true),
-      northEast: 'house',
-      southEast: 'water',
-      south: 'pasture',
-      southWest: 'rail',
-      northWest: 'field',
+      center: toTerrain('water'),
+      north: new WaterTerrain({ linkToCenter: true }),
+      northEast: toTerrain('house'),
+      southEast: toTerrain('water'),
+      south: toTerrain('pasture'),
+      southWest: toTerrain('rail'),
+      northWest: toTerrain('field'),
     });
 
     expect(() => validator.validate(tile)).not.toThrow();

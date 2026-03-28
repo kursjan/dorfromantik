@@ -2,18 +2,19 @@ import { describe, it, expect } from 'vitest';
 import { TilePrinter } from './TilePrinter';
 import { Canvas } from './Canvas';
 import { Tile } from '../models/Tile';
+import { toTerrain } from '../models/Terrain';
 
 describe('TilePrinter', () => {
   it('should print a tile correctly onto the canvas', () => {
     const canvas = new Canvas({ topLeft: { x: 0, y: 0 }, bottomRight: { x: 8, y: 4 } });
     const tile = new Tile({
       id: 'test',
-      north: 'tree',
-      northEast: 'house',
-      southEast: 'water',
-      south: 'pasture',
-      southWest: 'rail',
-      northWest: 'field',
+      north: toTerrain('tree'),
+      northEast: toTerrain('house'),
+      southEast: toTerrain('water'),
+      south: toTerrain('pasture'),
+      southWest: toTerrain('rail'),
+      northWest: toTerrain('field'),
     });
 
     const printer = new TilePrinter(canvas);
@@ -32,21 +33,21 @@ describe('TilePrinter', () => {
     const canvas = new Canvas({ topLeft: { x: 0, y: 0 }, bottomRight: { x: 15, y: 6 } });
     const tile1 = new Tile({
       id: 'test1',
-      north: 'tree',
-      northEast: 'house',
-      southEast: 'water',
-      south: 'pasture',
-      southWest: 'rail',
-      northWest: 'field',
+      north: toTerrain('tree'),
+      northEast: toTerrain('house'),
+      southEast: toTerrain('water'),
+      south: toTerrain('pasture'),
+      southWest: toTerrain('rail'),
+      northWest: toTerrain('field'),
     });
     const tile2 = new Tile({
       id: 'test2',
-      north: 'field',
-      northEast: 'pasture',
-      southEast: 'water',
-      south: 'field',
-      southWest: 'water',
-      northWest: 'house',
+      north: toTerrain('field'),
+      northEast: toTerrain('pasture'),
+      southEast: toTerrain('water'),
+      south: toTerrain('field'),
+      southWest: toTerrain('water'),
+      northWest: toTerrain('house'),
     });
 
     const printer = new TilePrinter(canvas);
@@ -68,21 +69,21 @@ describe('TilePrinter', () => {
     const canvas = new Canvas({ topLeft: { x: 0, y: 0 }, bottomRight: { x: 8, y: 8 } });
     const tile1 = new Tile({
       id: 'tile1',
-      north: 'tree',
-      northEast: 'house',
-      southEast: 'water',
-      south: 'pasture',
-      southWest: 'rail',
-      northWest: 'field',
+      north: toTerrain('tree'),
+      northEast: toTerrain('house'),
+      southEast: toTerrain('water'),
+      south: toTerrain('pasture'),
+      southWest: toTerrain('rail'),
+      northWest: toTerrain('field'),
     });
     const tile2 = new Tile({
       id: 'tile2',
-      north: 'tree',
-      northEast: 'house',
-      southEast: 'water',
-      south: 'pasture',
-      southWest: 'rail',
-      northWest: 'field',
+      north: toTerrain('tree'),
+      northEast: toTerrain('house'),
+      southEast: toTerrain('water'),
+      south: toTerrain('pasture'),
+      southWest: toTerrain('rail'),
+      northWest: toTerrain('field'),
     });
 
     const printer = new TilePrinter(canvas);
@@ -106,30 +107,30 @@ describe('TilePrinter', () => {
     const canvas = new Canvas({ topLeft: { x: 0, y: 0 }, bottomRight: { x: 15, y: 8 } });
     const tile1 = new Tile({
       id: 'tile1',
-      north: 'tree',
-      northEast: 'house',
-      southEast: 'water',
-      south: 'pasture',
-      southWest: 'rail',
-      northWest: 'field',
+      north: toTerrain('tree'),
+      northEast: toTerrain('house'),
+      southEast: toTerrain('water'),
+      south: toTerrain('pasture'),
+      southWest: toTerrain('rail'),
+      northWest: toTerrain('field'),
     });
     const tile2 = new Tile({
       id: 'tile2',
-      north: 'field',
-      northEast: 'pasture',
-      southEast: 'water',
-      south: 'field',
-      southWest: 'water',
-      northWest: 'house',
+      north: toTerrain('field'),
+      northEast: toTerrain('pasture'),
+      southEast: toTerrain('water'),
+      south: toTerrain('field'),
+      southWest: toTerrain('water'),
+      northWest: toTerrain('house'),
     });
     const tile3 = new Tile({
       id: 'tile3',
-      north: 'water',
-      northEast: 'rail',
-      southEast: 'field',
-      south: 'tree',
-      southWest: 'house',
-      northWest: 'pasture',
+      north: toTerrain('water'),
+      northEast: toTerrain('rail'),
+      southEast: toTerrain('field'),
+      south: toTerrain('tree'),
+      southWest: toTerrain('house'),
+      northWest: toTerrain('pasture'),
     });
 
     const printer = new TilePrinter(canvas);
@@ -154,30 +155,30 @@ describe('TilePrinter', () => {
     const canvas = new Canvas({ topLeft: { x: -7, y: 0 }, bottomRight: { x: 8, y: 8 } });
     const tile1 = new Tile({
       id: 'tile1',
-      north: 'tree',
-      northEast: 'house',
-      southEast: 'water',
-      south: 'pasture',
-      southWest: 'rail',
-      northWest: 'field',
+      north: toTerrain('tree'),
+      northEast: toTerrain('house'),
+      southEast: toTerrain('water'),
+      south: toTerrain('pasture'),
+      southWest: toTerrain('rail'),
+      northWest: toTerrain('field'),
     });
     const tile2 = new Tile({
       id: 'tile2',
-      north: 'field',
-      northEast: 'pasture',
-      southEast: 'water',
-      south: 'field',
-      southWest: 'water',
-      northWest: 'house',
+      north: toTerrain('field'),
+      northEast: toTerrain('pasture'),
+      southEast: toTerrain('water'),
+      south: toTerrain('field'),
+      southWest: toTerrain('water'),
+      northWest: toTerrain('house'),
     });
     const tile3 = new Tile({
       id: 'tile3',
-      north: 'water',
-      northEast: 'rail',
-      southEast: 'field',
-      south: 'tree',
-      southWest: 'house',
-      northWest: 'pasture',
+      north: toTerrain('water'),
+      northEast: toTerrain('rail'),
+      southEast: toTerrain('field'),
+      south: toTerrain('tree'),
+      southWest: toTerrain('house'),
+      northWest: toTerrain('pasture'),
     });
 
     const printer = new TilePrinter(canvas);
@@ -202,13 +203,13 @@ describe('TilePrinter', () => {
     const canvas = new Canvas({ topLeft: { x: 0, y: 0 }, bottomRight: { x: 8, y: 4 } });
     const tile = new Tile({
       id: 'center-test',
-      center: 'water',
-      north: 'tree',
-      northEast: 'house',
-      southEast: 'water',
-      south: 'pasture',
-      southWest: 'rail',
-      northWest: 'field',
+      center: toTerrain('water'),
+      north: toTerrain('tree'),
+      northEast: toTerrain('house'),
+      southEast: toTerrain('water'),
+      south: toTerrain('pasture'),
+      southWest: toTerrain('rail'),
+      northWest: toTerrain('field'),
     });
 
     const printer = new TilePrinter(canvas);
