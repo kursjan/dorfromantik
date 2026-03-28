@@ -16,13 +16,14 @@ description: Use this skill when transitioning between phases or finalizing a tr
      ```bash
      git add .
      git commit -m "Checkpoint end of Phase X: [summary of changes]"
-     git push origin HEAD
+     git push --no-verify origin HEAD
      ```
    - If there are no uncommitted changes, use the following to mark the phase boundary and push:
      ```bash
      git commit --allow-empty -m "Checkpoint end of Phase X: [summary of changes]"
-     git push origin HEAD
+     git push --no-verify origin HEAD
      ```
+   - Use **`git push --no-verify`** when pushing right after step 3’s **`npm run test:ci`** and **`npm run test:e2e:ci`** succeeded and nothing changed in the tree since then, so local hooks do not repeat **`check:pre-push`**. Re-run step 3 after any post-verify edits.
 6. **Draft PR Strategy**: Ensure a Pull Request exists for the current branch to allow for immediate review in Reviewable.
    - Check for an existing PR: `gh pr view`
    - If no PR exists, create a Draft PR: `gh pr create --draft --title "WIP: [Track Name]" --body "Tracking progress for [Track ID]"`

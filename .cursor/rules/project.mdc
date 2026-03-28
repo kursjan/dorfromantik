@@ -40,6 +40,7 @@ alwaysApply: true
   - Example: `feat(auth): add anonymous session initialization (refs #42)`.
 - When asked to create phase or track checkpoints:
   - Ensure all work is committed and pushed.
+  - Use `--no-verify` if tests were run immediately before push to avoid test re-runs.
   - Use an explicit checkpoint commit message summarizing changes for that phase/track.
 
 # User Approval & Iteration

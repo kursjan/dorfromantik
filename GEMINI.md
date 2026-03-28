@@ -1,6 +1,6 @@
 # **AI Development Guidelines for Dorfromatik Game**
 
-These guidelines define the operational principles and capabilities of an AI agent (e.g., Gemini) developing Dorfromatik, a React-based game. 
+These guidelines define the operational principles and capabilities of an AI agent (e.g., Gemini) developing Dorfromatik, a React-based game.
 
 The goal is to enable an efficient, automated, and error-resilient application design and development workflow, focusing on modern React practices and human oversight of automated AI agent work.
 
@@ -18,8 +18,8 @@ You work either on a conductor track or an ad-hoc task. Always define which type
 - **Preservation of User Content:** When asked to "correct" or "improve" a user-authored document, your primary goal is to preserve the user's original content and voice. Corrections and suggestions should be additive or minor edits to the existing text.
 - **Refactoring Rule:** When refactoring, your goal is to improve code structure while preserving all existing business logic. Use the test suite to verify that the logic remains unchanged.
 
-
 ### Conductor Workflow
+
 - Conductor workflow is a track where tasks are grouped into phases, phases consit of tasks.
   - Agent works on a single task, until phase is done.
   - **project-orchestrator** triggers phase verification protocol, and commit changes, according to the protocol
@@ -27,31 +27,33 @@ You work either on a conductor track or an ad-hoc task. Always define which type
     - if user approves, the work is done
     - if user has concerns, agent fixes them or updates the conductor plan.
       - after that, work start on new phase of a track
-  
+
 ### Ad-hoc Task Workflow
+
 Ad hoc task can be implement in main.
 
 - **Approval Protocol:** Before starting work on a task, ask the user for an explicit approval.
 - **Iteration Loop:** After finishing a user request or a task, always present user with a summary of changes and ask for explicit approval. If they request changes, apply them, verify them, present summary and ask for explicit approval again.
   - **Termination:** Repeat until you get explicit user approval.
 - **"Done" Definition:** A coding task is only "Done" when:
-    1. **Implementation:** Code is implemented.
-    2. **Testing:** All changed files have adequate unit tests.
-    3. **Verification:** Verification Protocol (tsc, tests, e2e) passes 100%.
-    4. **Approval:** User approved the work:
-       - Present the user with a manual verification plan.
-       - If the user requests changes, apply them, verify them, and request approval again. 
-       - This loop continues until the user explicitly accepts the implementation (`lgtm`, `sgtm`, etc.).
+  1. **Implementation:** Code is implemented.
+  2. **Testing:** All changed files have adequate unit tests.
+  3. **Verification:** Verification Protocol (tsc, tests, e2e) passes 100%.
+  4. **Approval:** User approved the work:
+     - Present the user with a manual verification plan.
+     - If the user requests changes, apply them, verify them, and request approval again.
+     - This loop continues until the user explicitly accepts the implementation (`lgtm`, `sgtm`, etc.).
 
 - **Git Tracking**
-    If user asks you to commit changes:
-    1. **Summary:** Attach task summary to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
-    2. **Persistence:** Committed and pushed all changes
-       - when staging changes, stage only changes AI agent did, do not interfere with users works, if possible
-
+  If user asks you to commit changes:
+  1. **Summary:** Attach task summary to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
+  2. **Persistence:** Committed and pushed all changes
+     - when staging changes, stage only changes AI agent did, do not interfere with users works, if possible
+     - when pushing changes, use `--no-verify` if you ran tests successfully immediately before push
 
 ### **Commit Strategy**
-- **Ad-Hoc Tasks:** 
+
+- **Ad-Hoc Tasks:**
   - Suggest user to commit an ad-hoc tasks after you get explicit approval of your changes. If you can commit:
     1. **Summary:** Attach task summary to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
     2. **Persistence:** Committed and pushed all changes
@@ -62,12 +64,13 @@ Ad hoc task can be implement in main.
   - **Phase Completion:** Once a phase is completed, the **project-orchestrator** will perform a final verification and create a **Phase Checkpoint** commit if necessary.
 
 ### **GitHub Integration:**
-  - Most tasks should have a GitHub Issue. Ask user for the issue or if you can proceed without GitHub issue.
-  - **Issue Linkage:**
-    - **Development Commits:** Use `refs #123` to link a task to an issue without closing it (e.g., `feat: add hex logic (refs #123)`).
-    - **Closing Commits:** ONLY use `fixes #123` or `closes #123` in the final commit of a Track or when the entire feature/bug is verified as complete.
-  - **Backlog:** Maintain a `low priority` label on GitHub for non-critical backlog items.
-  - **Tooling:** Use the `gh` CLI for creating, listing, and managing issues.
+
+- Most tasks should have a GitHub Issue. Ask user for the issue or if you can proceed without GitHub issue.
+- **Issue Linkage:**
+  - **Development Commits:** Use `refs #123` to link a task to an issue without closing it (e.g., `feat: add hex logic (refs #123)`).
+  - **Closing Commits:** ONLY use `fixes #123` or `closes #123` in the final commit of a Track or when the entire feature/bug is verified as complete.
+- **Backlog:** Maintain a `low priority` label on GitHub for non-critical backlog items.
+- **Tooling:** Use the `gh` CLI for creating, listing, and managing issues.
 
 ## **MULTI-WORKTREE & PRAGMATIC BRANCHING PROTOCOL (High Priority)**
 
@@ -80,9 +83,8 @@ This project uses a "Track-Based" branching model to maintain focus and ensure a
   - **Minor Fixes, Ad-hoc tasks & Chores:** For documentation updates, configuration tweaks, or minor verified bug fixes, you may work directly on the current branch (including `main`).
 - **Synchronization:** All changes intended for the codebase MUST be pushed to the remote repository (`origin`).
 
-
-
 ### **Core Engineering Mandates**
+
 - **Contextual Precedence:** Instructions within an active **Gemini Skill** (e.g., `task-conductor`, `project-orchestrator`) take absolute precedence over the general workflows described below. When executing a Conductor Track, strictly adhere to the methodology defined in the skill file.
 - **Refactoring:** Always analyze files in the context of the entire project. Check all usages of a class or function to ensure its public API remains valid after refactoring.
 - **Verification:**
@@ -90,9 +92,9 @@ This project uses a "Track-Based" branching model to maintain focus and ensure a
   2. **Development Loop (UI):** If you are modifying React components or styling (`.tsx`, `.css`), run `npx putout <changed_files>`, `npm run typecheck`, `npm run test:unit`, AND **`npm run test:ui`** to ensure visual components render correctly.
   3. **Phase/Track Gates:** Run `npm run test:e2e` ONLY when completing a Conductor Phase or finalizing an Ad-hoc Task.
   4. **Targeted E2E:** You may run specific E2E tests (e.g., `npx playwright test e2e/main-menu.spec.ts`) if your changes directly affect visual rendering or complex UI flows, but avoid running the full suite unnecessarily.
-      - **Port Pinning (Multi-Worktree):** To avoid port conflicts when running multiple agents in separate worktrees, each worktree MUST have its own local `.env` file pinning the `PORT` variable (e.g., `PORT=5173` for main, `PORT=5174` for worker1, `PORT=5175` for worker2). Playwright and Vite will automatically honor this variable.
-      - **E2E/CI Port:** Dedicated port `5179` is reserved for isolated E2E and CI test runs to prevent collision with active development servers.
-      - **Inquiry:** When in doubt, ask the user for the port number.
+     - **Port Pinning (Multi-Worktree):** To avoid port conflicts when running multiple agents in separate worktrees, each worktree MUST have its own local `.env` file pinning the `PORT` variable (e.g., `PORT=5173` for main, `PORT=5174` for worker1, `PORT=5175` for worker2). Playwright and Vite will automatically honor this variable.
+     - **E2E/CI Port:** Dedicated port `5179` is reserved for isolated E2E and CI test runs to prevent collision with active development servers.
+     - **Inquiry:** When in doubt, ask the user for the port number.
 - **Maintenance:** The AI is responsible for keeping project documentation up-to-date.
   - **Architecture Sync:** Whenever a refactoring or architectural change occurs (e.g., adding a new renderer, changing a design pattern), the AI must update the relevant `ARCHITECTURE.md` file (`tech-stack.md`, `CHANGELOG.md` or equivalent) and ensure `conductor/product.md` remains consistent.
   - **Code Comments:** Maintain clear, concise JSDoc (or equivalent) for all public classes and methods. Ensure comments explain _intent_ and _parameters_, especially after refactoring.
@@ -106,7 +108,7 @@ This project uses a "Track-Based" branching model to maintain focus and ensure a
 The AI's workflow is iterative, transparent, and responsive to user input.
 
 - **Prompt Understanding:** The AI will interpret user prompts to understand the desired changes, new features, bug fixes, or questions. It will ask clarifying questions if the prompt is ambiguous.
-- **Track Generation & Plan Management:** Each time the user requests a significant change or feature, the AI will propose a new **Track** or update an existing one using **planning-architect** skill. 
+- **Track Generation & Plan Management:** Each time the user requests a significant change or feature, the AI will propose a new **Track** or update an existing one using **planning-architect** skill.
 - **Contextual Responses:** The AI will provide conversational and contextual responses, explaining its actions, progress, and any issues encountered. It will summarize changes made.
 - **Error Checking Flow:**
   1.  **Code Change:** AI applies a code modification.
@@ -128,22 +130,24 @@ User can trigger AI or human review at the end of a task, phase or a track to en
 Therefore it is important to ask user if we can move to the next task.
 
 ### **Standard Review (On-Demand)**
+
 1.  **Implementation Phase:**
-    *   The coding agent implements the feature/fix.
-    *   **"Done" Signal:** When the code is ready and verified (tests pass), the agent stops and says: "Ready for Review."
+    - The coding agent implements the feature/fix.
+    - **"Done" Signal:** When the code is ready and verified (tests pass), the agent stops and says: "Ready for Review."
 
 2.  **Review Phase (User-Driven):**
-    *   The user runs `.gemini/review-loop.sh`.
-    *   This script invokes the **Adversarial Senior Architect** (configured in `.gemini/reviewer.md`) to analyze the changes.
-    *   The reviewer outputs a `REVIEW_FEEDBACK.md` file.
-    *   The user manually filters this feedback to ensure relevance.
+    - The user runs `.gemini/review-loop.sh`.
+    - This script invokes the **Adversarial Senior Architect** (configured in `.gemini/reviewer.md`) to analyze the changes.
+    - The reviewer outputs a `REVIEW_FEEDBACK.md` file.
+    - The user manually filters this feedback to ensure relevance.
 
 3.  **Fix Phase:**
-    *   The user passes the filtered `REVIEW_FEEDBACK.md` back to the coding agent.
-    *   **Mandate:** The coding agent must address *every* item in the feedback file.
-    *   Once fixes are applied and verified, the loop is complete.
+    - The user passes the filtered `REVIEW_FEEDBACK.md` back to the coding agent.
+    - **Mandate:** The coding agent must address _every_ item in the feedback file.
+    - Once fixes are applied and verified, the loop is complete.
 
 ### **Thorough Review (Deep Dive / Audit)**
+
 For complex features or comprehensive code audits, we use a structured Conductor-based process (refs #20).
 
 1.  **Initiation:** Triggered by asking for a "Thorough Review" or using `/code-review --against main`.
@@ -246,12 +250,14 @@ When writing Playwright tests for a canvas:
 ### **"Tiles are Turns" Philosophy**
 
 To ensure state synchronization and a clean game loop, the game follows a "Tiles are Turns" philosophy.
+
 - **Single Source of Truth:** `remainingTurns` must be a derived property (getter) of `tileQueue.length`.
 - **Benefit:** This prevents synchronization errors between the turn counter and the actual resources available to the player.
 
 ### Canvas -> React State Synchronization
 
 For the Controller Pattern to work with React-based UI (HUD), we use a synchronization callback:
+
 - **Pattern:** `CanvasView` (React) passes a callback or attaches a listener to `CanvasController` (Plain TS).
 - **Update:** When the game state changes (score, turns), the Controller invokes the callback, triggering a `useState` update in React.
 - **Why:** This keeps the heavy rendering loop out of React while allowing the UI to remain reactive to state changes.
@@ -259,33 +265,39 @@ For the Controller Pattern to work with React-based UI (HUD), we use a synchroni
 ### Vitest & requestAnimationFrame
 
 In a JSDOM environment, `requestAnimationFrame` is not natively supported.
+
 - **Gotcha:** Recursive `setTimeout` mocks for `requestAnimationFrame` can lead to "leaking" timeouts that cause `ReferenceError` or infinite loops in subsequent tests.
 - **Best Practice:** Use a static mock `vi.fn().mockReturnValue(1)` in `setup.ts`. This allows the first frame of a Controller (triggered in the constructor) to run while preventing the background loop from interfering with other tests.
 
 ### **Explicit Domain Accessors**
 
 Prefer explicit methods like `Tile.getTerrain(direction)` or `Game.rotateQueuedTileClockwise()` over direct property access or boolean-flagged methods (e.g., `rotate(true)`).
+
 - **Reason:** This improves readability for non-TypeScript developers, ensures clearer intent, and prevents "boolean blindness" in API usage.
 
 ### **Fail Fast in Game Logic**
 
 Avoid wrapping core game logic (like placement or rotation) in `try/catch` blocks that merely log errors.
+
 - **Reason:** Domain errors (e.g., rotating an empty queue) represent logic bugs or UI state desyncs. Silent catching masks these issues; allowing them to throw ensures they are visible and fixed early.
 
 ### **Geometric Logic Centralization**
 
 All geometric and directional logic (finding neighbors, determining opposite sides) must reside in the `Navigation` class.
+
 - **Service Pattern:** Treat `Navigation` as a geometric service that other models (`Game`, `Board`) use to query the world's structure, rather than embedding coordinates math directly into business logic.
 
 ### **Graphics Type Safety (Browser Imports)**
 
 When importing types from models into graphics/renderer files (e.g., `TerrainType`):
+
 - **Requirement:** Use `import type { ... }` to ensure the type is stripped during compilation.
 - **Why:** Importing a type as a value can lead to a `SyntaxError` in the browser if the underlying model file does not provide a corresponding runtime export for that specific name.
 
 ### **Fail-Fast Session State**
 
 The `CanvasController` requires a valid `Session` with an `activeGame` to function.
+
 - **Pattern:** Throw an explicit `Error` in the constructor or `render` loop if `session.activeGame` is missing.
 - **Why:** This ensures that synchronization issues between React and the Controller are caught immediately during development rather than failing silently with blank screens.
 
@@ -476,4 +488,5 @@ State Ownership: (Who "owns" the data?)
 Visual Hierarchy: (Where does this sit in the tree?)
 
 ## Misc
+
 SGTM means sounds good to me, like LGTM Looks good to me.
