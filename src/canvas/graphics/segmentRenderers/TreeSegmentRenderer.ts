@@ -7,7 +7,11 @@ import {
 } from './WedgeDrawContext';
 
 export class TreeSegmentRenderer implements TerrainSegmentRenderer {
-  render(context: WedgeDrawContext, _neighborAcrossEdge: Terrain | undefined): void {
+  render(
+    context: WedgeDrawContext,
+    _neighborAcrossEdge: Terrain | undefined,
+    _segmentTerrain: Terrain
+  ): void {
     fillHexWedge(context, TERRAIN_COLORS.tree);
   }
 }

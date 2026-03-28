@@ -6,7 +6,7 @@ import { TERRAIN_ID_SEGMENT_RENDERERS } from './segmentRenderers/terrainIdSegmen
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { Board } from '../../models/Board';
 import { directions, getNeighbor, getOpposite, type Direction } from '../../models/Navigation';
-import { WaterOrPastureTerrain, WaterTerrain, type Terrain } from '../../models/Terrain';
+import type { Terrain } from '../../models/Terrain';
 
 export interface TileDrawOptions {
   /** Terrain on the neighbor tile along the shared edge for each direction (see `neighborEdgeTerrainsFromBoard`). */
@@ -57,10 +57,6 @@ export class TileRenderer {
       const startCorner = (i + 4) % 6;
       const endCorner = (i + 5) % 6;
 
-      const linkWaterStrokeToCenter =
-        (terrain instanceof WaterTerrain || terrain instanceof WaterOrPastureTerrain) &&
-        terrain.linkToCenter;
-
       const wedgeContext: WedgeDrawContext = {
         ctx: this.ctx,
         centerX: x,
@@ -70,11 +66,10 @@ export class TileRenderer {
         startCorner,
         endCorner,
         style,
-        linkWaterStrokeToCenter,
       };
 
       const neighborAcrossEdge = options?.neighborEdgeTerrains?.[direction];
-      TERRAIN_ID_SEGMENT_RENDERERS[terrain.id].render(wedgeContext, neighborAcrossEdge);
+      TERRAIN_ID_SEGMENT_RENDERERS[terrain.id].render(wedgeContext, neighborAcrossEdge, terrain);
     }
 
     this.drawWaterCenter(tile, x, y, style);

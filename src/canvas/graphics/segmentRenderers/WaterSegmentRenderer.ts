@@ -1,5 +1,5 @@
 import { TERRAIN_COLORS } from '../HexStyles';
-import type { Terrain } from '../../../models/Terrain';
+import { type Terrain, type WaterStrokeEdge } from '../../../models/Terrain';
 import {
   fillHexWedge,
   type TerrainSegmentRenderer,
@@ -7,15 +7,18 @@ import {
 } from './WedgeDrawContext';
 
 export class WaterSegmentRenderer implements TerrainSegmentRenderer {
-  render(context: WedgeDrawContext, _neighborAcrossEdge: Terrain | undefined): void {
+  render(
+    context: WedgeDrawContext,
+    _neighborAcrossEdge: Terrain | undefined,
+    segmentTerrain: Terrain
+  ): void {
     fillHexWedge(context, TERRAIN_COLORS.pasture);
-    this.drawWaterStroke(context);
+    this.drawWaterStroke(context, segmentTerrain as WaterStrokeEdge);
   }
 
   /** River stroke from the middle of this wedge’s outer edge toward the center (or midpoint). */
-  private drawWaterStroke(context: WedgeDrawContext): void {
-    const { ctx, corners, centerX, centerY, style, segmentIndex, linkWaterStrokeToCenter } =
-      context;
+  private drawWaterStroke(context: WedgeDrawContext, waterEdge: WaterStrokeEdge): void {
+    const { ctx, corners, centerX, centerY, style, segmentIndex } = context;
 
     ctx.strokeStyle = TERRAIN_COLORS.water;
     ctx.lineWidth = Math.max(5, style.size * 0.24);
@@ -26,7 +29,7 @@ export class WaterSegmentRenderer implements TerrainSegmentRenderer {
       x: (corners[startCorner].x + corners[endCorner].x) / 2,
       y: (corners[startCorner].y + corners[endCorner].y) / 2,
     };
-    const target = linkWaterStrokeToCenter
+    const target = waterEdge.linkToCenter
       ? { x: centerX, y: centerY }
       : {
           x: (edgeMidpoint.x + centerX) / 2,

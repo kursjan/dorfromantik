@@ -101,7 +101,7 @@ describe('TileRenderer', () => {
     expect(ctx.lineWidth).toBe(4);
   });
 
-  it('passes linkWaterStrokeToCenter into wedge context for water and waterOrPasture', () => {
+  it('passes segment terrain as third render argument for water and waterOrPasture', () => {
     const waterSpy = vi.spyOn(waterSegmentRenderer, 'render');
 
     const linkedWater = allPastureTile('lw', {
@@ -109,7 +109,8 @@ describe('TileRenderer', () => {
       north: new WaterTerrain({ linkToCenter: true }),
     });
     renderer.drawTile(linkedWater, 0, 0, DEFAULT_HEX_STYLE);
-    expect(waterSpy.mock.calls[0][0].linkWaterStrokeToCenter).toBe(true);
+    expect(waterSpy.mock.calls[0][2]).toBe(linkedWater.north);
+    expect((waterSpy.mock.calls[0][2] as WaterTerrain).linkToCenter).toBe(true);
 
     waterSpy.mockClear();
 
@@ -117,7 +118,8 @@ describe('TileRenderer', () => {
       north: new WaterTerrain({ linkToCenter: false }),
     });
     renderer.drawTile(unlinkedWater, 0, 0, DEFAULT_HEX_STYLE);
-    expect(waterSpy.mock.calls[0][0].linkWaterStrokeToCenter).toBe(false);
+    expect(waterSpy.mock.calls[0][2]).toBe(unlinkedWater.north);
+    expect((waterSpy.mock.calls[0][2] as WaterTerrain).linkToCenter).toBe(false);
 
     waterSpy.mockClear();
 
@@ -128,7 +130,8 @@ describe('TileRenderer', () => {
     renderer.drawTile(linkedWop, 0, 0, DEFAULT_HEX_STYLE, {
       neighborEdgeTerrains: { north: new WaterTerrain() },
     });
-    expect(waterSpy.mock.calls[0][0].linkWaterStrokeToCenter).toBe(true);
+    expect(waterSpy.mock.calls[0][2]).toBe(linkedWop.north);
+    expect((waterSpy.mock.calls[0][2] as WaterOrPastureTerrain).linkToCenter).toBe(true);
   });
 
   it('forwards neighborEdgeTerrains to the segment renderer per direction', () => {
@@ -142,7 +145,11 @@ describe('TileRenderer', () => {
       neighborEdgeTerrains: { north: neighbor },
     });
 
-    expect(wopSpy).toHaveBeenCalledWith(expect.objectContaining({ segmentIndex: 0 }), neighbor);
+    expect(wopSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ segmentIndex: 0 }),
+      neighbor,
+      tile.north
+    );
   });
 
   it('draws a tile at a specific hex coordinate', () => {

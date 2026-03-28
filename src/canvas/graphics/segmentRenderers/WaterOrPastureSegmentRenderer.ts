@@ -28,15 +28,19 @@ function resolveWaterOrPastureNeighborPaint(neighborAcrossEdge: Terrain | undefi
 }
 
 export class WaterOrPastureSegmentRenderer implements TerrainSegmentRenderer {
-  render(context: WedgeDrawContext, neighborAcrossEdge: Terrain | undefined): void {
+  render(
+    context: WedgeDrawContext,
+    neighborAcrossEdge: Terrain | undefined,
+    segmentTerrain: Terrain
+  ): void {
     const resolved = resolveWaterOrPastureNeighborPaint(neighborAcrossEdge);
 
     if (resolved === 'water') {
-      waterSegmentRenderer.render(context, neighborAcrossEdge);
+      waterSegmentRenderer.render(context, neighborAcrossEdge, segmentTerrain);
       return;
     }
     if (resolved === 'pasture') {
-      pastureSegmentRenderer.render(context, neighborAcrossEdge);
+      pastureSegmentRenderer.render(context, neighborAcrossEdge, segmentTerrain);
       return;
     }
     throw new Error(`Unexpected resolved terrain type for waterOrPasture wedge: ${resolved}`);

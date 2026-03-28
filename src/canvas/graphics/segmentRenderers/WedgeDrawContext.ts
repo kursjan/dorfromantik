@@ -11,8 +11,6 @@ export interface WedgeDrawContext {
   startCorner: number;
   endCorner: number;
   style: HexStyle;
-  /** For water / waterOrPasture edges: river stroke targets tile center vs edge midpoint. */
-  linkWaterStrokeToCenter: boolean;
 }
 
 export function fillHexWedge(context: WedgeDrawContext, fillColor: string): void {
@@ -26,7 +24,15 @@ export function fillHexWedge(context: WedgeDrawContext, fillColor: string): void
   ctx.fill();
 }
 
-/** One renderer per terrain id; `neighborAcrossEdge` is the opposite edge on the adjacent hex. */
+/**
+ * One renderer per terrain id.
+ * `neighborAcrossEdge` is the opposite edge on the adjacent hex.
+ * `segmentTerrain` is the terrain instance on this wedge (same reference as on the tile).
+ */
 export interface TerrainSegmentRenderer {
-  render(context: WedgeDrawContext, neighborAcrossEdge: Terrain | undefined): void;
+  render(
+    context: WedgeDrawContext,
+    neighborAcrossEdge: Terrain | undefined,
+    segmentTerrain: Terrain
+  ): void;
 }

@@ -126,6 +126,9 @@ export class WaterOrPastureTerrain extends Terrain {
   }
 }
 
+/** Terrains that draw a river stroke with {@link WaterTerrain.linkToCenter} semantics. */
+export type WaterStrokeEdge = WaterTerrain | WaterOrPastureTerrain;
+
 export class RailTerrain extends Terrain {
   constructor() {
     super('rail', 'R');

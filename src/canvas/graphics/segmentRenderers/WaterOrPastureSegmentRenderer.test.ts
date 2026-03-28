@@ -39,7 +39,6 @@ function minimalWedgeContext(ctx: CanvasRenderingContext2D): WedgeDrawContext {
     startCorner: 4,
     endCorner: 5,
     style: { ...DEFAULT_HEX_STYLE, size },
-    linkWaterStrokeToCenter: false,
   };
 }
 
@@ -48,6 +47,7 @@ describe('WaterOrPastureSegmentRenderer', () => {
   let renderer: WaterOrPastureSegmentRenderer;
   let waterSpy: ReturnType<typeof vi.spyOn>;
   let pastureSpy: ReturnType<typeof vi.spyOn>;
+  const segment = new WaterOrPastureTerrain({ linkToCenter: false });
 
   beforeEach(() => {
     ctx = mockCtx();
@@ -62,37 +62,46 @@ describe('WaterOrPastureSegmentRenderer', () => {
   });
 
   it('delegates to pasture when neighbor is missing', () => {
-    renderer.render(minimalWedgeContext(ctx), undefined);
+    const wctx = minimalWedgeContext(ctx);
+    renderer.render(wctx, undefined, segment);
 
-    expect(pastureSpy).toHaveBeenCalledTimes(1);
+    expect(pastureSpy).toHaveBeenCalledWith(wctx, undefined, segment);
     expect(waterSpy).not.toHaveBeenCalled();
   });
 
   it('delegates to water when neighbor is water', () => {
-    renderer.render(minimalWedgeContext(ctx), new WaterTerrain());
+    const wctx = minimalWedgeContext(ctx);
+    const neighbor = new WaterTerrain();
+    renderer.render(wctx, neighbor, segment);
 
-    expect(waterSpy).toHaveBeenCalledTimes(1);
+    expect(waterSpy).toHaveBeenCalledWith(wctx, neighbor, segment);
     expect(pastureSpy).not.toHaveBeenCalled();
   });
 
   it('delegates to pasture when neighbor is pasture', () => {
-    renderer.render(minimalWedgeContext(ctx), new PastureTerrain());
+    const wctx = minimalWedgeContext(ctx);
+    const neighbor = new PastureTerrain();
+    renderer.render(wctx, neighbor, segment);
 
-    expect(pastureSpy).toHaveBeenCalledTimes(1);
+    expect(pastureSpy).toHaveBeenCalledWith(wctx, neighbor, segment);
     expect(waterSpy).not.toHaveBeenCalled();
   });
 
   it('delegates to pasture when neighbor does not match water or pasture', () => {
-    renderer.render(minimalWedgeContext(ctx), new TreeTerrain());
+    const wctx = minimalWedgeContext(ctx);
+    const neighbor = new TreeTerrain();
+    renderer.render(wctx, neighbor, segment);
 
-    expect(pastureSpy).toHaveBeenCalledTimes(1);
+    expect(pastureSpy).toHaveBeenCalledWith(wctx, neighbor, segment);
     expect(waterSpy).not.toHaveBeenCalled();
   });
 
   it('delegates to water when neighbor is waterOrPasture (shared match picks water first)', () => {
-    renderer.render(minimalWedgeContext(ctx), new WaterOrPastureTerrain());
+    const wctx = minimalWedgeContext(ctx);
+    const neighbor = new WaterOrPastureTerrain();
+    renderer.render(wctx, neighbor, segment);
 
-    expect(waterSpy).toHaveBeenCalledTimes(1);
+    expect(waterSpy).toHaveBeenCalledWith(wctx, neighbor, segment);
     expect(pastureSpy).not.toHaveBeenCalled();
   });
 });
