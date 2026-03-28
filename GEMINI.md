@@ -11,7 +11,7 @@ These instructions must be followed above all else.
 By "task" we mean a conductor task or a direct user request.
 By "phase" and "track" we mean a conductor phase and a conductor track, respectively.
 
-You work either on a conductor track or an ad-hoc task. Always define which type of work you are doing.
+Agent works either on a conductor track or an ad-hoc task. Always define which type of work you are doing.
 
 - **Communication:** Communicate in a brief and professional manner.
 - **Scope:** Adhere strictly to the scope of the assigned task and instructions. Make small changes and minimize file touches.
@@ -20,9 +20,9 @@ You work either on a conductor track or an ad-hoc task. Always define which type
 
 ### Conductor Workflow
 
-- Conductor workflow is a track where tasks are grouped into phases, phases consit of tasks.
+- Conductor workflow is a track where work is split into phases, phases consit of tasks.
   - Agent works on a single task, until phase is done.
-  - **project-orchestrator** triggers phase verification protocol, and commit changes, according to the protocol
+  - **project-orchestrator** triggers phase verification protocol, and commit and pushes changes, according to the protocol
   - Once all phases are done, **project-orchestrator** triggers a PR review.
     - if user approves, the work is done
     - if user has concerns, agent fixes them or updates the conductor plan.
@@ -33,37 +33,37 @@ You work either on a conductor track or an ad-hoc task. Always define which type
 Ad hoc task can be implement in main.
 
 - **Approval Protocol:** Before starting work on a task, ask the user for an explicit approval.
-- **Iteration Loop:** After finishing a user request or a task, always present user with a summary of changes and ask for explicit approval. If they request changes, apply them, verify them, present summary and ask for explicit approval again.
-  - **Termination:** Repeat until you get explicit user approval.
+- **Iteration Loop:** After finishing a user request or a task, commit and present user with a summary of changes and ask for explicit approval
+  - If they request changes, apply them, verify them, amend the commit, present summary and ask for explicit approval again.
+  - Termination: Repeat until you get explicit user approval.
+  - Push changes after the approval.
 - **"Done" Definition:** A coding task is only "Done" when:
   1. **Implementation:** Code is implemented.
   2. **Testing:** All changed files have adequate unit tests.
-  3. **Verification:** Verification Protocol (tsc, tests, e2e) passes 100%.
-  4. **Approval:** User approved the work:
-     - Present the user with a manual verification plan.
+  3. **Verification:** Verification Protocol all relevant tests passes 100%.
+  4. **Approval:** User approved the work with explicit LGTM.
      - If the user requests changes, apply them, verify them, and request approval again.
      - This loop continues until the user explicitly accepts the implementation (`lgtm`, `sgtm`, etc.).
+     - Push only after explicit LGTM.
 
 - **Git Tracking (ad-hoc)**
-  If the user asks you to commit changes:
+  If the user asks you to commit and push changes:
   1. **Summary:** Attach task summary to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
-  2. **Persistence:** Commit verified changes locally. Do not `git push` until the user explicitly approves the work (`LGTM`, `approved`, `sgtm`, etc.)
-     - After approval (or an explicit push request), push to `origin`; use `--no-verify` only if you ran the same checks successfully immediately before that push.
+     - push to `origin`; use `--no-verify` if you ran the tests immediatelly before the push.
      - When staging changes, stage only changes the AI agent made; do not interfere with the user’s work, if possible.
 
-### **Commit Strategy**
+### **Commit and Push Strategy**
 
 - **Ad-Hoc Tasks:**
-  - Suggest user to commit an ad-hoc tasks after you get explicit approval of your changes. If you can commit:
-    1. **Summary:** Attach task summary to the final implementation commit using `git notes add -m "<summary>" <commit_hash>`.
-    2. **Persistence:** Committed and pushed all changes
-       - when staging changes, stage only changes AI agent did, do not interfere with users works, if possible
-       - push changes only after approval
-       - when pushing, use `--no-verify` if push is immediately after test were run.
+  - Typically, do not commit, until user approves.
+  - After user approval, either, commit or commit and push, based on user input.
+    - remember to add notes
+
 - **Conductor Tasks (Phase Workflow):**
   - Complete task -> Verify -> Update `plan.md` (mark `[x]`).
   - **Task Commit:** Commit the individual task immediately after it is verified to prevent data loss.
   - **Phase Completion:** Once a phase is completed, the **project-orchestrator** will perform a final verification and create a **Phase Checkpoint** commit if necessary.
+    - push will happen at the end of the track
 
 ### **GitHub Integration:**
 
@@ -79,11 +79,14 @@ Ad hoc task can be implement in main.
 This project uses a "Track-Based" branching model to maintain focus and ensure a clean history.
 
 - **Branching Strategy:**
-  - **New Tracks:** When starting a new Conductor Track (e.g., `feat/tile-rotation`), create a dedicated feature branch or reuse a universal branch, such as `coding-agent/worker1`
+  - **New Tracks:** When starting a new Conductor Track (e.g., `feat/tile-rotation`), create a dedicated feature branch or reuse a universal branch, such as `coding-agent/worker1`.
   - **Merging:** When working in a branch, all PRs to sync with `main` MUST use a **rebase** strategy (no squash) to preserve a linear and detailed history. All PRs must be reviewed and approved by the user.
-  - **Cross-Branch Synchronization:** When asked to implement a track or task from `main` while staying on a current working branch (e.g., `worker1`), ALWAYS synchronize the branch by running `git fetch origin main && git rebase origin/main`. NEVER surgically fetch or checkout specific files/folders from another branch, as this bypasses version control history and creates untracked file conflicts.
+  - **Cross-Branch Synchronization:** When asked to implement a track or task from `main` while staying on a current working branch (e.g., `worker1`), ALWAYS synchronize the branch by running `git fetch origin main && git rebase origin/main`.
+    - NEVER surgically fetch or checkout specific files/folders from another branch, as this bypasses version control history and creates untracked file conflicts.
   - **Minor Fixes, Ad-hoc tasks & Chores:** For documentation updates, configuration tweaks, or minor verified bug fixes, you may work directly on the current branch (including `main`).
-- **Synchronization:** Changes must reach `origin` when appropriate. **Ad-hoc:** push only after user **LGTM** / **approved** (or explicit push instruction). **Conductor:** routine **`git push`** for the track happens at **phase checkpoints** through **project-orchestrator**, not after each task.
+- **Synchronization:** Changes must reach `origin` when appropriate.
+  - **Ad-hoc:** push only after user **LGTM** / **approved** (or explicit push instruction).
+  - **Conductor:** routine **`git push`** for the track happens at end of the track or during phase checkpoint, depending on user input.
 
 ### **Core Engineering Mandates**
 
@@ -120,7 +123,7 @@ The AI's workflow is iterative, transparent, and responsive to user input.
   5.  **Test Execution:** The AI runs the appropriate verification checks:
       - **Always:** `npm run typecheck` and `npm run test:unit`.
       - **UI Changes:** `npm run test:ui`.
-      - **At Gates only:** `npm run test:e2e` (unless the task specifically requires visual verification).
+      - **At Gates only:** `npm run test:e2e:ci` (unless the task specifically requires visual verification).
   6.  **Preview Check:** AI observes the browser preview for visual and runtime errors.
   7.  **Remediation/Report:** If errors are found, AI attempts automatic fixes. If unsuccessful, it reports details to the user.
 

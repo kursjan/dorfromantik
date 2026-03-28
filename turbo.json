@@ -2,27 +2,17 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["package-lock.json", ".env.ci"],
   "tasks": {
-    "typecheck": {
+    "test:raw": {
       "outputs": []
     },
-    "lint": {
+    "test:unit:raw": {
       "outputs": []
     },
-    "test:unit": {
-      "dependsOn": ["typecheck"],
+    "test:ui:raw": {
       "outputs": []
     },
-    "test:ui": {
-      "dependsOn": ["typecheck"],
+    "test:ci:raw": {
       "outputs": []
-    },
-    "test:ci": {
-      "dependsOn": ["typecheck"],
-      "outputs": []
-    },
-    "build": {
-      "dependsOn": ["typecheck"],
-      "outputs": ["dist/**"]
     }
   }
 }

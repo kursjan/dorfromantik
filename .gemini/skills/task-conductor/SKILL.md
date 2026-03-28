@@ -9,7 +9,8 @@ description: Use this skill for any coding or implementation task defined in a C
 1. **Task Selection**: Always select the next uncompleted task from the current phase in `conductor/tracks/<track_id>/plan.md` and mark it as selected.
 2. **Execution**: Perform the requested code changes using available tools.
 3. **Quality Gate Verification**:
-   - Run **Unit Tests**: `npm test` (Ensure all pass).
+   - Run **Unit Tests**: `npm test:unit` (Ensure all pass).
+   - Run **Unit Tests**: `npm test:ui` (if suitable).
    - Run **Type Check**: `npm run typecheck` (No errors).
    - Run **Linting**: `npm run lint` (Fix all auto-fixable issues).
    - **Code Coverage**: Verify critical paths are covered.
