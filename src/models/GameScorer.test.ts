@@ -2,10 +2,31 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { GameScorer } from './GameScorer';
 import { Board } from './Board';
 import { GameRules } from './GameRules';
-import { Tile, type TileTerrainOptions } from './Tile';
+import { Tile } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
-import { north, northEast, getNeighbors, getOpposite } from './Navigation';
-import { PastureTerrain, toTerrain, type TerrainType } from './Terrain';
+import { north, northEast, getNeighbors, getOpposite, type Direction } from './Navigation';
+import { toTerrain, type Terrain, type TerrainType } from './Terrain';
+
+/**
+ * Neighbor hex tile: `toTerrain('pasture')` on every side except `inwardEdgeDirection`, where
+ * `inwardEdgeTerrain` faces the tile being placed next to (the shared edge).
+ */
+function neighborTileFacingInward(
+  id: string,
+  inwardEdgeDirection: Direction,
+  inwardEdgeTerrain: Terrain
+): Tile {
+  const pastureSide = () => toTerrain('pasture');
+  return new Tile({
+    id,
+    north: inwardEdgeDirection === 'north' ? inwardEdgeTerrain : pastureSide(),
+    northEast: inwardEdgeDirection === 'northEast' ? inwardEdgeTerrain : pastureSide(),
+    southEast: inwardEdgeDirection === 'southEast' ? inwardEdgeTerrain : pastureSide(),
+    south: inwardEdgeDirection === 'south' ? inwardEdgeTerrain : pastureSide(),
+    southWest: inwardEdgeDirection === 'southWest' ? inwardEdgeTerrain : pastureSide(),
+    northWest: inwardEdgeDirection === 'northWest' ? inwardEdgeTerrain : pastureSide(),
+  });
+}
 
 /**
  * 1. Lone Tile: 0 points.
@@ -43,58 +64,36 @@ describe('GameScorer', () => {
     center = new HexCoordinate(0, 0, 0);
   });
 
-  const defaultPastureSides = (): Pick<
-    TileTerrainOptions,
-    'north' | 'northEast' | 'southEast' | 'south' | 'southWest' | 'northWest'
-  > => {
-    const p = new PastureTerrain();
-    return {
-      north: p,
-      northEast: p,
-      southEast: p,
-      south: p,
-      southWest: p,
-      northWest: p,
-    };
-  };
-
-  // Helper to create a tile with identical terrain on all sides
-  const createTile = (id: string, terrain: TerrainType = 'pasture'): Tile => {
-    const t = toTerrain(terrain);
-    return new Tile({
+  /** Uniform tile: same terrain kind on all six sides (each side is its own instance). */
+  const createTile = (id: string, terrain: TerrainType = 'pasture'): Tile =>
+    new Tile({
       id,
-      north: t,
-      northEast: t,
-      southEast: t,
-      south: t,
-      southWest: t,
-      northWest: t,
+      north: toTerrain(terrain),
+      northEast: toTerrain(terrain),
+      southEast: toTerrain(terrain),
+      south: toTerrain(terrain),
+      southWest: toTerrain(terrain),
+      northWest: toTerrain(terrain),
     });
-  };
-
-  // Helper to create a tile with specific sides
-  const createSpecificTile = (id: string, props: Partial<TileTerrainOptions>): Tile => {
-    const d = defaultPastureSides();
-    return new Tile({
-      id,
-      ...d,
-      ...props,
-    });
-  };
 
   /**
-   * Helper to surround a target coordinate with matching neighbors,
-   * specifically ignoring the 'center' coordinate to allow for later placement.
+   * Surround `target` with neighbors whose inward edge is pasture, skipping `center` and occupied coords.
    */
   const surroundExceptCenter = (target: HexCoordinate, idPrefix: string) => {
-    const pasture = new PastureTerrain();
     getNeighbors(target).forEach(({ direction, coordinate }) => {
       if (coordinate.getKey() === center.getKey()) return;
       if (board.has(coordinate)) return;
 
-      const opposite = getOpposite(direction);
-      const props: Partial<TileTerrainOptions> = { [opposite]: pasture };
-      board.place(createSpecificTile(`${idPrefix}-${direction}`, props), coordinate);
+      const inwardEdgeDirection = getOpposite(direction);
+      const inwardEdgeTerrain = toTerrain('pasture');
+      board.place(
+        neighborTileFacingInward(
+          `${idPrefix}-${direction}`,
+          inwardEdgeDirection,
+          inwardEdgeTerrain
+        ),
+        coordinate
+      );
     });
   };
 
@@ -112,12 +111,20 @@ describe('GameScorer', () => {
     // Scenario 2. Single Neighbor (No Match): 0 points.
     const northCoord = north(center);
 
-    // Center has plains at North
-    const centerTile = createSpecificTile('center', { north: new PastureTerrain() });
+    // Center: all pasture; north edge faces the neighbor
+    const centerTile = createTile('center', 'pasture');
     board.place(centerTile, center);
 
-    // Neighbor has forest at South (facing center)
-    const northTile = createSpecificTile('north', { south: toTerrain('tree') });
+    // Neighbor: all pasture except south = tree (the edge shared with center)
+    const northTile = new Tile({
+      id: 'north',
+      north: toTerrain('pasture'),
+      northEast: toTerrain('pasture'),
+      southEast: toTerrain('pasture'),
+      south: toTerrain('tree'),
+      southWest: toTerrain('pasture'),
+      northWest: toTerrain('pasture'),
+    });
     const placed = board.place(northTile, northCoord);
 
     const result = scorer.scorePlacement(board, placed);
@@ -127,10 +134,26 @@ describe('GameScorer', () => {
   it('should score 10 when waterOrPasture matches water across the edge', () => {
     const northCoord = north(center);
 
-    const northTile = createSpecificTile('north', { south: toTerrain('water') });
+    const northTile = new Tile({
+      id: 'north',
+      north: toTerrain('pasture'),
+      northEast: toTerrain('pasture'),
+      southEast: toTerrain('pasture'),
+      south: toTerrain('water'),
+      southWest: toTerrain('pasture'),
+      northWest: toTerrain('pasture'),
+    });
     board.place(northTile, northCoord);
 
-    const centerTile = createSpecificTile('center', { north: toTerrain('waterOrPasture') });
+    const centerTile = new Tile({
+      id: 'center',
+      north: toTerrain('waterOrPasture'),
+      northEast: toTerrain('pasture'),
+      southEast: toTerrain('pasture'),
+      south: toTerrain('pasture'),
+      southWest: toTerrain('pasture'),
+      northWest: toTerrain('pasture'),
+    });
     const placed = board.place(centerTile, center);
 
     const result = scorer.scorePlacement(board, placed);
@@ -141,13 +164,10 @@ describe('GameScorer', () => {
     // Scenario 3. Single Neighbor (Match): 10 points.
     const northCoord = north(center);
 
-    // Center has plains at North
-    const centerTile = createSpecificTile('center', { north: new PastureTerrain() });
+    const centerTile = createTile('center', 'pasture');
     board.place(centerTile, center);
 
-    // Neighbor has plains at South
-    const northTile = createSpecificTile('north', { south: new PastureTerrain() });
-    const placed = board.place(northTile, northCoord);
+    const placed = board.place(createTile('north', 'pasture'), northCoord);
 
     const result = scorer.scorePlacement(board, placed);
     expect(result.scoreAdded).toBe(10);
@@ -159,18 +179,10 @@ describe('GameScorer', () => {
     const northCoord = north(center);
     const northEastCoord = northEast(center);
 
-    const northTile = createSpecificTile('north', { south: new PastureTerrain() });
-    const neTile = createSpecificTile('ne', { southWest: new PastureTerrain() });
+    board.place(createTile('north', 'pasture'), northCoord);
+    board.place(createTile('ne', 'pasture'), northEastCoord);
 
-    board.place(northTile, northCoord);
-    board.place(neTile, northEastCoord);
-
-    // Place center matching both
-    const centerTile = createSpecificTile('center', {
-      north: new PastureTerrain(),
-      northEast: new PastureTerrain(),
-    });
-    const placed = board.place(centerTile, center);
+    const placed = board.place(createTile('center', 'pasture'), center);
 
     const result = scorer.scorePlacement(board, placed);
     expect(result.scoreAdded).toBe(20);
@@ -181,10 +193,12 @@ describe('GameScorer', () => {
 
     // Surround with 6 matching neighbors
     getNeighbors(center).forEach(({ direction, coordinate }) => {
-      // Center will be all 'pasture', so neighbors must present 'pasture' on opposite side
-      const opposite = getOpposite(direction);
-      const props: Partial<TileTerrainOptions> = { [opposite]: new PastureTerrain() };
-      board.place(createSpecificTile(`n-${direction}`, props), coordinate);
+      const inwardEdgeDirection = getOpposite(direction);
+      const inwardEdgeTerrain = toTerrain('pasture');
+      board.place(
+        neighborTileFacingInward(`n-${direction}`, inwardEdgeDirection, inwardEdgeTerrain),
+        coordinate
+      );
     });
 
     const centerTile = createTile('center', 'pasture');
@@ -200,11 +214,12 @@ describe('GameScorer', () => {
 
     const neighbors = getNeighbors(center);
     neighbors.forEach(({ direction, coordinate }, index) => {
-      const opposite = getOpposite(direction);
-      const props: Partial<TileTerrainOptions> = {
-        [opposite]: toTerrain(index < 5 ? 'pasture' : 'tree'),
-      };
-      board.place(createSpecificTile(`n-${direction}`, props), coordinate);
+      const inwardEdgeDirection = getOpposite(direction);
+      const inwardEdgeTerrain = toTerrain(index < 5 ? 'pasture' : 'tree');
+      board.place(
+        neighborTileFacingInward(`n-${direction}`, inwardEdgeDirection, inwardEdgeTerrain),
+        coordinate
+      );
     });
 
     const centerTile = createTile('center', 'pasture');
@@ -228,9 +243,12 @@ describe('GameScorer', () => {
     getNeighbors(center).forEach(({ direction, coordinate }) => {
       if (direction === 'north') return; // Skip North
 
-      const opposite = getOpposite(direction);
-      const props: Partial<TileTerrainOptions> = { [opposite]: new PastureTerrain() };
-      board.place(createSpecificTile(`n-${direction}`, props), coordinate);
+      const inwardEdgeDirection = getOpposite(direction);
+      const inwardEdgeTerrain = toTerrain('pasture');
+      board.place(
+        neighborTileFacingInward(`n-${direction}`, inwardEdgeDirection, inwardEdgeTerrain),
+        coordinate
+      );
     });
 
     // 2. Place North neighbor.
@@ -238,10 +256,14 @@ describe('GameScorer', () => {
     // It MUST NOT match its other neighbors (NE and NW) to avoid extra points.
     // North touches NE at SouthEast.
     // North touches NW at SouthWest.
-    const northTile = createSpecificTile('north', {
-      south: new PastureTerrain(), // Match Center
-      southEast: toTerrain('tree'), // Mismatch NE (which is default plains)
-      southWest: toTerrain('tree'), // Mismatch NW (which is default plains)
+    const northTile = new Tile({
+      id: 'north',
+      north: toTerrain('pasture'),
+      northEast: toTerrain('pasture'),
+      southEast: toTerrain('tree'), // mismatch NE (all pasture)
+      south: toTerrain('pasture'), // match center
+      southWest: toTerrain('tree'), // mismatch NW (all pasture)
+      northWest: toTerrain('pasture'),
     });
     const placed = board.place(northTile, northCoord);
 
@@ -302,9 +324,12 @@ describe('GameScorer', () => {
       const tile = board.place(createTile('center', 'pasture'), center);
 
       getNeighbors(center).forEach(({ direction, coordinate }, i) => {
-        const opposite = getOpposite(direction);
-        const terrain = i === 5 ? toTerrain('tree') : new PastureTerrain(); // One mismatch
-        board.place(createSpecificTile(`n${i}`, { [opposite]: terrain }), coordinate);
+        const inwardEdgeDirection = getOpposite(direction);
+        const inwardEdgeTerrain = i === 5 ? toTerrain('tree') : toTerrain('pasture');
+        board.place(
+          neighborTileFacingInward(`n${i}`, inwardEdgeDirection, inwardEdgeTerrain),
+          coordinate
+        );
       });
 
       expect(scorer.isPerfect(board, tile)).toBe(false);
@@ -314,8 +339,12 @@ describe('GameScorer', () => {
       const tile = board.place(createTile('center', 'pasture'), center);
 
       getNeighbors(center).forEach(({ direction, coordinate }, i) => {
-        const opposite = getOpposite(direction);
-        board.place(createSpecificTile(`n${i}`, { [opposite]: new PastureTerrain() }), coordinate);
+        const inwardEdgeDirection = getOpposite(direction);
+        const inwardEdgeTerrain = toTerrain('pasture');
+        board.place(
+          neighborTileFacingInward(`n${i}`, inwardEdgeDirection, inwardEdgeTerrain),
+          coordinate
+        );
       });
 
       expect(scorer.isPerfect(board, tile)).toBe(true);
