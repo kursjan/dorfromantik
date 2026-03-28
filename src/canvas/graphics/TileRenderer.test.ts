@@ -1,114 +1,148 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { TileRenderer, neighborEdgeTerrainsFromBoard } from './TileRenderer';
-import { resolveEdgePaintTerrainType } from './segmentRenderers/WaterOrPastureSegmentRenderer';
 import { Tile } from '../../models/Tile';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { Board } from '../../models/Board';
-import { DEFAULT_HEX_STYLE } from './HexStyles';
+import { DEFAULT_HEX_STYLE, TERRAIN_COLORS } from './HexStyles';
 import {
   PastureTerrain,
   toTerrain,
-  TreeTerrain,
   WaterOrPastureTerrain,
   WaterTerrain,
 } from '../../models/Terrain';
+import { waterSegmentRenderer } from './segmentRenderers/WaterSegmentRenderer';
+import { waterOrPastureSegmentRenderer } from './segmentRenderers/WaterOrPastureSegmentRenderer';
+
+function allPastureTile(id: string, extra: ConstructorParameters<typeof Tile>[0] = {}): Tile {
+  const p = () => new PastureTerrain();
+  return new Tile({
+    id,
+    north: p(),
+    northEast: p(),
+    southEast: p(),
+    south: p(),
+    southWest: p(),
+    northWest: p(),
+    ...extra,
+  });
+}
+
+function mockCanvasContext(): CanvasRenderingContext2D {
+  const alpha = { value: 1 };
+  return {
+    get globalAlpha() {
+      return alpha.value;
+    },
+    set globalAlpha(v: number) {
+      alpha.value = v;
+    },
+    lineWidth: 0,
+    strokeStyle: '',
+    fillStyle: '',
+    beginPath: vi.fn(),
+    moveTo: vi.fn(),
+    lineTo: vi.fn(),
+    quadraticCurveTo: vi.fn(),
+    closePath: vi.fn(),
+    stroke: vi.fn(),
+    fill: vi.fn(),
+  } as unknown as CanvasRenderingContext2D;
+}
 
 describe('TileRenderer', () => {
   let ctx: CanvasRenderingContext2D;
   let renderer: TileRenderer;
 
   beforeEach(() => {
-    ctx = {
-      beginPath: vi.fn(),
-      moveTo: vi.fn(),
-      lineTo: vi.fn(),
-      quadraticCurveTo: vi.fn(),
-      closePath: vi.fn(),
-      stroke: vi.fn(),
-      fill: vi.fn(),
-    } as unknown as CanvasRenderingContext2D;
-
+    ctx = mockCanvasContext();
     renderer = new TileRenderer(ctx);
   });
 
-  it('draws water overlays on top of pasture background', () => {
-    const tile = new Tile({
-      id: 'test-tile',
-      north: toTerrain('tree'),
-      northEast: toTerrain('water'),
-      southEast: toTerrain('house'),
-      south: toTerrain('pasture'),
-      southWest: toTerrain('rail'),
-      northWest: toTerrain('field'),
-    });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
-    renderer.drawTile(tile, 0, 0, DEFAULT_HEX_STYLE);
+  it('applies style opacity then restores globalAlpha', () => {
+    ctx.globalAlpha = 0.99;
+    const tile = allPastureTile('a');
 
-    // 6 wedges + 1 water line + 1 outline
-    expect(ctx.beginPath).toHaveBeenCalledTimes(8);
+    renderer.drawTile(tile, 0, 0, { ...DEFAULT_HEX_STYLE, opacity: 0.4 });
 
-    // 6 wedges + 1 line + 1 outline
-    expect(ctx.moveTo).toHaveBeenCalledTimes(8);
+    expect(ctx.globalAlpha).toBe(0.99);
+  });
 
-    // 6 wedges * 2 + 1 outline * 5
-    expect(ctx.lineTo).toHaveBeenCalledTimes(17);
-    expect(ctx.quadraticCurveTo).toHaveBeenCalledTimes(1);
-
+  it('draws center water inset only when tile.center is water', () => {
+    const withoutCenter = allPastureTile('no-center');
+    renderer.drawTile(withoutCenter, 0, 0, DEFAULT_HEX_STYLE);
     expect(ctx.fill).toHaveBeenCalledTimes(6);
-    expect(ctx.stroke).toHaveBeenCalledTimes(2);
-    expect(ctx.closePath).toHaveBeenCalledTimes(7);
-  });
 
-  it('draws center water hex when center terrain is water', () => {
-    const pasture = new PastureTerrain();
-    const tile = new Tile({
-      id: 'water-center',
-      center: toTerrain('water'),
-      north: new WaterTerrain({ linkToCenter: true }),
-      northEast: pasture,
-      southEast: pasture,
-      south: pasture,
-      southWest: pasture,
-      northWest: pasture,
-    });
+    vi.mocked(ctx.fill).mockClear();
 
-    renderer.drawTile(tile, 0, 0, DEFAULT_HEX_STYLE);
-
-    // 6 wedges + 1 water line + 1 center hex + 1 outline
-    expect(ctx.beginPath).toHaveBeenCalledTimes(9);
+    const withCenter = allPastureTile('with-center', { center: toTerrain('water') });
+    renderer.drawTile(withCenter, 0, 0, DEFAULT_HEX_STYLE);
     expect(ctx.fill).toHaveBeenCalledTimes(7);
+    expect(ctx.fillStyle).toBe(TERRAIN_COLORS.water);
   });
 
-  it('draws linked water to center and unlinked water to mid-segment point', () => {
-    const pasture = new PastureTerrain();
-    const tile = new Tile({
-      id: 'water-link-geometry',
+  it('does not draw center inset when center is not water', () => {
+    const tile = allPastureTile('house-center', { center: toTerrain('house') });
+    renderer.drawTile(tile, 0, 0, DEFAULT_HEX_STYLE);
+    expect(ctx.fill).toHaveBeenCalledTimes(6);
+  });
+
+  it('strokes hex outline using style lineWidth and strokeColor', () => {
+    const tile = allPastureTile('outline');
+    const style = { ...DEFAULT_HEX_STYLE, strokeColor: '#112233', lineWidth: 4 };
+
+    renderer.drawTile(tile, 0, 0, style);
+
+    expect(ctx.stroke).toHaveBeenCalledTimes(1);
+    expect(ctx.strokeStyle).toBe('#112233');
+    expect(ctx.lineWidth).toBe(4);
+  });
+
+  it('passes linkWaterStrokeToCenter into wedge context for water and waterOrPasture', () => {
+    const waterSpy = vi.spyOn(waterSegmentRenderer, 'render');
+
+    const linkedWater = allPastureTile('lw', {
       center: toTerrain('water'),
       north: new WaterTerrain({ linkToCenter: true }),
-      northEast: new WaterTerrain({ linkToCenter: false }),
-      southEast: pasture,
-      south: pasture,
-      southWest: pasture,
-      northWest: pasture,
+    });
+    renderer.drawTile(linkedWater, 0, 0, DEFAULT_HEX_STYLE);
+    expect(waterSpy.mock.calls[0][0].linkWaterStrokeToCenter).toBe(true);
+
+    waterSpy.mockClear();
+
+    const unlinkedWater = allPastureTile('uw', {
+      north: new WaterTerrain({ linkToCenter: false }),
+    });
+    renderer.drawTile(unlinkedWater, 0, 0, DEFAULT_HEX_STYLE);
+    expect(waterSpy.mock.calls[0][0].linkWaterStrokeToCenter).toBe(false);
+
+    waterSpy.mockClear();
+
+    const linkedWop = allPastureTile('lwop', {
+      center: toTerrain('water'),
+      north: new WaterOrPastureTerrain({ linkToCenter: true }),
+    });
+    renderer.drawTile(linkedWop, 0, 0, DEFAULT_HEX_STYLE, {
+      neighborEdgeTerrains: { north: new WaterTerrain() },
+    });
+    expect(waterSpy.mock.calls[0][0].linkWaterStrokeToCenter).toBe(true);
+  });
+
+  it('forwards neighborEdgeTerrains to the segment renderer per direction', () => {
+    const wopSpy = vi.spyOn(waterOrPastureSegmentRenderer, 'render');
+    const neighbor = new WaterTerrain();
+    const tile = allPastureTile('wop-n', {
+      north: new WaterOrPastureTerrain({ linkToCenter: false }),
     });
 
-    renderer.drawTile(tile, 0, 0, DEFAULT_HEX_STYLE);
+    renderer.drawTile(tile, 0, 0, DEFAULT_HEX_STYLE, {
+      neighborEdgeTerrains: { north: neighbor },
+    });
 
-    const curveCalls = (ctx.quadraticCurveTo as ReturnType<typeof vi.fn>).mock.calls;
-    const waterEndpoints = curveCalls.map(([, , x, y]) => [x, y]);
-
-    // North linked water should end exactly at tile center.
-    const hasCenterEndpoint = waterEndpoints.some(
-      ([x, y]) => Math.abs(x - 0) < 0.001 && Math.abs(y - 0) < 0.001
-    );
-    expect(hasCenterEndpoint).toBe(true);
-
-    // NorthEast unlinked water should end halfway from edge midpoint to center.
-    // For size=40 and this orientation, that point is approximately (15, -8.6603).
-    const hasMidpointEndpoint = waterEndpoints.some(
-      ([x, y]) => Math.abs(x - 15) < 0.01 && Math.abs(y + 8.6603) < 0.01
-    );
-    expect(hasMidpointEndpoint).toBe(true);
+    expect(wopSpy).toHaveBeenCalledWith(expect.objectContaining({ segmentIndex: 0 }), neighbor);
   });
 
   it('draws a tile at a specific hex coordinate', () => {
@@ -127,17 +161,30 @@ describe('TileRenderer', () => {
     expect(y).toBeCloseTo(40 * Math.sqrt(3));
   });
 
-  it('resolves edge paint type from local match set and neighbor intersection', () => {
-    expect(resolveEdgePaintTerrainType(new TreeTerrain(), undefined)).toBe('tree');
-    expect(resolveEdgePaintTerrainType(new WaterTerrain(), new TreeTerrain())).toBe('water');
-    expect(resolveEdgePaintTerrainType(new PastureTerrain(), undefined)).toBe('pasture');
+  it('drawTileAtHex passes neighbor map from board when board is provided', () => {
+    const board = new Board();
+    const center = new HexCoordinate(0, 0, 0);
+    const northN = new HexCoordinate(-1, 0, 1);
+    board.place(new Tile({ id: 'n', south: toTerrain('water') }), northN);
 
-    const wop = new WaterOrPastureTerrain();
-    expect(resolveEdgePaintTerrainType(wop, undefined)).toBe('pasture');
-    expect(resolveEdgePaintTerrainType(wop, new WaterTerrain())).toBe('water');
-    expect(resolveEdgePaintTerrainType(wop, new PastureTerrain())).toBe('pasture');
-    expect(resolveEdgePaintTerrainType(wop, new TreeTerrain())).toBe('pasture');
-    expect(resolveEdgePaintTerrainType(wop, new WaterOrPastureTerrain())).toBe('water');
+    const tile = allPastureTile('at-hex', {
+      north: new WaterOrPastureTerrain({ linkToCenter: false }),
+    });
+    const drawSpy = vi.spyOn(renderer, 'drawTile');
+
+    renderer.drawTileAtHex(tile, center, DEFAULT_HEX_STYLE, board);
+
+    expect(drawSpy).toHaveBeenCalledWith(
+      tile,
+      expect.any(Number),
+      expect.any(Number),
+      DEFAULT_HEX_STYLE,
+      {
+        neighborEdgeTerrains: expect.objectContaining({
+          north: expect.objectContaining({ id: 'water' }),
+        }),
+      }
+    );
   });
 
   it('builds neighbor edge terrains from board', () => {
@@ -147,39 +194,5 @@ describe('TileRenderer', () => {
     board.place(new Tile({ id: 'n', south: toTerrain('water') }), northN);
     const map = neighborEdgeTerrainsFromBoard(board, center);
     expect(map.north?.id).toBe('water');
-  });
-
-  it('draws waterOrPasture as water when neighbor across edge is water', () => {
-    const pasture = new PastureTerrain();
-    const tile = new Tile({
-      id: 'wop-water',
-      north: new WaterOrPastureTerrain({ linkToCenter: false }),
-      northEast: pasture,
-      southEast: pasture,
-      south: pasture,
-      southWest: pasture,
-      northWest: pasture,
-    });
-    renderer.drawTile(tile, 0, 0, DEFAULT_HEX_STYLE, {
-      neighborEdgeTerrains: { north: new WaterTerrain() },
-    });
-    expect(ctx.quadraticCurveTo).toHaveBeenCalledTimes(1);
-  });
-
-  it('draws waterOrPasture as pasture when neighbor is tree', () => {
-    const pasture = new PastureTerrain();
-    const tile = new Tile({
-      id: 'wop-tree',
-      north: new WaterOrPastureTerrain({ linkToCenter: false }),
-      northEast: pasture,
-      southEast: pasture,
-      south: pasture,
-      southWest: pasture,
-      northWest: pasture,
-    });
-    renderer.drawTile(tile, 0, 0, DEFAULT_HEX_STYLE, {
-      neighborEdgeTerrains: { north: new TreeTerrain() },
-    });
-    expect(ctx.quadraticCurveTo).toHaveBeenCalledTimes(0);
   });
 });

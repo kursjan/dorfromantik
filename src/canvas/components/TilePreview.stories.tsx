@@ -1,12 +1,28 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { TilePreview } from './TilePreview';
 import { Tile } from '../../models/Tile';
-import { PastureTerrain, WaterTerrain } from '../../models/Terrain';
+import type { Terrain } from '../../models/Terrain';
+import {
+  FieldTerrain,
+  HouseTerrain,
+  PastureTerrain,
+  RailTerrain,
+  TreeTerrain,
+} from '../../models/Terrain';
 
-const pasture = () => new PastureTerrain();
+function tileUniformEdges(create: () => Terrain): Tile {
+  return new Tile({
+    north: create(),
+    northEast: create(),
+    southEast: create(),
+    south: create(),
+    southWest: create(),
+    northWest: create(),
+  });
+}
 
 const meta: Meta<typeof TilePreview> = {
-  title: 'Game/Tiles/WaterVariants',
+  title: 'Game/Tiles/TilePreview',
   component: TilePreview,
   parameters: {
     layout: 'centered',
@@ -17,47 +33,37 @@ const meta: Meta<typeof TilePreview> = {
 export default meta;
 type Story = StoryObj<typeof TilePreview>;
 
-export const WaterLinkedToCenter: Story = {
+export const Tree: Story = {
   args: {
-    tile: new Tile({
-      center: new WaterTerrain(),
-      north: new WaterTerrain({ linkToCenter: true }),
-      northEast: pasture(),
-      southEast: pasture(),
-      south: pasture(),
-      southWest: pasture(),
-      northWest: pasture(),
-    }),
+    tile: tileUniformEdges(() => new TreeTerrain()),
     size: 48,
   },
 };
 
-export const WaterNotLinkedToCenter: Story = {
+export const House: Story = {
   args: {
-    tile: new Tile({
-      center: new WaterTerrain(),
-      north: new WaterTerrain({ linkToCenter: false }),
-      northEast: pasture(),
-      southEast: pasture(),
-      south: pasture(),
-      southWest: pasture(),
-      northWest: pasture(),
-    }),
+    tile: tileUniformEdges(() => new HouseTerrain()),
     size: 48,
   },
 };
 
-export const MultiWaterMixedLinks: Story = {
+export const Pasture: Story = {
   args: {
-    tile: new Tile({
-      center: new WaterTerrain(),
-      north: new WaterTerrain({ linkToCenter: true }),
-      northEast: new WaterTerrain({ linkToCenter: false }),
-      southEast: new WaterTerrain({ linkToCenter: true }),
-      south: pasture(),
-      southWest: new WaterTerrain({ linkToCenter: false }),
-      northWest: pasture(),
-    }),
+    tile: tileUniformEdges(() => new PastureTerrain()),
+    size: 48,
+  },
+};
+
+export const Rail: Story = {
+  args: {
+    tile: tileUniformEdges(() => new RailTerrain()),
+    size: 48,
+  },
+};
+
+export const Field: Story = {
+  args: {
+    tile: tileUniformEdges(() => new FieldTerrain()),
     size: 48,
   },
 };

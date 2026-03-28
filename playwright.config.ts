@@ -53,7 +53,5 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
-    // In-memory Firestore so saves succeed without real Firebase (e.g. history-sync e2e).
-    env: { ...process.env, VITE_USE_MOCK_AUTH: 'true' },
   },
 });

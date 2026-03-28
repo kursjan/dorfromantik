@@ -6,7 +6,7 @@ import { PastureTerrain, WaterOrPastureTerrain, WaterTerrain } from '../../model
 const pasture = () => new PastureTerrain();
 
 const meta: Meta<typeof TilePreview> = {
-  title: 'Game/Tiles/Water or pasture',
+  title: 'Game/Tiles/TilePreview/WaterOrPasture',
   component: TilePreview,
   parameters: {
     layout: 'centered',

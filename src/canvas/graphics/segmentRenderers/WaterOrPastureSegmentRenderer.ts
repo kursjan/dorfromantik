@@ -27,21 +27,6 @@ function resolveWaterOrPastureNeighborPaint(neighborAcrossEdge: Terrain | undefi
   return 'pasture';
 }
 
-/**
- * Picks which base {@link TerrainType} to paint on a wedge (tests / tooling).
- * Multi-type locals (e.g. waterOrPasture) use {@link WaterOrPastureTerrain.edgeMatchTerrainTypes} vs neighbor.
- */
-export function resolveEdgePaintTerrainType(
-  terrain: Terrain,
-  neighborAcrossEdge: Terrain | undefined
-): TerrainType {
-  const local = terrain.edgeMatchTypes();
-  if (local.size === 1) {
-    return local.values().next().value as TerrainType;
-  }
-  return resolveWaterOrPastureNeighborPaint(neighborAcrossEdge);
-}
-
 export class WaterOrPastureSegmentRenderer implements TerrainSegmentRenderer {
   render(context: WedgeDrawContext, neighborAcrossEdge: Terrain | undefined): void {
     const resolved = resolveWaterOrPastureNeighborPaint(neighborAcrossEdge);
