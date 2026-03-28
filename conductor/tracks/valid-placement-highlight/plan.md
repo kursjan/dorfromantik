@@ -17,6 +17,6 @@
 - [x] **Phase Gate**: Verify the new architecture and run all unit tests using **project-orchestrator** skill.
 
 ## Phase 4: Final Polish & Review
-- [ ] Perform a rigorous file-by-file review of the new architecture against `main` using **quick-review** skill.
-- [ ] Address any feedback from `REVIEW_FEEDBACK.md` using **task-conductor** skill.
+- [x] Perform a rigorous file-by-file review of the new architecture against `main` using **quick-review** skill.
+- [x] Address any feedback from `REVIEW_FEEDBACK.md` using **task-conductor** skill.
 - [ ] **Final Track Gate**: Final verification, PR update, and Git commit using **project-orchestrator** skill.

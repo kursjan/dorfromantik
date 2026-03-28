@@ -35,8 +35,7 @@ src/canvas/
 │   ├── DebugStyles.ts        # (DEPRECATED) Legacy configuration
 │   ├── HexRenderer.ts        # Main game world rendering (Grid, Highlights)
 │   ├── HexStyles.ts          # Hex visual configuration
-│   ├── TileRenderer.ts       # Specialized renderer for 6-sided tiles
-│   └── HexStyles.ts          # Hex visual configuration
+│   └── TileRenderer.ts       # Specialized renderer for 6-sided tiles
 └── ARCHITECTURE.md    # This file
 ```
 
