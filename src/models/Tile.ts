@@ -40,16 +40,14 @@ export class Tile {
   readonly northWest: Terrain;
 
   constructor(options: TileTerrainOptions = {}) {
-    const defaultSide = () => new PastureTerrain();
-
     this.id = options.id ?? `tile-${Date.now()}-${Tile.idCounter++}`;
     this.center = options.center;
-    this.north = options.north ?? defaultSide();
-    this.northEast = options.northEast ?? defaultSide();
-    this.southEast = options.southEast ?? defaultSide();
-    this.south = options.south ?? defaultSide();
-    this.southWest = options.southWest ?? defaultSide();
-    this.northWest = options.northWest ?? defaultSide();
+    this.north = options.north ?? new PastureTerrain();
+    this.northEast = options.northEast ?? new PastureTerrain();
+    this.southEast = options.southEast ?? new PastureTerrain();
+    this.south = options.south ?? new PastureTerrain();
+    this.southWest = options.southWest ?? new PastureTerrain();
+    this.northWest = options.northWest ?? new PastureTerrain();
 
     Tile.validator.validate(this);
   }

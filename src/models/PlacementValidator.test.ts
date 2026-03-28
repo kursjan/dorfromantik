@@ -3,18 +3,25 @@ import { Board } from './Board';
 import { Tile } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
 import { isValidPlacement } from './PlacementValidator';
-import { toTerrain } from './Terrain';
+import {
+  FieldTerrain,
+  HouseTerrain,
+  PastureTerrain,
+  RailTerrain,
+  TreeTerrain,
+  WaterTerrain,
+} from './Terrain';
 
 describe('PlacementValidator', () => {
   let board: Board;
   const tile = new Tile({
     id: 'test-tile',
-    north: toTerrain('tree'),
-    northEast: toTerrain('house'),
-    southEast: toTerrain('water'),
-    south: toTerrain('pasture'),
-    southWest: toTerrain('rail'),
-    northWest: toTerrain('field'),
+    north: new TreeTerrain(),
+    northEast: new HouseTerrain(),
+    southEast: new WaterTerrain(),
+    south: new PastureTerrain(),
+    southWest: new RailTerrain(),
+    northWest: new FieldTerrain(),
   });
   const origin = new HexCoordinate(0, 0, 0);
 

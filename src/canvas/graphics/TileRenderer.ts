@@ -1,7 +1,6 @@
 import { Tile } from '../../models/Tile';
 import { getHexCorners, hexToPixel } from '../utils/HexUtils';
-import { type HexStyle, DEFAULT_HEX_STYLE } from './HexStyles';
-import { WaterRenderer } from './WaterRenderer';
+import { type HexStyle, DEFAULT_HEX_STYLE, TERRAIN_COLORS } from './HexStyles';
 import type { WedgeDrawContext } from './segmentRenderers/WedgeDrawContext';
 import { TERRAIN_ID_SEGMENT_RENDERERS } from './segmentRenderers/terrainIdSegmentRenderers';
 import { HexCoordinate } from '../../models/HexCoordinate';
@@ -73,7 +72,7 @@ export class TileRenderer {
       TERRAIN_ID_SEGMENT_RENDERERS[terrain.id].render(wedgeContext, neighborAcrossEdge, terrain);
     }
 
-    WaterRenderer.drawCenterHex(this.ctx, tile, x, y, style);
+    this.drawWaterCenter(tile, x, y, style);
 
     // Draw hex outline
     this.ctx.beginPath();
@@ -103,5 +102,21 @@ export class TileRenderer {
     const { x, y } = hexToPixel(hex, style.size);
     const neighborEdgeTerrains = board ? neighborEdgeTerrainsFromBoard(board, hex) : undefined;
     this.drawTile(tile, x, y, style, { neighborEdgeTerrains });
+  }
+
+  private drawWaterCenter(tile: Tile, x: number, y: number, style: HexStyle): void {
+    if (tile.center?.id !== 'water') {
+      return;
+    }
+
+    const centerHexCorners = getHexCorners(x, y, style.size * 0.25);
+    this.ctx.beginPath();
+    this.ctx.moveTo(centerHexCorners[0].x, centerHexCorners[0].y);
+    for (let i = 1; i < 6; i++) {
+      this.ctx.lineTo(centerHexCorners[i].x, centerHexCorners[i].y);
+    }
+    this.ctx.closePath();
+    this.ctx.fillStyle = TERRAIN_COLORS.water;
+    this.ctx.fill();
   }
 }
