@@ -5,7 +5,7 @@ import type { WedgeDrawContext } from './segmentRenderers/WedgeDrawContext';
 import { TERRAIN_ID_SEGMENT_RENDERERS } from './segmentRenderers/terrainIdSegmentRenderers';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { Board } from '../../models/Board';
-import { directions, getNeighbor, getOpposite, type Direction } from '../../models/Navigation';
+import { directions, getNeighbors, getOpposite, type Direction } from '../../models/Navigation';
 import type { Terrain } from '../../models/Terrain';
 
 export interface TileDrawOptions {
@@ -17,15 +17,14 @@ export function neighborEdgeTerrainsFromBoard(
   board: Board,
   coord: HexCoordinate
 ): Partial<Record<Direction, Terrain>> {
-  const out: Partial<Record<Direction, Terrain>> = {};
-  for (const d of directions) {
-    const nCoord = getNeighbor(coord, d);
-    const boardTile = board.get(nCoord);
+  const returnValue: Partial<Record<Direction, Terrain>> = {};
+  for (const { direction, coordinate } of getNeighbors(coord)) {
+    const boardTile = board.get(coordinate);
     if (boardTile) {
-      out[d] = boardTile.tile.getTerrain(getOpposite(d));
+      returnValue[direction] = boardTile.tile.getTerrain(getOpposite(direction));
     }
   }
-  return out;
+  return returnValue;
 }
 
 export class TileRenderer {
@@ -72,7 +71,7 @@ export class TileRenderer {
       TERRAIN_ID_SEGMENT_RENDERERS[terrain.id].render(wedgeContext, neighborAcrossEdge, terrain);
     }
 
-    this.drawWaterCenter(tile, x, y, style);
+    this.drawCenter(tile, x, y, style);
 
     // Draw hex outline
     this.ctx.beginPath();
@@ -104,7 +103,7 @@ export class TileRenderer {
     this.drawTile(tile, x, y, style, { neighborEdgeTerrains });
   }
 
-  private drawWaterCenter(tile: Tile, x: number, y: number, style: HexStyle): void {
+  private drawCenter(tile: Tile, x: number, y: number, style: HexStyle): void {
     if (tile.center?.id !== 'water') {
       return;
     }

@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **Terrain model (class-based edges):** Introduced `Terrain.ts` with concrete terrain classes (`TreeTerrain`, `WaterTerrain` with optional `linkToCenter`, `WaterOrPastureTerrain`, etc.). Edge compatibility uses overlapping sets of base `TerrainType` values so hybrid edges (e.g. water/pasture) can match neighbors without expanding the six-color palette.
+- **Tile validation:** `TileValidator` runs on `Tile` construction to enforce structural rules (for example, water segments that link to the center require a water center terrain).
+- **Canvas terrain segment renderers:** `graphics/segmentRenderers/` holds one stateless wedge renderer per `TerrainId`, wired through `terrainIdSegmentRenderers` and `WedgeDrawContext`. `TileRenderer` accepts optional `neighborEdgeTerrains` (and `neighborEdgeTerrainsFromBoard`) so wedges can draw contextually (notably `waterOrPasture` against real neighbors).
+- **Storybook coverage:** Added stories for `TilePreview` variants, including water center and `waterOrPasture` neighbor edge cases.
+- **Deterministic scenario (water / pasture):** `GameRules.createTest2()` plus a **Test Game 2** entry on the main menu for manual and automated exercise of the new terrain behavior.
+- **Developer tooling:** `.cursor/skills/quick-review` documents the adversarial review workflow; Storybook tests share Vitest setup via `.storybook/vitest.setup.ts`; ESLint config extended for Storybook test files.
+
 - **Highlight Valid Placement Coordinates:**
   - **GameHints Architecture:** Extracted derived board state (like `validPlacements`) into a dedicated `GameHints` model. This cache is invalidated on tile placement and rotation, avoiding expensive coordinate recalculations on every frame.
   - **UI Visualization:** Implemented a new `VALID_PLACEMENT_STYLE` to visually highlight all valid empty hexes on the board, aiding the player in finding valid placement spots.
@@ -57,6 +64,11 @@ All notable changes to this project will be documented in this file.
 - **Specialized Renderers:** Refactored the canvas engine to use specialized renderers (`Background`, `Hex`, `Debug`) orchestrated by a central `CanvasController`.
 - **Rotated Hex System:** Implemented a custom hexagonal coordinate system where "North" is defined as `(-1, 0, 1)` to align with the desired visual orientation.
 - **GameScorer:** Extracted scoring logic into a dedicated service for better testability and separation of concerns.
+
+### Changed
+
+- **Tile & serialization:** Each tile side (and optional center) is a `Terrain` instance; `Tile` defaults unfilled sides to pasture. `GameSerializer` persists `TerrainId` strings per cell and rebuilds instances with `toTerrain()`. Printers and broad test suites were updated for the new model.
+- **E2E tests:** Playwright specs and helpers adjusted for the extra main-menu action and related UI flows.
 
 ### Fixed
 

@@ -14,6 +14,7 @@ The canvas visualization logic is separated from the React component tree to ens
 ```
 src/canvas/
 ├── components/        # React Components
+│   ├── TilePreview.tsx     # Small canvas preview of a tile (optional neighborEdgeTerrains for hybrid edges)
 │   ├── CanvasView.tsx      # Entry point (Main container, manages HUD/Canvas sync)
 │   ├── DebugOverlay.tsx    # (NEW) React-based technical info overlay (FPS, Camera)
 │   ├── DebugOverlay.css    # Debug overlay styling
@@ -35,7 +36,8 @@ src/canvas/
 │   ├── DebugStyles.ts        # (DEPRECATED) Legacy configuration
 │   ├── HexRenderer.ts        # Main game world rendering (Grid, Highlights)
 │   ├── HexStyles.ts          # Hex visual configuration
-│   └── TileRenderer.ts       # Specialized renderer for 6-sided tiles
+│   ├── TileRenderer.ts       # Orchestrates hex wedges; delegates wedge fill to segment renderers
+│   └── segmentRenderers/     # One stateless renderer per TerrainId (WedgeDrawContext + neighbor terrain)
 └── ARCHITECTURE.md    # This file
 ```
 
@@ -105,7 +107,7 @@ Stateless rendering utilities. They receive the `Context2D` and necessary data t
 
 - **BackgroundRenderer:** Handles clearing the screen and drawing the background color.
 - **HexRenderer:** Draws the game grid and debug highlights. It uses `HexStyles.ts` for configuration.
-- **TileRenderer:** Draws the 6-sided terrain wedges for placed tiles. It aligns the model's terrain mapping with the canvas orientation.
+- **TileRenderer:** Draws the 6-sided terrain wedges for placed tiles. For each direction it builds a `WedgeDrawContext` and dispatches to `TERRAIN_ID_SEGMENT_RENDERERS[tileSide.id]`, passing the terrain across the shared edge on the neighbor tile when provided (`TileDrawOptions.neighborEdgeTerrains` or `neighborEdgeTerrainsFromBoard` + optional `board` in `drawTileAtHex`). This keeps hybrid terrains (e.g. `waterOrPasture`) visually consistent with neighbors. Water-filled center hexes are drawn inside `TileRenderer` when the tile center is water.
 - **(Deprecated) DebugRenderer:** Legacy canvas-based debug text. Replaced by `DebugOverlay` component.
 
 ### Services (`services/*.ts`)
