@@ -1,0 +1,8 @@
+{
+  "id": "valid-placement-highlight",
+  "name": "Highlight Valid Placement Coordinates",
+  "description": "Visually highlight all valid placement coordinates on the board.",
+  "status": "planned",
+  "issue": "https://github.com/kursjan/dorfromantik/issues/63",
+  "branch": "worker1"
+}

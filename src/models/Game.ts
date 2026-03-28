@@ -4,6 +4,7 @@ import { Tile } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
 import { getNeighbors } from './Navigation';
 import { GameScorer } from './GameScorer';
+import { GameHints } from './GameHints';
 
 export interface GameProps {
   id?: string;
@@ -54,6 +55,7 @@ export class Game {
   lastPlayed: string;
   score: number;
   tileQueue: Tile[];
+  hints: GameHints;
 
   private scorer: GameScorer;
 
@@ -73,14 +75,11 @@ export class Game {
     this.score = props.score ?? 0;
     this.scorer = new GameScorer(this.rules);
     this.tileQueue = props.tileQueue ?? [];
+    this.hints = new GameHints(this.board, this.peek() || null);
 
     if (this.score < 0) {
       throw new Error('score must be non-negative');
     }
-  }
-
-  inProgress(): boolean {
-    return this.remainingTurns > 0;
   }
 
   /**
@@ -88,6 +87,10 @@ export class Game {
    */
   get remainingTurns(): number {
     return this.tileQueue.length;
+  }
+
+  inProgress(): boolean {
+    return this.remainingTurns > 0;
   }
 
   /**
@@ -108,6 +111,7 @@ export class Game {
     }
 
     this.tileQueue[0] = tile.rotateClockwise();
+    this.updateHints();
   }
 
   /**
@@ -121,6 +125,7 @@ export class Game {
     }
 
     this.tileQueue[0] = tile.rotateCounterClockwise();
+    this.updateHints();
   }
 
   /**
@@ -162,6 +167,11 @@ export class Game {
 
     this.score += scoreAdded;
     this.lastPlayed = new Date().toISOString();
+    this.updateHints();
     return { scoreAdded, perfectCount };
+  }
+
+  private updateHints(): void {
+    this.hints = new GameHints(this.board, this.peek() || null);
   }
 }

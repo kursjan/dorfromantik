@@ -3,7 +3,14 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
 ### Added
+
+- **Highlight Valid Placement Coordinates:**
+  - **GameHints Architecture:** Extracted derived board state (like `validPlacements`) into a dedicated `GameHints` model. This cache is invalidated on tile placement and rotation, avoiding expensive coordinate recalculations on every frame.
+  - **UI Visualization:** Implemented a new `VALID_PLACEMENT_STYLE` to visually highlight all valid empty hexes on the board, aiding the player in finding valid placement spots.
+  - **Controller Integration:** `CanvasController` now consumes `activeGame.hints.validPlacements` for rendering highlights and optimizing hover detection.
+
 - **Session Context Lean Refactor:**
   - **Granular Contexts:** Decoupled the monolithic `SessionProvider` state into `UserContext`, `GameHistoryContext`, and `ActiveGameContext` to prevent unnecessary component re-renders (e.g., `GameBoard` no longer re-renders when a background auto-save updates the game history list).
   - **Model Cleanup:** Removed the legacy `Session` domain model, migrating its orchestration logic directly to `MainMenu` and `SessionProvider`.
@@ -41,7 +48,7 @@ All notable changes to this project will be documented in this file.
 - **Firebase Integration (Initial):** Added the `firebase` SDK and initialization logic for Authentication and Firestore.
 - **Game Serialization:** Implemented `GameSerializer` to convert complex class-based game state (Game, Board, Tile, HexCoordinate) into plain JSON for persistent storage and back into functional class instances. This is a critical foundation for cross-session play and cloud saving.
 - **Always-on Ghost Preview:** The game now continuously renders a preview of the next tile under the cursor, with distinct styles for valid and invalid placements.
-...
+  ...
 - **Interactive Camera:** Implemented Panning (drag), Zooming (scroll), and Rotation (Q/E keys).
 - **Hex Interaction:** Added "Hex Picking" to detect and highlight the hexagon currently under the mouse cursor.
 - **Reset View Button:** Added a polished, styled UI component in the top-right corner to restore the camera to its default state.
