@@ -1,0 +1,18 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["package-lock.json", ".env.ci"],
+  "tasks": {
+    "test:raw": {
+      "outputs": []
+    },
+    "test:unit:raw": {
+      "outputs": []
+    },
+    "test:ui:raw": {
+      "outputs": []
+    },
+    "test:ci:raw": {
+      "outputs": []
+    }
+  }
+}

@@ -16,13 +16,14 @@ description: Use this skill when transitioning between phases or finalizing a tr
      ```bash
      git add .
      git commit -m "Checkpoint end of Phase X: [summary of changes]"
-     git push origin HEAD
+     git push --no-verify origin HEAD
      ```
    - If there are no uncommitted changes, use the following to mark the phase boundary and push:
      ```bash
      git commit --allow-empty -m "Checkpoint end of Phase X: [summary of changes]"
-     git push origin HEAD
+     git push --no-verify origin HEAD
      ```
+   - Use **`git push --no-verify`** when pushing right after step 3’s **`npm run test:ci`** and **`npm run test:e2e:ci`** succeeded and nothing changed in the tree since then, so local hooks do not repeat **`check:pre-push`**. Re-run step 3 after any post-verify edits.
 6. **Draft PR Strategy**: Ensure a Pull Request exists for the current branch to allow for immediate review in Reviewable.
    - Check for an existing PR: `gh pr view`
    - If no PR exists, create a Draft PR: `gh pr create --draft --title "WIP: [Track Name]" --body "Tracking progress for [Track ID]"`
@@ -64,6 +65,9 @@ description: Use this skill when transitioning between phases or finalizing a tr
 1. **Architecture Sync**: Update `ARCHITECTURE.md` across the project to reflect new models, patterns, and decisions.
 2. **Final Approval**: Ask for explicit user approval and present a final project status summary.
 3. **PR Creation**: Create a Pull Request on GitHub and assign it to the user.
+   - For final review handoff, the PR must be **ready for review** (not Draft):
+     - If no PR exists, create a non-draft PR.
+     - If a Draft PR exists, publish it before handoff (e.g. `gh pr ready`).
 4. **Handover**: Present the link to the PR. You MUST NOT merge the PR yourself, user must do the code review.
    - Include a ready-to-send track sync request so the user does not need to write one manually:
 

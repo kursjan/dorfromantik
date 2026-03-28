@@ -53,6 +53,14 @@ export const VALID_PREVIEW_STYLE: HexStyle = {
   opacity: 0.6,
 };
 
+export const VALID_PLACEMENT_STYLE: HexStyle = {
+  ...DEFAULT_HEX_STYLE,
+  strokeColor: 'rgba(0, 255, 0, 0.4)', // Faint Green
+  lineWidth: 1,
+  fillColor: 'rgba(0, 255, 0, 0.05)', // Very subtle Green
+  textColor: 'transparent',
+};
+
 export const INVALID_PREVIEW_STYLE: HexStyle = {
   ...DEFAULT_HEX_STYLE,
   strokeColor: '#FF0000', // Red

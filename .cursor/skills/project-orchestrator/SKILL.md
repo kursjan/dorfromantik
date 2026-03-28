@@ -40,13 +40,14 @@ Use this skill when **transitioning between phases** or **finalizing a Conductor
      ```bash
      git add .
      git commit -m "Checkpoint end of Phase X: <short summary>"
-     git push origin HEAD
+     git push --no-verify origin HEAD
      ```
    - If there are no pending changes but a phase boundary still needs to be recorded:
      ```bash
      git commit --allow-empty -m "Checkpoint end of Phase X: <short summary>"
-     git push origin HEAD
+     git push --no-verify origin HEAD
      ```
+   - Use **`git push --no-verify`** when pushing immediately after step 3’s **`npm run test:ci`** and **`npm run test:e2e:ci`** passed and the working tree has not changed since that verification. That avoids Husky **`check:pre-push`** re-running typecheck and Vitest locally. If you edit files after verification, run step 3 again before committing and pushing.
 
 6. **Draft PR Strategy**
    - Ensure a Pull Request exists for the current branch:
@@ -115,6 +116,9 @@ Use this once **all phases** in a track are complete.
 
 3. **PR Creation / Finalization**
    - Ensure there is a PR for the track branch and that it includes all changes.
+   - For final review handoff, the PR must be **ready for review** (not Draft):
+     - If no PR exists, create a non-draft PR.
+     - If a Draft PR exists, publish it before handoff (e.g. `gh pr ready`).
    - Present the PR link to the user.
    - Do **not** merge the PR yourself; the user is responsible for final review and merge.
 

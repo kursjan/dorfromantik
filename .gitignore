@@ -10,6 +10,9 @@ lerna-debug.log*
 # Dependencies
 /node_modules
 
+# Turborepo
+.turbo
+
 # Build output
 /dist
 /dist-ssr

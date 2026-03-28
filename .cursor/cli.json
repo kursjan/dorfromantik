@@ -14,6 +14,7 @@
       "Shell(npx)",
       "Shell(pwd)",
       "Shell(sed)",
+      "Shell(sleep)",
       "Shell(tail)",
       "Shell(tsc)"
     ],

@@ -35,8 +35,7 @@ src/canvas/
 │   ├── DebugStyles.ts        # (DEPRECATED) Legacy configuration
 │   ├── HexRenderer.ts        # Main game world rendering (Grid, Highlights)
 │   ├── HexStyles.ts          # Hex visual configuration
-│   ├── TileRenderer.ts       # Specialized renderer for 6-sided tiles
-│   └── HexStyles.ts          # Hex visual configuration
+│   └── TileRenderer.ts       # Specialized renderer for 6-sided tiles
 └── ARCHITECTURE.md    # This file
 ```
 
@@ -140,7 +139,7 @@ While the Controller runs independently for performance, the React-based HUD nee
 2.  **InputManager:** Catches `mousemove`, calls `callbacks.onHover(500, 300)`.
 3.  **CanvasController:**
     - Calls `camera.screenToWorld(500, 300)` -> applies Inverse Rotate, Inverse Scale, Inverse Translate -> gets World `(120.5, -40.2)`.
-    - Calls `activeGame.board.getValidPlacementCoordinates()` to get all currently legal placement spots.
+    - Reads `activeGame.hints.validPlacements` (immutable pre-computed array).
     - Finds the valid coordinate with the minimum `distanceToHex` from the World `(120.5, -40.2)`.
     - Updates `this.hoveredHex` to that closest valid coordinate (snapping effect).
 4.  **Render Loop:**
