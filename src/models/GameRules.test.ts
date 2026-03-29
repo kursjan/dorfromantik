@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { HexCoordinate } from './HexCoordinate';
 import { Game } from './Game';
-import { directions } from './Navigation';
+import { Direction } from './Navigation';
 import { GameRules, RandomTileGenerator } from './GameRules';
 
 describe('GameRules', () => {
@@ -58,21 +58,20 @@ describe('GameRules.createTest2', () => {
     const start = game.board.get(origin)!.tile;
 
     expect(start.center?.id).toBe('water');
-    for (const d of directions) {
-      expect(start.getTerrain(d).id).toBe('waterOrPasture');
-    }
+    expect(start.getTerrain(Direction.North).id).toBe('waterOrPasture');
+    expect(start.getTerrain(Direction.NorthEast).id).toBe('waterOrPasture');
+    expect(start.getTerrain(Direction.SouthEast).id).toBe('waterOrPasture');
+    expect(start.getTerrain(Direction.South).id).toBe('waterOrPasture');
+    expect(start.getTerrain(Direction.SouthWest).id).toBe('waterOrPasture');
+    expect(start.getTerrain(Direction.NorthWest).id).toBe('waterOrPasture');
 
     const next = game.peek()!;
-    let waterCount = 0;
-    for (const d of directions) {
-      if (next.getTerrain(d).id === 'water') waterCount++;
-    }
-    expect(waterCount).toBe(1);
-    expect(next.north.id).toBe('water');
-    for (const d of directions) {
-      if (d === 'north') continue;
-      expect(next.getTerrain(d).id).toBe('pasture');
-    }
+    expect(next.getTerrain(Direction.North).id).toBe('water');
+    expect(next.getTerrain(Direction.NorthEast).id).toBe('pasture');
+    expect(next.getTerrain(Direction.SouthEast).id).toBe('pasture');
+    expect(next.getTerrain(Direction.South).id).toBe('pasture');
+    expect(next.getTerrain(Direction.SouthWest).id).toBe('pasture');
+    expect(next.getTerrain(Direction.NorthWest).id).toBe('pasture');
   });
 });
 
