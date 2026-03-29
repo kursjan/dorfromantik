@@ -31,10 +31,10 @@ export class Game {
    * @returns A fully initialized Game instance.
    */
   static create(rules: GameRules): Game {
-    const board = new Board();
+    const startBoard = new Board();
 
     const startTile = rules.createInitialTile('start-tile');
-    board.place(startTile, new HexCoordinate(0, 0, 0));
+    const { board } = startBoard.place(startTile, new HexCoordinate(0, 0, 0));
 
     const tileQueue = rules.createInitialQueue();
 
@@ -45,7 +45,7 @@ export class Game {
     });
   }
 
-  readonly board: Board;
+  board: Board;
   readonly rules: GameRules;
   readonly id: string;
   readonly name: string;
@@ -150,7 +150,8 @@ export class Game {
       throw new Error('No tiles remaining in the queue');
     }
 
-    const placedTile = this.board.place(tile, coord);
+    const { board: newBoard, placedTile } = this.board.place(tile, coord);
+    this.board = newBoard;
 
     const { scoreAdded, perfectCount } = this.scorer.scorePlacement(this.board, placedTile);
 

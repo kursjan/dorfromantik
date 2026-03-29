@@ -6,7 +6,7 @@ import { Tile } from './Tile';
 import { toTerrain } from './Terrain';
 import { HexCoordinate } from './HexCoordinate';
 import { GameScorer } from './GameScorer';
-// Add missing tests: https://github.com/kursjan/dorfromantik/issues/35
+
 describe('Game', () => {
   let board: Board;
   let rules: GameRules;
@@ -92,7 +92,8 @@ describe('Game', () => {
   describe('isValidPlacement', () => {
     it('should return false if the position is already occupied', () => {
       const coord = new HexCoordinate(0, 0, 0);
-      board.place(randomGenerator.createTile('t1'), coord);
+      const { board: b1 } = board.place(randomGenerator.createTile('t1'), coord);
+      board = b1;
       const freeTile = new Tile({
         north: toTerrain('pasture'),
         northEast: toTerrain('pasture'),
@@ -112,7 +113,8 @@ describe('Game', () => {
 
     it('should return false if the position is not adjacent to any existing tile', () => {
       const origin = new HexCoordinate(0, 0, 0);
-      board.place(randomGenerator.createTile('t1'), origin);
+      const { board: b1 } = board.place(randomGenerator.createTile('t1'), origin);
+      board = b1;
       const freeTile = new Tile({
         north: toTerrain('pasture'),
         northEast: toTerrain('pasture'),
@@ -143,7 +145,8 @@ describe('Game', () => {
         southWest: toTerrain('pasture'),
         northWest: toTerrain('pasture'),
       });
-      board.place(pastureTile, origin);
+      const { board: b1 } = board.place(pastureTile, origin);
+      board = b1;
       const freeTile = new Tile({
         north: toTerrain('pasture'),
         northEast: toTerrain('pasture'),
@@ -158,7 +161,6 @@ describe('Game', () => {
         tileQueue: [freeTile],
       });
 
-      // TODO: this should use coordinates of all neighbours
       const adjCoord = new HexCoordinate(1, 0, -1);
 
       expect(game.isValidPlacement(adjCoord)).toBe(true);
@@ -237,26 +239,21 @@ describe('Game', () => {
     });
 
     it('should place tile, call scorer, and generate bonus tiles from the generator', () => {
-      // 1. Define the exact tiles we expect the generator to yield
       const initialTile = randomGenerator.createTile('initial-tile');
       const expectedBonus1 = randomGenerator.createTile('bonus-1');
       const expectedBonus2 = randomGenerator.createTile('bonus-2');
 
-      // 2. Configure rules to use a SequenceTileGenerator that will return exactly those tiles in order
       const customRules = new GameRules({
         initialTurns: 1,
         tileGenerator: new SequenceTileGenerator([initialTile, expectedBonus1, expectedBonus2]),
-        turnsPerPerfect: 2, // 2 bonus tiles per perfect match
+        turnsPerPerfect: 2,
       });
 
-      // 3. Create the game. This consumes 'initialTile' to fill the initial queue of size 1.
       const game = Game.create(customRules);
 
-      // Verify initial state
       expect(game.tileQueue.length).toBe(1);
       expect(game.tileQueue[0]).toBe(initialTile);
 
-      // Spy on GameScorer to force a perfect placement return without having to set up the board perfectly
       const scoreSpy = vi.spyOn(GameScorer.prototype, 'scorePlacement').mockReturnValue({
         scoreAdded: 100,
         perfectCount: 1,
@@ -264,14 +261,11 @@ describe('Game', () => {
 
       const coord = new HexCoordinate(1, 0, -1);
 
-      // 4. Place the tile. This removes 'initialTile' from the queue, places it,
-      // and asks the generator for 2 new bonus tiles (perfectCount: 1 * turnsPerPerfect: 2).
       const result = game.placeTile(coord);
 
       expect(result.scoreAdded).toBe(100);
       expect(result.perfectCount).toBe(1);
 
-      // 5. Verify the queue now contains exactly the expected bonus tiles in order
       expect(game.tileQueue.length).toBe(2);
       expect(game.tileQueue[0]).toBe(expectedBonus1);
       expect(game.tileQueue[1]).toBe(expectedBonus2);

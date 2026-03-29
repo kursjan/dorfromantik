@@ -109,7 +109,7 @@ describe('GameSerializer', () => {
   });
 
   it('preserves optional center terrain on serialization', () => {
-    const board = new Board();
+    let board = new Board();
     const centered = new Tile({
       id: 'centered',
       center: toTerrain('house'),
@@ -120,7 +120,8 @@ describe('GameSerializer', () => {
       southWest: toTerrain('rail'),
       northWest: toTerrain('house'),
     });
-    board.place(centered, new HexCoordinate(0, 0, 0));
+    const { board: newBoard } = board.place(centered, new HexCoordinate(0, 0, 0));
+    board = newBoard;
 
     const game = new Game({
       id: 'game-center',

@@ -99,11 +99,12 @@ export class GameSerializer {
   }
 
   private static deserializeBoard(json: BoardJSON): Board {
-    const board = new Board();
+    let board = new Board();
     for (const entry of json.tiles) {
       const tile = this.deserializeTile(entry.tile);
       const coord = this.deserializeCoordinate(entry.coordinate);
-      board.place(tile, coord);
+      const { board: newBoard } = board.place(tile, coord);
+      board = newBoard;
     }
     return board;
   }

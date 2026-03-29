@@ -37,18 +37,6 @@ function neighborTileFacingInward(
  * 6. Perfect Ring (Mismatch): 5 matches, 1 mismatch = 50 points.
  * 7. Cascading Perfect: 10 (match) + 60 (neighbor becomes perfect) = 70 points.
  * 8. Double Cascading Perfect: 2 neighbors become perfect = 120 bonus points.
- *
- * COORDINATE SYSTEM (Flat-Top)
- *
- *          [North]     [NorthEast]
- *         (-1,0,1)      (-1,1,0)
- *            / \          / \
- * [NorthWest]   \        /   [SouthEast]
- *  (0,-1,1) ---- [Center] ---- (0,1,-1)
- *            /   (0,0,0)  \
- *           / \          / \
- *      [SouthWest]     [South]
- *       (1,-1,0)       (1,0,-1)
  */
 
 describe('GameScorer', () => {
@@ -86,7 +74,7 @@ describe('GameScorer', () => {
 
       const inwardEdgeDirection = getOpposite(direction);
       const inwardEdgeTerrain = toTerrain('pasture');
-      board.place(
+      const { board: newBoard } = board.place(
         neighborTileFacingInward(
           `${idPrefix}-${direction}`,
           inwardEdgeDirection,
@@ -94,28 +82,27 @@ describe('GameScorer', () => {
         ),
         coordinate
       );
+      board = newBoard;
     });
   };
 
   it('should score 0 for a lone tile', () => {
-    // Scenario 1. Lone Tile: 0 points.
     const tile = createTile('t1');
-    const placed = board.place(tile, center);
+    const { board: newBoard, placedTile } = board.place(tile, center);
+    board = newBoard;
 
-    const result = scorer.scorePlacement(board, placed);
+    const result = scorer.scorePlacement(board, placedTile);
     expect(result.scoreAdded).toBe(0);
     expect(result.perfectCount).toBe(0);
   });
 
   it('should score 0 for a single neighbor with no match', () => {
-    // Scenario 2. Single Neighbor (No Match): 0 points.
     const northCoord = north(center);
 
-    // Center: all pasture; north edge faces the neighbor
     const centerTile = createTile('center', 'pasture');
-    board.place(centerTile, center);
+    const { board: b1 } = board.place(centerTile, center);
+    board = b1;
 
-    // Neighbor: all pasture except south = tree (the edge shared with center)
     const northTile = new Tile({
       id: 'north',
       north: toTerrain('pasture'),
@@ -125,9 +112,10 @@ describe('GameScorer', () => {
       southWest: toTerrain('pasture'),
       northWest: toTerrain('pasture'),
     });
-    const placed = board.place(northTile, northCoord);
+    const { board: b2, placedTile } = board.place(northTile, northCoord);
+    board = b2;
 
-    const result = scorer.scorePlacement(board, placed);
+    const result = scorer.scorePlacement(board, placedTile);
     expect(result.scoreAdded).toBe(0);
   });
 
@@ -143,7 +131,8 @@ describe('GameScorer', () => {
       southWest: toTerrain('pasture'),
       northWest: toTerrain('pasture'),
     });
-    board.place(northTile, northCoord);
+    const { board: b1 } = board.place(northTile, northCoord);
+    board = b1;
 
     const centerTile = new Tile({
       id: 'center',
@@ -154,200 +143,189 @@ describe('GameScorer', () => {
       southWest: toTerrain('pasture'),
       northWest: toTerrain('pasture'),
     });
-    const placed = board.place(centerTile, center);
+    const { board: b2, placedTile } = board.place(centerTile, center);
+    board = b2;
 
-    const result = scorer.scorePlacement(board, placed);
+    const result = scorer.scorePlacement(board, placedTile);
     expect(result.scoreAdded).toBe(10);
   });
 
   it('should score 10 for a single neighbor with match', () => {
-    // Scenario 3. Single Neighbor (Match): 10 points.
     const northCoord = north(center);
 
     const centerTile = createTile('center', 'pasture');
-    board.place(centerTile, center);
+    const { board: b1 } = board.place(centerTile, center);
+    board = b1;
 
-    const placed = board.place(createTile('north', 'pasture'), northCoord);
+    const { board: b2, placedTile } = board.place(createTile('north', 'pasture'), northCoord);
+    board = b2;
 
-    const result = scorer.scorePlacement(board, placed);
+    const result = scorer.scorePlacement(board, placedTile);
     expect(result.scoreAdded).toBe(10);
   });
 
   it('should score 20 for two matching neighbors', () => {
-    // Scenario 4. Double Match: 20 points.
-    // Neighbors at North and NorthEast
     const northCoord = north(center);
     const northEastCoord = northEast(center);
 
-    board.place(createTile('north', 'pasture'), northCoord);
-    board.place(createTile('ne', 'pasture'), northEastCoord);
+    const { board: b1 } = board.place(createTile('north', 'pasture'), northCoord);
+    const { board: b2 } = b1.place(createTile('ne', 'pasture'), northEastCoord);
+    board = b2;
 
-    const placed = board.place(createTile('center', 'pasture'), center);
+    const { board: b3, placedTile } = board.place(createTile('center', 'pasture'), center);
+    board = b3;
 
-    const result = scorer.scorePlacement(board, placed);
+    const result = scorer.scorePlacement(board, placedTile);
     expect(result.scoreAdded).toBe(20);
   });
 
   it('should score 120 (60 match + 60 perfect) for a perfect ring placement', () => {
-    // Scenario 5. Perfect Ring (Matching): 60 (match) + 60 (bonus) = 120 points.
-
-    // Surround with 6 matching neighbors
     getNeighbors(center).forEach(({ direction, coordinate }) => {
       const inwardEdgeDirection = getOpposite(direction);
       const inwardEdgeTerrain = toTerrain('pasture');
-      board.place(
+      const { board: newBoard } = board.place(
         neighborTileFacingInward(`n-${direction}`, inwardEdgeDirection, inwardEdgeTerrain),
         coordinate
       );
+      board = newBoard;
     });
 
     const centerTile = createTile('center', 'pasture');
-    const placed = board.place(centerTile, center);
+    const { board: bFinal, placedTile } = board.place(centerTile, center);
+    board = bFinal;
 
-    const result = scorer.scorePlacement(board, placed);
+    const result = scorer.scorePlacement(board, placedTile);
     expect(result.scoreAdded).toBe(120);
     expect(result.perfectCount).toBe(1);
   });
 
   it('should score 50 for a full ring with one mismatch', () => {
-    // Scenario 6. Perfect Ring (Mismatch): 5 matches, 1 mismatch = 50 points.
-
     const neighbors = getNeighbors(center);
     neighbors.forEach(({ direction, coordinate }, index) => {
       const inwardEdgeDirection = getOpposite(direction);
       const inwardEdgeTerrain = toTerrain(index < 5 ? 'pasture' : 'tree');
-      board.place(
+      const { board: newBoard } = board.place(
         neighborTileFacingInward(`n-${direction}`, inwardEdgeDirection, inwardEdgeTerrain),
         coordinate
       );
+      board = newBoard;
     });
 
     const centerTile = createTile('center', 'pasture');
-    const placed = board.place(centerTile, center);
+    const { board: bFinal, placedTile } = board.place(centerTile, center);
+    board = bFinal;
 
-    const result = scorer.scorePlacement(board, placed);
-    // 5 matches * 10 = 50. No perfect bonus.
+    const result = scorer.scorePlacement(board, placedTile);
     expect(result.scoreAdded).toBe(50);
     expect(result.perfectCount).toBe(0);
   });
 
   it('should score 70 (10 match + 60 perfect) when a neighbor becomes perfect', () => {
-    // Scenario 7. Cascading Perfect: 10 (match) + 60 (neighbor becomes perfect) = 70 points.
     const northCoord = north(center);
 
-    // 1. Setup Center to be missing only North neighbor to be perfect
     const centerTile = createTile('center', 'pasture');
-    board.place(centerTile, center);
+    const { board: b1 } = board.place(centerTile, center);
+    board = b1;
 
-    // Place 5 neighbors (excluding North) matching Center
     getNeighbors(center).forEach(({ direction, coordinate }) => {
-      if (direction === 'north') return; // Skip North
-
+      if (direction === 'north') return;
       const inwardEdgeDirection = getOpposite(direction);
       const inwardEdgeTerrain = toTerrain('pasture');
-      board.place(
+      const { board: newBoard } = board.place(
         neighborTileFacingInward(`n-${direction}`, inwardEdgeDirection, inwardEdgeTerrain),
         coordinate
       );
+      board = newBoard;
     });
 
-    // 2. Place North neighbor.
-    // It MUST match Center (South side).
-    // It MUST NOT match its other neighbors (NE and NW) to avoid extra points.
-    // North touches NE at SouthEast.
-    // North touches NW at SouthWest.
     const northTile = new Tile({
       id: 'north',
       north: toTerrain('pasture'),
       northEast: toTerrain('pasture'),
-      southEast: toTerrain('tree'), // mismatch NE (all pasture)
-      south: toTerrain('pasture'), // match center
-      southWest: toTerrain('tree'), // mismatch NW (all pasture)
+      southEast: toTerrain('tree'),
+      south: toTerrain('pasture'),
+      southWest: toTerrain('tree'),
       northWest: toTerrain('pasture'),
     });
-    const placed = board.place(northTile, northCoord);
+    const { board: bFinal, placedTile } = board.place(northTile, northCoord);
+    board = bFinal;
 
-    const result = scorer.scorePlacement(board, placed);
-
-    // Points:
-    // - Match between North and Center: 10
-    // - Center becomes perfect: 60
-    // Total: 70
+    const result = scorer.scorePlacement(board, placedTile);
     expect(result.scoreAdded).toBe(70);
     expect(result.perfectCount).toBe(1);
   });
 
   it('should score multiple perfect bonuses if one placement completes multiple neighbors', () => {
-    // Scenario 8. Double Cascading Perfect: 2 neighbors become perfect = 120 bonus points.
     const northCoord = north(center);
     const northEastCoord = northEast(center);
 
-    // 1. Setup North and NorthEast as candidates
-    board.place(createTile('north', 'pasture'), northCoord);
-    board.place(createTile('northEast', 'pasture'), northEastCoord);
+    const { board: b1 } = board.place(createTile('north', 'pasture'), northCoord);
+    const { board: b2 } = b1.place(createTile('northEast', 'pasture'), northEastCoord);
+    board = b2;
 
     surroundExceptCenter(northCoord, 'n');
     surroundExceptCenter(northEastCoord, 'ne');
 
-    // 2. Place Center matching both
     const centerTile = createTile('center', 'pasture');
-    const placed = board.place(centerTile, center);
+    const { board: bFinal, placedTile } = board.place(centerTile, center);
+    board = bFinal;
 
-    const result = scorer.scorePlacement(board, placed);
-
-    // Points:
-    // - Matches: Center touches N, NE, and potentially others from surround (NW and SE).
-    // - Perfects: North and NorthEast both become perfect.
+    const result = scorer.scorePlacement(board, placedTile);
     expect(result.perfectCount).toBe(2);
-    expect(result.scoreAdded).toBeGreaterThanOrEqual(140); // 20 (N, NE) + 120 (bonuses)
+    expect(result.scoreAdded).toBeGreaterThanOrEqual(140);
   });
 
   describe('isPerfect', () => {
     it('should return false for a lone tile', () => {
-      const tile = board.place(createTile('t1'), center);
-      expect(scorer.isPerfect(board, tile)).toBe(false);
+      const { board: newBoard, placedTile } = board.place(createTile('t1'), center);
+      expect(scorer.isPerfect(newBoard, placedTile)).toBe(false);
     });
 
     it('should return false if tile has fewer than 6 neighbors', () => {
-      const tile = board.place(createTile('center'), center);
-      // Place only 3 neighbors
+      const { board: b1, placedTile } = board.place(createTile('center'), center);
+      board = b1;
       getNeighbors(center)
         .slice(0, 3)
         .forEach(({ coordinate }, i) => {
-          board.place(createTile(`n${i}`), coordinate);
+          const { board: nb } = board.place(createTile(`n${i}`), coordinate);
+          board = nb;
         });
 
-      expect(scorer.isPerfect(board, tile)).toBe(false);
+      expect(scorer.isPerfect(board, placedTile)).toBe(false);
     });
 
     it('should return false if 6 neighbors exist but one terrain mismatches', () => {
-      const tile = board.place(createTile('center', 'pasture'), center);
+      const { board: b1, placedTile } = board.place(createTile('center', 'pasture'), center);
+      board = b1;
 
       getNeighbors(center).forEach(({ direction, coordinate }, i) => {
         const inwardEdgeDirection = getOpposite(direction);
         const inwardEdgeTerrain = i === 5 ? toTerrain('tree') : toTerrain('pasture');
-        board.place(
+        const { board: nb } = board.place(
           neighborTileFacingInward(`n${i}`, inwardEdgeDirection, inwardEdgeTerrain),
           coordinate
         );
+        board = nb;
       });
 
-      expect(scorer.isPerfect(board, tile)).toBe(false);
+      expect(scorer.isPerfect(board, placedTile)).toBe(false);
     });
 
     it('should return true if 6 neighbors exist and all terrains match', () => {
-      const tile = board.place(createTile('center', 'pasture'), center);
+      const { board: b1, placedTile } = board.place(createTile('center', 'pasture'), center);
+      board = b1;
 
       getNeighbors(center).forEach(({ direction, coordinate }, i) => {
         const inwardEdgeDirection = getOpposite(direction);
         const inwardEdgeTerrain = toTerrain('pasture');
-        board.place(
+        const { board: nb } = board.place(
           neighborTileFacingInward(`n${i}`, inwardEdgeDirection, inwardEdgeTerrain),
           coordinate
         );
+        board = nb;
       });
 
-      expect(scorer.isPerfect(board, tile)).toBe(true);
+      expect(scorer.isPerfect(board, placedTile)).toBe(true);
     });
   });
 });

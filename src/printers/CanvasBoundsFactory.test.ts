@@ -30,8 +30,7 @@ describe('CanvasBoundsFactory', () => {
         northWest: toTerrain('pasture'),
       });
       const coord = new HexCoordinate(5, -10, 5);
-      board.place(tile, coord);
-      const boardTile = board.get(coord)!;
+      const { placedTile: boardTile } = board.place(tile, coord);
 
       const newFactory = factory.stretch(boardTile);
       expect(newFactory).toBeInstanceOf(InitializedCanvasBoundsFactory);
@@ -72,8 +71,7 @@ describe('CanvasBoundsFactory', () => {
         northWest: toTerrain('pasture'),
       });
       const coord = new HexCoordinate(1, 0, -1); // Placed to the south-east of the initial bounds
-      board.place(tile, coord);
-      const boardTile = board.get(coord)!;
+      const { placedTile: boardTile } = board.place(tile, coord);
 
       const newFactory = factory.stretch(boardTile);
       const newBounds = newFactory.getCanvasBounds();
@@ -102,8 +100,7 @@ describe('CanvasBoundsFactory', () => {
         northWest: toTerrain('pasture'),
       });
       const coord = new HexCoordinate(-1, 0, 1); // Placed to the north-west of the initial bounds
-      board.place(tile, coord);
-      const boardTile = board.get(coord)!;
+      const { placedTile: boardTile } = board.place(tile, coord);
 
       const newFactory = factory.stretch(boardTile);
       const newBounds = newFactory.getCanvasBounds();

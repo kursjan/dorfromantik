@@ -15,17 +15,19 @@ describe('Board', () => {
 
   it('should place a tile correctly', () => {
     const tile = new Tile({ id: 'test-tile' });
-    board.place(tile, coord);
+    const { board: newBoard } = board.place(tile, coord);
 
-    expect(board.has(coord)).toBe(true);
-    expect(board.get(coord)?.tile).toBe(tile);
+    expect(newBoard.has(coord)).toBe(true);
+    expect(newBoard.get(coord)?.tile).toBe(tile);
+    // Ensure original board is not mutated
+    expect(board.has(coord)).toBe(false);
   });
 
   it('should throw an error when placing a tile on an occupied spot', () => {
     const tile = new Tile({ id: 'test-tile' });
-    board.place(tile, coord);
+    const { board: newBoard } = board.place(tile, coord);
 
-    expect(() => board.place(tile, coord)).toThrowError(/occupied/);
+    expect(() => newBoard.place(tile, coord)).toThrowError(/occupied/);
   });
 
   it('should canPlace return true for empty spot', () => {
@@ -34,18 +36,20 @@ describe('Board', () => {
 
   it('should canPlace return false for occupied spot', () => {
     const tile = new Tile({ id: 'test-tile' });
-    board.place(tile, coord);
+    const { board: newBoard } = board.place(tile, coord);
 
-    expect(board.canPlace(coord)).toBe(false);
+    expect(newBoard.canPlace(coord)).toBe(false);
   });
 
   it('should clear the board', () => {
     const tile = new Tile({ id: 'test-tile' });
-    board.place(tile, coord);
-    board.clear();
+    const { board: newBoard } = board.place(tile, coord);
+    const emptyBoard = newBoard.clear();
 
-    expect(board.has(coord)).toBe(false);
-    expect(Array.from(board.getAll()).length).toBe(0);
+    expect(emptyBoard.has(coord)).toBe(false);
+    expect(Array.from(emptyBoard.getAll()).length).toBe(0);
+    // Original still has it
+    expect(newBoard.has(coord)).toBe(true);
   });
 
   it('should return all tiles', () => {
@@ -53,10 +57,10 @@ describe('Board', () => {
     const tile2 = new Tile({ id: 'test-tile-2' });
     const coord2 = southWest(coord);
 
-    board.place(tile1, coord);
-    board.place(tile2, coord2);
+    const { board: board1 } = board.place(tile1, coord);
+    const { board: board2 } = board1.place(tile2, coord2);
 
-    const all = Array.from(board.getAll());
+    const all = Array.from(board2.getAll());
     expect(all.length).toBe(2);
     expect(all.some((t) => t.tile === tile1)).toBe(true);
     expect(all.some((t) => t.tile === tile2)).toBe(true);
@@ -70,12 +74,12 @@ describe('Board', () => {
     const neighborCoord = north(coord);
     const nonNeighborCoord = north(north(coord));
 
-    board.place(tile1, coord);
-    board.place(tile2, neighborCoord);
-    board.place(tile3, nonNeighborCoord);
+    const { board: b1 } = board.place(tile1, coord);
+    const { board: b2 } = b1.place(tile2, neighborCoord);
+    const { board: b3 } = b2.place(tile3, nonNeighborCoord);
 
-    const placedTile = board.get(coord)!;
-    const neighbors = board.getExistingNeighbors(placedTile);
+    const placedTile = b3.get(coord)!;
+    const neighbors = b3.getExistingNeighbors(placedTile);
 
     expect(Object.keys(neighbors).length).toBe(1);
     expect(neighbors.north?.coordinate).toEqual(neighborCoord);
@@ -87,10 +91,10 @@ describe('Board', () => {
       southEast: toTerrain('water'),
       southWest: toTerrain('rail'),
     });
-    board.place(placedTile, coord);
+    const { board: newBoard } = board.place(placedTile, coord);
 
     const freeTile = new Tile({ id: 'free-tile' });
-    const validCoords = board.getValidPlacementCoordinates(freeTile);
+    const validCoords = newBoard.getValidPlacementCoordinates(freeTile);
 
     expect(validCoords.length).toBe(4);
 
@@ -109,7 +113,7 @@ describe('Board', () => {
       southEast: toTerrain('water'),
       southWest: toTerrain('rail'),
     });
-    board.place(placedTile, coord);
+    const { board: newBoard } = board.place(placedTile, coord);
 
     const matchingTile = new Tile({
       id: 'matching-tile',
@@ -117,7 +121,7 @@ describe('Board', () => {
       northEast: toTerrain('rail'),
     });
 
-    const validCoords = board.getValidPlacementCoordinates(matchingTile);
+    const validCoords = newBoard.getValidPlacementCoordinates(matchingTile);
 
     expect(validCoords.length).toBe(6);
   });
@@ -128,7 +132,7 @@ describe('Board', () => {
       southEast: toTerrain('water'),
       southWest: toTerrain('rail'),
     });
-    board.place(placedTile1, coord);
+    const { board: b1 } = board.place(placedTile1, coord);
 
     const coord2 = southWest(coord);
     const placedTile2 = new Tile({
@@ -136,10 +140,10 @@ describe('Board', () => {
       southEast: toTerrain('water'),
       southWest: toTerrain('rail'),
     });
-    board.place(placedTile2, coord2);
+    const { board: b2 } = b1.place(placedTile2, coord2);
 
     const freeTile = new Tile({ id: 'free-tile' });
-    const validCoords = board.getValidPlacementCoordinates(freeTile);
+    const validCoords = b2.getValidPlacementCoordinates(freeTile);
 
     expect(validCoords.length).toBe(5);
   });

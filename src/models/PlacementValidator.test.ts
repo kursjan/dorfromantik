@@ -59,8 +59,8 @@ describe('PlacementValidator', () => {
     });
 
     it('should return false if the coordinate has a tile', () => {
-      board.place(tile, origin);
-      expect(isPositionEmpty(board, origin)).toBe(false);
+      const { board: b1 } = board.place(tile, origin);
+      expect(isPositionEmpty(b1, origin)).toBe(false);
     });
   });
 
@@ -70,56 +70,58 @@ describe('PlacementValidator', () => {
     });
 
     it('should return true if there is an adjacent tile', () => {
-      board.place(tile, origin);
+      const { board: b1 } = board.place(tile, origin);
       const neighborCoord = north(origin);
-      expect(hasAdjacentTile(board, neighborCoord)).toBe(true);
+      expect(hasAdjacentTile(b1, neighborCoord)).toBe(true);
     });
 
     it('should return false if tiles are far away', () => {
-      board.place(tile, origin);
+      const { board: b1 } = board.place(tile, origin);
       const farCoord = north(north(origin));
-      expect(hasAdjacentTile(board, farCoord)).toBe(false);
+      expect(hasAdjacentTile(b1, farCoord)).toBe(false);
     });
   });
 
   describe('doStrictEdgesMatch', () => {
+    let boardWithTile: Board;
     beforeEach(() => {
-      board.place(tile, origin);
+      const { board: b1 } = board.place(tile, origin);
+      boardWithTile = b1;
     });
 
     it('should return true when a non-strict edge touches a non-strict edge', () => {
       const neighborCoord = north(origin);
       const testTile = new Tile({ south: new FieldTerrain() });
-      expect(doStrictEdgesMatch(board, neighborCoord, testTile)).toBe(true);
+      expect(doStrictEdgesMatch(boardWithTile, neighborCoord, testTile)).toBe(true);
     });
 
     it('should return false when a strict edge touches a mismatching non-strict edge', () => {
       const seCoord = southEast(origin);
       const testTile = new Tile({ northWest: new FieldTerrain() });
-      expect(doStrictEdgesMatch(board, seCoord, testTile)).toBe(false);
+      expect(doStrictEdgesMatch(boardWithTile, seCoord, testTile)).toBe(false);
     });
 
     it('should return true when a strict edge touches a matching strict edge', () => {
       const seCoord = southEast(origin);
       const testTile = new Tile({ northWest: new WaterTerrain() });
-      expect(doStrictEdgesMatch(board, seCoord, testTile)).toBe(true);
+      expect(doStrictEdgesMatch(boardWithTile, seCoord, testTile)).toBe(true);
     });
 
     it('should handle hybrid waterOrPasture terrain correctly', () => {
       const seCoord = southEast(origin);
 
       const hybridTile = new Tile({ northWest: new WaterOrPastureTerrain() });
-      expect(doStrictEdgesMatch(board, seCoord, hybridTile)).toBe(true);
+      expect(doStrictEdgesMatch(boardWithTile, seCoord, hybridTile)).toBe(true);
 
       const sCoord = south(origin);
 
       const hybridTile2 = new Tile({ north: new WaterOrPastureTerrain() });
-      expect(doStrictEdgesMatch(board, sCoord, hybridTile2)).toBe(true);
+      expect(doStrictEdgesMatch(boardWithTile, sCoord, hybridTile2)).toBe(true);
 
       const nCoord = north(origin);
 
       const hybridTile3 = new Tile({ south: new WaterOrPastureTerrain() });
-      expect(doStrictEdgesMatch(board, nCoord, hybridTile3)).toBe(false);
+      expect(doStrictEdgesMatch(boardWithTile, nCoord, hybridTile3)).toBe(false);
     });
   });
 
@@ -129,31 +131,31 @@ describe('PlacementValidator', () => {
     });
 
     it('should return true if adjacent tile exists and no strict mismatches', () => {
-      board.place(tile, origin);
+      const { board: b1 } = board.place(tile, origin);
 
       const neighborCoord = north(origin);
       const validTile = new Tile({ south: new FieldTerrain() });
-      expect(isValidPlacement(board, neighborCoord, validTile)).toBe(true);
+      expect(isValidPlacement(b1, neighborCoord, validTile)).toBe(true);
     });
 
     it('should return false if spot is occupied', () => {
-      board.place(tile, origin);
-      expect(isValidPlacement(board, origin, tile)).toBe(false);
+      const { board: b1 } = board.place(tile, origin);
+      expect(isValidPlacement(b1, origin, tile)).toBe(false);
     });
 
     it('should return false if only far away tiles exist', () => {
-      board.place(tile, origin);
+      const { board: b1 } = board.place(tile, origin);
 
       const farCoord = north(north(origin));
-      expect(isValidPlacement(board, farCoord, tile)).toBe(false);
+      expect(isValidPlacement(b1, farCoord, tile)).toBe(false);
     });
 
     it('should return false if placing water next to non-water', () => {
-      board.place(tile, origin);
+      const { board: b1 } = board.place(tile, origin);
 
       const seCoord = southEast(origin);
       const fieldTile = new Tile({ northWest: new FieldTerrain() });
-      expect(isValidPlacement(board, seCoord, fieldTile)).toBe(false);
+      expect(isValidPlacement(b1, seCoord, fieldTile)).toBe(false);
     });
   });
 });
