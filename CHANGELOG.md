@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 - **Canvas terrain segment renderers:** `graphics/segmentRenderers/` holds one stateless wedge renderer per `TerrainId`, wired through `terrainIdSegmentRenderers` and `WedgeDrawContext`. `TileRenderer` accepts optional `neighborEdgeTerrains`; on-board draws use `BoardNavigation.neighborEdgeTerrains` (notably for `waterOrPasture` against neighbors). Water tile centers use `WaterCenterSegmentRenderer` via `terrainIdCenterSegmentRenderers`.
 - **Board navigation (experiment):** `BoardNavigation` static `neighborEdgeTerrains(board, coord)` centralizes neighbor-edge terrain lookup using `Board.getExistingNeighborsAt`.
 - **Storybook coverage:** Added stories for `TilePreview` variants, including water center and `waterOrPasture` neighbor edge cases.
-- **Deterministic scenario (water / pasture):** `GameRules.createTest2()` plus a **Test Game 2** entry on the main menu for manual and automated exercise of the new terrain behavior.
+- **Deterministic scenario (water / pasture):** `GameRules.createTest2()` (water-center starter with mixed water/pasture edges; queue tiles are pasture with one water edge, rotating) plus a **Test Game 2** main-menu entry.
 - **Developer tooling:** `.cursor/skills/quick-review` documents the adversarial review workflow; Storybook tests share Vitest setup via `.storybook/vitest.setup.ts`; ESLint config extended for Storybook test files.
 
 - **Highlight Valid Placement Coordinates:**

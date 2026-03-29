@@ -30,7 +30,7 @@ This directory contains the core data structures and business logic for the Dorf
 ### 4. User & Rules (`User.ts`, `GameRules.ts`)
 
 - **`User`**: Represents a player identity. It supports both **Anonymous Guests** (auto-assigned on app load) and **Permanent Accounts** (linked via Google). It tracks `id`, `isAnonymous`, and `displayName`.
-- **`GameRules`**: Configurable settings for a game (initial turns, points per match), tile generators, and test factories such as `createTest2()` for water / pasture / `waterOrPasture` scenarios.
+- **`GameRules`**: Configurable settings for a game (initial turns, points per match), tile generators, and test factories such as `createTest2()` (water-center starter, mixed water/pasture edges; queue tiles pasture with one rotating water edge).
 
 ### 5. Services & Providers
 

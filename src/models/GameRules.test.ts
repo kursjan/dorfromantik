@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { HexCoordinate } from './HexCoordinate';
 import { Game } from './Game';
+import { directions } from './Navigation';
 import { GameRules, RandomTileGenerator } from './GameRules';
 
 describe('GameRules', () => {
@@ -50,18 +51,34 @@ describe('GameRules', () => {
 });
 
 describe('GameRules.createTest2', () => {
-  it('places a starter with water and pasture and queues waterOrPasture first', () => {
+  it('places a starter with water center and mixed water/pasture edges; queue is pasture with one water edge', () => {
     const rules = GameRules.createTest2();
     const game = Game.create(rules);
     const origin = new HexCoordinate(0, 0, 0);
     const start = game.board.get(origin)!.tile;
 
-    expect(start.north.id).toBe('water');
-    expect(start.south.id).toBe('pasture');
+    expect(start.center?.id).toBe('water');
+    let waterEdges = 0;
+    let pastureEdges = 0;
+    for (const d of directions) {
+      const id = start.getTerrain(d).id;
+      if (id === 'water') waterEdges++;
+      if (id === 'pasture') pastureEdges++;
+    }
+    expect(waterEdges).toBe(3);
+    expect(pastureEdges).toBe(3);
 
-    const next = game.peek();
-    expect(next?.north.id).toBe('waterOrPasture');
-    expect(next?.south.id).toBe('waterOrPasture');
+    const next = game.peek()!;
+    let waterCount = 0;
+    for (const d of directions) {
+      if (next.getTerrain(d).id === 'water') waterCount++;
+    }
+    expect(waterCount).toBe(1);
+    expect(next.north.id).toBe('water');
+    for (const d of directions) {
+      if (d === 'north') continue;
+      expect(next.getTerrain(d).id).toBe('pasture');
+    }
   });
 });
 

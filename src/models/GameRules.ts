@@ -1,12 +1,13 @@
 import {
   PastureTerrain,
   toTerrain,
-  WaterOrPastureTerrain,
   WaterTerrain,
   TERRAIN_TYPES,
   type TerrainType,
+  WaterOrPastureTerrain,
 } from './Terrain';
 import { Tile } from './Tile';
+import { directions } from './Navigation';
 
 export interface GameRulesOptions {
   initialTurns?: number;
@@ -29,10 +30,6 @@ export class GameRules {
   readonly initialTileGenerator: TileGenerator;
   readonly tileGenerator: TileGenerator;
 
-  /**
-   * Creates a new instance of GameRules.
-   * @param options - Optional configuration for game rules.
-   */
   constructor(options: GameRulesOptions = {}) {
     this.initialTurns = options.initialTurns ?? 40;
     this.pointsPerMatch = options.pointsPerMatch ?? 10;
@@ -55,9 +52,6 @@ export class GameRules {
     }
   }
 
-  /**
-   * Creates a standard GameRules instance with default settings (30 turns, pasture starter).
-   */
   static createStandard(): GameRules {
     return new GameRules({
       initialTurns: 30,
@@ -85,34 +79,13 @@ export class GameRules {
     });
   }
 
-  /**
-   * Deterministic scenario for water / pasture / waterOrPasture: starter tile has water on the north
-   * edge and pasture on the south; remaining sides are pasture. The first tile in the queue is
-   * all waterOrPasture; further tiles match {@link GameRules.createTest}.
-   */
   static createTest2(): GameRules {
     return new GameRules({
       initialTurns: 6,
-      initialTileGenerator: new WaterPastureStarterTileGenerator(),
-      tileGenerator: new SequenceTileGenerator([
-        new Tile({
-          id: 'wop-1',
-          north: new WaterOrPastureTerrain({ linkToCenter: false }),
-          northEast: new WaterOrPastureTerrain({ linkToCenter: false }),
-          southEast: new WaterOrPastureTerrain({ linkToCenter: false }),
-          south: new WaterOrPastureTerrain({ linkToCenter: false }),
-          southWest: new WaterOrPastureTerrain({ linkToCenter: false }),
-          northWest: new WaterOrPastureTerrain({ linkToCenter: false }),
-        }),
-        new Tile({ id: '1' }),
-        new Tile({ id: '2' }),
-        new Tile({ id: '3' }),
-        new Tile({ id: '4' }),
-        new Tile({ id: '5' }),
-        new Tile({ id: '6' }),
-        new Tile({ id: '7' }),
-        new Tile({ id: '8' }),
-      ]),
+      initialTileGenerator: new WaterOrPastureStarterTileGenerator(),
+      tileGenerator: new SequenceTileGenerator(
+        Array.from({ length: 10 }, (_, index) => createTest2QueueTile(index))
+      ),
     });
   }
 
@@ -129,16 +102,10 @@ export class GameRules {
   }
 }
 
-/**
- * Interface for tile generator strategies.
- */
 export interface TileGenerator {
   createTile(id?: string): Tile;
 }
 
-/**
- * Tile generator implementation for a standard all-pasture tile.
- */
 export class PastureTileGenerator implements TileGenerator {
   createTile(id?: string): Tile {
     return new Tile({
@@ -153,19 +120,50 @@ export class PastureTileGenerator implements TileGenerator {
   }
 }
 
-/** Starter with water (north) and pasture (south) for waterOrPasture placement tests. */
-export class WaterPastureStarterTileGenerator implements TileGenerator {
+export class WaterOrPastureStarterTileGenerator implements TileGenerator {
   createTile(id?: string): Tile {
     return new Tile({
       id,
-      north: new WaterTerrain({ linkToCenter: false }),
-      northEast: new PastureTerrain(),
-      southEast: new PastureTerrain(),
-      south: new PastureTerrain(),
-      southWest: new PastureTerrain(),
-      northWest: new PastureTerrain(),
+      center: new WaterTerrain(),
+      north: new WaterOrPastureTerrain({ linkToCenter: true }),
+      northEast: new WaterOrPastureTerrain({ linkToCenter: true }),
+      southEast: new WaterOrPastureTerrain({ linkToCenter: true }),
+      south: new WaterOrPastureTerrain({ linkToCenter: true }),
+      southWest: new WaterOrPastureTerrain({ linkToCenter: true }),
+      northWest: new WaterOrPastureTerrain({ linkToCenter: true }),
     });
   }
+}
+
+function createTest2QueueTile(index: number): Tile {
+  const waterDirection = directions[index % 6];
+  return new Tile({
+    id: `test2-q-${index + 1}`,
+    north:
+      waterDirection === 'north'
+        ? (() => new WaterTerrain({ linkToCenter: false }))()
+        : (() => new PastureTerrain())(),
+    northEast:
+      waterDirection === 'northEast'
+        ? (() => new WaterTerrain({ linkToCenter: false }))()
+        : (() => new PastureTerrain())(),
+    southEast:
+      waterDirection === 'southEast'
+        ? (() => new WaterTerrain({ linkToCenter: false }))()
+        : (() => new PastureTerrain())(),
+    south:
+      waterDirection === 'south'
+        ? (() => new WaterTerrain({ linkToCenter: false }))()
+        : (() => new PastureTerrain())(),
+    southWest:
+      waterDirection === 'southWest'
+        ? (() => new WaterTerrain({ linkToCenter: false }))()
+        : (() => new PastureTerrain())(),
+    northWest:
+      waterDirection === 'northWest'
+        ? (() => new WaterTerrain({ linkToCenter: false }))()
+        : (() => new PastureTerrain())(),
+  });
 }
 
 export class RandomTileGenerator implements TileGenerator {
