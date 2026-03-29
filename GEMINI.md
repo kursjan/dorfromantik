@@ -459,6 +459,7 @@ When requested, the AI will facilitate the creation and execution of tests, ensu
   - Upon user request for tests (e.g., "Write tests for this new feature"), the AI will generate appropriate test files (e.g., `src/components/MyComponent.test.jsx`).
   - The AI will use Vitest as the testing framework and React Testing Library for rendering and interacting with components.
   - Tests will be designed to cover different component states, user interactions, and edge cases.
+  - **Keep tests DRY** (shared helpers, setup, fixtures where it helps). **Using `for` loops in tests is discouraged** (prefer clear, explicit cases).
 - **Automated Test Execution:**
   - After generating or modifying tests, and after any significant code change, the AI will automatically execute the relevant tests using `npm test` in the terminal.
   - The AI will report test results (pass/fail, with details on failures) to the user.

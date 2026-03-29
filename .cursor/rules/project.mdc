@@ -29,6 +29,10 @@ alwaysApply: true
   - If you must stop with a failing state, clearly report why and where it fails.
   - Verify CI pipeline by running `npm run test:ci`
 
+# Tests (Vitest / RTL)
+
+- Keep tests **DRY**. **Using `for` loops in tests is discouraged** (prefer clear, explicit cases).
+
 # Git & Branching
 
 - Do **not** develop directly on `main` for feature work; use a dedicated branch (e.g. `coding-agent/worker1` or a track-specific branch).
