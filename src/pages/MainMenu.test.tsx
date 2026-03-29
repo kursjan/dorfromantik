@@ -109,7 +109,7 @@ describe('MainMenu', () => {
     expect(mockSetActiveGame).toHaveBeenCalledWith(expect.any(Game));
     const game = mockSetActiveGame.mock.calls[0][0];
     expect(game.rules.initialTurns).toBe(6);
-    expect(game.peek()?.north.id).toBe('waterOrPasture');
+    expect(game.peek()?.north.id).toBe('water');
     expect(mockNavigate).toHaveBeenCalledWith('/game');
   });
 

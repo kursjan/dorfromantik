@@ -51,22 +51,16 @@ describe('GameRules', () => {
 });
 
 describe('GameRules.createTest2', () => {
-  it('places a starter with water center and mixed water/pasture edges; queue is pasture with one water edge', () => {
+  it('places a starter with water center and waterOrPasture edges; queue tiles are pasture with one water edge', () => {
     const rules = GameRules.createTest2();
     const game = Game.create(rules);
     const origin = new HexCoordinate(0, 0, 0);
     const start = game.board.get(origin)!.tile;
 
     expect(start.center?.id).toBe('water');
-    let waterEdges = 0;
-    let pastureEdges = 0;
     for (const d of directions) {
-      const id = start.getTerrain(d).id;
-      if (id === 'water') waterEdges++;
-      if (id === 'pasture') pastureEdges++;
+      expect(start.getTerrain(d).id).toBe('waterOrPasture');
     }
-    expect(waterEdges).toBe(3);
-    expect(pastureEdges).toBe(3);
 
     const next = game.peek()!;
     let waterCount = 0;

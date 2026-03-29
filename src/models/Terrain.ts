@@ -2,11 +2,6 @@
 export const TERRAIN_TYPES = ['tree', 'house', 'water', 'pasture', 'rail', 'field'] as const;
 export type TerrainType = (typeof TERRAIN_TYPES)[number];
 
-/**
- * Stable keys for terrain *instances* in saves and string constructors — separate registry from
- * {@link TERRAIN_TYPES}. Hybrid `waterOrPasture` has id here; its edge match set uses two
- * {@link TerrainType}s only, not a seventh base kind.
- */
 export const TERRAIN_IDS = [
   'tree',
   'house',
