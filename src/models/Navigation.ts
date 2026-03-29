@@ -1,44 +1,64 @@
 import { HexCoordinate } from './HexCoordinate';
 
-export type Direction = 'north' | 'northEast' | 'southEast' | 'south' | 'southWest' | 'northWest';
+/**
+ * Enum-like names for hex edge directions. Prefer `Direction.North` over raw `'north'` at call sites.
+ * @see directions — canonical order for wedge indices / iteration
+ */
+export const Direction = {
+  North: 'north',
+  NorthEast: 'northEast',
+  SouthEast: 'southEast',
+  South: 'south',
+  SouthWest: 'southWest',
+  NorthWest: 'northWest',
+} as const;
+
+export type Direction = (typeof Direction)[keyof typeof Direction];
 
 export interface NeighborInfo {
   direction: Direction;
   coordinate: HexCoordinate;
 }
 
-export const directions: Direction[] = ['north', 'northEast', 'southEast', 'south', 'southWest', 'northWest'];
+export const directions: Direction[] = [
+  Direction.North,
+  Direction.NorthEast,
+  Direction.SouthEast,
+  Direction.South,
+  Direction.SouthWest,
+  Direction.NorthWest,
+];
 
 export function getOpposite(direction: Direction): Direction {
   switch (direction) {
-    case 'north':
-      return 'south';
-    case 'northEast':
-      return 'southWest';
-    case 'southEast':
-      return 'northWest';
-    case 'south':
-      return 'north';
-    case 'southWest':
-      return 'northEast';
-    case 'northWest':
-      return 'southEast';
+    case Direction.North:
+      return Direction.South;
+    case Direction.NorthEast:
+      return Direction.SouthWest;
+    case Direction.SouthEast:
+      return Direction.NorthWest;
+    case Direction.South:
+      return Direction.North;
+    case Direction.SouthWest:
+      return Direction.NorthEast;
+    case Direction.NorthWest:
+      return Direction.SouthEast;
   }
 }
 
 export function getNeighbor(coord: HexCoordinate, direction: Direction): HexCoordinate {
   switch (direction) {
-    case 'north':
+    case Direction.North:
       return north(coord);
-    case 'northEast':
+    case Direction.NorthEast:
       return northEast(coord);
-    case 'southEast':
+    case Direction.SouthEast:
       return southEast(coord);
-    case 'south':
+    case Direction.South:
       return south(coord);
-    case 'southWest':
+    case Direction.SouthWest:
       return southWest(coord);
-    case 'northWest':
+    case Direction.NorthWest:
       return northWest(coord);
   }
 }
