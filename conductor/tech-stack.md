@@ -36,6 +36,7 @@ This document defines the core technologies, architectural patterns, and quality
 - **"Tiles are Turns" Philosophy:** `remainingTurns` is a derived property (getter) of `tileQueue.length`.
 - **GameHints Caching:** Derived game state properties (like valid placements) are cached in a `GameHints` model and invalidated upon board mutations (e.g. tile placement, rotation) to avoid expensive recalculations on every frame.
 - **Geometric Logic Centralization:** All directional logic (neighbors, opposite sides) must reside in the `Navigation` service.
+- **Board-scoped navigation:** `BoardNavigation` holds static helpers that take a `Board` (e.g. `neighborEdgeTerrains` for canvas neighbor-aware wedges).
 - **Explicit Domain Accessors:** Prefer explicit methods like `Tile.getTerrain(direction)` over direct property access.
 - **Terrain instances:** Tile edges (and optional centers) are `Terrain` subclasses in `Terrain.ts` (`TerrainId`, `TerrainType`, `matchesForEdge` for scoring and placement). Saves store `TerrainId` strings per cell and reconstruct via `toTerrain()`.
 - **Fail-Fast State:** The `CanvasController` throws an error if `activeGame` is missing.

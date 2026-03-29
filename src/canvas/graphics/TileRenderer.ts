@@ -1,30 +1,19 @@
 import { Tile } from '../../models/Tile';
 import { getHexCorners, hexToPixel } from '../utils/HexUtils';
-import { type HexStyle, DEFAULT_HEX_STYLE, TERRAIN_COLORS } from './HexStyles';
+import { type HexStyle, DEFAULT_HEX_STYLE } from './HexStyles';
+import type { CenterDrawContext } from './segmentRenderers/CenterDrawContext';
 import type { WedgeDrawContext } from './segmentRenderers/WedgeDrawContext';
+import { TERRAIN_ID_CENTER_SEGMENT_RENDERERS } from './segmentRenderers/terrainIdCenterSegmentRenderers';
 import { TERRAIN_ID_SEGMENT_RENDERERS } from './segmentRenderers/terrainIdSegmentRenderers';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { Board } from '../../models/Board';
-import { directions, getNeighbors, getOpposite, type Direction } from '../../models/Navigation';
+import { BoardNavigation } from '../../models/BoardNavigation';
+import { directions, type Direction } from '../../models/Navigation';
 import type { Terrain } from '../../models/Terrain';
 
 export interface TileDrawOptions {
-  /** Terrain on the neighbor tile along the shared edge for each direction (see `neighborEdgeTerrainsFromBoard`). */
+  /** Terrain on the neighbor tile along the shared edge for each direction (see {@link BoardNavigation.neighborEdgeTerrains}). */
   neighborEdgeTerrains?: Partial<Record<Direction, Terrain>>;
-}
-
-export function neighborEdgeTerrainsFromBoard(
-  board: Board,
-  coord: HexCoordinate
-): Partial<Record<Direction, Terrain>> {
-  const returnValue: Partial<Record<Direction, Terrain>> = {};
-  for (const { direction, coordinate } of getNeighbors(coord)) {
-    const boardTile = board.get(coordinate);
-    if (boardTile) {
-      returnValue[direction] = boardTile.tile.getTerrain(getOpposite(direction));
-    }
-  }
-  return returnValue;
 }
 
 export class TileRenderer {
@@ -71,7 +60,7 @@ export class TileRenderer {
       TERRAIN_ID_SEGMENT_RENDERERS[terrain.id].render(wedgeContext, neighborAcrossEdge, terrain);
     }
 
-    this.drawCenter(tile, x, y, style);
+    this.drawCenter(tile, x, y, style, corners);
 
     // Draw hex outline
     this.ctx.beginPath();
@@ -99,23 +88,34 @@ export class TileRenderer {
     board?: Board
   ) {
     const { x, y } = hexToPixel(hex, style.size);
-    const neighborEdgeTerrains = board ? neighborEdgeTerrainsFromBoard(board, hex) : undefined;
+    const neighborEdgeTerrains = board
+      ? BoardNavigation.neighborEdgeTerrains(board, hex)
+      : undefined;
     this.drawTile(tile, x, y, style, { neighborEdgeTerrains });
   }
 
-  private drawCenter(tile: Tile, x: number, y: number, style: HexStyle): void {
-    if (tile.center?.id !== 'water') {
+  private drawCenter(
+    tile: Tile,
+    x: number,
+    y: number,
+    style: HexStyle,
+    corners: { x: number; y: number }[]
+  ): void {
+    const center = tile.center;
+    if (!center) {
       return;
     }
-
-    const centerHexCorners = getHexCorners(x, y, style.size * 0.25);
-    this.ctx.beginPath();
-    this.ctx.moveTo(centerHexCorners[0].x, centerHexCorners[0].y);
-    for (let i = 1; i < 6; i++) {
-      this.ctx.lineTo(centerHexCorners[i].x, centerHexCorners[i].y);
+    const renderer = TERRAIN_ID_CENTER_SEGMENT_RENDERERS[center.id];
+    if (!renderer) {
+      return;
     }
-    this.ctx.closePath();
-    this.ctx.fillStyle = TERRAIN_COLORS.water;
-    this.ctx.fill();
+    const context: CenterDrawContext = {
+      ctx: this.ctx,
+      centerX: x,
+      centerY: y,
+      corners,
+      style,
+    };
+    renderer.render(context, center);
   }
 }

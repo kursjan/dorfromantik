@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { TilePreview } from './TilePreview';
-import { Tile } from '../../models/Tile';
-import { PastureTerrain, WaterOrPastureTerrain, WaterTerrain } from '../../models/Terrain';
+import { TilePreview } from '../TilePreview';
+import { Tile } from '../../../models/Tile';
+import { PastureTerrain, WaterOrPastureTerrain, WaterTerrain } from '../../../models/Terrain';
 
 const pasture = () => new PastureTerrain();
 
 const meta: Meta<typeof TilePreview> = {
-  title: 'Game/Tiles/TilePreview/WaterOrPasture',
+  title: 'UI/Tiles/WaterOrPasture',
   component: TilePreview,
   parameters: {
     layout: 'centered',

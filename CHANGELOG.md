@@ -8,7 +8,8 @@ All notable changes to this project will be documented in this file.
 
 - **Terrain model (class-based edges):** Introduced `Terrain.ts` with concrete terrain classes (`TreeTerrain`, `WaterTerrain` with optional `linkToCenter`, `WaterOrPastureTerrain`, etc.). Edge compatibility uses overlapping sets of base `TerrainType` values so hybrid edges (e.g. water/pasture) can match neighbors without expanding the six-color palette.
 - **Tile validation:** `TileValidator` runs on `Tile` construction to enforce structural rules (for example, water segments that link to the center require a water center terrain).
-- **Canvas terrain segment renderers:** `graphics/segmentRenderers/` holds one stateless wedge renderer per `TerrainId`, wired through `terrainIdSegmentRenderers` and `WedgeDrawContext`. `TileRenderer` accepts optional `neighborEdgeTerrains` (and `neighborEdgeTerrainsFromBoard`) so wedges can draw contextually (notably `waterOrPasture` against real neighbors).
+- **Canvas terrain segment renderers:** `graphics/segmentRenderers/` holds one stateless wedge renderer per `TerrainId`, wired through `terrainIdSegmentRenderers` and `WedgeDrawContext`. `TileRenderer` accepts optional `neighborEdgeTerrains`; on-board draws use `BoardNavigation.neighborEdgeTerrains` (notably for `waterOrPasture` against neighbors). Water tile centers use `WaterCenterSegmentRenderer` via `terrainIdCenterSegmentRenderers`.
+- **Board navigation (experiment):** `BoardNavigation` static `neighborEdgeTerrains(board, coord)` centralizes neighbor-edge terrain lookup using `Board.getExistingNeighborsAt`.
 - **Storybook coverage:** Added stories for `TilePreview` variants, including water center and `waterOrPasture` neighbor edge cases.
 - **Deterministic scenario (water / pasture):** `GameRules.createTest2()` plus a **Test Game 2** entry on the main menu for manual and automated exercise of the new terrain behavior.
 - **Developer tooling:** `.cursor/skills/quick-review` documents the adversarial review workflow; Storybook tests share Vitest setup via `.storybook/vitest.setup.ts`; ESLint config extended for Storybook test files.
@@ -69,6 +70,7 @@ All notable changes to this project will be documented in this file.
 
 - **Tile & serialization:** Each tile side (and optional center) is a `Terrain` instance; `Tile` defaults unfilled sides to pasture. `GameSerializer` persists `TerrainId` strings per cell and rebuilds instances with `toTerrain()`. Printers and broad test suites were updated for the new model.
 - **E2E tests:** Playwright specs and helpers adjusted for the extra main-menu action and related UI flows.
+- **Storybook:** Tile preview stories live in `components/Tiles/` under sidebar **UI/Tiles** (with **Water** and **WaterOrPasture** subgroups). **SaveStatusIndicator** uses **UI/Components/SaveStatusIndicator** alongside GameHUD and ResetViewButton.
 
 ### Fixed
 

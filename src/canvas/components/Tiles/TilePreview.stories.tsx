@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { TilePreview } from './TilePreview';
-import { Tile } from '../../models/Tile';
-import type { Terrain } from '../../models/Terrain';
+import { TilePreview } from '../TilePreview';
+import { Tile } from '../../../models/Tile';
+import type { Terrain } from '../../../models/Terrain';
 import {
   FieldTerrain,
   HouseTerrain,
   PastureTerrain,
   RailTerrain,
   TreeTerrain,
-} from '../../models/Terrain';
+} from '../../../models/Terrain';
 
 function tileUniformEdges(create: () => Terrain): Tile {
   return new Tile({
@@ -22,7 +22,7 @@ function tileUniformEdges(create: () => Terrain): Tile {
 }
 
 const meta: Meta<typeof TilePreview> = {
-  title: 'Game/Tiles/TilePreview',
+  title: 'UI/Tiles',
   component: TilePreview,
   parameters: {
     layout: 'centered',

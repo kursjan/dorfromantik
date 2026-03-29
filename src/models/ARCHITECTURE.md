@@ -20,10 +20,12 @@ This directory contains the core data structures and business logic for the Dorf
   - **`rotateClockwise()` / `rotateCounterClockwise()`**: Return a _new_ `Tile` with rotated terrains; `id` is preserved for stable UI keys.
 - **`TileValidator`**: Validates new tiles (real `Terrain` instances, linked-water vs center rules, etc.).
 
-### 3. Board (`Board.ts`)
+### 3. Board (`Board.ts`, `BoardNavigation.ts`)
 
 - **`Board`**: Manages placement on the grid.
   - **`getValidPlacementCoordinates()`**: Empty cells adjacent to at least one tile — the geometric basis for valid placement. **`GameHints`** recomputes a cached `validPlacements` array from this (and related rules) so the canvas loop does not call into the board graph on every frame.
+  - **`getExistingNeighborsAt(coord)`**: Directions to placed neighbor tiles (used by navigation helpers).
+- **`BoardNavigation`**: Static board queries for now (no instance state). **`neighborEdgeTerrains(board, coord)`** returns, for each direction with a neighbor, the neighbor’s terrain on the shared edge — used when drawing tiles (e.g. `waterOrPasture`) against the real board.
 
 ### 4. User & Rules (`User.ts`, `GameRules.ts`)
 
