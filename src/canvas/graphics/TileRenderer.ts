@@ -115,6 +115,7 @@ export class TileRenderer {
       centerY: y,
       corners,
       style,
+      tile,
     };
     renderer.render(context, center);
   }

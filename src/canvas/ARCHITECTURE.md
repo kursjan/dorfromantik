@@ -110,7 +110,7 @@ Stateless rendering utilities. They receive the `Context2D` and necessary data t
 
 - **BackgroundRenderer:** Handles clearing the screen and drawing the background color.
 - **HexRenderer:** Draws the game grid and debug highlights. It uses `HexStyles.ts` for configuration.
-- **TileRenderer:** Draws the 6-sided terrain wedges for placed tiles. For each direction it builds a `WedgeDrawContext` and dispatches to `TERRAIN_ID_SEGMENT_RENDERERS[tileSide.id]`, passing the terrain across the shared edge on the neighbor tile when provided (`TileDrawOptions.neighborEdgeTerrains` or `BoardNavigation.neighborEdgeTerrains` when a `board` is passed to `drawTileAtHex`). This keeps hybrid terrains (e.g. `waterOrPasture`) visually consistent with neighbors. When `tile.center` is set, it looks up `TERRAIN_ID_CENTER_SEGMENT_RENDERERS` (e.g. `WaterCenterSegmentRenderer` for water) and draws the inner hex via `CenterDrawContext`.
+- **TileRenderer:** Draws the 6-sided terrain wedges for placed tiles. For each direction it builds a `WedgeDrawContext` and dispatches to `TERRAIN_ID_SEGMENT_RENDERERS[tileSide.id]`, passing the terrain across the shared edge on the neighbor tile when provided (`TileDrawOptions.neighborEdgeTerrains` or `BoardNavigation.neighborEdgeTerrains` when a `board` is passed to `drawTileAtHex`). This keeps hybrid terrains (e.g. `waterOrPasture`) visually consistent with neighbors. When `tile.center` is set, it looks up `TERRAIN_ID_CENTER_SEGMENT_RENDERERS` (e.g. `WaterCenterSegmentRenderer` for water, `RailCenterSegmentRenderer` for rail) and draws the inner hex via `CenterDrawContext`.
 - **(Deprecated) DebugRenderer:** Legacy canvas-based debug text. Replaced by `DebugOverlay` component.
 
 ### Services (`services/*.ts`)

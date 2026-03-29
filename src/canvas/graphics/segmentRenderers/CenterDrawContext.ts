@@ -1,4 +1,5 @@
 import type { Terrain } from '../../../models/Terrain';
+import type { Tile } from '../../../models/Tile';
 import type { HexStyle } from '../HexStyles';
 
 /** Pixel context for drawing the optional center hex inside a tile. */
@@ -9,6 +10,8 @@ export interface CenterDrawContext {
   /** Outer tile hex corners (same as wedge rendering). */
   corners: { x: number; y: number }[];
   style: HexStyle;
+  /** The full tile being rendered (allows center to inspect neighboring edges). */
+  tile: Tile;
 }
 
 /**

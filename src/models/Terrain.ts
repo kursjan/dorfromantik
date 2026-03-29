@@ -124,9 +124,16 @@ export class WaterOrPastureTerrain extends Terrain {
 /** Terrains that draw a river stroke with {@link WaterTerrain.linkToCenter} semantics. */
 export type WaterStrokeEdge = WaterTerrain | WaterOrPastureTerrain;
 
+export interface RailTerrainOptions {
+  linkToCenter?: boolean;
+}
+
 export class RailTerrain extends Terrain {
-  constructor() {
+  readonly linkToCenter: boolean;
+
+  constructor(options: RailTerrainOptions = {}) {
     super('rail', 'R');
+    this.linkToCenter = options.linkToCenter ?? false;
   }
 
   protected getEdgeMatchTypes(): ReadonlySet<TerrainType> {
