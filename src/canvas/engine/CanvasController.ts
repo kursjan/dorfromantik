@@ -5,7 +5,13 @@ import { TileRenderer } from '../graphics/TileRenderer';
 import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { distanceToHex } from '../utils/HexUtils';
-import { HEX_SIZE, DEFAULT_HEX_STYLE, VALID_PREVIEW_STYLE, INVALID_PREVIEW_STYLE, VALID_PLACEMENT_STYLE } from '../graphics/HexStyles';
+import {
+  HEX_SIZE,
+  DEFAULT_HEX_STYLE,
+  VALID_PREVIEW_STYLE,
+  INVALID_PREVIEW_STYLE,
+  VALID_PLACEMENT_STYLE,
+} from '../graphics/HexStyles';
 import { Tile } from '../../models/Tile';
 import { Game } from '../../models/Game';
 
@@ -46,7 +52,11 @@ export class CanvasController {
   public onStatsChange?: (score: number, remainingTurns: number, nextTile: Tile | null) => void;
   public onTilePlaced?: () => void;
 
-  constructor(canvas: HTMLCanvasElement, activeGame: Game, options?: { onToggleDebugOverlay?: () => void }) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    activeGame: Game,
+    options?: { onToggleDebugOverlay?: () => void }
+  ) {
     this.canvas = canvas;
     this.activeGame = activeGame;
     const ctx = canvas.getContext('2d');
@@ -142,7 +152,12 @@ export class CanvasController {
 
     // Draw placed tiles from the board
     for (const boardTile of activeGame.board.getAll()) {
-      this.tileRenderer.drawTileAtHex(boardTile.tile, boardTile.coordinate, DEFAULT_HEX_STYLE);
+      this.tileRenderer.drawTileAtHex(
+        boardTile.tile,
+        boardTile.coordinate,
+        DEFAULT_HEX_STYLE,
+        activeGame.board
+      );
     }
 
     // Draw valid placement highlights
@@ -155,7 +170,7 @@ export class CanvasController {
       const nextTile = activeGame.peek()!;
       const isValid = this.isValidPlacement(this.hoveredHex);
       const style = isValid ? VALID_PREVIEW_STYLE : INVALID_PREVIEW_STYLE;
-      this.tileRenderer.drawTileAtHex(nextTile, this.hoveredHex, style);
+      this.tileRenderer.drawTileAtHex(nextTile, this.hoveredHex, style, activeGame.board);
     }
 
     // Draw highlight for current mouse position
@@ -278,7 +293,11 @@ export class CanvasController {
     };
   }
 
-  private static findClosestHexCoordinate(validCoords: HexCoordinate[], x: number, y: number): HexCoordinate {
+  private static findClosestHexCoordinate(
+    validCoords: HexCoordinate[],
+    x: number,
+    y: number
+  ): HexCoordinate {
     return validCoords
       .map((coord) => ({ coord, dist: distanceToHex(coord, x, y, HEX_SIZE) }))
       .sort((a, b) => a.dist - b.dist)[0].coord;

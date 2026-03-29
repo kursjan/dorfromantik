@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { Board } from '../models/Board';
 import { Tile } from '../models/Tile';
 import { HexCoordinate } from '../models/HexCoordinate';
+import { toTerrain } from '../models/Terrain';
 import { BoardPrinter } from './BoardPrinter';
 
 describe('BoardPrinter', () => {
@@ -16,12 +17,12 @@ describe('BoardPrinter', () => {
       const board = new Board();
       const tile = new Tile({
         id: 'test',
-        north: 'tree',
-        northEast: 'house',
-        southEast: 'water',
-        south: 'pasture',
-        southWest: 'rail',
-        northWest: 'field',
+        north: toTerrain('tree'),
+        northEast: toTerrain('house'),
+        southEast: toTerrain('water'),
+        south: toTerrain('pasture'),
+        southWest: toTerrain('rail'),
+        northWest: toTerrain('field'),
       });
       const coord = new HexCoordinate(0, 0, 0);
       board.place(tile, coord);
@@ -42,12 +43,12 @@ describe('BoardPrinter', () => {
       const board = new Board();
       const tile = new Tile({
         id: 'test',
-        north: 'tree',
-        northEast: 'house',
-        southEast: 'water',
-        south: 'pasture',
-        southWest: 'rail',
-        northWest: 'field',
+        north: toTerrain('tree'),
+        northEast: toTerrain('house'),
+        southEast: toTerrain('water'),
+        south: toTerrain('pasture'),
+        southWest: toTerrain('rail'),
+        northWest: toTerrain('field'),
       });
       const coord = new HexCoordinate(10, 10, -20);
       board.place(tile, coord);
@@ -68,12 +69,12 @@ describe('BoardPrinter', () => {
       const board = new Board();
       const tile = new Tile({
         id: 'test',
-        north: 'tree',
-        northEast: 'house',
-        southEast: 'water',
-        south: 'pasture',
-        southWest: 'rail',
-        northWest: 'field',
+        north: toTerrain('tree'),
+        northEast: toTerrain('house'),
+        southEast: toTerrain('water'),
+        south: toTerrain('pasture'),
+        southWest: toTerrain('rail'),
+        northWest: toTerrain('field'),
       });
       const coord = new HexCoordinate(-10, -10, 20);
       board.place(tile, coord);
@@ -94,21 +95,21 @@ describe('BoardPrinter', () => {
       const board = new Board();
       const tile1 = new Tile({
         id: 't1',
-        north: 'tree',
-        northEast: 'house',
-        southEast: 'water',
-        south: 'pasture',
-        southWest: 'rail',
-        northWest: 'field',
+        north: toTerrain('tree'),
+        northEast: toTerrain('house'),
+        southEast: toTerrain('water'),
+        south: toTerrain('pasture'),
+        southWest: toTerrain('rail'),
+        northWest: toTerrain('field'),
       });
       const tile2 = new Tile({
         id: 't2',
-        north: 'field',
-        northEast: 'pasture',
-        southEast: 'water',
-        south: 'field',
-        southWest: 'water',
-        northWest: 'house',
+        north: toTerrain('field'),
+        northEast: toTerrain('pasture'),
+        southEast: toTerrain('water'),
+        south: toTerrain('field'),
+        southWest: toTerrain('water'),
+        northWest: toTerrain('house'),
       });
 
       board.place(tile1, new HexCoordinate(0, 0, 0));
@@ -134,21 +135,21 @@ describe('BoardPrinter', () => {
       const board = new Board();
       const tile1 = new Tile({
         id: 't1',
-        north: 'tree',
-        northEast: 'house',
-        southEast: 'water',
-        south: 'pasture',
-        southWest: 'rail',
-        northWest: 'field',
+        north: toTerrain('tree'),
+        northEast: toTerrain('house'),
+        southEast: toTerrain('water'),
+        south: toTerrain('pasture'),
+        southWest: toTerrain('rail'),
+        northWest: toTerrain('field'),
       });
       const tile2 = new Tile({
         id: 't2',
-        north: 'field',
-        northEast: 'pasture',
-        southEast: 'water',
-        south: 'field',
-        southWest: 'water',
-        northWest: 'house',
+        north: toTerrain('field'),
+        northEast: toTerrain('pasture'),
+        southEast: toTerrain('water'),
+        south: toTerrain('field'),
+        southWest: toTerrain('water'),
+        northWest: toTerrain('house'),
       });
 
       board.place(tile1, new HexCoordinate(0, 0, 0));
@@ -174,12 +175,12 @@ describe('BoardPrinter', () => {
       const board = new Board();
       const tile = new Tile({
         id: 'test',
-        north: 'tree',
-        northEast: 'house',
-        southEast: 'water',
-        south: 'pasture',
-        southWest: 'rail',
-        northWest: 'field',
+        north: toTerrain('tree'),
+        northEast: toTerrain('house'),
+        southEast: toTerrain('water'),
+        south: toTerrain('pasture'),
+        southWest: toTerrain('rail'),
+        northWest: toTerrain('field'),
       });
       const coord = new HexCoordinate(-1, -1, 2);
       board.place(tile, coord);

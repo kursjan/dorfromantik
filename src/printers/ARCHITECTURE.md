@@ -38,7 +38,7 @@ This two-pass approach ensures that the output is perfectly sized to fit the boa
 - **Logic:**
   - Takes a `Canvas` object in its constructor.
   - The `print` method takes a `Tile` and the top-left coordinates where it should be drawn.
-  - It then places the appropriate characters on the canvas to represent the tile's shape and terrain types.
+  - It then places the appropriate characters on the canvas to represent the tile's shape and each side's `Terrain` (e.g. `shortCode`).
 
 ### 4. `CanvasCoordinates`
 

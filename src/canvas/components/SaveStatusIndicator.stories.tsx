@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { SaveStatusIndicator } from './SaveStatusIndicator';
 
 const meta = {
-  title: 'Components/SaveStatusIndicator',
+  title: 'UI/Components/SaveStatusIndicator',
   component: SaveStatusIndicator,
   parameters: {
     layout: 'centered',

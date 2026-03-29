@@ -38,7 +38,7 @@ export default defineConfig(({ mode }) => {
       environment: 'jsdom',
       setupFiles: './src/test/setup.ts',
       // 2. Ensure tests can see the same .env variables
-      env: env, 
+      env: env,
       exclude: [
         '**/node_modules/**',
         '**/dist/**',
@@ -64,6 +64,8 @@ export default defineConfig(({ mode }) => {
           ],
           test: {
             name: 'storybook',
+            /** Chromium + parallel story mounts can exceed 15s on cold CI / pre-push runs. */
+            testTimeout: 45_000,
             browser: {
               enabled: true,
               headless: true,

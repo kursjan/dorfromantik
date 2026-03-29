@@ -1,42 +1,45 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Real-time History Sync', () => {
-  test('adds a newly played game to the Continue Journey list without reloading', async ({ page }) => {
-    // 1. Go to Main Menu
+  test('adds a newly played game to the Continue Journey list without reloading', async ({
+    page,
+  }) => {
     await page.goto('/');
-
-    // Ensure we start with an empty or existing state
+    await expect(page.locator('text=Loading Profile')).not.toBeVisible();
     const initialGamesCount = await page.locator('.game-card').count();
 
-    // 2. Start a new Test Game
-    const startButton = page.getByRole('button', { name: /Test Game/i });
-    await startButton.click();
-
-    // 3. Wait for canvas to load
+    await page.getByRole('button', { name: /^Test Game$/i }).click();
     await expect(page).toHaveURL(/\/game$/);
+
     const canvas = page.locator('[data-testid="game-canvas"]');
     await expect(canvas).toBeVisible();
 
-    // 4. Place a tile (click middle of canvas, and a bit offset just in case)
+    // 2. Place a tile on a valid empty hex (canvas center is the occupied origin; hover a neighbor)
     const box = await canvas.boundingBox();
-    if (box) {
-      // Click center (origin)
-      await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-      await page.waitForTimeout(500); // Give the game loop a frame
-      // Click slightly right (south east)
-      await page.mouse.click(box.x + box.width / 2 + 50, box.y + box.height / 2 + 30);
-    }
+    if (!box) throw new Error('Canvas not found');
+    const centerX = box.x + box.width / 2;
+    const centerY = box.y + box.height / 2;
+    await page.mouse.move(centerX, centerY - 40);
+    await page.waitForTimeout(100);
+    await page.mouse.click(centerX, centerY - 40);
 
-    // 5. Wait for the game to auto-save
-    // The GameAutosaver should trigger and the SaveStatusIndicator should show "Saved"
-    // Since we use 10ms in test mode, it should be near instant.
-    await expect(page.locator('text=Saved')).toBeVisible({ timeout: 5000 });
+    // 3. Confirm placement (queue was 6 tiles; after one placement, 5 remain)
+    const turnsValue = page
+      .locator('.game-hud__item')
+      .filter({ hasText: 'Tiles' })
+      .locator('.game-hud__value');
+    await expect(turnsValue).toHaveText('5', { timeout: 5000 });
 
-    // 6. Navigate back to Main Menu using browser history (simulating user going back)
+    // 4. Wait for auto-save (dev server uses a 2s debounce before persisting)
+    await expect(page.locator('[data-testid="save-status"].save-status--saved')).toBeVisible({
+      timeout: 15_000,
+    });
+
+    // 5. Navigate back to Main Menu using browser history (simulating user going back)
     await page.goBack();
     await expect(page).toHaveURL(/\/$/);
 
-    // 7. Verify the Continue Journey list has updated without a hard reload
+    // 6. Verify the Continue Journey list has updated without a hard reload
     // The count of game cards should be initial + 1
     const newGamesCount = await page.locator('.game-card').count();
     expect(newGamesCount).toBe(initialGamesCount + 1);

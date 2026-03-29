@@ -1,13 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { 
-  north, 
-  northEast, 
-  southEast, 
-  south, 
-  southWest, 
-  northWest, 
-  getNeighbors, 
-  getOpposite 
+import {
+  Direction,
+  north,
+  northEast,
+  southEast,
+  south,
+  southWest,
+  northWest,
+  getNeighbors,
+  getOpposite,
 } from './Navigation';
 import { HexCoordinate } from './HexCoordinate';
 
@@ -61,28 +62,28 @@ describe('Navigation', () => {
     const result = northWest(start);
     expect(result.q).toBe(3);
     expect(result.r).toBe(5);
-    expect(result.s).toBe(-8); 
+    expect(result.s).toBe(-8);
   });
 
   it('provides all 6 neighbors', () => {
     const neighbors = getNeighbors(center);
     expect(neighbors.length).toBe(6);
-    
-    const directions = neighbors.map(n => n.direction);
-    expect(directions).toContain('north');
-    expect(directions).toContain('south');
-    expect(directions).toContain('northEast');
-    expect(directions).toContain('southEast');
-    expect(directions).toContain('northWest');
-    expect(directions).toContain('southWest');
+
+    const neighborDirections = neighbors.map((n) => n.direction);
+    expect(neighborDirections).toContain(Direction.North);
+    expect(neighborDirections).toContain(Direction.South);
+    expect(neighborDirections).toContain(Direction.NorthEast);
+    expect(neighborDirections).toContain(Direction.SouthEast);
+    expect(neighborDirections).toContain(Direction.NorthWest);
+    expect(neighborDirections).toContain(Direction.SouthWest);
   });
 
   it('correctly identifies opposite directions', () => {
-    expect(getOpposite('north')).toBe('south');
-    expect(getOpposite('south')).toBe('north');
-    expect(getOpposite('northEast')).toBe('southWest');
-    expect(getOpposite('southWest')).toBe('northEast');
-    expect(getOpposite('northWest')).toBe('southEast');
-    expect(getOpposite('southEast')).toBe('northWest');
+    expect(getOpposite(Direction.North)).toBe(Direction.South);
+    expect(getOpposite(Direction.South)).toBe(Direction.North);
+    expect(getOpposite(Direction.NorthEast)).toBe(Direction.SouthWest);
+    expect(getOpposite(Direction.SouthWest)).toBe(Direction.NorthEast);
+    expect(getOpposite(Direction.NorthWest)).toBe(Direction.SouthEast);
+    expect(getOpposite(Direction.SouthEast)).toBe(Direction.NorthWest);
   });
 });

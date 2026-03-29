@@ -1,4 +1,7 @@
 import { describe, it, expect } from 'vitest';
+import { HexCoordinate } from './HexCoordinate';
+import { Game } from './Game';
+import { Direction } from './Navigation';
 import { GameRules, RandomTileGenerator } from './GameRules';
 
 describe('GameRules', () => {
@@ -29,15 +32,46 @@ describe('GameRules', () => {
   });
 
   it('should throw error if pointsPerMatch is negative', () => {
-    expect(() => new GameRules({ pointsPerMatch: -1 })).toThrow('pointsPerMatch must be non-negative');
+    expect(() => new GameRules({ pointsPerMatch: -1 })).toThrow(
+      'pointsPerMatch must be non-negative'
+    );
   });
 
   it('should throw error if pointsPerPerfect is negative', () => {
-    expect(() => new GameRules({ pointsPerPerfect: -1 })).toThrow('pointsPerPerfect must be non-negative');
+    expect(() => new GameRules({ pointsPerPerfect: -1 })).toThrow(
+      'pointsPerPerfect must be non-negative'
+    );
   });
 
   it('should throw error if turnsPerPerfect is negative', () => {
-    expect(() => new GameRules({ turnsPerPerfect: -1 })).toThrow('turnsPerPerfect must be non-negative');
+    expect(() => new GameRules({ turnsPerPerfect: -1 })).toThrow(
+      'turnsPerPerfect must be non-negative'
+    );
+  });
+});
+
+describe('GameRules.createTest2', () => {
+  it('places a starter with water center and waterOrPasture edges; queue tiles are pasture with one water edge', () => {
+    const rules = GameRules.createTest2();
+    const game = Game.create(rules);
+    const origin = new HexCoordinate(0, 0, 0);
+    const start = game.board.get(origin)!.tile;
+
+    expect(start.center?.id).toBe('water');
+    expect(start.getTerrain(Direction.North).id).toBe('waterOrPasture');
+    expect(start.getTerrain(Direction.NorthEast).id).toBe('waterOrPasture');
+    expect(start.getTerrain(Direction.SouthEast).id).toBe('waterOrPasture');
+    expect(start.getTerrain(Direction.South).id).toBe('waterOrPasture');
+    expect(start.getTerrain(Direction.SouthWest).id).toBe('waterOrPasture');
+    expect(start.getTerrain(Direction.NorthWest).id).toBe('waterOrPasture');
+
+    const next = game.peek()!;
+    expect(next.getTerrain(Direction.North).id).toBe('water');
+    expect(next.getTerrain(Direction.NorthEast).id).toBe('pasture');
+    expect(next.getTerrain(Direction.SouthEast).id).toBe('pasture');
+    expect(next.getTerrain(Direction.South).id).toBe('pasture');
+    expect(next.getTerrain(Direction.SouthWest).id).toBe('pasture');
+    expect(next.getTerrain(Direction.NorthWest).id).toBe('pasture');
   });
 });
 
@@ -46,12 +80,12 @@ describe('RandomTileGenerator', () => {
     const generator = new RandomTileGenerator();
     const tile1 = generator.createTile();
     const tile2 = generator.createTile();
-    
+
     expect(tile1.id).not.toBe(tile2.id);
     expect(tile1.id).toMatch(/^tile-gen-\d+-[a-z0-9]{6}$/);
     expect(tile2.id).toMatch(/^tile-gen-\d+-[a-z0-9]{6}$/);
   });
-  
+
   it('should use provided ID if supplied', () => {
     const generator = new RandomTileGenerator();
     const tile = generator.createTile('custom-id');

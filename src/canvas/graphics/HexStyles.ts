@@ -70,6 +70,7 @@ export const INVALID_PREVIEW_STYLE: HexStyle = {
   opacity: 0.3,
 };
 
+/** Fill colors for the six {@link TerrainType} values; hybrid `waterOrPasture` resolves per edge. */
 export const TERRAIN_COLORS: Record<TerrainType, string> = {
   tree: '#228B22', // ForestGreen
   house: '#8B4513', // SaddleBrown

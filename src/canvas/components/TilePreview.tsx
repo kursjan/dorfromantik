@@ -1,14 +1,22 @@
 import React, { useEffect, useRef } from 'react';
 import { Tile } from '../../models/Tile';
+import type { Terrain } from '../../models/Terrain';
+import type { Direction } from '../../models/Navigation';
 import { TileRenderer } from '../graphics/TileRenderer';
 import { DEFAULT_HEX_STYLE } from '../graphics/HexStyles';
 
 interface TilePreviewProps {
   tile: Tile | null;
   size?: number;
+  /** Optional neighbor terrains along shared edges (for `waterOrPasture` resolution). */
+  neighborEdgeTerrains?: Partial<Record<Direction, Terrain>>;
 }
 
-export const TilePreview: React.FC<TilePreviewProps> = ({ tile, size = 40 }) => {
+export const TilePreview: React.FC<TilePreviewProps> = ({
+  tile,
+  size = 40,
+  neighborEdgeTerrains,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -28,12 +36,17 @@ export const TilePreview: React.FC<TilePreviewProps> = ({ tile, size = 40 }) => 
     // Center the tile
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    
+
     // We need to pass coordinates that center the hex.
     // TileRenderer.drawTile takes x, y as center.
-    renderer.drawTile(tile, centerX, centerY, { ...DEFAULT_HEX_STYLE, size });
-
-  }, [tile, size]);
+    renderer.drawTile(
+      tile,
+      centerX,
+      centerY,
+      { ...DEFAULT_HEX_STYLE, size },
+      { neighborEdgeTerrains }
+    );
+  }, [tile, size, neighborEdgeTerrains]);
 
   // Adjust canvas size to fit the hex with some padding
   // Hex width = sqrt(3) * size
@@ -42,11 +55,11 @@ export const TilePreview: React.FC<TilePreviewProps> = ({ tile, size = 40 }) => 
   const canvasSize = size * 3;
 
   return (
-    <canvas 
-      ref={canvasRef} 
-      width={canvasSize} 
-      height={canvasSize} 
-      style={{ width: canvasSize, height: canvasSize }} 
+    <canvas
+      ref={canvasRef}
+      width={canvasSize}
+      height={canvasSize}
+      style={{ width: canvasSize, height: canvasSize }}
       role="img"
       aria-label="Next tile preview"
     />

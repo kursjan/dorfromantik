@@ -1,44 +1,61 @@
 import type { Direction } from './Navigation';
+import {
+  PastureTerrain,
+  TERRAIN_IDS,
+  TERRAIN_TYPES,
+  type TerrainId,
+  type TerrainType,
+  Terrain,
+} from './Terrain';
+import { TileValidator } from './TileValidator';
 
-export const TERRAIN_TYPES = ['tree', 'house', 'water', 'pasture', 'rail', 'field'] as const;
-export type TerrainType = (typeof TERRAIN_TYPES)[number];
+export { TERRAIN_TYPES, TERRAIN_IDS };
+export type { TerrainId, TerrainType };
+export type TerrainEntity = Terrain;
+export type TileOptions = TileTerrainOptions;
 
-export interface TileOptions {
+export interface TileTerrainOptions {
   id?: string;
-  north?: TerrainType;
-  northEast?: TerrainType;
-  southEast?: TerrainType;
-  south?: TerrainType;
-  southWest?: TerrainType;
-  northWest?: TerrainType;
+  center?: Terrain;
+  north?: Terrain;
+  northEast?: Terrain;
+  southEast?: Terrain;
+  south?: Terrain;
+  southWest?: Terrain;
+  northWest?: Terrain;
 }
 
 export class Tile {
   private static idCounter = 0;
+  private static validator = new TileValidator();
 
   readonly type = 'tile';
   readonly id: string;
-  readonly north: TerrainType;
-  readonly northEast: TerrainType;
-  readonly southEast: TerrainType;
-  readonly south: TerrainType;
-  readonly southWest: TerrainType;
-  readonly northWest: TerrainType;
+  readonly center?: Terrain;
+  readonly north: Terrain;
+  readonly northEast: Terrain;
+  readonly southEast: Terrain;
+  readonly south: Terrain;
+  readonly southWest: Terrain;
+  readonly northWest: Terrain;
 
-  constructor(options: TileOptions = {}) {
+  constructor(options: TileTerrainOptions = {}) {
     this.id = options.id ?? `tile-${Date.now()}-${Tile.idCounter++}`;
-    this.north = options.north ?? 'pasture';
-    this.northEast = options.northEast ?? 'pasture';
-    this.southEast = options.southEast ?? 'pasture';
-    this.south = options.south ?? 'pasture';
-    this.southWest = options.southWest ?? 'pasture';
-    this.northWest = options.northWest ?? 'pasture';
+    this.center = options.center;
+    this.north = options.north ?? new PastureTerrain();
+    this.northEast = options.northEast ?? new PastureTerrain();
+    this.southEast = options.southEast ?? new PastureTerrain();
+    this.south = options.south ?? new PastureTerrain();
+    this.southWest = options.southWest ?? new PastureTerrain();
+    this.northWest = options.northWest ?? new PastureTerrain();
+
+    Tile.validator.validate(this);
   }
 
   /**
    * Returns a map of all directions to their terrain types.
    */
-  getTerrains(): Record<Direction, TerrainType> {
+  getTerrains(): Record<Direction, Terrain> {
     return {
       north: this.north,
       northEast: this.northEast,
@@ -52,7 +69,7 @@ export class Tile {
   /**
    * Returns the terrain type for a specific direction on this tile.
    */
-  getTerrain(direction: Direction): TerrainType {
+  getTerrain(direction: Direction): Terrain {
     return this.getTerrains()[direction];
   }
 
@@ -68,6 +85,7 @@ export class Tile {
   rotateClockwise(): Tile {
     return new Tile({
       id: this.id,
+      center: this.center,
       north: this.northEast,
       northEast: this.southEast,
       southEast: this.south,
@@ -89,6 +107,7 @@ export class Tile {
   rotateCounterClockwise(): Tile {
     return new Tile({
       id: this.id,
+      center: this.center,
       north: this.northWest,
       northEast: this.north,
       southEast: this.northEast,
@@ -98,8 +117,8 @@ export class Tile {
     });
   }
 
-  private getTerrainChar(type: TerrainType): string {
-    return type[0].toUpperCase();
+  private getTerrainChar(type: Terrain): string {
+    return type.shortCode;
   }
 
   print(): string {
@@ -110,11 +129,12 @@ export class Tile {
     const s = this.getTerrainChar(terrains.south);
     const sw = this.getTerrainChar(terrains.southWest);
     const nw = this.getTerrainChar(terrains.northWest);
+    const c = this.center ? this.getTerrainChar(this.center) : ' ';
 
     return `Tile ${this.id}:
     _ _
   /  ${n}  \\
- /${nw}     ${ne}\\
+ /${nw}  ${c}  ${ne}\\
  \\${sw}     ${se}/
   \\ _${s}_ /`;
   }

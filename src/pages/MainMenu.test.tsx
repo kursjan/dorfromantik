@@ -100,6 +100,19 @@ describe('MainMenu', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/game');
   });
 
+  it('handles test game 2 creation and navigation', () => {
+    const user = new AnonymousUser('guest');
+    renderWithProviders(user);
+
+    fireEvent.click(screen.getByText('Test Game 2'));
+
+    expect(mockSetActiveGame).toHaveBeenCalledWith(expect.any(Game));
+    const game = mockSetActiveGame.mock.calls[0][0];
+    expect(game.rules.initialTurns).toBe(6);
+    expect(game.peek()?.north.id).toBe('water');
+    expect(mockNavigate).toHaveBeenCalledWith('/game');
+  });
+
   it('handles settings modal visibility', () => {
     const user = new AnonymousUser('guest');
     renderWithProviders(user);
@@ -128,7 +141,7 @@ describe('MainMenu', () => {
   it('handles continuing a game from the list', () => {
     const user = new AnonymousUser('guest');
     const game = Game.create(GameRules.createStandard());
-    
+
     renderWithProviders(user, [game]);
 
     fireEvent.click(screen.getByText('Continue'));
@@ -139,7 +152,9 @@ describe('MainMenu', () => {
 
   it('handles logout failure gracefully', async () => {
     const user = new RegisteredUser('user-id', 'John Doe');
-    const signOutSpy = vi.spyOn(authService, 'signOut').mockRejectedValue(new Error('Logout failed'));
+    const signOutSpy = vi
+      .spyOn(authService, 'signOut')
+      .mockRejectedValue(new Error('Logout failed'));
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     renderWithProviders(user);
 
@@ -148,14 +163,14 @@ describe('MainMenu', () => {
     await waitFor(() => {
       expect(signOutSpy).toHaveBeenCalled();
     });
-    expect(consoleSpy).toHaveBeenCalledWith("Logout failed", expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith('Logout failed', expect.any(Error));
     consoleSpy.mockRestore();
   });
 
   it('handles missing game on continue gracefully', () => {
     const user = new AnonymousUser('guest');
     const game = Game.create(GameRules.createStandard());
-    
+
     renderWithProviders(user, [game]);
 
     // Use the Corrupt button from our mock to trigger a non-existent ID

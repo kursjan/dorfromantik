@@ -14,11 +14,15 @@ The canvas visualization logic is separated from the React component tree to ens
 ```
 src/canvas/
 ├── components/        # React Components
+│   ├── TilePreview.tsx     # Small canvas preview of a tile (optional neighborEdgeTerrains for hybrid edges)
+│   ├── Tiles/              # Storybook stories under UI/Tiles in the sidebar
 │   ├── CanvasView.tsx      # Entry point (Main container, manages HUD/Canvas sync)
 │   ├── DebugOverlay.tsx    # (NEW) React-based technical info overlay (FPS, Camera)
 │   ├── DebugOverlay.css    # Debug overlay styling
 │   ├── GameHUD.tsx         # Score and Turn counter overlay
 │   ├── GameHUD.css         # HUD styling
+│   ├── SaveStatusIndicator.tsx # Autosave status (GameBoard); Storybook: UI/Components/SaveStatusIndicator
+│   ├── SaveStatusIndicator.css
 │   ├── ResetViewButton.tsx # UI Overlay for camera control
 │   └── ResetViewButton.css # Button styling
 ├── services/          # Pure TS Logic
@@ -35,7 +39,8 @@ src/canvas/
 │   ├── DebugStyles.ts        # (DEPRECATED) Legacy configuration
 │   ├── HexRenderer.ts        # Main game world rendering (Grid, Highlights)
 │   ├── HexStyles.ts          # Hex visual configuration
-│   └── TileRenderer.ts       # Specialized renderer for 6-sided tiles
+│   ├── TileRenderer.ts       # Orchestrates hex wedges; delegates wedge fill to segment renderers
+│   └── segmentRenderers/     # Edge: TerrainId → wedge renderer; center: optional CenterDrawContext + WaterCenterSegmentRenderer
 └── ARCHITECTURE.md    # This file
 ```
 
@@ -105,7 +110,7 @@ Stateless rendering utilities. They receive the `Context2D` and necessary data t
 
 - **BackgroundRenderer:** Handles clearing the screen and drawing the background color.
 - **HexRenderer:** Draws the game grid and debug highlights. It uses `HexStyles.ts` for configuration.
-- **TileRenderer:** Draws the 6-sided terrain wedges for placed tiles. It aligns the model's terrain mapping with the canvas orientation.
+- **TileRenderer:** Draws the 6-sided terrain wedges for placed tiles. For each direction it builds a `WedgeDrawContext` and dispatches to `TERRAIN_ID_SEGMENT_RENDERERS[tileSide.id]`, passing the terrain across the shared edge on the neighbor tile when provided (`TileDrawOptions.neighborEdgeTerrains` or `BoardNavigation.neighborEdgeTerrains` when a `board` is passed to `drawTileAtHex`). This keeps hybrid terrains (e.g. `waterOrPasture`) visually consistent with neighbors. When `tile.center` is set, it looks up `TERRAIN_ID_CENTER_SEGMENT_RENDERERS` (e.g. `WaterCenterSegmentRenderer` for water) and draws the inner hex via `CenterDrawContext`.
 - **(Deprecated) DebugRenderer:** Legacy canvas-based debug text. Replaced by `DebugOverlay` component.
 
 ### Services (`services/*.ts`)

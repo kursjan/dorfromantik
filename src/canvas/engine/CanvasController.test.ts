@@ -99,7 +99,8 @@ describe('CanvasController', () => {
     expect(tileRenderer.drawTileAtHex).toHaveBeenCalledWith(
       tile,
       coord,
-      expect.any(Object)
+      expect.any(Object),
+      activeGame.board
     );
   });
 
@@ -166,7 +167,7 @@ describe('CanvasController', () => {
     controller = new CanvasController(canvas, activeGame);
     const callback = vi.fn();
     const removeListener = controller.subscribeDebug(callback);
-    
+
     expect((controller as any).debugState.listeners.has(callback)).toBe(true);
     removeListener();
     expect((controller as any).debugState.listeners.has(callback)).toBe(false);
@@ -181,14 +182,15 @@ describe('CanvasController', () => {
   it('should render ghost preview when hovering over a hex', () => {
     controller = new CanvasController(canvas, activeGame);
     (controller as any).hoveredHex = new HexCoordinate(1, 0, -1);
-    
+
     const tileRenderer = (controller as any).tileRenderer as any;
     (controller as any).render();
 
     expect(tileRenderer.drawTileAtHex).toHaveBeenCalledWith(
       expect.any(Tile),
       (controller as any).hoveredHex,
-      expect.any(Object)
+      expect.any(Object),
+      activeGame.board
     );
   });
 
@@ -196,18 +198,18 @@ describe('CanvasController', () => {
     controller = new CanvasController(canvas, activeGame);
     const inputManager = (controller as any).inputManager as any;
     const camera = (controller as any).camera;
-    
+
     // Simulate continuous rotation input (clockwise)
     inputManager.getRotationDirection.mockReturnValue(1);
-    
+
     (controller as any).processContinuousInput();
-    
+
     expect(camera.rotateBy).toHaveBeenCalledWith(0.05);
   });
 
   it('should cover input manager callbacks', () => {
     let capturedCallbacks: any;
-    
+
     // We need to temporarily override the mock for this specific test
     const OriginalInputManager = vi.mocked(InputManager);
     OriginalInputManager.mockImplementation(function (this: any, _canvas: any, callbacks: any) {
@@ -248,7 +250,7 @@ describe('CanvasController', () => {
 
     capturedCallbacks.onLeave();
     expect(leaveSpy).toHaveBeenCalled();
-    
+
     // Resize test
     capturedCallbacks.onResize();
     expect(canvas.width).toBe(window.innerWidth);
@@ -269,9 +271,9 @@ describe('CanvasController', () => {
     it('should handle zoom and respect sensitivity bounds', () => {
       const camera = (controller as any).camera;
       const zoomBySpy = vi.spyOn(camera, 'zoomBy');
-      
+
       (controller as any).handleZoom(100);
-      
+
       // ZOOM_SENSITIVITY is 0.001, MIN_ZOOM is 0.5, MAX_ZOOM is 3.0
       expect(zoomBySpy).toHaveBeenCalledWith(
         -0.1, // -100 * 0.001
@@ -286,9 +288,9 @@ describe('CanvasController', () => {
       // Depending on HexSize, 0,0 is hex 0,0,0
       camera.screenToWorld = vi.fn().mockReturnValue({ x: 0, y: 0 });
       vi.mocked(pixelToHex).mockReturnValue(new HexCoordinate(0, 0, 0));
-      
+
       (controller as any).handleHover(100, 100);
-      
+
       // Based on pixelToHex(0, 0)
       // Snaps to nearest valid coordinate, which is not (0, 0, 0) because it is occupied
       expect((controller as any).hoveredHex).not.toEqual(new HexCoordinate(0, 0, 0));
@@ -297,9 +299,9 @@ describe('CanvasController', () => {
 
     it('should handle leave and clear hoveredHex', () => {
       (controller as any).hoveredHex = new HexCoordinate(0, 0, 0);
-      
+
       (controller as any).handleLeave();
-      
+
       expect((controller as any).hoveredHex).toBeNull();
     });
 
@@ -340,10 +342,10 @@ describe('CanvasController', () => {
 
       // Coordinate (1, 0, -1) is adjacent to (0, 0, 0) and likely empty initially
       const targetCoord = new HexCoordinate(1, 0, -1);
-      
+
       // Set hoveredHex manually for the test
       (controller as any).hoveredHex = targetCoord;
-      
+
       // Mock isValidPlacement to return true
       vi.spyOn(activeGame, 'isValidPlacement').mockReturnValue(true);
 
@@ -362,7 +364,7 @@ describe('CanvasController', () => {
       const camera = (controller as any).camera;
       camera.screenToWorld = vi.fn().mockReturnValue({ x: 0, y: 0 });
       vi.mocked(pixelToHex).mockReturnValue(targetCoord);
-      
+
       // Mock isValidPlacement to return false
       vi.spyOn(activeGame, 'isValidPlacement').mockReturnValue(false);
 
