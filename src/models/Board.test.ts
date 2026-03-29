@@ -3,18 +3,10 @@ import { Board } from './Board';
 import { Tile } from './Tile';
 import { toTerrain } from './Terrain';
 import { HexCoordinate } from './HexCoordinate';
+import { north, northEast, southEast, south, southWest, northWest } from './Navigation';
 
 describe('Board', () => {
   let board: Board;
-  const tile = new Tile({
-    id: 'test-tile',
-    north: toTerrain('tree'),
-    northEast: toTerrain('house'),
-    southEast: toTerrain('water'),
-    south: toTerrain('pasture'),
-    southWest: toTerrain('rail'),
-    northWest: toTerrain('field'),
-  });
   const coord = new HexCoordinate(0, 0, 0);
 
   beforeEach(() => {
@@ -22,13 +14,17 @@ describe('Board', () => {
   });
 
   it('should place a tile correctly', () => {
+    const tile = new Tile({ id: 'test-tile' });
     board.place(tile, coord);
+
     expect(board.has(coord)).toBe(true);
     expect(board.get(coord)?.tile).toBe(tile);
   });
 
   it('should throw an error when placing a tile on an occupied spot', () => {
+    const tile = new Tile({ id: 'test-tile' });
     board.place(tile, coord);
+
     expect(() => board.place(tile, coord)).toThrowError(/occupied/);
   });
 
@@ -37,69 +33,114 @@ describe('Board', () => {
   });
 
   it('should canPlace return false for occupied spot', () => {
+    const tile = new Tile({ id: 'test-tile' });
     board.place(tile, coord);
+
     expect(board.canPlace(coord)).toBe(false);
   });
 
   it('should clear the board', () => {
+    const tile = new Tile({ id: 'test-tile' });
     board.place(tile, coord);
     board.clear();
+
     expect(board.has(coord)).toBe(false);
     expect(Array.from(board.getAll()).length).toBe(0);
   });
 
   it('should return all tiles', () => {
-    const tile2 = new Tile({ ...tile, id: 'test-tile-2' });
-    const coord2 = new HexCoordinate(1, -1, 0);
+    const tile1 = new Tile({ id: 'test-tile-1' });
+    const tile2 = new Tile({ id: 'test-tile-2' });
+    const coord2 = southWest(coord);
 
-    board.place(tile, coord);
+    board.place(tile1, coord);
     board.place(tile2, coord2);
 
     const all = Array.from(board.getAll());
     expect(all.length).toBe(2);
-    expect(all.some((t) => t.tile === tile)).toBe(true);
+    expect(all.some((t) => t.tile === tile1)).toBe(true);
     expect(all.some((t) => t.tile === tile2)).toBe(true);
   });
 
   it('should return existing neighbors correctly', () => {
-    const neighborCoord = new HexCoordinate(-1, 0, 1);
-    const nonNeighborCoord = new HexCoordinate(2, 0, -2);
+    const tile1 = new Tile({ id: 'origin-tile' });
+    const tile2 = new Tile({ id: 'neighbor-tile' });
+    const tile3 = new Tile({ id: 'far-tile' });
 
-    board.place(tile, coord); // Origin
-    board.place(tile, neighborCoord); // North of origin
-    board.place(tile, nonNeighborCoord); // Far away
+    const neighborCoord = north(coord);
+    const nonNeighborCoord = north(north(coord));
+
+    board.place(tile1, coord);
+    board.place(tile2, neighborCoord);
+    board.place(tile3, nonNeighborCoord);
 
     const placedTile = board.get(coord)!;
     const neighbors = board.getExistingNeighbors(placedTile);
 
     expect(Object.keys(neighbors).length).toBe(1);
-    expect(neighbors.north?.coordinate.getKey()).toBe(neighborCoord.getKey());
+    expect(neighbors.north?.coordinate).toEqual(neighborCoord);
   });
 
-  it('should return all valid placement coordinates around placed tiles', () => {
-    board.place(tile, coord); // (0,0,0)
-    const validCoords = board.getValidPlacementCoordinates();
+  it('should return valid placement coordinates filtered by strict matching', () => {
+    const placedTile = new Tile({
+      id: 'origin-tile',
+      southEast: toTerrain('water'),
+      southWest: toTerrain('rail'),
+    });
+    board.place(placedTile, coord);
 
-    // 6 neighbors of (0,0,0) should be valid
+    const freeTile = new Tile({ id: 'free-tile' });
+    const validCoords = board.getValidPlacementCoordinates(freeTile);
+
+    expect(validCoords.length).toBe(4);
+
+    expect(validCoords).toContainEqual(north(coord));
+    expect(validCoords).toContainEqual(northEast(coord));
+    expect(validCoords).toContainEqual(south(coord));
+    expect(validCoords).toContainEqual(northWest(coord));
+
+    expect(validCoords).not.toContainEqual(southEast(coord));
+    expect(validCoords).not.toContainEqual(southWest(coord));
+  });
+
+  it('should include strict coordinates if the tile matches them', () => {
+    const placedTile = new Tile({
+      id: 'origin-tile',
+      southEast: toTerrain('water'),
+      southWest: toTerrain('rail'),
+    });
+    board.place(placedTile, coord);
+
+    const matchingTile = new Tile({
+      id: 'matching-tile',
+      northWest: toTerrain('water'),
+      northEast: toTerrain('rail'),
+    });
+
+    const validCoords = board.getValidPlacementCoordinates(matchingTile);
+
     expect(validCoords.length).toBe(6);
-
-    const neighborKeys = new Set(validCoords.map((c) => c.getKey()));
-    expect(neighborKeys.has('0,1,-1')).toBe(true); // North (Actually North in this system is (-1, 0, 1)? Let's check Navigation)
   });
 
   it('should return unique placement coordinates when multiple tiles are placed', () => {
-    const coord2 = new HexCoordinate(1, -1, 0); // One neighbor of origin
-    board.place(tile, coord);
-    board.place(tile, coord2);
+    const placedTile1 = new Tile({
+      id: 'tile-1',
+      southEast: toTerrain('water'),
+      southWest: toTerrain('rail'),
+    });
+    board.place(placedTile1, coord);
 
-    const validCoords = board.getValidPlacementCoordinates();
+    const coord2 = southWest(coord);
+    const placedTile2 = new Tile({
+      id: 'tile-2',
+      southEast: toTerrain('water'),
+      southWest: toTerrain('rail'),
+    });
+    board.place(placedTile2, coord2);
 
-    // Origin has 6 neighbors. Neighbor (1,-1,0) is occupied.
-    // So 5 neighbors from origin + neighbors of (1,-1,0) that are not origin or occupied.
-    // Neighbors of (0,0,0): (0,1,-1), (1,0,-1), (1,-1,0) [OCCUPIED], (0,-1,1), (-1,0,1), (-1,1,0)
-    // Neighbors of (1,-1,0): (1,0,-1), (2,-1,-1), (2,-2,0), (1,-2,1), (0,-1,1), (0,0,0) [OCCUPIED]
-    // Unique valid: (0,1,-1), (1,0,-1), (0,-1,1), (-1,0,1), (-1,1,0), (2,-1,-1), (2,-2,0), (1,-2,1)
-    // Total 8
-    expect(validCoords.length).toBe(8);
+    const freeTile = new Tile({ id: 'free-tile' });
+    const validCoords = board.getValidPlacementCoordinates(freeTile);
+
+    expect(validCoords.length).toBe(5);
   });
 });

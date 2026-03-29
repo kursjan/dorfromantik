@@ -2,9 +2,9 @@ import { Board } from './Board';
 import { GameRules } from './GameRules';
 import { Tile } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
-import { getNeighbors } from './Navigation';
 import { GameScorer } from './GameScorer';
 import { GameHints } from './GameHints';
+import { isValidPlacement } from './PlacementValidator';
 
 export interface GameProps {
   id?: string;
@@ -33,14 +33,11 @@ export class Game {
   static create(rules: GameRules): Game {
     const board = new Board();
 
-    // 1. Create and place initial tile at origin (0, 0, 0)
     const startTile = rules.createInitialTile('start-tile');
     board.place(startTile, new HexCoordinate(0, 0, 0));
 
-    // If no queue is provided, initialize with random tiles based on rules
     const tileQueue = rules.createInitialQueue();
 
-    // 2. Create the game instance
     return new Game({
       rules: rules,
       board: board,
@@ -130,17 +127,16 @@ export class Game {
 
   /**
    * Checks if a tile can be placed at the given coordinate.
-   * A placement is valid if the hex is empty and adjacent to at least one existing tile.
+   * A placement is valid if the hex is empty, adjacent to at least one existing tile,
+   * and strict terrains (water, rail) match.
    */
   isValidPlacement(coord: HexCoordinate): boolean {
-    // 1. Position must be empty
-    if (this.board.has(coord)) {
+    const tile = this.peek();
+    if (!tile) {
       return false;
     }
 
-    // 2. Position must be adjacent to an existing tile
-    const neighbors = getNeighbors(coord);
-    return neighbors.some((neighbor) => this.board.has(neighbor.coordinate));
+    return isValidPlacement(this.board, coord, tile);
   }
 
   /**
@@ -156,10 +152,8 @@ export class Game {
 
     const placedTile = this.board.place(tile, coord);
 
-    // Delegate scoring to GameScorer
     const { scoreAdded, perfectCount } = this.scorer.scorePlacement(this.board, placedTile);
 
-    // Add extra tiles to the queue for perfect placements
     const extraTilesCount = perfectCount * this.rules.turnsPerPerfect;
     for (let i = 0; i < extraTilesCount; i++) {
       this.tileQueue.push(this.rules.tileGenerator.createTile());

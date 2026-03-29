@@ -93,9 +93,18 @@ describe('Game', () => {
     it('should return false if the position is already occupied', () => {
       const coord = new HexCoordinate(0, 0, 0);
       board.place(randomGenerator.createTile('t1'), coord);
+      const freeTile = new Tile({
+        north: toTerrain('pasture'),
+        northEast: toTerrain('pasture'),
+        southEast: toTerrain('pasture'),
+        south: toTerrain('pasture'),
+        southWest: toTerrain('pasture'),
+        northWest: toTerrain('pasture'),
+      });
       const game = new Game({
         board,
         rules,
+        tileQueue: [freeTile],
       });
 
       expect(game.isValidPlacement(coord)).toBe(false);
@@ -104,9 +113,18 @@ describe('Game', () => {
     it('should return false if the position is not adjacent to any existing tile', () => {
       const origin = new HexCoordinate(0, 0, 0);
       board.place(randomGenerator.createTile('t1'), origin);
+      const freeTile = new Tile({
+        north: toTerrain('pasture'),
+        northEast: toTerrain('pasture'),
+        southEast: toTerrain('pasture'),
+        south: toTerrain('pasture'),
+        southWest: toTerrain('pasture'),
+        northWest: toTerrain('pasture'),
+      });
       const game = new Game({
         board,
         rules,
+        tileQueue: [freeTile],
       });
 
       // (2, 0, -2) is not adjacent to (0, 0, 0)
@@ -117,10 +135,27 @@ describe('Game', () => {
 
     it('should return true if the position is empty and adjacent to an existing tile', () => {
       const origin = new HexCoordinate(0, 0, 0);
-      board.place(randomGenerator.createTile('t1'), origin);
+      const pastureTile = new Tile({
+        north: toTerrain('pasture'),
+        northEast: toTerrain('pasture'),
+        southEast: toTerrain('pasture'),
+        south: toTerrain('pasture'),
+        southWest: toTerrain('pasture'),
+        northWest: toTerrain('pasture'),
+      });
+      board.place(pastureTile, origin);
+      const freeTile = new Tile({
+        north: toTerrain('pasture'),
+        northEast: toTerrain('pasture'),
+        southEast: toTerrain('pasture'),
+        south: toTerrain('pasture'),
+        southWest: toTerrain('pasture'),
+        northWest: toTerrain('pasture'),
+      });
       const game = new Game({
         board,
         rules,
+        tileQueue: [freeTile],
       });
 
       // TODO: this should use coordinates of all neighbours

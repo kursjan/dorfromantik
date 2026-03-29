@@ -3,7 +3,6 @@
     "showSpinner": true,
     "inlineThinkingMode": "full",
     "accessibility": {
-      "disableLoadingPhrases": true,
       "enableLoadingPhrases": false
     },
     "loadingPhrases": "off"
@@ -35,8 +34,6 @@
     ]
   },
   "hooksConfig": {
-    "disabled": [
-      "doc-reminder"
-    ]
+    "disabled": ["doc-reminder"]
   }
 }
