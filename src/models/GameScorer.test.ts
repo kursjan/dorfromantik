@@ -81,7 +81,7 @@ describe('GameScorer', () => {
    */
   const surroundExceptCenter = (target: HexCoordinate, idPrefix: string) => {
     getNeighbors(target).forEach(({ direction, coordinate }) => {
-      if (coordinate.getKey() === center.getKey()) return;
+      if (coordinate.equals(center)) return;
       if (board.has(coordinate)) return;
 
       const inwardEdgeDirection = getOpposite(direction);

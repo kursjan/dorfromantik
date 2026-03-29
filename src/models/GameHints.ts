@@ -21,6 +21,6 @@ export class GameHints {
     if (this.currentTile === null) {
       return [];
     }
-    return this.board.getValidPlacementCoordinates();
+    return this.board.getValidPlacementCoordinates(this.currentTile);
   }
 }

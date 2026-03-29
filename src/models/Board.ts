@@ -33,26 +33,12 @@ export class Board {
     return this.getExistingNeighborsAt(tile.coordinate);
   }
 
-  getValidPlacementCoordinates(): HexCoordinate[] {
+  getValidPlacementCoordinates(tile: Tile): HexCoordinate[] {
     const uniqueCoords = new Map<string, HexCoordinate>();
-
-    for (const tile of this.tiles.values()) {
-      for (const coord of this.getValidNeighborsOf(tile)) {
-        uniqueCoords.set(coord.getKey(), coord);
-      }
+    for (const coord of this.getAllValidNeighbors(tile)) {
+      uniqueCoords.set(coord.getKey(), coord);
     }
-
     return Array.from(uniqueCoords.values());
-  }
-
-  private getValidNeighborsOf(boardTile: BoardTile): HexCoordinate[] {
-    const results: HexCoordinate[] = [];
-    for (const { coordinate: neighborCoord } of getNeighbors(boardTile.coordinate)) {
-      if (isValidPlacement(this, neighborCoord)) {
-        results.push(neighborCoord);
-      }
-    }
-    return results;
   }
 
   place(tile: Tile, coord: HexCoordinate): BoardTile {
@@ -87,5 +73,23 @@ export class Board {
 
   clear(): void {
     this.tiles.clear();
+  }
+
+  private getAllValidNeighbors(tile: Tile): HexCoordinate[] {
+    const allCoords: HexCoordinate[] = [];
+    for (const boardTile of this.tiles.values()) {
+      allCoords.push(...this.getValidNeighborsOf(boardTile, tile));
+    }
+    return allCoords;
+  }
+
+  private getValidNeighborsOf(boardTile: BoardTile, tile: Tile): HexCoordinate[] {
+    const results: HexCoordinate[] = [];
+    for (const { coordinate: neighborCoord } of getNeighbors(boardTile.coordinate)) {
+      if (isValidPlacement(this, neighborCoord, tile)) {
+        results.push(neighborCoord);
+      }
+    }
+    return results;
   }
 }
