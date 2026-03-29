@@ -71,6 +71,7 @@ All notable changes to this project will be documented in this file.
 - **Tile & serialization:** Each tile side (and optional center) is a `Terrain` instance; `Tile` defaults unfilled sides to pasture. `GameSerializer` persists `TerrainId` strings per cell and rebuilds instances with `toTerrain()`. Printers and broad test suites were updated for the new model.
 - **E2E tests:** Playwright specs and helpers adjusted for the extra main-menu action and related UI flows.
 - **Storybook:** Tile preview stories live in `components/Tiles/` under sidebar **UI/Tiles** (with **Water** and **WaterOrPasture** subgroups). **SaveStatusIndicator** uses **UI/Components/SaveStatusIndicator** alongside GameHUD and ResetViewButton.
+- **Storybook Vitest:** Increased `testTimeout` (45s) for the browser `storybook` project in `vite.config.ts` to reduce flaky timeouts when Chromium starts cold during `test:ui:raw` / pre-push.
 
 ### Fixed
 
