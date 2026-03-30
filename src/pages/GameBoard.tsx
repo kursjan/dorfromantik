@@ -22,7 +22,10 @@ export const GameBoard: React.FC = () => {
   const autosaverRef = useRef<GameAutosaver | null>(null);
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeGameRef = useRef(activeGame);
+
   useLayoutEffect(() => {
+    // Keep the latest snapshot available to imperative timers (debounce + forceSave)
+    // without recreating the autosaver instance.
     activeGameRef.current = activeGame;
   }, [activeGame]);
 
@@ -35,9 +38,8 @@ export const GameBoard: React.FC = () => {
     autosaverRef.current = new GameAutosaver({
       firestoreService,
       getUserId: () => user.id,
-      // Stable ref-backed getter prevents recreating GameAutosaver on every
-      // immutable `activeGame` identity change while ensuring the autosaver
-      // always persists the latest snapshot.
+      // `GameAutosaver` is created without depending on `activeGame` (deps exclude it),
+      // so we always read the latest immutable snapshot through `activeGameRef`.
       getActiveGame: () => activeGameRef.current,
       debounceMs: SAVE_DEBOUNCE_MS,
       onSaveStart: () => {
