@@ -12,7 +12,7 @@ const STATUS_CLEAR_TIMEOUT_MS = 1000;
 export const GameBoard: React.FC = () => {
   // 1. Context & Services
   const { user } = useUser();
-  const { activeGame } = useActiveGame();
+  const { activeGame, setActiveGame } = useActiveGame();
   const firestoreService = useFirestoreService();
 
   // 2. Component State
@@ -67,7 +67,11 @@ export const GameBoard: React.FC = () => {
 
   return (
     <main className="game-board">
-      <CanvasView activeGame={activeGame} onTilePlaced={debouncedSave} />
+      <CanvasView
+        activeGame={activeGame}
+        setActiveGame={setActiveGame}
+        onTilePlaced={debouncedSave}
+      />
       <SaveStatusIndicator status={saveStatus} />
     </main>
   );

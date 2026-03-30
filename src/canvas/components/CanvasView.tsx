@@ -4,17 +4,21 @@ import { ResetViewButton } from './ResetViewButton';
 import { GameHUD } from './GameHUD';
 import { DebugOverlay } from './DebugOverlay';
 import { Game } from '../../models/Game';
-import { useActiveGame } from '../../context/SessionContext';
 import { useGameSnapshotBridge } from '../hooks/useGameSnapshotBridge';
 
 interface CanvasViewProps {
   activeGame: Game;
+  /** Typically `setActiveGame` from session context; commits snapshots from the canvas. */
+  setActiveGame: (game: Game) => void;
   /** Called when a tile is placed; e.g. parent may debounce and persist game state. */
   onTilePlaced: () => void;
 }
 
-export const CanvasView: React.FC<CanvasViewProps> = ({ activeGame, onTilePlaced }) => {
-  const { setActiveGame } = useActiveGame();
+export const CanvasView: React.FC<CanvasViewProps> = ({
+  activeGame,
+  setActiveGame,
+  onTilePlaced,
+}) => {
   const { getGameSnapshot, setGameSnapshot } = useGameSnapshotBridge(activeGame, setActiveGame);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
