@@ -58,6 +58,6 @@ Second full `main...HEAD` review after Phase 6; use a distinct findings filename
 - [x] Triage second-pass findings: extend Phase 6-style rework if major issues remain; otherwise queue minor fixes for Phase 8 using **task-conductor** skill.
 - [x] **Approval Gate**: Stop after writing/triaging the second review and wait for explicit maintainer approval before starting Phase 8 (handled via **project-orchestrator** skill).
 
-## Phase 8: Final track handoff
+## Phase 8: Final track handoff [DONE]
 
-- [ ] **Final Track Gate**: PR readiness, verification report, handoff template, and final checkpoint using **project-orchestrator** skill.
+- [x] **Final Track Gate**: PR readiness, verification report, handoff template, and final checkpoint using **project-orchestrator** skill.
