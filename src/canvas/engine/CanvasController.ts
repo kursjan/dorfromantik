@@ -103,6 +103,14 @@ export class CanvasController {
     this.camera.reset();
   }
 
+  /**
+   * Dev / Playwright: read-only view of the latest snapshot (`window.canvasCtrl` in DEV).
+   * Prefer `getGameSnapshot` in new code; this keeps rotation E2E specs stable.
+   */
+  public get activeGame(): Game {
+    return this.getGameSnapshot();
+  }
+
   public subscribeDebug(listener: () => void): () => void {
     this.debugState.listeners.add(listener);
     return () => {

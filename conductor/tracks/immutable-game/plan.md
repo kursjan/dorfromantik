@@ -22,7 +22,7 @@ Refactor `Board` and `Game` models to be immutable to align with React state man
 - [x] Update remaining test files (`PlacementValidator.test.ts`, `GameScorer.test.ts`, `BoardNavigation.test.ts`, `src/printers/*.test.ts`) using **task-conductor** skill.
 - [x] **Phase Gate**: Run full CI verification (`npm run test:ci`) and sync state using **project-orchestrator** skill.
 
-## Phase 4: Canvas game snapshot API (single source of truth)
+## Phase 4: Canvas game snapshot API (single source of truth) [DONE]
 
 Replace mirrored `Game` state and dual callbacks (`onStatsChange` + `onActiveGameChange`) with **`getGameSnapshot` + `setGameSnapshot`** (bridge to context’s `setActiveGame`): React owns the canonical snapshot; the controller reads via a getter (backed by a ref updated synchronously when setting the snapshot so the rAF loop never lags a frame).
 
@@ -30,7 +30,7 @@ Replace mirrored `Game` state and dual callbacks (`onStatsChange` + `onActiveGam
 - [x] Refactor `CanvasView.tsx`: keep a ref to the latest `Game`; bridge `setActiveGame` from context so the ref updates **synchronously** with each new snapshot; derive HUD from `activeGame` (remove `onStatsChange` wiring); keep controller lifecycle keyed by `activeGame.id` using **task-conductor** skill.
 - [x] Update `CanvasController.test.ts` and `CanvasView.test.ts` for the new constructor API and assertions using **task-conductor** skill.
 - [x] Update `src/canvas/ARCHITECTURE.md` (and this track’s `spec.md` if the “bridge” wording should match) for the snapshot API using **task-conductor** skill.
-- [ ] **Phase Gate**: Run `npm run test:unit`, `npm run test:ci`, and `npm run test:e2e:ci`, then checkpoint using **project-orchestrator** skill.
+- [x] **Phase Gate**: Run `npm run test:unit`, `npm run test:ci`, and `npm run test:e2e:ci`, then checkpoint using **project-orchestrator** skill.
 
 ## Phase 5: Adversarial Review
 
