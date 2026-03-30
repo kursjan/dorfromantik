@@ -11,7 +11,7 @@ Refactor `Board` and `Game` models to be immutable to align with React state man
 
 ## Phase 2: Immutable Game
 
-- [ ] Refactor `Game.ts` properties to be `readonly` and update action methods to return new `Game` instances using **task-conductor** skill.
+- [x] Refactor `Game.ts` properties to be `readonly` and update action methods to return new `Game` instances using **task-conductor** skill.
 - [ ] Update `Game.test.ts` to verify immutable state transitions using **task-conductor** skill.
 - [ ] **Phase Gate**: Verify Game unit tests and sync state using **project-orchestrator** skill.
 

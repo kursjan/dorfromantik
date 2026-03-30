@@ -19,6 +19,7 @@ export interface GameProps {
 export interface PlacementResult {
   scoreAdded: number;
   perfectCount: number;
+  game: Game;
 }
 
 /**
@@ -101,28 +102,36 @@ export class Game {
    * Rotates the tile currently at the head of the queue clockwise.
    * @throws Error if the queue is empty.
    */
-  rotateQueuedTileClockwise(): void {
+  rotateQueuedTileClockwise(): Game {
     const tile = this.tileQueue[0];
     if (!tile) {
       throw new Error('No tiles remaining in the queue');
     }
 
-    this.tileQueue[0] = tile.rotateClockwise();
-    this.updateHints();
+    const tileQueue = [...this.tileQueue];
+    tileQueue[0] = tile.rotateClockwise();
+
+    const nextGame = this.buildNextGame({ tileQueue });
+    this.applyFrom(nextGame);
+    return nextGame;
   }
 
   /**
    * Rotates the tile currently at the head of the queue counter-clockwise.
    * @throws Error if the queue is empty.
    */
-  rotateQueuedTileCounterClockwise(): void {
+  rotateQueuedTileCounterClockwise(): Game {
     const tile = this.tileQueue[0];
     if (!tile) {
       throw new Error('No tiles remaining in the queue');
     }
 
-    this.tileQueue[0] = tile.rotateCounterClockwise();
-    this.updateHints();
+    const tileQueue = [...this.tileQueue];
+    tileQueue[0] = tile.rotateCounterClockwise();
+
+    const nextGame = this.buildNextGame({ tileQueue });
+    this.applyFrom(nextGame);
+    return nextGame;
   }
 
   /**
@@ -145,28 +154,50 @@ export class Game {
    * @returns Results of the placement (e.g., score added).
    */
   placeTile(coord: HexCoordinate): PlacementResult {
-    const tile = this.tileQueue.shift();
+    const tile = this.tileQueue[0];
     if (!tile) {
       throw new Error('No tiles remaining in the queue');
     }
 
     const { board: newBoard, placedTile } = this.board.place(tile, coord);
-    this.board = newBoard;
 
-    const { scoreAdded, perfectCount } = this.scorer.scorePlacement(this.board, placedTile);
+    const { scoreAdded, perfectCount } = this.scorer.scorePlacement(newBoard, placedTile);
+
+    const tileQueue = this.tileQueue.slice(1);
 
     const extraTilesCount = perfectCount * this.rules.turnsPerPerfect;
     for (let i = 0; i < extraTilesCount; i++) {
-      this.tileQueue.push(this.rules.tileGenerator.createTile());
+      tileQueue.push(this.rules.tileGenerator.createTile());
     }
 
-    this.score += scoreAdded;
-    this.lastPlayed = new Date().toISOString();
-    this.updateHints();
-    return { scoreAdded, perfectCount };
+    const nextGame = this.buildNextGame({
+      board: newBoard,
+      tileQueue,
+      score: this.score + scoreAdded,
+      lastPlayed: new Date().toISOString(),
+    });
+    this.applyFrom(nextGame);
+
+    return { scoreAdded, perfectCount, game: nextGame };
   }
 
-  private updateHints(): void {
-    this.hints = new GameHints(this.board, this.peek() || null);
+  private buildNextGame(overrides: Partial<GameProps>): Game {
+    return new Game({
+      id: this.id,
+      name: this.name,
+      lastPlayed: overrides.lastPlayed ?? this.lastPlayed,
+      board: overrides.board ?? this.board,
+      rules: this.rules,
+      score: overrides.score ?? this.score,
+      tileQueue: overrides.tileQueue ?? this.tileQueue,
+    });
+  }
+
+  private applyFrom(nextGame: Game): void {
+    this.board = nextGame.board;
+    this.lastPlayed = nextGame.lastPlayed;
+    this.score = nextGame.score;
+    this.tileQueue = nextGame.tileQueue;
+    this.hints = nextGame.hints;
   }
 }
