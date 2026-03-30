@@ -43,7 +43,7 @@ First `main...HEAD` review; output `REVIEW_FEEDBACK.md`. LGTM on this phase appr
 
 Address `REVIEW_FEEDBACK.md`: persistence / autosave, `Game` contract vs `spec.md`, tests and docs, and constructor comment hygiene.
 
-- [ ] Fix `GameBoard` + `GameAutosaver` lifecycle (`getActiveGame` via ref, no autosaver churn on new `Game` identity, regression tests for save/debounce) using **task-conductor** skill.
+- [x] Fix `GameBoard` + `GameAutosaver` lifecycle (`getActiveGame` via ref, no autosaver churn on new `Game` identity, regression tests for save/debounce) using **task-conductor** skill.
 - [ ] Resolve `Game` dual API (`buildNextGame` + `applyFrom` + return): pure successors only **or** documented enforced contract plus `src/models/ARCHITECTURE.md` / tests using **task-conductor** skill.
 - [ ] Add `useGameSnapshotBridge` unit tests (prop swap, `setGameSnapshot` / `getGameSnapshot`) using **task-conductor** skill.
 - [ ] Refresh `src/models/ARCHITECTURE.md` and `src/canvas/ARCHITECTURE.md` for final `Game` + snapshot decisions using **task-conductor** skill.

@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect, useState } from 'react';
+import React, { useRef, useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { CanvasView } from '../canvas/components/CanvasView';
 import { useUser, useActiveGame } from '../context/SessionContext';
 import { useFirestoreService } from '../services/hooks/useServices';
@@ -21,6 +21,10 @@ export const GameBoard: React.FC = () => {
   // 3. Mutable Refs
   const autosaverRef = useRef<GameAutosaver | null>(null);
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeGameRef = useRef(activeGame);
+  useLayoutEffect(() => {
+    activeGameRef.current = activeGame;
+  }, [activeGame]);
 
   // 4. Callbacks
   const debouncedSave = useCallback(() => {
@@ -31,7 +35,10 @@ export const GameBoard: React.FC = () => {
     autosaverRef.current = new GameAutosaver({
       firestoreService,
       getUserId: () => user.id,
-      getActiveGame: () => activeGame,
+      // Stable ref-backed getter prevents recreating GameAutosaver on every
+      // immutable `activeGame` identity change while ensuring the autosaver
+      // always persists the latest snapshot.
+      getActiveGame: () => activeGameRef.current,
       debounceMs: SAVE_DEBOUNCE_MS,
       onSaveStart: () => {
         // Clear previous status immediately when a new save starts
@@ -54,7 +61,7 @@ export const GameBoard: React.FC = () => {
       autosaverRef.current = null;
       if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
     };
-  }, [firestoreService, user, activeGame]);
+  }, [firestoreService, user.id]);
 
   if (!activeGame) {
     return (

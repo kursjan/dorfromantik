@@ -14,7 +14,7 @@ import { GameAutosaver } from '../canvas/services/GameAutosaver';
 
 vi.mock('../canvas/services/GameAutosaver', () => {
   return {
-    GameAutosaver: vi.fn().mockImplementation(function(this: any, options: any) {
+    GameAutosaver: vi.fn().mockImplementation(function (this: any, options: any) {
       this.handleTilePlaced = vi.fn();
       this.dispose = vi.fn();
       this.forceSaveAndDispose = vi.fn();
@@ -131,6 +131,54 @@ describe('GameBoard', () => {
 
     // Verify forceSaveAndDispose was called instead of just dispose
     expect(autosaverMockInstance.forceSaveAndDispose).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps a stable GameAutosaver and reads latest activeGame via ref', async () => {
+    const gameA = new Game({
+      board: new Board(),
+      rules: new GameRules(),
+      tileQueue: [new Tile()],
+      score: 0,
+    });
+    const gameB = new Game({
+      board: new Board(),
+      rules: new GameRules(),
+      tileQueue: [new Tile()],
+      score: 10,
+    });
+
+    const { rerender } = renderWithProviders(gameA);
+
+    expect(GameAutosaver).toHaveBeenCalledTimes(1);
+    const autosaverMockInstance = vi.mocked(GameAutosaver).mock.results[0].value;
+
+    expect(autosaverMockInstance.options.getActiveGame()).toBe(gameA);
+
+    act(() => {
+      rerender(
+        <ServiceProvider authService={authService} firestoreService={firestoreService}>
+          <UserContext.Provider value={{ user }}>
+            <GameHistoryContext.Provider value={{ games: [] }}>
+              <ActiveGameContext.Provider
+                value={{
+                  activeGame: gameB,
+                  setActiveGame: vi.fn(),
+                }}
+              >
+                <GameBoard />
+              </ActiveGameContext.Provider>
+            </GameHistoryContext.Provider>
+          </UserContext.Provider>
+        </ServiceProvider>
+      );
+    });
+
+    // Component re-render should not recreate autosaver; ref-backed getter should update.
+    expect(GameAutosaver).toHaveBeenCalledTimes(1);
+    expect(autosaverMockInstance.options.getActiveGame()).toBe(gameB);
+
+    // No effect cleanup should have happened during rerender.
+    expect(autosaverMockInstance.forceSaveAndDispose).toHaveBeenCalledTimes(0);
   });
 
   it('displays save status feedback', async () => {
