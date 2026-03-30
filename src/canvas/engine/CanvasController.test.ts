@@ -40,7 +40,7 @@ describe('CanvasController', () => {
   function makeControllerOptions(onSet?: (g: Game) => void) {
     return {
       getActiveGame: () => activeGame,
-      setActiveGame: (g: Game) => {
+      setGameSnapshot: (g: Game) => {
         activeGame = g;
         onSet?.(g);
       },
@@ -188,7 +188,7 @@ describe('CanvasController', () => {
     let missing = false;
     controller = new CanvasController(canvas, {
       getActiveGame: () => (missing ? (undefined as unknown as Game) : activeGame),
-      setActiveGame: (g: Game) => {
+      setGameSnapshot: (g: Game) => {
         activeGame = g;
       },
     });
@@ -322,7 +322,7 @@ describe('CanvasController', () => {
       expect((controller as any).hoveredHex).toBeNull();
     });
 
-    it('should handle rotate clockwise and persist snapshot via setActiveGame', () => {
+    it('should handle rotate clockwise and persist snapshot via setGameSnapshot', () => {
       const rotateSpy = vi.spyOn(activeGame, 'rotateQueuedTileClockwise');
       const setSpy = vi.fn();
       controller = new CanvasController(canvas, makeControllerOptions(setSpy));
@@ -333,7 +333,7 @@ describe('CanvasController', () => {
       expect(setSpy).toHaveBeenCalled();
     });
 
-    it('should handle rotate counter-clockwise and persist snapshot via setActiveGame', () => {
+    it('should handle rotate counter-clockwise and persist snapshot via setGameSnapshot', () => {
       const rotateSpy = vi.spyOn(activeGame, 'rotateQueuedTileCounterClockwise');
       const setSpy = vi.fn();
       controller = new CanvasController(canvas, makeControllerOptions(setSpy));

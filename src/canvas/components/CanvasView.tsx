@@ -1,10 +1,11 @@
-import { useRef, useEffect, useLayoutEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { CanvasController } from '../engine/CanvasController';
 import { ResetViewButton } from './ResetViewButton';
 import { GameHUD } from './GameHUD';
 import { DebugOverlay } from './DebugOverlay';
 import { Game } from '../../models/Game';
 import { useActiveGame } from '../../context/SessionContext';
+import { useGameSnapshotBridge } from '../hooks/useGameSnapshotBridge';
 
 interface CanvasViewProps {
   activeGame: Game;
@@ -14,21 +15,7 @@ interface CanvasViewProps {
 
 export const CanvasView: React.FC<CanvasViewProps> = ({ activeGame, onTilePlaced }) => {
   const { setActiveGame } = useActiveGame();
-  const gameRef = useRef(activeGame);
-
-  useLayoutEffect(() => {
-    gameRef.current = activeGame;
-  }, [activeGame]);
-
-  const setGameSnapshot = useCallback(
-    (g: Game) => {
-      gameRef.current = g;
-      setActiveGame(g);
-    },
-    [setActiveGame]
-  );
-
-  const getActiveGame = useCallback(() => gameRef.current, []);
+  const { getActiveGame, setGameSnapshot } = useGameSnapshotBridge(activeGame, setActiveGame);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const controllerRef = useRef<CanvasController | null>(null);
@@ -42,7 +29,7 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ activeGame, onTilePlaced
 
     const newController = new CanvasController(canvas, {
       getActiveGame,
-      setActiveGame: setGameSnapshot,
+      setGameSnapshot,
       onToggleDebugOverlay: () => setDebugOverlayVisible((v) => !v),
     });
     setController(newController);
@@ -56,7 +43,7 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ activeGame, onTilePlaced
       controllerRef.current = null;
       setController(null);
     };
-    // Recreate controller when switching games (id), not on every immutable snapshot.
+    // Recreate controller when switching games (id), not on every immutable snapshot — latest game is read via getActiveGame.
   }, [activeGame.id, onTilePlaced, getActiveGame, setGameSnapshot]);
 
   return (

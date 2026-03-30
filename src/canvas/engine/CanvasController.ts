@@ -23,7 +23,8 @@ export interface DebugStats {
 export interface CanvasControllerOptions {
   /** Latest immutable game snapshot (typically backed by a React ref updated in sync with context). */
   getActiveGame: () => Game;
-  setActiveGame: (game: Game) => void;
+  /** Commit the next immutable `Game` after place/rotate (e.g. ref + context setter from the view bridge). */
+  setGameSnapshot: (game: Game) => void;
   onToggleDebugOverlay?: () => void;
 }
 
@@ -42,7 +43,7 @@ export class CanvasController {
   private static readonly ZOOM_SENSITIVITY = 0.001;
 
   private readonly getActiveGame: () => Game;
-  private readonly setActiveGame: (game: Game) => void;
+  private readonly setGameSnapshot: (game: Game) => void;
 
   private readonly backgroundRenderer: BackgroundRenderer;
   private readonly canvas: HTMLCanvasElement;
@@ -61,7 +62,7 @@ export class CanvasController {
   constructor(canvas: HTMLCanvasElement, options: CanvasControllerOptions) {
     this.canvas = canvas;
     this.getActiveGame = options.getActiveGame;
-    this.setActiveGame = options.setActiveGame;
+    this.setGameSnapshot = options.setGameSnapshot;
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Could not get 2d context');
     this.ctx = ctx;
@@ -247,19 +248,19 @@ export class CanvasController {
 
     if (activeGame.inProgress() && this.hoveredHex && this.isValidPlacement(this.hoveredHex)) {
       const { game: nextGame } = activeGame.placeTile(this.hoveredHex);
-      this.setActiveGame(nextGame);
+      this.setGameSnapshot(nextGame);
       this.onTilePlaced?.();
     }
   }
 
   private handleRotateClockwise() {
     const nextGame = this.getActiveGame().rotateQueuedTileClockwise();
-    this.setActiveGame(nextGame);
+    this.setGameSnapshot(nextGame);
   }
 
   private handleRotateCounterClockwise() {
     const nextGame = this.getActiveGame().rotateQueuedTileCounterClockwise();
-    this.setActiveGame(nextGame);
+    this.setGameSnapshot(nextGame);
   }
 
   private handleResize() {

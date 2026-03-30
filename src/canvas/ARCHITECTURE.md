@@ -133,8 +133,8 @@ Configuration files for their respective renderers.
 
 While the Controller runs independently for performance, the React tree must hold the **canonical immutable `Game` snapshot** (via `ActiveGameContext`) so persistence (`GameAutosaver`) and the HUD see the same state.
 
-- **Pattern:** `CanvasController` is constructed with **`getActiveGame()`** and **`setActiveGame(game)`**. It does not mirror `Game` on `this`; it reads the latest snapshot from the getter each frame and calls **`setActiveGame`** after place / rotate with the returned snapshot.
-- **`CanvasView`:** Keeps a **ref** to the latest `Game`, syncs it from **`activeGame`** in **`useLayoutEffect`**, and wraps **`setActiveGame`** so the ref is also updated **synchronously** inside **`setGameSnapshot`** when the controller applies a new snapshot (avoids the rAF loop lagging React by one frame). The HUD reads **score / turns / next tile** from the **`activeGame` prop** (context), not a separate stats callback.
+- **Pattern:** `CanvasController` is constructed with **`getActiveGame()`** and **`setGameSnapshot(game)`**. It does not mirror `Game` on `this`; it reads the latest snapshot from the getter each frame and calls **`setGameSnapshot`** after place / rotate with the returned snapshot.
+- **`CanvasView`:** Uses **`useGameSnapshotBridge`** (or equivalent): syncs a **ref** from **`activeGame`** (e.g. **`useLayoutEffect`**) and wraps **`setActiveGame`** from context into **`setGameSnapshot`**, which updates the ref **synchronously** with each new snapshot (avoids the rAF loop lagging React by one frame). The HUD reads **score / turns / next tile** from the **`activeGame` prop** (context), not a separate stats callback.
 - **Debug Stats:** `CanvasController` also exposes `subscribeDebug` and `getDebugSnapshot` for high-frequency updates (FPS, Camera) used by `DebugOverlay` via `useSyncExternalStore`.
 
 ## 6. Data Flow Example: Hovering (Magnetic Snapping)
