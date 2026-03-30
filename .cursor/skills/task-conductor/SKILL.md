@@ -56,6 +56,7 @@ Use this skill for any **coding or implementation task** defined in a Conductor 
 
 7. **Mark as Done**
    - Once the user approves, consider this task complete.
+   - Move the approved git tag to the task commit.
    - Only then may you move to the next uncompleted task (with a new invocation of this skill or explicit user request).
 
 ## Iteration Protocol
