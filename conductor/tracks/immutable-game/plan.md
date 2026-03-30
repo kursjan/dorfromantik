@@ -7,7 +7,7 @@ Refactor `Board` and `Game` models to be immutable to align with React state man
 - [x] Ensure we are on working branch `worker1` using **task-conductor** skill.
 - [x] Refactor `Board.ts` to use `ReadonlyMap` and return new instances from `place()` and `clear()` using **task-conductor** skill.
 - [x] Update `Board.test.ts` to accommodate the new immutable signatures using **task-conductor** skill.
-- [ ] **Phase Gate**: Verify Board unit tests and sync state using **project-orchestrator** skill.
+- [x] **Phase Gate**: Verify Board unit tests and sync state using **project-orchestrator** skill.
 
 ## Phase 2: Immutable Game
 
