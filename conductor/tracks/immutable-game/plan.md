@@ -39,7 +39,7 @@ First `main...HEAD` review; output `REVIEW_FEEDBACK.md`. LGTM on this phase appr
 - [x] Perform a rigorous file-by-file review of all changes in this branch against `main` using **quick-review** skill (output: `REVIEW_FEEDBACK.md`).
 - [x] **Phase Gate**: Record review outcome and sync track state using **project-orchestrator** skill.
 
-## Phase 6: Major review rework
+## Phase 6: Major review rework [DONE]
 
 Address `REVIEW_FEEDBACK.md`: persistence / autosave, `Game` contract vs `spec.md`, tests and docs, and constructor comment hygiene.
 
@@ -48,7 +48,7 @@ Address `REVIEW_FEEDBACK.md`: persistence / autosave, `Game` contract vs `spec.m
 - [x] Add `useGameSnapshotBridge` unit tests (prop swap, `setGameSnapshot` / `getGameSnapshot`) using **task-conductor** skill.
 - [x] Refresh `src/models/ARCHITECTURE.md` and `src/canvas/ARCHITECTURE.md` for final `Game` + snapshot decisions using **task-conductor** skill.
 - [x] Clean up `Game` constructor comments (remove AI-style wording, fix typos) using **task-conductor** skill.
-- [ ] **Phase Gate**: Run `npm run test:ci` and `npm run test:e2e:ci`, then checkpoint using **project-orchestrator** skill.
+- [x] **Phase Gate**: Run `npm run test:ci` and `npm run test:e2e:ci`, then checkpoint using **project-orchestrator** skill.
 
 ## Phase 7: Adversarial Review (second pass)
 
