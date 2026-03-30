@@ -168,7 +168,7 @@ describe('Game', () => {
   });
 
   describe('rotateQueuedTile', () => {
-    it('should rotate the next tile in the queue clockwise', () => {
+    it('should rotate the next tile in the queue clockwise and return the next game snapshot', () => {
       const tile = new Tile({
         id: 't1',
         north: toTerrain('tree'),
@@ -185,13 +185,16 @@ describe('Game', () => {
       });
       const game = Game.create(customRules);
 
-      game.rotateQueuedTileClockwise();
+      const nextGame = game.rotateQueuedTileClockwise();
 
-      const rotated = game.peek()!;
+      expect(nextGame).not.toBe(game);
+
+      const rotated = nextGame.peek()!;
       expect(rotated.north.id).toBe('house');
+      expect(nextGame.remainingTurns).toBe(1);
     });
 
-    it('should rotate the next tile in the queue counter-clockwise', () => {
+    it('should rotate the next tile in the queue counter-clockwise and return the next game snapshot', () => {
       const tile = new Tile({
         id: 't1',
         north: toTerrain('tree'),
@@ -208,10 +211,13 @@ describe('Game', () => {
       });
       const game = Game.create(customRules);
 
-      game.rotateQueuedTileCounterClockwise();
+      const nextGame = game.rotateQueuedTileCounterClockwise();
 
-      const rotated = game.peek()!;
+      expect(nextGame).not.toBe(game);
+
+      const rotated = nextGame.peek()!;
       expect(rotated.north.id).toBe('field');
+      expect(nextGame.remainingTurns).toBe(1);
     });
 
     it('should throw error if queue is empty', () => {
@@ -238,7 +244,7 @@ describe('Game', () => {
       expect(() => game.placeTile(coord)).toThrow('No tiles remaining in the queue');
     });
 
-    it('should place tile, call scorer, and generate bonus tiles from the generator', () => {
+    it('should place tile, call scorer, and return the next game snapshot with bonus tiles', () => {
       const initialTile = randomGenerator.createTile('initial-tile');
       const expectedBonus1 = randomGenerator.createTile('bonus-1');
       const expectedBonus2 = randomGenerator.createTile('bonus-2');
@@ -250,6 +256,7 @@ describe('Game', () => {
       });
 
       const game = Game.create(customRules);
+      const previousLastPlayed = game.lastPlayed;
 
       expect(game.tileQueue.length).toBe(1);
       expect(game.tileQueue[0]).toBe(initialTile);
@@ -262,13 +269,17 @@ describe('Game', () => {
       const coord = new HexCoordinate(1, 0, -1);
 
       const result = game.placeTile(coord);
+      const nextGame = result.game;
 
       expect(result.scoreAdded).toBe(100);
       expect(result.perfectCount).toBe(1);
+      expect(nextGame).not.toBe(game);
+      expect(nextGame.lastPlayed).not.toBe(previousLastPlayed);
+      expect(nextGame.score).toBe(100);
 
-      expect(game.tileQueue.length).toBe(2);
-      expect(game.tileQueue[0]).toBe(expectedBonus1);
-      expect(game.tileQueue[1]).toBe(expectedBonus2);
+      expect(nextGame.tileQueue.length).toBe(2);
+      expect(nextGame.tileQueue[0]).toBe(expectedBonus1);
+      expect(nextGame.tileQueue[1]).toBe(expectedBonus2);
 
       scoreSpy.mockRestore();
     });
