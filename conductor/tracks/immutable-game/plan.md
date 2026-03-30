@@ -32,8 +32,32 @@ Replace mirrored `Game` state and dual callbacks (`onStatsChange` + `onActiveGam
 - [x] Update `src/canvas/ARCHITECTURE.md` (and this track’s `spec.md` if the “bridge” wording should match) for the snapshot API using **task-conductor** skill.
 - [x] **Phase Gate**: Run `npm run test:unit`, `npm run test:ci`, and `npm run test:e2e:ci`, then checkpoint using **project-orchestrator** skill.
 
-## Phase 5: Adversarial Review
+## Phase 5: Adversarial Review (first pass) [DONE]
+
+First `main...HEAD` review; output `REVIEW_FEEDBACK.md`. LGTM on this phase approves the first pass only (major items are handled in Phase 6; a second review is Phase 7).
+
+- [x] Perform a rigorous file-by-file review of all changes in this branch against `main` using **quick-review** skill (output: `REVIEW_FEEDBACK.md`).
+- [x] **Phase Gate**: Record review outcome and sync track state using **project-orchestrator** skill.
+
+## Phase 6: Major review rework
+
+Address `REVIEW_FEEDBACK.md`: persistence / autosave, `Game` contract vs `spec.md`, tests and docs, and constructor comment hygiene.
+
+- [ ] Fix `GameBoard` + `GameAutosaver` lifecycle (`getActiveGame` via ref, no autosaver churn on new `Game` identity, regression tests for save/debounce) using **task-conductor** skill.
+- [ ] Resolve `Game` dual API (`buildNextGame` + `applyFrom` + return): pure successors only **or** documented enforced contract plus `src/models/ARCHITECTURE.md` / tests using **task-conductor** skill.
+- [ ] Add `useGameSnapshotBridge` unit tests (prop swap, `setGameSnapshot` / `getGameSnapshot`) using **task-conductor** skill.
+- [ ] Refresh `src/models/ARCHITECTURE.md` and `src/canvas/ARCHITECTURE.md` for final `Game` + snapshot decisions using **task-conductor** skill.
+- [ ] Clean up `Game` constructor comments (remove AI-style wording, fix typos) using **task-conductor** skill.
+- [ ] **Phase Gate**: Run `npm run test:ci` and `npm run test:e2e:ci`, then checkpoint using **project-orchestrator** skill.
+
+## Phase 7: Adversarial Review (second pass)
+
+Second full `main...HEAD` review after Phase 6; use a distinct findings filename from Phase 5 (e.g. `REVIEW_FEEDBACK_post_rework.md`) so both passes stay comparable.
 
 - [ ] Perform a rigorous file-by-file review of all changes in this branch against `main` using **quick-review** skill.
-- [ ] Address any feedback from `REVIEW_FEEDBACK.md` using **task-conductor** skill.
-- [ ] **Final Track Gate**: Final verification and Git commit using **project-orchestrator** skill.
+- [ ] Triage second-pass findings: extend Phase 6-style rework if major issues remain; otherwise queue minor fixes for Phase 8 using **task-conductor** skill.
+- [ ] **Approval Gate**: Stop after writing/triaging the second review and wait for explicit maintainer approval before starting Phase 8 (handled via **project-orchestrator** skill).
+
+## Phase 8: Final track handoff
+
+- [ ] **Final Track Gate**: PR readiness, verification report, handoff template, and final checkpoint using **project-orchestrator** skill.
