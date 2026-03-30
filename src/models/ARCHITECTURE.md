@@ -43,7 +43,7 @@ The `Game` class is the central orchestrator of an active game.
 
 - **State**: Tracks the `Board`, `Score`, `TileQueue`, and `GameHints`.
 - **Turns as Tiles**: The game follows a "Tiles are Turns" philosophy. `remainingTurns` is a derived property of `tileQueue.length`.
-- **GameHints**: Caches derived hints, such as `validPlacements`, to avoid recalculating complex board state on every frame. Invalidates cache on `placeTile` and tile rotation.
+- **GameHints**: Derived hints (e.g. `validPlacements`) are recomputed in each successor snapshot created by `placeTile` and tile rotation methods, so the current instance remains immutable.
 - **Immutable transitions**: State-changing methods return a **new** `Game` snapshot and do not mutate the receiver. Callers should always use the returned instance (`result.game` from `placeTile`, return value from rotate methods) as the canonical next state.
 - **Lifecycle**:
   - **Start**: Typically created via static factory methods: `Game.create(rules)`. These methods handle initializing the `Board` and placing the initial "starter" tile at the origin `(0, 0, 0)`. In the current architecture, these factories are called by page components (e.g., `MainMenu`).
@@ -93,6 +93,6 @@ The game implements the "Perfect Placement" bonus (Steam rules):
 
 ## Design Principles
 
-- **Immutability where possible**: Entity properties like `HexCoordinate` and `GameRules` are `readonly`.
+- **Immutability by default**: `Board` and `Game` transitions return new instances; entities such as `HexCoordinate` and `GameRules` are `readonly`.
 - **Explicit Accessors**: Methods like `Tile.getTerrain(direction)` are preferred over direct property access for clarity.
 - **Single Source of Truth**: Game state (like turns) is derived from primary data (the queue) to prevent sync errors.

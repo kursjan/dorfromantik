@@ -75,7 +75,7 @@ Understanding the coordinate spaces is critical for this engine:
 
 The central hub. It:
 
-- **Owns State:** Camera, Hovered Hex, (Future: Board).
+- **Owns State:** Camera, hovered hex, debug snapshot publishing, and input wiring. Game board data is read from `getGameSnapshot()` and committed via `setGameSnapshot(game)` (see §5).
 - **Runs Loop:** Manages `requestAnimationFrame`.
 - **Orchestrates:** `InputManager` callbacks -> updates State -> delegates drawing to Renderers.
 - **Validation:** Provides `isValidPlacement(coord)` by delegating to the `Game` model, ensuring the UI only allows valid actions.

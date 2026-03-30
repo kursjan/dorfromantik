@@ -46,7 +46,7 @@ Address `REVIEW_FEEDBACK.md`: persistence / autosave, `Game` contract vs `spec.m
 - [x] Fix `GameBoard` + `GameAutosaver` lifecycle (`getActiveGame` via ref, no autosaver churn on new `Game` identity, regression tests for save/debounce) using **task-conductor** skill.
 - [x] Resolve `Game` dual API (`buildNextGame` + `applyFrom` + return): pure successors only **or** documented enforced contract plus `src/models/ARCHITECTURE.md` / tests using **task-conductor** skill.
 - [x] Add `useGameSnapshotBridge` unit tests (prop swap, `setGameSnapshot` / `getGameSnapshot`) using **task-conductor** skill.
-- [ ] Refresh `src/models/ARCHITECTURE.md` and `src/canvas/ARCHITECTURE.md` for final `Game` + snapshot decisions using **task-conductor** skill.
+- [x] Refresh `src/models/ARCHITECTURE.md` and `src/canvas/ARCHITECTURE.md` for final `Game` + snapshot decisions using **task-conductor** skill.
 - [ ] Clean up `Game` constructor comments (remove AI-style wording, fix typos) using **task-conductor** skill.
 - [ ] **Phase Gate**: Run `npm run test:ci` and `npm run test:e2e:ci`, then checkpoint using **project-orchestrator** skill.
 
