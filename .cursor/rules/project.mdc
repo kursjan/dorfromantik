@@ -53,6 +53,9 @@ alwaysApply: true
     - Moving to the next Conductor task,
     - Or making further non-trivial edits,
 - Respect phrases like "lgtm", "sgtm", "approved" as signals that the user is satisfied.
+- Approval marker uses a moving Git tag per branch: `approved/<branch-name>` (e.g. `approved/worker1`, `approved/worker2`).
+  - On approval, move that tag to the latest approved commit on the current branch.
+  - Keep one current approval pointer per branch (history can be recovered from commits/PR discussion).
 
 # Terminal & Working Directory
 
