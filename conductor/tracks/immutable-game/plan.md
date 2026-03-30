@@ -18,7 +18,7 @@ Refactor `Board` and `Game` models to be immutable to align with React state man
 ## Phase 3: Integration & Test Suite Cleanup
 
 - [x] Update `GameSerializer.ts` and its tests to handle immutable reconstruction using **task-conductor** skill.
-- [ ] Update `CanvasController.ts` to manage the mutable reference to the immutable `activeGame` using **task-conductor** skill.
+- [x] Update `CanvasController.ts` to manage the mutable reference to the immutable `activeGame` using **task-conductor** skill.
 - [ ] Update remaining test files (`PlacementValidator.test.ts`, `GameScorer.test.ts`, `BoardNavigation.test.ts`, `src/printers/*.test.ts`) using **task-conductor** skill.
 - [ ] **Phase Gate**: Run full CI verification (`npm run test:ci`) and sync state using **project-orchestrator** skill.
 

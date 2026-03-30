@@ -35,7 +35,8 @@ export class CanvasController {
   private static readonly ROTATION_SPEED = 0.05;
   private static readonly ZOOM_SENSITIVITY = 0.001;
 
-  private readonly activeGame: Game;
+  /** Current game snapshot; reassigned when a move returns a new immutable `Game` instance. */
+  private activeGame: Game;
   private readonly backgroundRenderer: BackgroundRenderer;
   private readonly canvas: HTMLCanvasElement;
   private readonly camera: Camera;
@@ -52,13 +53,16 @@ export class CanvasController {
   public onStatsChange?: (score: number, remainingTurns: number, nextTile: Tile | null) => void;
   public onTilePlaced?: () => void;
 
+  private readonly onActiveGameChange?: (game: Game) => void;
+
   constructor(
     canvas: HTMLCanvasElement,
     activeGame: Game,
-    options?: { onToggleDebugOverlay?: () => void }
+    options?: { onToggleDebugOverlay?: () => void; onActiveGameChange?: (game: Game) => void }
   ) {
     this.canvas = canvas;
     this.activeGame = activeGame;
+    this.onActiveGameChange = options?.onActiveGameChange;
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Could not get 2d context');
     this.ctx = ctx;
@@ -250,19 +254,25 @@ export class CanvasController {
     const activeGame = this.activeGame;
 
     if (activeGame.inProgress() && this.hoveredHex && this.isValidPlacement(this.hoveredHex)) {
-      activeGame.placeTile(this.hoveredHex);
+      const { game: nextGame } = activeGame.placeTile(this.hoveredHex);
+      this.activeGame = nextGame;
+      this.onActiveGameChange?.(nextGame);
       this.notifyStatsChange();
       this.onTilePlaced?.();
     }
   }
 
   private handleRotateClockwise() {
-    this.activeGame.rotateQueuedTileClockwise();
+    const nextGame = this.activeGame.rotateQueuedTileClockwise();
+    this.activeGame = nextGame;
+    this.onActiveGameChange?.(nextGame);
     this.notifyStatsChange();
   }
 
   private handleRotateCounterClockwise() {
-    this.activeGame.rotateQueuedTileCounterClockwise();
+    const nextGame = this.activeGame.rotateQueuedTileCounterClockwise();
+    this.activeGame = nextGame;
+    this.onActiveGameChange?.(nextGame);
     this.notifyStatsChange();
   }
 

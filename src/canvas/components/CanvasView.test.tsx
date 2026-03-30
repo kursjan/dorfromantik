@@ -10,6 +10,7 @@ import { CanvasView } from './CanvasView';
 import { ServiceProvider } from '../../services/ServiceProvider';
 import { InMemoryAuthService } from '../../services/auth/InMemoryAuthService';
 import { InMemoryFirestoreService } from '../../services/firestore/InMemoryFirestoreService';
+import { ActiveGameContext } from '../../context/SessionContext';
 
 vi.mock('../engine/CanvasController', () => {
   const mockSnapshot = {
@@ -44,7 +45,9 @@ describe('CanvasView', () => {
   function renderWithProvider(ui: React.ReactElement) {
     return render(
       <ServiceProvider authService={authService} firestoreService={firestoreService}>
-        {ui}
+        <ActiveGameContext.Provider value={{ activeGame: game, setActiveGame: vi.fn() }}>
+          {ui}
+        </ActiveGameContext.Provider>
       </ServiceProvider>
     );
   }

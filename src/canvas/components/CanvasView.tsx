@@ -5,6 +5,7 @@ import { GameHUD } from './GameHUD';
 import { DebugOverlay } from './DebugOverlay';
 import { Game } from '../../models/Game';
 import type { Tile } from '../../models/Tile';
+import { useActiveGame } from '../../context/SessionContext';
 
 interface CanvasViewProps {
   activeGame: Game;
@@ -13,6 +14,7 @@ interface CanvasViewProps {
 }
 
 export const CanvasView: React.FC<CanvasViewProps> = ({ activeGame, onTilePlaced }) => {
+  const { setActiveGame } = useActiveGame();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const controllerRef = useRef<CanvasController | null>(null);
 
@@ -24,15 +26,28 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ activeGame, onTilePlaced
   const [debugOverlayVisible, setDebugOverlayVisible] = useState(false);
 
   useEffect(() => {
+    setScore(activeGame.score);
+    setRemainingTurns(activeGame.remainingTurns);
+    setNextTile(activeGame.peek() ?? null);
+    // Sync HUD from props only when switching games; in-session updates come from onStatsChange.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: do not reset HUD on every immutable snapshot
+  }, [activeGame.id]);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const newController = new CanvasController(canvas, activeGame, {
       onToggleDebugOverlay: () => setDebugOverlayVisible((v) => !v),
+      onActiveGameChange: setActiveGame,
     });
     setController(newController);
 
-    newController.onStatsChange = (newScore: number, newTurns: number, newNextTile: Tile | null) => {
+    newController.onStatsChange = (
+      newScore: number,
+      newTurns: number,
+      newNextTile: Tile | null
+    ) => {
       setScore(newScore);
       setRemainingTurns(newTurns);
       setNextTile(newNextTile);
@@ -48,7 +63,9 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ activeGame, onTilePlaced
       controllerRef.current = null;
       setController(null);
     };
-  }, [activeGame, onTilePlaced]);
+    // Recreate controller only when switching games (id), not on every immutable snapshot of the same session.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- activeGame identity updates every move; controller applies snapshots via onActiveGameChange
+  }, [activeGame.id, onTilePlaced, setActiveGame]);
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
