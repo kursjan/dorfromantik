@@ -1,13 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { startTestGame } from './test-utils';
+import { waitForDevCanvasController } from './waitForDevCanvasController';
 
 test.describe('DebugOverlay', () => {
   test.beforeEach(async ({ page }) => {
-    // 1. Go to the app and start game
     await startTestGame(page);
-
-    // 2. Wait for the controller to be initialized (published on window in dev)
-    await page.waitForFunction(() => (window as any).canvasCtrl !== undefined);
+    await waitForDevCanvasController(page);
   });
 
   test('should be hidden by default', async ({ page }) => {
