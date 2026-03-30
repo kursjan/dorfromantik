@@ -54,8 +54,8 @@ Address `REVIEW_FEEDBACK.md`: persistence / autosave, `Game` contract vs `spec.m
 
 Second full `main...HEAD` review after Phase 6; use a distinct findings filename from Phase 5 (e.g. `REVIEW_FEEDBACK_post_rework.md`) so both passes stay comparable.
 
-- [ ] Perform a rigorous file-by-file review of all changes in this branch against `main` using **quick-review** skill.
-- [ ] Triage second-pass findings: extend Phase 6-style rework if major issues remain; otherwise queue minor fixes for Phase 8 using **task-conductor** skill.
+- [x] Perform a rigorous file-by-file review of all changes in this branch against `main` using **quick-review** skill.
+- [x] Triage second-pass findings: extend Phase 6-style rework if major issues remain; otherwise queue minor fixes for Phase 8 using **task-conductor** skill.
 - [ ] **Approval Gate**: Stop after writing/triaging the second review and wait for explicit maintainer approval before starting Phase 8 (handled via **project-orchestrator** skill).
 
 ## Phase 8: Final track handoff
