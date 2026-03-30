@@ -2,7 +2,7 @@
 
 ## Problem
 
-`Game` and `Board` models are currently mutated in place during play (placing tiles, rotating the queue, etc.). React components like `CanvasView` do not observe these mutations directly and instead rely on imperative bridges (e.g., `CanvasController.onStatsChange`) to sync state. This duplicates the source of truth and makes it easy to introduce synchronization bugs when adding new UI elements.
+`Game` and `Board` models are currently mutated in place during play (placing tiles, rotating the queue, etc.). React components like `CanvasView` do not observe these mutations directly and instead rely on imperative bridges (historically e.g. stats callbacks) to sync state. The target model is a **single source of truth**: `CanvasController` uses **`getActiveGame` / `setActiveGame`** so the canonical `Game` snapshot lives in React context, not duplicated on the controller.
 
 ## Goals
 

@@ -22,7 +22,17 @@ Refactor `Board` and `Game` models to be immutable to align with React state man
 - [x] Update remaining test files (`PlacementValidator.test.ts`, `GameScorer.test.ts`, `BoardNavigation.test.ts`, `src/printers/*.test.ts`) using **task-conductor** skill.
 - [x] **Phase Gate**: Run full CI verification (`npm run test:ci`) and sync state using **project-orchestrator** skill.
 
-## Phase 4: Adversarial Review
+## Phase 4: Canvas game snapshot API (single source of truth)
+
+Replace mirrored `Game` state and dual callbacks (`onStatsChange` + `onActiveGameChange`) with **`getActiveGame` + `setActiveGame` only**: React owns the canonical snapshot; the controller reads via a getter (backed by a ref updated synchronously when setting the snapshot so the rAF loop never lags a frame).
+
+- [x] Refactor `CanvasController.ts` to take `getActiveGame` and `setActiveGame` in constructor options; remove `this.activeGame`, `onStatsChange`, and `onActiveGameChange`; use the getter for all reads; after place/rotate call `setActiveGame(next)` only using **task-conductor** skill.
+- [x] Refactor `CanvasView.tsx`: keep a ref to the latest `Game`; wrap `setActiveGame` so the ref updates **synchronously** with each new snapshot; derive HUD from `activeGame` (remove `onStatsChange` wiring); keep controller lifecycle keyed by `activeGame.id` using **task-conductor** skill.
+- [x] Update `CanvasController.test.ts` and `CanvasView.test.ts` for the new constructor API and assertions using **task-conductor** skill.
+- [x] Update `src/canvas/ARCHITECTURE.md` (and this track’s `spec.md` if the “bridge” wording should match) for the snapshot API using **task-conductor** skill.
+- [ ] **Phase Gate**: Run `npm run test:unit`, `npm run test:ci`, and `npm run test:e2e:ci`, then checkpoint using **project-orchestrator** skill.
+
+## Phase 5: Adversarial Review
 
 - [ ] Perform a rigorous file-by-file review of all changes in this branch against `main` using **quick-review** skill.
 - [ ] Address any feedback from `REVIEW_FEEDBACK.md` using **task-conductor** skill.

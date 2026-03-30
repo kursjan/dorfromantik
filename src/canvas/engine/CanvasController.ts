@@ -12,13 +12,19 @@ import {
   INVALID_PREVIEW_STYLE,
   VALID_PLACEMENT_STYLE,
 } from '../graphics/HexStyles';
-import { Tile } from '../../models/Tile';
 import { Game } from '../../models/Game';
 
 export interface DebugStats {
   fps: number;
   camera: { x: number; y: number; zoom: number; rotation: number };
   hoveredHex: HexCoordinate | null;
+}
+
+export interface CanvasControllerOptions {
+  /** Latest immutable game snapshot (typically backed by a React ref updated in sync with context). */
+  getActiveGame: () => Game;
+  setActiveGame: (game: Game) => void;
+  onToggleDebugOverlay?: () => void;
 }
 
 interface DebugState {
@@ -35,8 +41,9 @@ export class CanvasController {
   private static readonly ROTATION_SPEED = 0.05;
   private static readonly ZOOM_SENSITIVITY = 0.001;
 
-  /** Current game snapshot; reassigned when a move returns a new immutable `Game` instance. */
-  private activeGame: Game;
+  private readonly getActiveGame: () => Game;
+  private readonly setActiveGame: (game: Game) => void;
+
   private readonly backgroundRenderer: BackgroundRenderer;
   private readonly canvas: HTMLCanvasElement;
   private readonly camera: Camera;
@@ -49,20 +56,12 @@ export class CanvasController {
   private debugState: DebugState = CanvasController.createDefaultDebugState();
   private hoveredHex: HexCoordinate | null = null;
 
-  // Callbacks for React synchronization
-  public onStatsChange?: (score: number, remainingTurns: number, nextTile: Tile | null) => void;
   public onTilePlaced?: () => void;
 
-  private readonly onActiveGameChange?: (game: Game) => void;
-
-  constructor(
-    canvas: HTMLCanvasElement,
-    activeGame: Game,
-    options?: { onToggleDebugOverlay?: () => void; onActiveGameChange?: (game: Game) => void }
-  ) {
+  constructor(canvas: HTMLCanvasElement, options: CanvasControllerOptions) {
     this.canvas = canvas;
-    this.activeGame = activeGame;
-    this.onActiveGameChange = options?.onActiveGameChange;
+    this.getActiveGame = options.getActiveGame;
+    this.setActiveGame = options.setActiveGame;
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Could not get 2d context');
     this.ctx = ctx;
@@ -80,7 +79,7 @@ export class CanvasController {
       onRotateClockwise: () => this.handleRotateClockwise(),
       onRotateCounterClockwise: () => this.handleRotateCounterClockwise(),
       onResize: () => this.handleResize(),
-      onToggleDebugOverlay: options?.onToggleDebugOverlay,
+      onToggleDebugOverlay: options.onToggleDebugOverlay,
     });
 
     // Handle Resize (Initial)
@@ -138,7 +137,7 @@ export class CanvasController {
   }
 
   private render() {
-    const activeGame = this.activeGame;
+    const activeGame = this.getActiveGame();
     if (!activeGame) {
       throw new Error('No active game found in session');
     }
@@ -203,13 +202,6 @@ export class CanvasController {
     this.debugState.listeners.forEach((listener) => listener());
   }
 
-  private notifyStatsChange() {
-    const activeGame = this.activeGame;
-    if (this.onStatsChange) {
-      this.onStatsChange(activeGame.score, activeGame.remainingTurns, activeGame.peek() || null);
-    }
-  }
-
   // --- Input Handlers ---
 
   private handlePan(dx: number, dy: number) {
@@ -232,7 +224,7 @@ export class CanvasController {
       this.canvas.height
     );
 
-    const validCoords = this.activeGame.hints.validPlacements;
+    const validCoords = this.getActiveGame().hints.validPlacements;
 
     if (validCoords.length === 0) {
       this.hoveredHex = null;
@@ -251,29 +243,23 @@ export class CanvasController {
   }
 
   private handleMouseClick() {
-    const activeGame = this.activeGame;
+    const activeGame = this.getActiveGame();
 
     if (activeGame.inProgress() && this.hoveredHex && this.isValidPlacement(this.hoveredHex)) {
       const { game: nextGame } = activeGame.placeTile(this.hoveredHex);
-      this.activeGame = nextGame;
-      this.onActiveGameChange?.(nextGame);
-      this.notifyStatsChange();
+      this.setActiveGame(nextGame);
       this.onTilePlaced?.();
     }
   }
 
   private handleRotateClockwise() {
-    const nextGame = this.activeGame.rotateQueuedTileClockwise();
-    this.activeGame = nextGame;
-    this.onActiveGameChange?.(nextGame);
-    this.notifyStatsChange();
+    const nextGame = this.getActiveGame().rotateQueuedTileClockwise();
+    this.setActiveGame(nextGame);
   }
 
   private handleRotateCounterClockwise() {
-    const nextGame = this.activeGame.rotateQueuedTileCounterClockwise();
-    this.activeGame = nextGame;
-    this.onActiveGameChange?.(nextGame);
-    this.notifyStatsChange();
+    const nextGame = this.getActiveGame().rotateQueuedTileCounterClockwise();
+    this.setActiveGame(nextGame);
   }
 
   private handleResize() {
@@ -286,7 +272,7 @@ export class CanvasController {
   // --- Helpers ---
 
   private isValidPlacement(coord: HexCoordinate): boolean {
-    return this.activeGame.isValidPlacement(coord);
+    return this.getActiveGame().isValidPlacement(coord);
   }
 
   private static createDefaultDebugState(): DebugState {
