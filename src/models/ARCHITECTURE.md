@@ -44,13 +44,14 @@ The `Game` class is the central orchestrator of an active game.
 - **State**: Tracks the `Board`, `Score`, `TileQueue`, and `GameHints`.
 - **Turns as Tiles**: The game follows a "Tiles are Turns" philosophy. `remainingTurns` is a derived property of `tileQueue.length`.
 - **GameHints**: Caches derived hints, such as `validPlacements`, to avoid recalculating complex board state on every frame. Invalidates cache on `placeTile` and tile rotation.
+- **Immutable transitions**: State-changing methods return a **new** `Game` snapshot and do not mutate the receiver. Callers should always use the returned instance (`result.game` from `placeTile`, return value from rotate methods) as the canonical next state.
 - **Lifecycle**:
   - **Start**: Typically created via static factory methods: `Game.create(rules)`. These methods handle initializing the `Board` and placing the initial "starter" tile at the origin `(0, 0, 0)`. In the current architecture, these factories are called by page components (e.g., `MainMenu`).
   - **Active**: Managed within the `ActiveGameContext`.
   - **Logic**:
     - **`isValidPlacement(coord)`**: Checks if a hex is empty, adjacent to at least one existing tile, and that strict edges (e.g., `water`, `rail`) match perfectly. It delegates to `PlacementValidator`. Used for UI validation and Ghost Preview.
-    - **`placeTile(coord)`**: The primary game action. It places a tile, delegates scoring to `GameScorer`, and updates the score and queue.
-    - **`rotateQueuedTileClockwise()` / `rotateQueuedTileCounterClockwise()`**: Rotates the tile currently at the head of the queue.
+    - **`placeTile(coord)`**: The primary game action. It places a tile, delegates scoring to `GameScorer`, and returns `PlacementResult` with `game` (the next immutable snapshot).
+    - **`rotateQueuedTileClockwise()` / `rotateQueuedTileCounterClockwise()`**: Rotate the tile currently at the head of the queue and return the next immutable snapshot.
     - **`peek()`**: Allows the UI to preview the next tile in the queue.
 
 ### 7. Scoring Logic (`GameScorer.ts`)

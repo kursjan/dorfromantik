@@ -192,6 +192,7 @@ describe('Game', () => {
       const rotated = nextGame.peek()!;
       expect(rotated.north.id).toBe('house');
       expect(nextGame.remainingTurns).toBe(1);
+      expect(game.peek()).toBe(tile);
     });
 
     it('should rotate the next tile in the queue counter-clockwise and return the next game snapshot', () => {
@@ -218,6 +219,7 @@ describe('Game', () => {
       const rotated = nextGame.peek()!;
       expect(rotated.north.id).toBe('field');
       expect(nextGame.remainingTurns).toBe(1);
+      expect(game.peek()).toBe(tile);
     });
 
     it('should throw error if queue is empty', () => {
@@ -280,6 +282,9 @@ describe('Game', () => {
       expect(nextGame.tileQueue.length).toBe(2);
       expect(nextGame.tileQueue[0]).toBe(expectedBonus1);
       expect(nextGame.tileQueue[1]).toBe(expectedBonus2);
+      expect(game.score).toBe(0);
+      expect(game.remainingTurns).toBe(1);
+      expect(game.board.get(coord)).toBeUndefined();
 
       scoreSpy.mockRestore();
     });

@@ -46,14 +46,14 @@ export class Game {
     });
   }
 
-  board: Board;
+  readonly board: Board;
   readonly rules: GameRules;
   readonly id: string;
   readonly name: string;
-  lastPlayed: string;
-  score: number;
-  tileQueue: Tile[];
-  hints: GameHints;
+  readonly lastPlayed: string;
+  readonly score: number;
+  readonly tileQueue: Tile[];
+  readonly hints: GameHints;
 
   private scorer: GameScorer;
 
@@ -111,9 +111,7 @@ export class Game {
     const tileQueue = [...this.tileQueue];
     tileQueue[0] = tile.rotateClockwise();
 
-    const nextGame = this.buildNextGame({ tileQueue });
-    this.applyFrom(nextGame);
-    return nextGame;
+    return this.buildNextGame({ tileQueue });
   }
 
   /**
@@ -129,9 +127,7 @@ export class Game {
     const tileQueue = [...this.tileQueue];
     tileQueue[0] = tile.rotateCounterClockwise();
 
-    const nextGame = this.buildNextGame({ tileQueue });
-    this.applyFrom(nextGame);
-    return nextGame;
+    return this.buildNextGame({ tileQueue });
   }
 
   /**
@@ -170,15 +166,13 @@ export class Game {
       tileQueue.push(this.rules.tileGenerator.createTile());
     }
 
-    const nextGame = this.buildNextGame({
+    const game = this.buildNextGame({
       board: newBoard,
       tileQueue,
       score: this.score + scoreAdded,
       lastPlayed: new Date().toISOString(),
     });
-    this.applyFrom(nextGame);
-
-    return { scoreAdded, perfectCount, game: nextGame };
+    return { scoreAdded, perfectCount, game };
   }
 
   private buildNextGame(overrides: Partial<GameProps>): Game {
@@ -191,13 +185,5 @@ export class Game {
       score: overrides.score ?? this.score,
       tileQueue: overrides.tileQueue ?? this.tileQueue,
     });
-  }
-
-  private applyFrom(nextGame: Game): void {
-    this.board = nextGame.board;
-    this.lastPlayed = nextGame.lastPlayed;
-    this.score = nextGame.score;
-    this.tileQueue = nextGame.tileQueue;
-    this.hints = nextGame.hints;
   }
 }
