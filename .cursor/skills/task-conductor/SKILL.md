@@ -17,6 +17,7 @@ Use this skill for any **coding or implementation task** defined in a Conductor 
    - Open the relevant `conductor/tracks/<track_id>/plan.md`.
    - Identify the **current phase** (the one containing unchecked tasks).
    - Select the **next uncompleted task** in that phase.
+   - Mark the current task as in progress: `- [~]` for that line only
    - Do not modify tasks from other phases.
 
 2. **Execution**
@@ -35,7 +36,7 @@ Use this skill for any **coding or implementation task** defined in a Conductor 
 
 4. **Persistence & Tracking**
    - Update the track’s `plan.md`:
-     - Mark the current task as completed: change `- [ ]` to `- [x]` for that line only.
+     - Mark the current task as completed: change `- [~]` or `- [ ]` to `- [x]` for that line only (clear the in-progress marker).
      - Do not alter unrelated tasks.
    - Commit the changes for this task **immediately after verification**:
      - Use a concise commit message that references the task and (optionally) the GitHub issue, e.g.:
