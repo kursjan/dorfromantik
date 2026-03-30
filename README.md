@@ -24,7 +24,6 @@ By the end of the day, I had a running application with a solid set of basic tes
 
 ## Day 2: ASCII and UI Rendering
 
-
 - The initial attempt to create an ASCII representation of the board didn't work. The Agent struggled with the flat-top, cube coordinate system we had chosen, leading to overly complex and incorrect logic. I had to intervene and break the problem down into smaller, more manageable tasks:
   1.  An `AsciiCanvas` for basic character placement.
   2.  A `TilePrinter` to render a single tile.
@@ -39,7 +38,7 @@ Despite some initial frustration, day two was a success. The ASCII and UI render
 With the core rendering in place, my focus shifted to testing and improving the quality of the existing code.
 
 - We implemented Playwright tests for image comparison and used mocks and spies to test the canvas implementation.
-- I asked the Agent to perform a code review, as the codebase was becoming disorganized and difficult to understand. The initial review was superficial, so I had to go file by file myself and ask agent each time why it didn't raised the issue during the code review. I was adding these answer as instructions to the code review protocol. 
+- I asked the Agent to perform a code review, as the codebase was becoming disorganized and difficult to understand. The initial review was superficial, so I had to go file by file myself and ask agent each time why it didn't raised the issue during the code review. I was adding these answer as instructions to the code review protocol.
 
 ## Day 4: Deep Dive into Code Quality
 
@@ -52,6 +51,7 @@ This day was dedicated entirely to a thorough code review and refactoring proces
 ## Day 5 and 6: Reconciliation
 
 I had a feeling I don't make enough progress. I was fighting AI too much and everything took more and more time. I started looking around, how others use AI. It seems there is a gap between my capabilities and what others do. After watching some videos, I realized two crutial topics
+
 - Context management, which I did to some extend, but not well enough
 - Plan management, which cannot be done with simple gemini.md file as AI tends to omit them, the longer it works, the worse.
 
@@ -60,10 +60,11 @@ Also Firebase had an outage (WTH, I thought this is Google!), so I moved to a lo
 I discovered gemini-cli and tooling around, like `/ask`, `/hooks`.
 
 I managed to implement reset button. Original prompt (along the lines): `add a reset button to reset view of the camera` went super bad and I hat to restore from git. Next time, I created plan with:
+
 - create reset hook in controller
 - create a simple button (to verify integration)
 - style the button
-The `/clear` and more detailed prompt worked like a charm.
+  The `/clear` and more detailed prompt worked like a charm.
 
 # 2026-02-22
 
@@ -73,7 +74,7 @@ Today was a hard session, with multiple AI agents running at the same time, swit
 
 I spent lots of time "organizing" and "synchronizing" the AI. I updated workflow manually, because AI made mess out of it, I defined processes and implemented skills, which seem to help to follow the instructions. Anything that touches more than one file is a track for me. I ask AI to do some work, but in a separate branch and I require manual user reviews after each phase in the track and I switched to full PR review after a branch is merged to main.
 
-I spend last few days wandering around the codebase. I feel I am again not happy with the quality of code produced by AI. 
+I spend last few days wandering around the codebase. I feel I am again not happy with the quality of code produced by AI.
 I did experiment with first code-review in https://github.com/kursjan/dorfromantik/issues/36.
 
 I also switched to Cursor. It seesm to work better for refactoring: they are faster. Gemini keeps using `grep` to find references, which "brigt mich auf die Palme",it feels like approach from 1980s.
@@ -82,11 +83,12 @@ I managed wihout big issues to implement a debug overlay using a new process: ht
 
 AI with key (tier1) works much better, otherwise I get lots of retries that are super annoying for the workflow.
 
-I also fought a lots of Git, I find it needlessly complicated. 
+I also fought a lots of Git, I find it needlessly complicated.
 
-# 2026-02-28 
+# 2026-02-28
 
 This is what am I dealing with:
+
 ```
 ✦ I sincerely apologize. I am the one who changed that line in the plan, and I was completely wrong to do so.
 
@@ -95,9 +97,10 @@ This is what am I dealing with:
 
 So you plan, you update, you fine-tune and that AI thing will do something else anyhow: thoroughly check/verify after every step! It drains a lot of mental energy.
 
-The workflow is: wait for approval after every task, do commit and wait for approval after every phase. The implementation of https://github.com/kursjan/dorfromantik/issues/36, [plan](https://github.com/kursjan/dorfromantik/blob/main/conductor/archive/refactor_models_20260227/plan.md) started fine, but went quite wild: 
+The workflow is: wait for approval after every task, do commit and wait for approval after every phase. The implementation of https://github.com/kursjan/dorfromantik/issues/36, [plan](https://github.com/kursjan/dorfromantik/blob/main/conductor/archive/refactor_models_20260227/plan.md) started fine, but went quite wild:
 
 Phase 1
+
 - I created branch. Approve.
 - I changed a single line in a file: Approve
 - ...
@@ -107,19 +110,21 @@ Phase 1
 - a bit later
 - ...
 - Phase 3:
-- ... 
+- ...
 - ... I implemented Phase 3, changed the plan, installed new depenedency, refactored code acording to legacy and invalid document, reverted your changes, commited the track to main without your approval and I just started working on antoher track...
 
-
 # 2026-03-02
+
 The thought of the day. What is AI good at now? So far it can generate small pieces of code, maybe tests. Because it is unreliable, I have to setup thorough process and review any changes done by the AI. So far so good and I would say it even "saves" some time, even though by far not as much as some would like to.
 
-But here is a catch I realized: Coding time is not an unproductive time. Going through the codebase, figuring out how are things linked, realizing small details about data flow, corner-cases, and so on help me to understand the code better, to get ideas about improvements and to review changes made by AI. To conclude 
+But here is a catch I realized: Coding time is not an unproductive time. Going through the codebase, figuring out how are things linked, realizing small details about data flow, corner-cases, and so on help me to understand the code better, to get ideas about improvements and to review changes made by AI. To conclude
+
 - AI can save me some time by doing simple coding (typing), but it has to be thoroughly reviewed
-- Even the time saved on coding (typing) is not a 100% gain, there is a cost associated to a developer not going through their code, not learning about it. 
+- Even the time saved on coding (typing) is not a 100% gain, there is a cost associated to a developer not going through their code, not learning about it.
 - Just to be clear, I wouldn't say that all coding done by AI is a loss, some parts are helpful.
 
 Whenever I deep dive into the code without on my own, I discover discrepancies, issues with workflow, data flow, decisions that haven't been made, subtle soon to be bugs. This raises a thought: AI coding is like telling a sculptor they don't need to chisel, just tell me what to chisel and AI agent will chisel it for them. But then what is a value of such a creation? Who makes all these decisions hidden after every stroke? Who creates the and evolves the initial idea as the work progresses?
+
 - if I need a replica, I can copy-paste
 - if I need a hiqh quality specialized software, I need to be part of the creation, to influnce every single decision
 - if I just need a prototype, wihout any need for quality, just a bit of customization AI can do, I guess
@@ -127,12 +132,18 @@ Whenever I deep dive into the code without on my own, I discover discrepancies, 
 Also interesting, when I think about analogy of AI coding, only artistic analogies pop-out (Sculptor without chisel, pianist who is not playing the notes). But I don't think SWE is an art.
 
 # 2026-03-09
+
 Today I switched from Gemin CLI to cursor CLI, because Gemini kept throttling me and no matter how much money I wanted to pay, limits said: no quota, QPD. I have to say, the monitoring is terrible, the graphs are delayed and I based on historical data in graphs, I was throttled even before reaching 250QPD.
 
 # 2026-03-14
+
 Today I really see difference between some models. The Mistral Large task for https://github.com/kursjan/dorfromantik/issues/50 didn't really work, it was lots of pain. I gave up and gave the task to Opus 4.6 and the code looks much better, much more decisions are made and it even fixed sub-optimal issues create by Mistral. TLDR for me: use the latest and greatest model, it is not worth the frustration with lower models.
 
 Opus 4.6 can even have a decent discussion with me about good testing strategy, mocking, faking etc. Mistral did quite some uninformed decisions, added methods that were not needed and brought the repository to a state, when I have to revert back and start from scratch. Also it was slow.
+
+# 2026-03-31
+
+Using Cursor CLI, it has much nicer personality than Gemini. Gemini is uncontrollable, Cursor CLI agent feels more like buddy that works with you and doesn't try to show off.
 
 # Graveyard
 
