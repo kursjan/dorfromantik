@@ -58,10 +58,9 @@ export class Game {
   private scorer: GameScorer;
 
   /**
-   * Instructions for AI agent:
-   * Prefer Game.create(). Use this only with an explcit approval of the project owner.
-   *
    * Creates a new instance of Game.
+   * Prefer {@link Game.create} for new sessions.
+   *
    * @param props - Properties to initialize the game state.
    */
   constructor(props: GameProps) {
