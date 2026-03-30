@@ -22,7 +22,7 @@ export interface DebugStats {
 
 export interface CanvasControllerOptions {
   /** Latest immutable game snapshot (typically backed by a React ref updated in sync with context). */
-  getActiveGame: () => Game;
+  getGameSnapshot: () => Game;
   /** Commit the next immutable `Game` after place/rotate (e.g. ref + context setter from the view bridge). */
   setGameSnapshot: (game: Game) => void;
   onToggleDebugOverlay?: () => void;
@@ -42,7 +42,7 @@ export class CanvasController {
   private static readonly ROTATION_SPEED = 0.05;
   private static readonly ZOOM_SENSITIVITY = 0.001;
 
-  private readonly getActiveGame: () => Game;
+  private readonly getGameSnapshot: () => Game;
   private readonly setGameSnapshot: (game: Game) => void;
 
   private readonly backgroundRenderer: BackgroundRenderer;
@@ -61,7 +61,7 @@ export class CanvasController {
 
   constructor(canvas: HTMLCanvasElement, options: CanvasControllerOptions) {
     this.canvas = canvas;
-    this.getActiveGame = options.getActiveGame;
+    this.getGameSnapshot = options.getGameSnapshot;
     this.setGameSnapshot = options.setGameSnapshot;
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Could not get 2d context');
@@ -138,7 +138,7 @@ export class CanvasController {
   }
 
   private render() {
-    const activeGame = this.getActiveGame();
+    const activeGame = this.getGameSnapshot();
     if (!activeGame) {
       throw new Error('No active game found in session');
     }
@@ -225,7 +225,7 @@ export class CanvasController {
       this.canvas.height
     );
 
-    const validCoords = this.getActiveGame().hints.validPlacements;
+    const validCoords = this.getGameSnapshot().hints.validPlacements;
 
     if (validCoords.length === 0) {
       this.hoveredHex = null;
@@ -244,7 +244,7 @@ export class CanvasController {
   }
 
   private handleMouseClick() {
-    const activeGame = this.getActiveGame();
+    const activeGame = this.getGameSnapshot();
 
     if (activeGame.inProgress() && this.hoveredHex && this.isValidPlacement(this.hoveredHex)) {
       const { game: nextGame } = activeGame.placeTile(this.hoveredHex);
@@ -254,12 +254,12 @@ export class CanvasController {
   }
 
   private handleRotateClockwise() {
-    const nextGame = this.getActiveGame().rotateQueuedTileClockwise();
+    const nextGame = this.getGameSnapshot().rotateQueuedTileClockwise();
     this.setGameSnapshot(nextGame);
   }
 
   private handleRotateCounterClockwise() {
-    const nextGame = this.getActiveGame().rotateQueuedTileCounterClockwise();
+    const nextGame = this.getGameSnapshot().rotateQueuedTileCounterClockwise();
     this.setGameSnapshot(nextGame);
   }
 
@@ -273,7 +273,7 @@ export class CanvasController {
   // --- Helpers ---
 
   private isValidPlacement(coord: HexCoordinate): boolean {
-    return this.getActiveGame().isValidPlacement(coord);
+    return this.getGameSnapshot().isValidPlacement(coord);
   }
 
   private static createDefaultDebugState(): DebugState {

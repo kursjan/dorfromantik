@@ -15,7 +15,7 @@ interface CanvasViewProps {
 
 export const CanvasView: React.FC<CanvasViewProps> = ({ activeGame, onTilePlaced }) => {
   const { setActiveGame } = useActiveGame();
-  const { getActiveGame, setGameSnapshot } = useGameSnapshotBridge(activeGame, setActiveGame);
+  const { getGameSnapshot, setGameSnapshot } = useGameSnapshotBridge(activeGame, setActiveGame);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const controllerRef = useRef<CanvasController | null>(null);
@@ -28,7 +28,7 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ activeGame, onTilePlaced
     if (!canvas) return;
 
     const newController = new CanvasController(canvas, {
-      getActiveGame,
+      getGameSnapshot,
       setGameSnapshot,
       onToggleDebugOverlay: () => setDebugOverlayVisible((v) => !v),
     });
@@ -43,8 +43,8 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ activeGame, onTilePlaced
       controllerRef.current = null;
       setController(null);
     };
-    // Recreate controller when switching games (id), not on every immutable snapshot — latest game is read via getActiveGame.
-  }, [activeGame.id, onTilePlaced, getActiveGame, setGameSnapshot]);
+    // Recreate controller when switching games (id), not on every immutable snapshot — latest game is read via getGameSnapshot.
+  }, [activeGame.id, onTilePlaced, getGameSnapshot, setGameSnapshot]);
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>

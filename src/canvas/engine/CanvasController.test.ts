@@ -39,7 +39,7 @@ describe('CanvasController', () => {
 
   function makeControllerOptions(onSet?: (g: Game) => void) {
     return {
-      getActiveGame: () => activeGame,
+      getGameSnapshot: () => activeGame,
       setGameSnapshot: (g: Game) => {
         activeGame = g;
         onSet?.(g);
@@ -187,7 +187,7 @@ describe('CanvasController', () => {
   it('should throw error in render if active game is missing', () => {
     let missing = false;
     controller = new CanvasController(canvas, {
-      getActiveGame: () => (missing ? (undefined as unknown as Game) : activeGame),
+      getGameSnapshot: () => (missing ? (undefined as unknown as Game) : activeGame),
       setGameSnapshot: (g: Game) => {
         activeGame = g;
       },
