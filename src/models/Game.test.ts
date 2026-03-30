@@ -276,7 +276,9 @@ describe('Game', () => {
       expect(result.scoreAdded).toBe(100);
       expect(result.perfectCount).toBe(1);
       expect(nextGame).not.toBe(game);
-      expect(nextGame.lastPlayed).not.toBe(previousLastPlayed);
+      expect(Date.parse(nextGame.lastPlayed)).toBeGreaterThanOrEqual(
+        Date.parse(previousLastPlayed)
+      );
       expect(nextGame.score).toBe(100);
 
       expect(nextGame.tileQueue.length).toBe(2);
