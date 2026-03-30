@@ -11,10 +11,18 @@ describe('GameSerializer', () => {
   it('should accurately serialize and deserialize a new game', () => {
     // 1. Setup a basic game
     const rules = GameRules.createStandard();
-    const game = Game.create(rules);
+    const created = Game.create(rules);
 
-    // Give the game a custom name and change the score to ensure those fields are captured
-    Object.assign(game, { name: 'Test Serialization Game', score: 100 });
+    // Immutable-style snapshot: new Game instance with updated metadata
+    const game = new Game({
+      id: created.id,
+      name: 'Test Serialization Game',
+      lastPlayed: created.lastPlayed,
+      board: created.board,
+      rules: created.rules,
+      score: 100,
+      tileQueue: created.tileQueue,
+    });
 
     // 2. Serialize
     const json: GameJSON = GameSerializer.serialize(game);
@@ -76,13 +84,13 @@ describe('GameSerializer', () => {
   it('should accurately serialize and deserialize an in-progress game with placed tiles', () => {
     // 1. Setup a game and play a few turns
     const rules = GameRules.createTest();
-    const game = Game.create(rules);
+    let game = Game.create(rules);
 
-    // Place a tile
-    game.placeTile(new HexCoordinate(1, -1, 0));
-    game.placeTile(new HexCoordinate(0, -1, 1));
-    game.placeTile(new HexCoordinate(-1, 0, 1));
-    game.placeTile(new HexCoordinate(-1, 1, 0));
+    // Chain placements via returned snapshots (aligns with immutable game transitions)
+    game = game.placeTile(new HexCoordinate(1, -1, 0)).game;
+    game = game.placeTile(new HexCoordinate(0, -1, 1)).game;
+    game = game.placeTile(new HexCoordinate(-1, 0, 1)).game;
+    game = game.placeTile(new HexCoordinate(-1, 1, 0)).game;
 
     // 2. Serialize
     const json: GameJSON = GameSerializer.serialize(game);
@@ -100,12 +108,19 @@ describe('GameSerializer', () => {
     expect(restoredGame.board.has(new HexCoordinate(-1, 1, 0))).toBe(true);
 
     // Verify it functions correctly after deserialization (state isn't frozen/corrupt)
-    expect(() => {
-      restoredGame.placeTile(new HexCoordinate(0, 1, -1));
-    }).not.toThrow();
+    const afterRestore = restoredGame.placeTile(new HexCoordinate(0, 1, -1));
 
     // After placing another tile, board size should increase
-    expect(Array.from(restoredGame.board.getAll()).length).toBe(6);
+    expect(Array.from(afterRestore.game.board.getAll()).length).toBe(6);
+  });
+
+  it('deserialize returns a new Game instance independent of the serialized object', () => {
+    const game = Game.create(GameRules.createStandard());
+    const json = GameSerializer.serialize(game);
+    const restored = GameSerializer.deserialize(json);
+
+    expect(restored).not.toBe(game);
+    expect(restored.board).not.toBe(game.board);
   });
 
   it('preserves optional center terrain on serialization', () => {
