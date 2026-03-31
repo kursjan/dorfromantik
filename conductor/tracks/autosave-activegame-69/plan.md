@@ -6,7 +6,7 @@ Refactor autosave triggering in `GameBoard` so persistence is derived from canon
 
 - [x] Create and switch to feature branch `worker1` using **task-conductor** skill.
 - [x] Validate issue scope and acceptance criteria against `#69` using **task-conductor** skill.
-- [ ] **Phase Gate**: Confirm planning readiness and sync state using **project-orchestrator** skill.
+- [x] **Phase Gate**: Confirm planning readiness and sync state using **project-orchestrator** skill.
 
 ## Phase 2: State-driven autosave trigger
 
