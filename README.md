@@ -1,6 +1,6 @@
 # Welcome
 
-This is an Agent assisted project. I was guiding Gemini agent and I myself didn't write any code.
+This is a hobby project, to get experience coding with AI agents. The goal was to develep Dorfromantik-stle game and learn a bit of FE.
 
 # Lessons Learned
 
@@ -141,9 +141,86 @@ Today I really see difference between some models. The Mistral Large task for ht
 
 Opus 4.6 can even have a decent discussion with me about good testing strategy, mocking, faking etc. Mistral did quite some uninformed decisions, added methods that were not needed and brought the repository to a state, when I have to revert back and start from scratch. Also it was slow.
 
-# 2026-03-31
+# 2026-03-30
 
 Using Cursor CLI, it has much nicer personality than Gemini. Gemini is uncontrollable, Cursor CLI agent feels more like buddy that works with you and doesn't try to show off.
+
+I was making the Game/Board immutable today. It plays much nicer with the React overall. I am quite happy with the changes in: https://github.com/kursjan/dorfromantik/issues/65.
+
+# 2026-03-31
+
+Thoughts of the day.
+
+Will I use AI (current LLMs): yes. But one have to keep in mind that AI can genuinely save time, but not as much as we are told to. I believe, it can save genuinely up 30% of SWE development time, depending on the project maturity and programmers experience. Anything above genuine save of time is generation of tech debt in these forms:
+
+- inconsistent code (props vs options)
+- over-zelous code (if checks everywhere) null checks and ifs everyhwere. Micro-optimizations that make little sense in grand scheme of things.
+- stupid comments (3lines of comment for one line of code)
+- dev/code owner not understanding the code they produce, leading to more mixture of concepts and inconsistencies.
+- lack of abstractions: ai is great adding yet another if into the code, but it rarerly finds ways to simplify
+- degradation of architecture: code tends to degrade to long spaghetti with occasional class or helper method here and there
+- ... ???
+
+Now the question is what is actually SWE job?
+
+- writing code?
+- maintaining code?
+- understing requirements?
+- debugging?
+- responsibility/accountability?
+- judgement?
+
+I agree that current is usable for writing code and also debugging. First ask yourself, how much time you spent writing code. Likely, the more senior, the less. For a reason.
+
+But even for writing, ask yourself, what writing code encompasess and whith which parts AI can help.
+
+Humans tend to think in words. And AI can accept words and produce code. That is great. But programmers think in code. They see code they learn, and they react, they improve, abstract, re-organzie, until the code is as simple as possible, as complex as necessary.
+
+Even when writing code, every line you write, you consider it, is it necessary, why does it exist, is it in the right place? Writing itself is learning and discovering.
+
+Why do we do this? To maintain complexity and tech-debt. If we ignore abstractions and simplifications, the next feature will be harder...
+
+... I think my thought are heading to explain that there is very little of software engineering that AI can help with. There is a misunderstanding what software engineering is, and people tend to over index on producing code. But I think the real bottlenecks are somewhere else. Writing code is maybe 10% of my SWE time, the rest of it is something AI can't replace.
+
+I saved a lots of time in the beginning of the project, I produced working prototype in first three days. But I learned little about React, I introduced so much tech-debt, I am still cleaning it up
+
+## AI Tooling Gap
+
+My workflow and I believe a decent workflow for some serious professionals will be using AI as a coding buddy. The tool you explain your thoughts, it plans with you, gives you ideas or opinions and you make decisions. It prototypes the code and you together refactor, until you are happy with the code.
+
+In this workflow, I save this part the AI is good at: producing text/code. But I am involved in any othe part, I provide context, logical thinking and judgment.
+
+And there are still a gaps:
+
+- AI is way to slow. I hope there will be 10x improvements.
+- Keeping AI in certain guardrails is a pain, it keeps forgetting instructions and context. I hope there will be better agents who follow given workflow reliably.
+- Tooling still lacks: I didn't find a good way to have AI produce code, have me do a "code review", leave comments in the code and wait for the next round. One has to babysit every agent a lot to produce high quality consistent results.
+
+## AI Personalities
+
+I could stand only Claude's AI agent. It feels professional, capable and follows your instructions.
+
+Mistral was way to basic and couldnt do any more serious coding. It generated lots of mess that I have to remove and start over.
+
+Gemini is capable, but completly wild. One can't keep it within a certain guardrails and I spend lots of time frustrated, reworking what it did in one go, instead of asking for a feedback after each task, as instructed.
+
+## `Worklfow.MD` file Organization
+
+I completely failed to maintain my worklfow instructions with an AI agent.
+
+I started instructing agent to update workflow whenever I need an update and in the end, nobody could follow what the workflow is. So rewrote it from scratch, by hand.
+
+Whenever there is a gap I discover in my workflow and I ask AI agent to plug that gap, it does a terrible job. It treats yours: "maybe we shouldn't do X, but Y instead" as the most important thing in the world. It pollutes your documents with bold text and critical instructions not to od X, always do Y all over the place. While the update that I do manulally is to find that one sentence in that one paragraph and append `using Y`. It does the same job, it is simpler, but requires me.
+
+This is same with programming, AI agent does something that solves immediate problem, but fails to see things in the big picture and makes things so polluted over time, that any resemblance of structure and organization gets lots in tons of spaghetti.
+
+## Specification Driven Development
+
+Seems this is a new trend. I think it just underestimates, what is programming. I wish I knew the exact spec at the beginning of the project. But I discover 80% of problems when coding, when starting to work on a problem, I just have a slight idea and whole world of specifications to discover.
+
+Even with very simple conductor tracks I use to implement features/refactorings with AI, with clear scope, thorough planning phase, we discover issues and we add new phases in the middle of the process, because there are consequences we didn't know.
+
+This is programming, discovering these 80% while writing code and adjusting. Repeating until you wrote code you are happy with.
 
 # Graveyard
 
