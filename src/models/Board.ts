@@ -16,6 +16,13 @@ export class Board {
   private readonly tiles: ReadonlyMap<string, BoardTile>;
 
   /**
+   * Static convenience for creating a board with a single initial tile.
+   */
+  static withTile(tile: Tile, coord: HexCoordinate): Board {
+    return new Board().withTile(tile, coord);
+  }
+
+  /**
    * Creates a new instance of the Board.
    * @param tiles - An optional map of initial tiles to populate the board.
    */

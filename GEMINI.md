@@ -461,6 +461,12 @@ When requested, the AI will facilitate the creation and execution of tests, ensu
   - The AI will use Vitest as the testing framework and React Testing Library for rendering and interacting with components.
   - Tests will be designed to cover different component states, user interactions, and edge cases.
   - **Keep tests DRY** (shared helpers, setup, fixtures where it helps). **Using `for` loops in tests is discouraged** (prefer clear, explicit cases).
+  - **Test formatting conventions:**
+    - For short tests (roughly 3-6 lines in the test body), do not add `// Arrange`, `// Act`, `// Assert` comments.
+    - For very short tests (about 3 lines), keep the body compact with no extra blank lines.
+    - Use `// Arrange`, `// Act`, `// Assert` comments only when the test body is medium/long and the sections improve readability.
+    - Inside a single test body, keep blank lines only when they separate conceptual blocks.
+    - Keep standard structural spacing between tests and describe blocks (one blank line between adjacent `it(...)` and `describe(...)` blocks).
 - **Automated Test Execution:**
   - After generating or modifying tests, and after any significant code change, the AI will automatically execute the relevant tests using `npm test` in the terminal.
   - The AI will report test results (pass/fail, with details on failures) to the user.

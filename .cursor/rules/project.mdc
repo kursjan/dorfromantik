@@ -32,6 +32,12 @@ alwaysApply: true
 # Tests (Vitest / RTL)
 
 - Keep tests **DRY**. **Using `for` loops in tests is discouraged** (prefer clear, explicit cases).
+- Keep test formatting consistent:
+  - For short tests (roughly 3-6 lines in the test body), do not use `// Arrange`, `// Act`, `// Assert` comments.
+  - For very short tests (about 3 lines), keep the body compact with no extra blank lines.
+  - Use `// Arrange`, `// Act`, `// Assert` comments only for medium/long tests where they improve readability.
+  - Inside a test body, keep blank lines only when they separate conceptual blocks.
+  - Keep normal structural spacing between test/describe blocks (one blank line between adjacent `it(...)` and `describe(...)` blocks).
 
 # Git & Branching
 

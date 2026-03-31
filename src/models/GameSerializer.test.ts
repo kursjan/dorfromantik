@@ -6,13 +6,11 @@ import { Tile } from './Tile';
 import { HexCoordinate } from './HexCoordinate';
 import { Board } from './Board';
 import { toTerrain } from './Terrain';
-
 describe('GameSerializer', () => {
   it('should accurately serialize and deserialize a new game', () => {
-    // 1. Setup a basic game
+    // Arrange
     const rules = GameRules.createStandard();
     const created = Game.create(rules);
-
     // Immutable-style snapshot: new Game instance with updated metadata
     const game = new Game({
       id: created.id,
@@ -24,10 +22,11 @@ describe('GameSerializer', () => {
       tileQueue: created.tileQueue,
     });
 
-    // 2. Serialize
+    // Act
     const json: GameJSON = GameSerializer.serialize(game);
+    const restoredGame: Game = GameSerializer.deserialize(json);
 
-    // Basic structural checks on the JSON
+    // Assert
     expect(json.id).toBe(game.id);
     expect(json.name).toBe('Test Serialization Game');
     expect(json.score).toBe(100);
@@ -36,45 +35,33 @@ describe('GameSerializer', () => {
     expect(json.board.tiles.length).toBe(1); // Should have the starting tile
     expect(json.tileQueue).toBeInstanceOf(Array);
     expect(json.tileQueue.length).toBe(30);
-
-    // 3. Deserialize
-    const restoredGame: Game = GameSerializer.deserialize(json);
-
-    // 4. Verification
     expect(restoredGame).toBeInstanceOf(Game);
     expect(restoredGame.id).toBe(game.id);
     expect(restoredGame.name).toBe(game.name);
     expect(restoredGame.score).toBe(game.score);
     expect(restoredGame.lastPlayed).toBe(game.lastPlayed);
-
     // Check Rules
     expect(restoredGame.rules).toBeInstanceOf(GameRules);
     expect(restoredGame.rules.initialTurns).toBe(game.rules.initialTurns);
-
     // Check Board
     // A restored board should have identical tiles at identical coordinates
     const originalTiles = Array.from(game.board.getAll());
     const restoredTiles = Array.from(restoredGame.board.getAll());
     expect(restoredTiles.length).toBe(originalTiles.length);
-
     for (let i = 0; i < originalTiles.length; i++) {
       const orig = originalTiles[i];
       const rest = restoredTiles[i];
-
       expect(rest.coordinate).toBeInstanceOf(HexCoordinate);
       expect(rest.coordinate.equals(orig.coordinate)).toBe(true);
-
       expect(rest.tile).toBeInstanceOf(Tile);
       expect(rest.tile.id).toBe(orig.tile.id);
       expect(rest.tile.getTerrains()).toEqual(orig.tile.getTerrains());
     }
-
     // Check Queue
     expect(restoredGame.tileQueue.length).toBe(game.tileQueue.length);
     for (let i = 0; i < game.tileQueue.length; i++) {
       const origTile = game.tileQueue[i];
       const restTile = restoredGame.tileQueue[i];
-
       expect(restTile).toBeInstanceOf(Tile);
       expect(restTile.id).toBe(origTile.id);
       expect(restTile.getTerrains()).toEqual(origTile.getTerrains());
@@ -82,35 +69,26 @@ describe('GameSerializer', () => {
   });
 
   it('should accurately serialize and deserialize an in-progress game with placed tiles', () => {
-    // 1. Setup a game and play a few turns
+    // Arrange
     const rules = GameRules.createTest();
     let game = Game.create(rules);
-
     // Chain placements via returned snapshots (aligns with immutable game transitions)
     game = game.placeTile(new HexCoordinate(1, -1, 0)).game;
     game = game.placeTile(new HexCoordinate(0, -1, 1)).game;
     game = game.placeTile(new HexCoordinate(-1, 0, 1)).game;
     game = game.placeTile(new HexCoordinate(-1, 1, 0)).game;
 
-    // 2. Serialize
+    // Act
     const json: GameJSON = GameSerializer.serialize(game);
-
-    // We expect 1 initial tile + 4 placed tiles
-    expect(json.board.tiles.length).toBe(5);
-
-    // 3. Deserialize
     const restoredGame: Game = GameSerializer.deserialize(json);
+    const afterRestore = restoredGame.placeTile(new HexCoordinate(0, 1, -1));
 
-    // 4. Verification
+    // Assert
+    expect(json.board.tiles.length).toBe(5);
     expect(restoredGame.board.has(new HexCoordinate(1, -1, 0))).toBe(true);
     expect(restoredGame.board.has(new HexCoordinate(0, -1, 1))).toBe(true);
     expect(restoredGame.board.has(new HexCoordinate(-1, 0, 1))).toBe(true);
     expect(restoredGame.board.has(new HexCoordinate(-1, 1, 0))).toBe(true);
-
-    // Verify it functions correctly after deserialization (state isn't frozen/corrupt)
-    const afterRestore = restoredGame.placeTile(new HexCoordinate(0, 1, -1));
-
-    // After placing another tile, board size should increase
     expect(Array.from(afterRestore.game.board.getAll()).length).toBe(6);
   });
 
@@ -118,13 +96,12 @@ describe('GameSerializer', () => {
     const game = Game.create(GameRules.createStandard());
     const json = GameSerializer.serialize(game);
     const restored = GameSerializer.deserialize(json);
-
     expect(restored).not.toBe(game);
     expect(restored.board).not.toBe(game.board);
   });
 
   it('preserves optional center terrain on serialization', () => {
-    let board = new Board();
+    // Arrange
     const centered = new Tile({
       id: 'centered',
       center: toTerrain('house'),
@@ -135,8 +112,7 @@ describe('GameSerializer', () => {
       southWest: toTerrain('rail'),
       northWest: toTerrain('house'),
     });
-    board = board.withTile(centered, new HexCoordinate(0, 0, 0));
-
+    const board = Board.withTile(centered, new HexCoordinate(0, 0, 0));
     const game = new Game({
       id: 'game-center',
       name: 'Center Test',
@@ -145,12 +121,14 @@ describe('GameSerializer', () => {
       rules: GameRules.createTest(),
     });
 
+    // Act
     const json = GameSerializer.serialize(game);
-    expect(json.board.tiles[0].tile.center).toBe('house');
-    expect(json.tileQueue[0].center).toBe('house');
-
     const restored = GameSerializer.deserialize(json);
     const restoredTile = restored.board.get(new HexCoordinate(0, 0, 0))?.tile;
+
+    // Assert
+    expect(json.board.tiles[0].tile.center).toBe('house');
+    expect(json.tileQueue[0].center).toBe('house');
     expect(restoredTile?.center?.id).toBe('house');
   });
 });

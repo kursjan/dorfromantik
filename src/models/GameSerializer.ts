@@ -104,13 +104,11 @@ export class GameSerializer {
   }
 
   private static deserializeBoard(json: BoardJSON): Board {
-    let board = new Board();
-    for (const entry of json.tiles) {
+    return json.tiles.reduce((acc, entry) => {
       const tile = this.deserializeTile(entry.tile);
       const coord = this.deserializeCoordinate(entry.coordinate);
-      board = board.withTile(tile, coord);
-    }
-    return board;
+      return acc.withTile(tile, coord);
+    }, new Board());
   }
 
   private static serializeTile(tile: Tile): TileJSON {
