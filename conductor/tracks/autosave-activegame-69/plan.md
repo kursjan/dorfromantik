@@ -10,7 +10,7 @@ Refactor autosave triggering in `GameBoard` so persistence is derived from canon
 
 ## Phase 2: State-driven autosave trigger
 
-- [ ] Remove autosave coupling to canvas `onTilePlaced` callback path (`CanvasView`/`GameBoard`) using **task-conductor** skill.
+- [x] Remove autosave coupling to canvas `onTilePlaced` callback path (`CanvasView`/`GameBoard`) using **task-conductor** skill.
 - [ ] Implement `GameBoard` transition-based trigger using existing `activeGameRef` and a domain helper (e.g. `didGameplayStateChange`) using **task-conductor** skill.
 - [ ] Preserve autosaver stability semantics (`getActiveGame` ref access and unmount flush behavior) using **task-conductor** skill.
 - [ ] **Phase Gate**: Run `npm run typecheck` and `npm run test:unit`, then checkpoint using **project-orchestrator** skill.

@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import React, { useRef, useEffect, useLayoutEffect, useState } from 'react';
 import { CanvasView } from '../canvas/components/CanvasView';
 import { useUser, useActiveGame } from '../context/SessionContext';
 import { useFirestoreService } from '../services/hooks/useServices';
@@ -29,11 +29,6 @@ export const GameBoard: React.FC = () => {
     // without recreating the autosaver instance.
     activeGameRef.current = activeGame;
   }, [activeGame]);
-
-  // Callbacks
-  const debouncedSave = useCallback(() => {
-    autosaverRef.current?.handleTilePlaced();
-  }, []);
 
   // Lifecycle effects
   useEffect(() => {
@@ -80,11 +75,7 @@ export const GameBoard: React.FC = () => {
   // Render
   return (
     <main className="game-board">
-      <CanvasView
-        activeGame={activeGame}
-        setActiveGame={setActiveGame}
-        onTilePlaced={debouncedSave}
-      />
+      <CanvasView activeGame={activeGame} setActiveGame={setActiveGame} />
       <SaveStatusIndicator status={saveStatus} />
     </main>
   );

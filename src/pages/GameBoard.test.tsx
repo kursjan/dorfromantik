@@ -25,13 +25,7 @@ vi.mock('../canvas/services/GameAutosaver', () => {
 
 // Mock CanvasView to avoid WebGL/CanvasController overhead in these tests
 vi.mock('../canvas/components/CanvasView', () => ({
-  CanvasView: ({ onTilePlaced }: { onTilePlaced: () => void }) => (
-    <div data-testid="mock-canvas-view">
-      <button data-testid="trigger-tile-placed" onClick={onTilePlaced}>
-        Place Tile
-      </button>
-    </div>
-  ),
+  CanvasView: () => <div data-testid="mock-canvas-view" />,
 }));
 
 describe('GameBoard', () => {
@@ -90,7 +84,7 @@ describe('GameBoard', () => {
     expect(screen.queryByText(/No active game session/i)).not.toBeInTheDocument();
   });
 
-  it('initializes GameAutosaver and delegates tile placement', async () => {
+  it('initializes GameAutosaver', async () => {
     const game = new Game({
       board: new Board(),
       rules: new GameRules(),
@@ -103,17 +97,8 @@ describe('GameBoard', () => {
     // Verify autosaver was instantiated
     expect(GameAutosaver).toHaveBeenCalledTimes(1);
 
-    // Get the mock instance
     const autosaverMockInstance = vi.mocked(GameAutosaver).mock.results[0].value;
-
-    // Simulate placing a tile via the mock CanvasView
-    const placeTileButton = screen.getByTestId('trigger-tile-placed');
-    act(() => {
-      placeTileButton.click();
-    });
-
-    // Verify the debounced save method was called on the autosaver
-    expect(autosaverMockInstance.handleTilePlaced).toHaveBeenCalledTimes(1);
+    expect(autosaverMockInstance.handleTilePlaced).toHaveBeenCalledTimes(0);
   });
 
   it('cleans up GameAutosaver on unmount using forceSaveAndDispose', () => {

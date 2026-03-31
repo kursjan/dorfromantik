@@ -10,18 +10,9 @@ interface CanvasViewProps {
   activeGame: Game;
   /** Typically `setActiveGame` from session context; commits snapshots from the canvas. */
   setActiveGame: (game: Game) => void;
-  /**
-   * @deprecated Tracked for removal in https://github.com/kursjan/dorfromantik/issues/69.
-   * Called when a tile is placed; currently used by parent autosave wiring.
-   */
-  onTilePlaced: () => void;
 }
 
-export const CanvasView: React.FC<CanvasViewProps> = ({
-  activeGame,
-  setActiveGame,
-  onTilePlaced,
-}) => {
+export const CanvasView: React.FC<CanvasViewProps> = ({ activeGame, setActiveGame }) => {
   const { getGameSnapshot, setGameSnapshot } = useGameSnapshotBridge(activeGame, setActiveGame);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -41,8 +32,6 @@ export const CanvasView: React.FC<CanvasViewProps> = ({
     });
     setController(newController);
 
-    newController.onTilePlaced = onTilePlaced;
-
     controllerRef.current = newController;
 
     return () => {
@@ -50,7 +39,7 @@ export const CanvasView: React.FC<CanvasViewProps> = ({
       controllerRef.current = null;
       setController(null);
     };
-  }, [activeGame.id, onTilePlaced, getGameSnapshot, setGameSnapshot]);
+  }, [activeGame.id, getGameSnapshot, setGameSnapshot]);
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>

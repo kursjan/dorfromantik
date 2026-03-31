@@ -33,12 +33,8 @@ describe('CanvasView', () => {
     vi.clearAllMocks();
   });
 
-  const noopOnTilePlaced = () => {};
-
   it('renders correctly with HUD and Canvas', () => {
-    render(
-      <CanvasView activeGame={game} setActiveGame={vi.fn()} onTilePlaced={noopOnTilePlaced} />
-    );
+    render(<CanvasView activeGame={game} setActiveGame={vi.fn()} />);
 
     expect(screen.getByText(/Score/i)).toBeInTheDocument();
     expect(screen.getByText('100')).toBeInTheDocument();
@@ -48,17 +44,13 @@ describe('CanvasView', () => {
   });
 
   it('initializes CanvasController on mount', () => {
-    render(
-      <CanvasView activeGame={game} setActiveGame={vi.fn()} onTilePlaced={noopOnTilePlaced} />
-    );
+    render(<CanvasView activeGame={game} setActiveGame={vi.fn()} />);
 
     expect(CanvasController).toHaveBeenCalled();
   });
 
   it('cleans up CanvasController on unmount', () => {
-    const { unmount } = render(
-      <CanvasView activeGame={game} setActiveGame={vi.fn()} onTilePlaced={noopOnTilePlaced} />
-    );
+    const { unmount } = render(<CanvasView activeGame={game} setActiveGame={vi.fn()} />);
 
     const controllerInstance = vi.mocked(CanvasController).mock.results[0].value;
     unmount();
