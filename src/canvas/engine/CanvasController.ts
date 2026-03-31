@@ -57,20 +57,22 @@ export class CanvasController {
   private debugState: DebugState = CanvasController.createDefaultDebugState();
   private hoveredHex: HexCoordinate | null = null;
 
+  /**
+   * @deprecated Tracked for removal in https://github.com/kursjan/dorfromantik/issues/69.
+   * Prefer deriving autosave/persistence from `activeGame` transitions in React state.
+   */
   public onTilePlaced?: () => void;
 
   constructor(canvas: HTMLCanvasElement, options: CanvasControllerOptions) {
     this.canvas = canvas;
     this.getGameSnapshot = options.getGameSnapshot;
     this.setGameSnapshot = options.setGameSnapshot;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('Could not get 2d context');
-    this.ctx = ctx;
+    this.ctx = this.getRequired2dContext(canvas);
 
     this.camera = new Camera({ x: 0, y: 0, zoom: 1 });
-    this.backgroundRenderer = new BackgroundRenderer(ctx);
-    this.hexRenderer = new HexRenderer(ctx);
-    this.tileRenderer = new TileRenderer(ctx);
+    this.backgroundRenderer = new BackgroundRenderer(this.getRequired2dContext(canvas));
+    this.hexRenderer = new HexRenderer(this.getRequired2dContext(canvas));
+    this.tileRenderer = new TileRenderer(this.getRequired2dContext(canvas));
     this.inputManager = new InputManager(canvas, {
       onPan: (dx, dy) => this.handlePan(dx, dy),
       onZoom: (delta) => this.handleZoom(delta),
@@ -143,9 +145,6 @@ export class CanvasController {
 
   private render() {
     const activeGame = this.getGameSnapshot();
-    if (!activeGame) {
-      throw new Error('No active game found in session');
-    }
 
     // 1. Clear
     this.backgroundRenderer.draw(this.canvas.width, this.canvas.height);
@@ -155,7 +154,6 @@ export class CanvasController {
     this.camera.applyTransform(this.ctx, this.canvas.width, this.canvas.height);
 
     // 3. Draw World
-    // Draw base grid (debug)
     this.hexRenderer.drawDebugGrid(5);
 
     // Draw placed tiles from the board
@@ -249,12 +247,13 @@ export class CanvasController {
 
   private handleMouseClick() {
     const activeGame = this.getGameSnapshot();
+    if (!activeGame.inProgress()) return;
+    if (!this.hoveredHex) return;
+    if (!this.isValidPlacement(this.hoveredHex)) return;
 
-    if (activeGame.inProgress() && this.hoveredHex && this.isValidPlacement(this.hoveredHex)) {
-      const { game: nextGame } = activeGame.placeTile(this.hoveredHex);
-      this.setGameSnapshot(nextGame);
-      this.onTilePlaced?.();
-    }
+    const { game: nextGame } = activeGame.placeTile(this.hoveredHex);
+    this.setGameSnapshot(nextGame);
+    this.onTilePlaced?.();
   }
 
   private handleRotateClockwise() {
@@ -268,13 +267,19 @@ export class CanvasController {
   }
 
   private handleResize() {
-    if (this.canvas.width !== window.innerWidth || this.canvas.height !== window.innerHeight) {
-      this.canvas.width = window.innerWidth;
-      this.canvas.height = window.innerHeight;
-    }
+    if (this.canvas.width === window.innerWidth && this.canvas.height === window.innerHeight)
+      return;
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
   }
 
   // --- Helpers ---
+
+  private getRequired2dContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Could not get 2d context');
+    return ctx;
+  }
 
   private isValidPlacement(coord: HexCoordinate): boolean {
     return this.getGameSnapshot().isValidPlacement(coord);

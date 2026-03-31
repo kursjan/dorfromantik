@@ -10,7 +10,10 @@ interface CanvasViewProps {
   activeGame: Game;
   /** Typically `setActiveGame` from session context; commits snapshots from the canvas. */
   setActiveGame: (game: Game) => void;
-  /** Called when a tile is placed; e.g. parent may debounce and persist game state. */
+  /**
+   * @deprecated Tracked for removal in https://github.com/kursjan/dorfromantik/issues/69.
+   * Called when a tile is placed; currently used by parent autosave wiring.
+   */
   onTilePlaced: () => void;
 }
 
