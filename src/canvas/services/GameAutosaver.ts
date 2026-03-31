@@ -61,6 +61,7 @@ export class GameAutosaver {
       return false;
     }
 
+    // Rotation-only changes should not schedule autosave.
     return (
       previousGame.board !== currentGame.board ||
       previousGame.score !== currentGame.score ||

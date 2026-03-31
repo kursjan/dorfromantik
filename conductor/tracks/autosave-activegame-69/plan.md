@@ -19,7 +19,7 @@ Refactor autosave triggering in `GameBoard` so persistence is derived from canon
 
 - [x] Add/update `GameBoard` autosave transition tests (meaningful transition triggers save, non-meaningful transition does not) using **task-conductor** skill.
 - [x] Add/update regression tests for rapid transitions/debounce and unmount flush using **task-conductor** skill.
-- [ ] Decide and codify rotation-only behavior in tests/docs (default: no autosave on rotation-only changes) using **task-conductor** skill.
+- [x] Decide and codify rotation-only behavior in tests/docs (default: no autosave on rotation-only changes) using **task-conductor** skill.
 - [ ] **Phase Gate**: Run `npm run test:ci` and `npm run test:e2e:ci`, then checkpoint using **project-orchestrator** skill.
 
 ## Phase 4: Adversarial review and handoff

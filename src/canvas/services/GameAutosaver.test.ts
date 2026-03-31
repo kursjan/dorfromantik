@@ -225,4 +225,18 @@ describe('GameAutosaver', () => {
     vi.advanceTimersByTime(2000);
     expect(saveGameStateSpy).not.toHaveBeenCalled();
   });
+
+  it('does not schedule save for rotation-only transition', () => {
+    const rotationOnlyGame = {
+      ...previousGame,
+      tileQueue: [{ id: 'rotated' }],
+      score: previousGame.score,
+      remainingTurns: previousGame.remainingTurns,
+      board: previousGame.board,
+    } as unknown as Game;
+
+    autosaver.handleGameChanged(previousGame, rotationOnlyGame);
+    vi.advanceTimersByTime(2000);
+    expect(saveGameStateSpy).not.toHaveBeenCalled();
+  });
 });

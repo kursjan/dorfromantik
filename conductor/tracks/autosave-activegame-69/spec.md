@@ -25,7 +25,7 @@
   - Trigger autosaver only when meaningful gameplay state changed.
 - Extract a domain-oriented helper:
   - Example: `didGameplayStateChange(prev, next): boolean`.
-  - Default behavior excludes rotation-only transitions from autosave unless explicitly changed.
+  - Rotation-only transitions must not schedule autosave.
   - Load/restore hydration transitions should not trigger immediate autosave by default.
 
 ## Acceptance criteria
