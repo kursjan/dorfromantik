@@ -108,7 +108,7 @@ export class GameSerializer {
     for (const entry of json.tiles) {
       const tile = this.deserializeTile(entry.tile);
       const coord = this.deserializeCoordinate(entry.coordinate);
-      board = board.place(tile, coord).board;
+      board = board.withTile(tile, coord);
     }
     return board;
   }

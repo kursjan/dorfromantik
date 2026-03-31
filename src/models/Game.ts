@@ -35,7 +35,7 @@ export class Game {
     const startBoard = new Board();
 
     const startTile = rules.createInitialTile('start-tile');
-    const { board } = startBoard.place(startTile, new HexCoordinate(0, 0, 0));
+    const board = startBoard.withTile(startTile, new HexCoordinate(0, 0, 0));
 
     const tileQueue = rules.createInitialQueue();
 
@@ -178,11 +178,11 @@ export class Game {
     return new Game({
       id: this.id,
       name: this.name,
-      lastPlayed: overrides.lastPlayed ?? this.lastPlayed,
-      board: overrides.board ?? this.board,
       rules: this.rules,
-      score: overrides.score ?? this.score,
+      board: overrides.board ?? this.board,
       tileQueue: overrides.tileQueue ?? this.tileQueue,
+      score: overrides.score ?? this.score,
+      lastPlayed: overrides.lastPlayed ?? this.lastPlayed,
     });
   }
 }
