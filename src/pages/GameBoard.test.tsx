@@ -118,6 +118,48 @@ describe('GameBoard', () => {
     expect(autosaverMockInstance.forceSaveAndDispose).toHaveBeenCalledTimes(1);
   });
 
+  it('preserves unmount flush behavior after multiple activeGame transitions', () => {
+    const gameA = new Game({
+      board: new Board(),
+      rules: new GameRules(),
+      tileQueue: [new Tile()],
+      score: 0,
+    });
+    const gameB = new Game({
+      id: gameA.id,
+      board: new Board(),
+      rules: gameA.rules,
+      tileQueue: [new Tile()],
+      score: 5,
+      lastPlayed: gameA.lastPlayed,
+    });
+
+    const { rerender, unmount } = renderWithProviders(gameA);
+    const autosaverMockInstance = vi.mocked(GameAutosaver).mock.results[0].value;
+
+    act(() => {
+      rerender(
+        <ServiceProvider authService={authService} firestoreService={firestoreService}>
+          <UserContext.Provider value={{ user }}>
+            <GameHistoryContext.Provider value={{ games: [] }}>
+              <ActiveGameContext.Provider
+                value={{
+                  activeGame: gameB,
+                  setActiveGame: vi.fn(),
+                }}
+              >
+                <GameBoard />
+              </ActiveGameContext.Provider>
+            </GameHistoryContext.Provider>
+          </UserContext.Provider>
+        </ServiceProvider>
+      );
+    });
+
+    unmount();
+    expect(autosaverMockInstance.forceSaveAndDispose).toHaveBeenCalledTimes(1);
+  });
+
   it('keeps a stable GameAutosaver and reads latest activeGame via ref', async () => {
     const gameA = new Game({
       board: new Board(),

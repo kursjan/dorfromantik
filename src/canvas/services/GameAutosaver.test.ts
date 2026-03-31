@@ -67,7 +67,7 @@ describe('GameAutosaver', () => {
     expect(saveGameStateSpy).toHaveBeenCalledWith('user-1', expect.any(Object));
   });
 
-  it('debounces multiple tile placements into a single save', () => {
+  it('debounces rapid meaningful transitions into a single save', () => {
     autosaver.handleGameChanged(previousGame, nextGame);
     vi.advanceTimersByTime(1000);
     autosaver.handleGameChanged(previousGame, nextGame);
@@ -78,6 +78,24 @@ describe('GameAutosaver', () => {
     // Advance one more debounce window from the last call.
     vi.advanceTimersByTime(2000);
 
+    expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not cancel pending save when transition is non-meaningful', () => {
+    autosaver.handleGameChanged(previousGame, nextGame);
+    vi.advanceTimersByTime(1000);
+
+    const equivalentGame = {
+      ...nextGame,
+      board: nextGame.board,
+      score: nextGame.score,
+      remainingTurns: nextGame.remainingTurns,
+    } as unknown as Game;
+
+    // Non-meaningful transition should not clear/restart the active debounce timer.
+    autosaver.handleGameChanged(nextGame, equivalentGame);
+
+    vi.advanceTimersByTime(1000);
     expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
   });
 
