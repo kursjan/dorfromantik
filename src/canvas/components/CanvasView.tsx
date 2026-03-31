@@ -47,7 +47,6 @@ export const CanvasView: React.FC<CanvasViewProps> = ({
       controllerRef.current = null;
       setController(null);
     };
-    // Recreate controller when switching games (id), not on every immutable snapshot — latest game is read via getGameSnapshot.
   }, [activeGame.id, onTilePlaced, getGameSnapshot, setGameSnapshot]);
 
   return (

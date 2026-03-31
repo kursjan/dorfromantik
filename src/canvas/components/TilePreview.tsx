@@ -48,10 +48,8 @@ export const TilePreview: React.FC<TilePreviewProps> = ({
     );
   }, [tile, size, neighborEdgeTerrains]);
 
-  // Adjust canvas size to fit the hex with some padding
-  // Hex width = sqrt(3) * size
-  // Hex height = 2 * size
-  // Let's use 2.5 * size for a comfortable square
+  // Use a larger square canvas so the rendered hex has comfortable padding
+  // and never clips at the edges while previewing.
   const canvasSize = size * 3;
 
   return (
