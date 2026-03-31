@@ -161,9 +161,44 @@ describe('GameBoard', () => {
     // Component re-render should not recreate autosaver; ref-backed getter should update.
     expect(GameAutosaver).toHaveBeenCalledTimes(1);
     expect(autosaverMockInstance.options.getActiveGame()).toBe(gameB);
+    expect(autosaverMockInstance.handleTilePlaced).toHaveBeenCalledTimes(1);
 
     // No effect cleanup should have happened during rerender.
     expect(autosaverMockInstance.forceSaveAndDispose).toHaveBeenCalledTimes(0);
+  });
+
+  it('does not trigger autosave for non-meaningful activeGame transitions', async () => {
+    const game = new Game({
+      board: new Board(),
+      rules: new GameRules(),
+      tileQueue: [new Tile()],
+      score: 0,
+    });
+
+    const { rerender } = renderWithProviders(game);
+    const autosaverMockInstance = vi.mocked(GameAutosaver).mock.results[0].value;
+    expect(autosaverMockInstance.handleTilePlaced).toHaveBeenCalledTimes(0);
+
+    act(() => {
+      rerender(
+        <ServiceProvider authService={authService} firestoreService={firestoreService}>
+          <UserContext.Provider value={{ user }}>
+            <GameHistoryContext.Provider value={{ games: [] }}>
+              <ActiveGameContext.Provider
+                value={{
+                  activeGame: game,
+                  setActiveGame: vi.fn(),
+                }}
+              >
+                <GameBoard />
+              </ActiveGameContext.Provider>
+            </GameHistoryContext.Provider>
+          </UserContext.Provider>
+        </ServiceProvider>
+      );
+    });
+
+    expect(autosaverMockInstance.handleTilePlaced).toHaveBeenCalledTimes(0);
   });
 
   it('displays save status feedback', async () => {
