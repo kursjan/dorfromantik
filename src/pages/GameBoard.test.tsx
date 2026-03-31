@@ -162,6 +162,7 @@ describe('GameBoard', () => {
     expect(GameAutosaver).toHaveBeenCalledTimes(1);
     expect(autosaverMockInstance.options.getActiveGame()).toBe(gameB);
     expect(autosaverMockInstance.handleGameChanged).toHaveBeenCalledTimes(1);
+    expect(autosaverMockInstance.handleGameChanged).toHaveBeenCalledWith(gameA, gameB);
 
     // No effect cleanup should have happened during rerender.
     expect(autosaverMockInstance.forceSaveAndDispose).toHaveBeenCalledTimes(0);
@@ -175,6 +176,15 @@ describe('GameBoard', () => {
       score: 0,
     });
 
+    const equivalentGame = new Game({
+      id: game.id,
+      board: game.board,
+      rules: game.rules,
+      tileQueue: game.tileQueue,
+      score: game.score,
+      lastPlayed: game.lastPlayed,
+    });
+
     const { rerender } = renderWithProviders(game);
     const autosaverMockInstance = vi.mocked(GameAutosaver).mock.results[0].value;
     expect(autosaverMockInstance.handleGameChanged).toHaveBeenCalledTimes(0);
@@ -186,7 +196,7 @@ describe('GameBoard', () => {
             <GameHistoryContext.Provider value={{ games: [] }}>
               <ActiveGameContext.Provider
                 value={{
-                  activeGame: game,
+                  activeGame: equivalentGame,
                   setActiveGame: vi.fn(),
                 }}
               >
@@ -198,7 +208,8 @@ describe('GameBoard', () => {
       );
     });
 
-    expect(autosaverMockInstance.handleGameChanged).toHaveBeenCalledTimes(0);
+    expect(autosaverMockInstance.handleGameChanged).toHaveBeenCalledTimes(1);
+    expect(autosaverMockInstance.handleGameChanged).toHaveBeenCalledWith(game, equivalentGame);
   });
 
   it('displays save status feedback', async () => {
