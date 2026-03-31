@@ -21,10 +21,12 @@
 - Keep using existing `activeGameRef` in `GameBoard` to access the latest snapshot in autosaver callbacks.
 - Add transition detection in `GameBoard` effect:
   - Compare previous snapshot vs current `activeGame`.
+  - Use domain-oriented fields for comparison (board, tile queue, score, remaining turns) instead of trivial reference-only checks.
   - Trigger autosaver only when meaningful gameplay state changed.
 - Extract a domain-oriented helper:
   - Example: `didGameplayStateChange(prev, next): boolean`.
   - Default behavior excludes rotation-only transitions from autosave unless explicitly changed.
+  - Load/restore hydration transitions should not trigger immediate autosave by default.
 
 ## Acceptance criteria
 
