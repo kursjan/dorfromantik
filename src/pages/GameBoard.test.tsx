@@ -15,7 +15,7 @@ import { GameAutosaver } from '../canvas/services/GameAutosaver';
 vi.mock('../canvas/services/GameAutosaver', () => {
   return {
     GameAutosaver: vi.fn().mockImplementation(function (this: any, options: any) {
-      this.handleTilePlaced = vi.fn();
+      this.handleGameChanged = vi.fn();
       this.dispose = vi.fn();
       this.forceSaveAndDispose = vi.fn();
       this.options = options;
@@ -98,7 +98,7 @@ describe('GameBoard', () => {
     expect(GameAutosaver).toHaveBeenCalledTimes(1);
 
     const autosaverMockInstance = vi.mocked(GameAutosaver).mock.results[0].value;
-    expect(autosaverMockInstance.handleTilePlaced).toHaveBeenCalledTimes(0);
+    expect(autosaverMockInstance.handleGameChanged).toHaveBeenCalledTimes(0);
   });
 
   it('cleans up GameAutosaver on unmount using forceSaveAndDispose', () => {
@@ -161,7 +161,7 @@ describe('GameBoard', () => {
     // Component re-render should not recreate autosaver; ref-backed getter should update.
     expect(GameAutosaver).toHaveBeenCalledTimes(1);
     expect(autosaverMockInstance.options.getActiveGame()).toBe(gameB);
-    expect(autosaverMockInstance.handleTilePlaced).toHaveBeenCalledTimes(1);
+    expect(autosaverMockInstance.handleGameChanged).toHaveBeenCalledTimes(1);
 
     // No effect cleanup should have happened during rerender.
     expect(autosaverMockInstance.forceSaveAndDispose).toHaveBeenCalledTimes(0);
@@ -177,7 +177,7 @@ describe('GameBoard', () => {
 
     const { rerender } = renderWithProviders(game);
     const autosaverMockInstance = vi.mocked(GameAutosaver).mock.results[0].value;
-    expect(autosaverMockInstance.handleTilePlaced).toHaveBeenCalledTimes(0);
+    expect(autosaverMockInstance.handleGameChanged).toHaveBeenCalledTimes(0);
 
     act(() => {
       rerender(
@@ -198,7 +198,7 @@ describe('GameBoard', () => {
       );
     });
 
-    expect(autosaverMockInstance.handleTilePlaced).toHaveBeenCalledTimes(0);
+    expect(autosaverMockInstance.handleGameChanged).toHaveBeenCalledTimes(0);
   });
 
   it('displays save status feedback', async () => {

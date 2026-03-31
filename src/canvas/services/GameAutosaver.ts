@@ -32,7 +32,11 @@ export class GameAutosaver {
     this.onSaveError = options.onSaveError;
   }
 
-  handleTilePlaced = () => {
+  handleGameChanged = (previousGame: Game | undefined, currentGame: Game | undefined) => {
+    if (!this.didGameplayStateChange(previousGame, currentGame)) {
+      return;
+    }
+
     if (this.saveTimer) {
       clearTimeout(this.saveTimer);
     }
@@ -41,6 +45,28 @@ export class GameAutosaver {
       this.executeSave();
     }, this.debounceMs);
   };
+
+  private didGameplayStateChange(
+    previousGame: Game | undefined,
+    currentGame: Game | undefined
+  ): boolean {
+    if (!previousGame || !currentGame) {
+      return false;
+    }
+    if (previousGame === currentGame) {
+      return false;
+    }
+    // Treat session switches/load restores as non-gameplay transitions.
+    if (previousGame.id !== currentGame.id) {
+      return false;
+    }
+
+    return (
+      previousGame.board !== currentGame.board ||
+      previousGame.score !== currentGame.score ||
+      previousGame.remainingTurns !== currentGame.remainingTurns
+    );
+  }
 
   private executeSave = () => {
     const game = this.getActiveGame();
@@ -57,7 +83,8 @@ export class GameAutosaver {
       }
     }, 5000);
 
-    this.firestoreService.saveGameState(this.getUserId(), game)
+    this.firestoreService
+      .saveGameState(this.getUserId(), game)
       .then(() => {
         isSettled = true;
         clearTimeout(timeoutId);
@@ -86,4 +113,3 @@ export class GameAutosaver {
     }
   }
 }
-

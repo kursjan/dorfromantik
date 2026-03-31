@@ -4,7 +4,6 @@ import { useUser, useActiveGame } from '../context/SessionContext';
 import { useFirestoreService } from '../services/hooks/useServices';
 import { GameAutosaver } from '../canvas/services/GameAutosaver';
 import { SaveStatusIndicator, type SaveStatus } from '../canvas/components/SaveStatusIndicator';
-import { Game } from '../models/Game';
 import './GameBoard.css';
 
 const SAVE_DEBOUNCE_MS = import.meta.env.MODE === 'test' ? 10 : 2000;
@@ -29,9 +28,7 @@ export const GameBoard: React.FC = () => {
     // Drive autosave from state transitions while keeping the latest snapshot
     // available to imperative timers (debounce + forceSave) via ref.
     const previousGame = activeGameRef.current;
-    if (previousGame && activeGame && didGameplayStateChange(previousGame, activeGame)) {
-      autosaverRef.current?.handleTilePlaced();
-    }
+    autosaverRef.current?.handleGameChanged(previousGame, activeGame);
     activeGameRef.current = activeGame;
   }, [activeGame]);
 
@@ -85,20 +82,3 @@ export const GameBoard: React.FC = () => {
     </main>
   );
 };
-
-function didGameplayStateChange(previousGame: Game, currentGame: Game): boolean {
-  if (previousGame === currentGame) {
-    return false;
-  }
-
-  // Treat game switches/load restores as non-gameplay transitions.
-  if (previousGame.id !== currentGame.id) {
-    return false;
-  }
-
-  return (
-    previousGame.board !== currentGame.board ||
-    previousGame.score !== currentGame.score ||
-    previousGame.remainingTurns !== currentGame.remainingTurns
-  );
-}
