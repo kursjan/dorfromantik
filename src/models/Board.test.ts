@@ -15,7 +15,7 @@ describe('Board', () => {
 
   it('should place a tile correctly', () => {
     const tile = new Tile({ id: 'test-tile' });
-    const { board: newBoard } = board.place(tile, coord);
+    const newBoard = board.withTile(tile, coord);
 
     expect(newBoard.has(coord)).toBe(true);
     expect(newBoard.get(coord)?.tile).toBe(tile);
@@ -25,7 +25,7 @@ describe('Board', () => {
 
   it('should throw an error when placing a tile on an occupied spot', () => {
     const tile = new Tile({ id: 'test-tile' });
-    const { board: newBoard } = board.place(tile, coord);
+    const newBoard = board.withTile(tile, coord);
 
     expect(() => newBoard.place(tile, coord)).toThrowError(/occupied/);
   });
@@ -36,14 +36,14 @@ describe('Board', () => {
 
   it('should canPlace return false for occupied spot', () => {
     const tile = new Tile({ id: 'test-tile' });
-    const { board: newBoard } = board.place(tile, coord);
+    const newBoard = board.withTile(tile, coord);
 
     expect(newBoard.canPlace(coord)).toBe(false);
   });
 
   it('should clear the board', () => {
     const tile = new Tile({ id: 'test-tile' });
-    const { board: newBoard } = board.place(tile, coord);
+    const newBoard = board.withTile(tile, coord);
     const emptyBoard = newBoard.clear();
 
     expect(emptyBoard.has(coord)).toBe(false);
@@ -57,10 +57,9 @@ describe('Board', () => {
     const tile2 = new Tile({ id: 'test-tile-2' });
     const coord2 = southWest(coord);
 
-    const { board: board1 } = board.place(tile1, coord);
-    const { board: board2 } = board1.place(tile2, coord2);
+    board = board.withTile(tile1, coord).withTile(tile2, coord2);
 
-    const all = Array.from(board2.getAll());
+    const all = Array.from(board.getAll());
     expect(all.length).toBe(2);
     expect(all.some((t) => t.tile === tile1)).toBe(true);
     expect(all.some((t) => t.tile === tile2)).toBe(true);
@@ -74,12 +73,13 @@ describe('Board', () => {
     const neighborCoord = north(coord);
     const nonNeighborCoord = north(north(coord));
 
-    const { board: b1 } = board.place(tile1, coord);
-    const { board: b2 } = b1.place(tile2, neighborCoord);
-    const { board: b3 } = b2.place(tile3, nonNeighborCoord);
+    board = board
+      .withTile(tile1, coord)
+      .withTile(tile2, neighborCoord)
+      .withTile(tile3, nonNeighborCoord);
 
-    const placedTile = b3.get(coord)!;
-    const neighbors = b3.getExistingNeighbors(placedTile);
+    const placedTile = board.get(coord)!;
+    const neighbors = board.getExistingNeighbors(placedTile);
 
     expect(Object.keys(neighbors).length).toBe(1);
     expect(neighbors.north?.coordinate).toEqual(neighborCoord);
@@ -91,7 +91,7 @@ describe('Board', () => {
       southEast: toTerrain('water'),
       southWest: toTerrain('rail'),
     });
-    const { board: newBoard } = board.place(placedTile, coord);
+    const newBoard = board.withTile(placedTile, coord);
 
     const freeTile = new Tile({ id: 'free-tile' });
     const validCoords = newBoard.getValidPlacementCoordinates(freeTile);
@@ -113,7 +113,7 @@ describe('Board', () => {
       southEast: toTerrain('water'),
       southWest: toTerrain('rail'),
     });
-    const { board: newBoard } = board.place(placedTile, coord);
+    const newBoard = board.withTile(placedTile, coord);
 
     const matchingTile = new Tile({
       id: 'matching-tile',
@@ -132,7 +132,6 @@ describe('Board', () => {
       southEast: toTerrain('water'),
       southWest: toTerrain('rail'),
     });
-    const { board: b1 } = board.place(placedTile1, coord);
 
     const coord2 = southWest(coord);
     const placedTile2 = new Tile({
@@ -140,10 +139,10 @@ describe('Board', () => {
       southEast: toTerrain('water'),
       southWest: toTerrain('rail'),
     });
-    const { board: b2 } = b1.place(placedTile2, coord2);
+    board = board.withTile(placedTile1, coord).withTile(placedTile2, coord2);
 
     const freeTile = new Tile({ id: 'free-tile' });
-    const validCoords = b2.getValidPlacementCoordinates(freeTile);
+    const validCoords = board.getValidPlacementCoordinates(freeTile);
 
     expect(validCoords.length).toBe(5);
   });

@@ -74,7 +74,7 @@ describe('GameScorer', () => {
 
       const inwardEdgeDirection = getOpposite(direction);
       const inwardEdgeTerrain = toTerrain('pasture');
-      const { board: newBoard } = board.place(
+      const newBoard = board.withTile(
         neighborTileFacingInward(
           `${idPrefix}-${direction}`,
           inwardEdgeDirection,
@@ -100,8 +100,7 @@ describe('GameScorer', () => {
     const northCoord = north(center);
 
     const centerTile = createTile('center', 'pasture');
-    const { board: b1 } = board.place(centerTile, center);
-    board = b1;
+    board = board.withTile(centerTile, center);
 
     const northTile = new Tile({
       id: 'north',
@@ -112,8 +111,9 @@ describe('GameScorer', () => {
       southWest: toTerrain('pasture'),
       northWest: toTerrain('pasture'),
     });
-    const { board: b2, placedTile } = board.place(northTile, northCoord);
-    board = b2;
+    const northPlacement = board.place(northTile, northCoord);
+    board = northPlacement.board;
+    const { placedTile } = northPlacement;
 
     const result = scorer.scorePlacement(board, placedTile);
     expect(result.scoreAdded).toBe(0);
@@ -131,8 +131,7 @@ describe('GameScorer', () => {
       southWest: toTerrain('pasture'),
       northWest: toTerrain('pasture'),
     });
-    const { board: b1 } = board.place(northTile, northCoord);
-    board = b1;
+    board = board.withTile(northTile, northCoord);
 
     const centerTile = new Tile({
       id: 'center',
@@ -143,8 +142,9 @@ describe('GameScorer', () => {
       southWest: toTerrain('pasture'),
       northWest: toTerrain('pasture'),
     });
-    const { board: b2, placedTile } = board.place(centerTile, center);
-    board = b2;
+    const centerPlacement = board.place(centerTile, center);
+    board = centerPlacement.board;
+    const { placedTile } = centerPlacement;
 
     const result = scorer.scorePlacement(board, placedTile);
     expect(result.scoreAdded).toBe(10);
@@ -154,11 +154,11 @@ describe('GameScorer', () => {
     const northCoord = north(center);
 
     const centerTile = createTile('center', 'pasture');
-    const { board: b1 } = board.place(centerTile, center);
-    board = b1;
+    board = board.withTile(centerTile, center);
 
-    const { board: b2, placedTile } = board.place(createTile('north', 'pasture'), northCoord);
-    board = b2;
+    const northPlacement = board.place(createTile('north', 'pasture'), northCoord);
+    board = northPlacement.board;
+    const { placedTile } = northPlacement;
 
     const result = scorer.scorePlacement(board, placedTile);
     expect(result.scoreAdded).toBe(10);
@@ -168,12 +168,12 @@ describe('GameScorer', () => {
     const northCoord = north(center);
     const northEastCoord = northEast(center);
 
-    const { board: b1 } = board.place(createTile('north', 'pasture'), northCoord);
-    const { board: b2 } = b1.place(createTile('ne', 'pasture'), northEastCoord);
-    board = b2;
+    board = board.withTile(createTile('north', 'pasture'), northCoord);
+    board = board.withTile(createTile('ne', 'pasture'), northEastCoord);
 
-    const { board: b3, placedTile } = board.place(createTile('center', 'pasture'), center);
-    board = b3;
+    const centerPlacement = board.place(createTile('center', 'pasture'), center);
+    board = centerPlacement.board;
+    const { placedTile } = centerPlacement;
 
     const result = scorer.scorePlacement(board, placedTile);
     expect(result.scoreAdded).toBe(20);
@@ -183,7 +183,7 @@ describe('GameScorer', () => {
     getNeighbors(center).forEach(({ direction, coordinate }) => {
       const inwardEdgeDirection = getOpposite(direction);
       const inwardEdgeTerrain = toTerrain('pasture');
-      const { board: newBoard } = board.place(
+      const newBoard = board.withTile(
         neighborTileFacingInward(`n-${direction}`, inwardEdgeDirection, inwardEdgeTerrain),
         coordinate
       );
@@ -204,7 +204,7 @@ describe('GameScorer', () => {
     neighbors.forEach(({ direction, coordinate }, index) => {
       const inwardEdgeDirection = getOpposite(direction);
       const inwardEdgeTerrain = toTerrain(index < 5 ? 'pasture' : 'tree');
-      const { board: newBoard } = board.place(
+      const newBoard = board.withTile(
         neighborTileFacingInward(`n-${direction}`, inwardEdgeDirection, inwardEdgeTerrain),
         coordinate
       );
@@ -224,14 +224,13 @@ describe('GameScorer', () => {
     const northCoord = north(center);
 
     const centerTile = createTile('center', 'pasture');
-    const { board: b1 } = board.place(centerTile, center);
-    board = b1;
+    board = board.withTile(centerTile, center);
 
     getNeighbors(center).forEach(({ direction, coordinate }) => {
       if (direction === 'north') return;
       const inwardEdgeDirection = getOpposite(direction);
       const inwardEdgeTerrain = toTerrain('pasture');
-      const { board: newBoard } = board.place(
+      const newBoard = board.withTile(
         neighborTileFacingInward(`n-${direction}`, inwardEdgeDirection, inwardEdgeTerrain),
         coordinate
       );
@@ -259,9 +258,8 @@ describe('GameScorer', () => {
     const northCoord = north(center);
     const northEastCoord = northEast(center);
 
-    const { board: b1 } = board.place(createTile('north', 'pasture'), northCoord);
-    const { board: b2 } = b1.place(createTile('northEast', 'pasture'), northEastCoord);
-    board = b2;
+    board = board.withTile(createTile('north', 'pasture'), northCoord);
+    board = board.withTile(createTile('northEast', 'pasture'), northEastCoord);
 
     surroundExceptCenter(northCoord, 'n');
     surroundExceptCenter(northEastCoord, 'ne');
@@ -282,26 +280,27 @@ describe('GameScorer', () => {
     });
 
     it('should return false if tile has fewer than 6 neighbors', () => {
-      const { board: b1, placedTile } = board.place(createTile('center'), center);
-      board = b1;
+      const centerPlacement = board.place(createTile('center'), center);
+      board = centerPlacement.board;
+      const { placedTile } = centerPlacement;
       getNeighbors(center)
         .slice(0, 3)
         .forEach(({ coordinate }, i) => {
-          const { board: nb } = board.place(createTile(`n${i}`), coordinate);
-          board = nb;
+          board = board.withTile(createTile(`n${i}`), coordinate);
         });
 
       expect(scorer.isPerfect(board, placedTile)).toBe(false);
     });
 
     it('should return false if 6 neighbors exist but one terrain mismatches', () => {
-      const { board: b1, placedTile } = board.place(createTile('center', 'pasture'), center);
-      board = b1;
+      const centerPlacement = board.place(createTile('center', 'pasture'), center);
+      board = centerPlacement.board;
+      const { placedTile } = centerPlacement;
 
       getNeighbors(center).forEach(({ direction, coordinate }, i) => {
         const inwardEdgeDirection = getOpposite(direction);
         const inwardEdgeTerrain = i === 5 ? toTerrain('tree') : toTerrain('pasture');
-        const { board: nb } = board.place(
+        const nb = board.withTile(
           neighborTileFacingInward(`n${i}`, inwardEdgeDirection, inwardEdgeTerrain),
           coordinate
         );
@@ -312,13 +311,14 @@ describe('GameScorer', () => {
     });
 
     it('should return true if 6 neighbors exist and all terrains match', () => {
-      const { board: b1, placedTile } = board.place(createTile('center', 'pasture'), center);
-      board = b1;
+      const centerPlacement = board.place(createTile('center', 'pasture'), center);
+      board = centerPlacement.board;
+      const { placedTile } = centerPlacement;
 
       getNeighbors(center).forEach(({ direction, coordinate }, i) => {
         const inwardEdgeDirection = getOpposite(direction);
         const inwardEdgeTerrain = toTerrain('pasture');
-        const { board: nb } = board.place(
+        const nb = board.withTile(
           neighborTileFacingInward(`n${i}`, inwardEdgeDirection, inwardEdgeTerrain),
           coordinate
         );

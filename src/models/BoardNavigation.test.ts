@@ -20,9 +20,10 @@ describe('BoardNavigation', () => {
       southWest: new PastureTerrain(),
       northWest: new PastureTerrain(),
     };
-    const { board: b1 } = board.place(new Tile(northNeighborTile), north(center));
-
-    const map = BoardNavigation.neighborEdgeTerrains(b1, center);
+    const map = BoardNavigation.neighborEdgeTerrains(
+      board.withTile(new Tile(northNeighborTile), north(center)),
+      center
+    );
 
     expect(map[Direction.North]?.id).toBe('water');
     expect(map[Direction.NorthEast]).toBeUndefined();

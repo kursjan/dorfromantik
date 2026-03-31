@@ -92,8 +92,7 @@ describe('Game', () => {
   describe('isValidPlacement', () => {
     it('should return false if the position is already occupied', () => {
       const coord = new HexCoordinate(0, 0, 0);
-      const { board: b1 } = board.place(randomGenerator.createTile('t1'), coord);
-      board = b1;
+      board = board.withTile(randomGenerator.createTile('t1'), coord);
       const freeTile = new Tile({
         north: toTerrain('pasture'),
         northEast: toTerrain('pasture'),
@@ -113,8 +112,7 @@ describe('Game', () => {
 
     it('should return false if the position is not adjacent to any existing tile', () => {
       const origin = new HexCoordinate(0, 0, 0);
-      const { board: b1 } = board.place(randomGenerator.createTile('t1'), origin);
-      board = b1;
+      board = board.withTile(randomGenerator.createTile('t1'), origin);
       const freeTile = new Tile({
         north: toTerrain('pasture'),
         northEast: toTerrain('pasture'),
@@ -145,8 +143,7 @@ describe('Game', () => {
         southWest: toTerrain('pasture'),
         northWest: toTerrain('pasture'),
       });
-      const { board: b1 } = board.place(pastureTile, origin);
-      board = b1;
+      board = board.withTile(pastureTile, origin);
       const freeTile = new Tile({
         north: toTerrain('pasture'),
         northEast: toTerrain('pasture'),

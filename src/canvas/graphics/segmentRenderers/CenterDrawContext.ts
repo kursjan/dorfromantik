@@ -7,10 +7,8 @@ export interface CenterDrawContext {
   ctx: CanvasRenderingContext2D;
   centerX: number;
   centerY: number;
-  /** Outer tile hex corners (same as wedge rendering). */
   corners: { x: number; y: number }[];
   style: HexStyle;
-  /** The full tile being rendered (allows center to inspect neighboring edges). */
   tile: Tile;
 }
 

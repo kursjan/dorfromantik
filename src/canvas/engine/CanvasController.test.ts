@@ -98,12 +98,11 @@ describe('CanvasController', () => {
   it('should render tiles from the board', () => {
     const tile = new Tile({ id: 't1' });
     const coord = new HexCoordinate(-1, 0, 1);
-    const { board: newBoard } = activeGame.board.place(tile, coord);
     activeGame = new Game({
       id: activeGame.id,
       name: activeGame.name,
       lastPlayed: activeGame.lastPlayed,
-      board: newBoard,
+      board: activeGame.board.withTile(tile, coord),
       rules: activeGame.rules,
       score: activeGame.score,
       tileQueue: activeGame.tileQueue,

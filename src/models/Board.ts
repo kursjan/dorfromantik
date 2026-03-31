@@ -23,9 +23,6 @@ export class Board {
     this.tiles = tiles ? new Map(tiles) : new Map();
   }
 
-  /**
-   * Returns a map of directions to existing neighbor tiles from a given coordinate.
-   */
   getExistingNeighborsAt(coord: HexCoordinate): Partial<Record<Direction, BoardTile>> {
     const results: Partial<Record<Direction, BoardTile>> = {};
     for (const { direction, coordinate } of getNeighbors(coord)) {
@@ -37,9 +34,6 @@ export class Board {
     return results;
   }
 
-  /**
-   * Returns a map of directions to existing neighbor tiles.
-   */
   getExistingNeighbors(tile: BoardTile): Partial<Record<Direction, BoardTile>> {
     return this.getExistingNeighborsAt(tile.coordinate);
   }
@@ -79,6 +73,13 @@ export class Board {
     };
   }
 
+  /**
+   * Fluent convenience for immutable board transitions when only the next Board is needed.
+   */
+  withTile(tile: Tile, coord: HexCoordinate): Board {
+    return this.place(tile, coord).board;
+  }
+
   canPlace(coord: HexCoordinate): boolean {
     return !this.tiles.has(coord.getKey());
   }
@@ -95,9 +96,6 @@ export class Board {
     return this.tiles.values();
   }
 
-  /**
-   * Returns a new, empty Board instance.
-   */
   clear(): Board {
     return new Board();
   }

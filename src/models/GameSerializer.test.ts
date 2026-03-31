@@ -135,8 +135,7 @@ describe('GameSerializer', () => {
       southWest: toTerrain('rail'),
       northWest: toTerrain('house'),
     });
-    const { board: newBoard } = board.place(centered, new HexCoordinate(0, 0, 0));
-    board = newBoard;
+    board = board.withTile(centered, new HexCoordinate(0, 0, 0));
 
     const game = new Game({
       id: 'game-center',
