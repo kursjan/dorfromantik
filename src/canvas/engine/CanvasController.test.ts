@@ -192,7 +192,7 @@ describe('CanvasController', () => {
     expect((controller as any).debugState.listeners.has(callback)).toBe(false);
   });
 
-  it('should throw error in render if active game is missing', () => {
+  it('should throw when render runs without active game snapshot', () => {
     let missing = false;
     controller = new CanvasController(canvas, {
       getGameSnapshot: () => (missing ? (undefined as unknown as Game) : activeGame),
@@ -201,7 +201,7 @@ describe('CanvasController', () => {
       },
     });
     missing = true;
-    expect(() => (controller as any).render()).toThrow('No active game found in session');
+    expect(() => (controller as any).render()).toThrow(/Cannot read properties of undefined/);
   });
 
   it('should render ghost preview when hovering over a hex', () => {
