@@ -50,20 +50,25 @@ export interface GameJSON {
 
 /**
  * Utility class to serialize and deserialize Game instances.
- * Ensures that class instances are properly reconstructed from plain JSON.
+ * Serialization reads current state only; deserialization always builds **new** domain objects.
+ *
+ * **Immutable reconstruction:** `deserialize` rebuilds the board by replaying placements on an
+ * empty `Board` (each `place` returns a new board instance). The returned `Game` is a fresh
+ * instance; it does not share references with any previously serialized game object.
  */
 export class GameSerializer {
   /**
    * Serializes a Game instance to a plain JSON object.
    */
   static serialize(game: Game): GameJSON {
+    const tileQueue = [...game.tileQueue];
     return {
       id: game.id,
       name: game.name,
       lastPlayed: game.lastPlayed,
       score: game.score,
       board: this.serializeBoard(game.board),
-      tileQueue: game.tileQueue.map((tile) => this.serializeTile(tile)),
+      tileQueue: tileQueue.map((tile) => this.serializeTile(tile)),
       rules: this.serializeRules(game.rules),
     };
   }
@@ -99,13 +104,11 @@ export class GameSerializer {
   }
 
   private static deserializeBoard(json: BoardJSON): Board {
-    const board = new Board();
-    for (const entry of json.tiles) {
+    return json.tiles.reduce((acc, entry) => {
       const tile = this.deserializeTile(entry.tile);
       const coord = this.deserializeCoordinate(entry.coordinate);
-      board.place(tile, coord);
-    }
-    return board;
+      return acc.withTile(tile, coord);
+    }, new Board());
   }
 
   private static serializeTile(tile: Tile): TileJSON {

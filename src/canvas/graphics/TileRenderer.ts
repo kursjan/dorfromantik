@@ -31,7 +31,7 @@ export class TileRenderer {
     x: number,
     y: number,
     style: HexStyle = DEFAULT_HEX_STYLE,
-    options?: TileDrawOptions
+    options: TileDrawOptions = {}
   ) {
     const originalAlpha = this.ctx.globalAlpha;
     this.ctx.globalAlpha = style.opacity ?? 1;
@@ -56,7 +56,7 @@ export class TileRenderer {
         style,
       };
 
-      const neighborAcrossEdge = options?.neighborEdgeTerrains?.[direction];
+      const neighborAcrossEdge = options.neighborEdgeTerrains?.[direction];
       TERRAIN_ID_SEGMENT_RENDERERS[terrain.id].render(wedgeContext, neighborAcrossEdge, terrain);
     }
 
@@ -115,6 +115,7 @@ export class TileRenderer {
       centerY: y,
       corners,
       style,
+      tile,
     };
     renderer.render(context, center);
   }

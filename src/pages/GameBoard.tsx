@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect, useState } from 'react';
+import React, { useRef, useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { CanvasView } from '../canvas/components/CanvasView';
 import { useUser, useActiveGame } from '../context/SessionContext';
 import { useFirestoreService } from '../services/hooks/useServices';
@@ -10,28 +10,39 @@ const SAVE_DEBOUNCE_MS = import.meta.env.MODE === 'test' ? 10 : 2000;
 const STATUS_CLEAR_TIMEOUT_MS = 1000;
 
 export const GameBoard: React.FC = () => {
-  // 1. Context & Services
+  // Context & services
   const { user } = useUser();
-  const { activeGame } = useActiveGame();
+  const { activeGame, setActiveGame } = useActiveGame();
   const firestoreService = useFirestoreService();
 
-  // 2. Component State
+  // UI state
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
-  // 3. Mutable Refs
+  // Mutable refs
   const autosaverRef = useRef<GameAutosaver | null>(null);
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeGameRef = useRef(activeGame);
 
-  // 4. Callbacks
+  // Synchronization effects
+  useLayoutEffect(() => {
+    // Keep the latest snapshot available to imperative timers (debounce + forceSave)
+    // without recreating the autosaver instance.
+    activeGameRef.current = activeGame;
+  }, [activeGame]);
+
+  // Callbacks
   const debouncedSave = useCallback(() => {
     autosaverRef.current?.handleTilePlaced();
   }, []);
 
+  // Lifecycle effects
   useEffect(() => {
     autosaverRef.current = new GameAutosaver({
       firestoreService,
       getUserId: () => user.id,
-      getActiveGame: () => activeGame,
+      // `GameAutosaver` is created without depending on `activeGame` (deps exclude it),
+      // so we always read the latest immutable snapshot through `activeGameRef`.
+      getActiveGame: () => activeGameRef.current,
       debounceMs: SAVE_DEBOUNCE_MS,
       onSaveStart: () => {
         // Clear previous status immediately when a new save starts
@@ -54,8 +65,9 @@ export const GameBoard: React.FC = () => {
       autosaverRef.current = null;
       if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
     };
-  }, [firestoreService, user, activeGame]);
+  }, [firestoreService, user.id]);
 
+  // Render guards
   if (!activeGame) {
     return (
       <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -65,9 +77,14 @@ export const GameBoard: React.FC = () => {
     );
   }
 
+  // Render
   return (
     <main className="game-board">
-      <CanvasView activeGame={activeGame} onTilePlaced={debouncedSave} />
+      <CanvasView
+        activeGame={activeGame}
+        setActiveGame={setActiveGame}
+        onTilePlaced={debouncedSave}
+      />
       <SaveStatusIndicator status={saveStatus} />
     </main>
   );

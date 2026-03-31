@@ -18,13 +18,11 @@ export class WaterSegmentRenderer implements TerrainSegmentRenderer {
 
   /** River stroke from the middle of this wedge’s outer edge toward the center (or midpoint). */
   private drawWaterStroke(context: WedgeDrawContext, waterEdge: WaterStrokeEdge): void {
-    const { ctx, corners, centerX, centerY, style, segmentIndex } = context;
+    const { ctx, corners, centerX, centerY, style, startCorner, endCorner } = context;
 
     ctx.strokeStyle = TERRAIN_COLORS.water;
     ctx.lineWidth = Math.max(5, style.size * 0.24);
 
-    const startCorner = (segmentIndex + 4) % 6;
-    const endCorner = (segmentIndex + 5) % 6;
     const edgeMidpoint = {
       x: (corners[startCorner].x + corners[endCorner].x) / 2,
       y: (corners[startCorner].y + corners[endCorner].y) / 2,

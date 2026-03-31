@@ -4,17 +4,32 @@ import { getNeighbors, type Direction } from './Navigation';
 import { isValidPlacement } from './PlacementValidator';
 
 export interface BoardTile {
-  id: string; // "q,r,s"
-  tile: Tile;
-  coordinate: HexCoordinate;
+  readonly id: string; // "q,r,s"
+  readonly tile: Tile;
+  readonly coordinate: HexCoordinate;
 }
 
+/**
+ * An immutable representation of the hexagonal board.
+ */
 export class Board {
-  private tiles = new Map<string, BoardTile>();
+  private readonly tiles: ReadonlyMap<string, BoardTile>;
 
   /**
-   * Returns a map of directions to existing neighbor tiles from a given coordinate.
+   * Static convenience for creating a board with a single initial tile.
    */
+  static withTile(tile: Tile, coord: HexCoordinate): Board {
+    return new Board().withTile(tile, coord);
+  }
+
+  /**
+   * Creates a new instance of the Board.
+   * @param tiles - An optional map of initial tiles to populate the board.
+   */
+  constructor(tiles?: Map<string, BoardTile> | ReadonlyMap<string, BoardTile>) {
+    this.tiles = tiles ? new Map(tiles) : new Map();
+  }
+
   getExistingNeighborsAt(coord: HexCoordinate): Partial<Record<Direction, BoardTile>> {
     const results: Partial<Record<Direction, BoardTile>> = {};
     for (const { direction, coordinate } of getNeighbors(coord)) {
@@ -26,9 +41,6 @@ export class Board {
     return results;
   }
 
-  /**
-   * Returns a map of directions to existing neighbor tiles.
-   */
   getExistingNeighbors(tile: BoardTile): Partial<Record<Direction, BoardTile>> {
     return this.getExistingNeighborsAt(tile.coordinate);
   }
@@ -41,7 +53,14 @@ export class Board {
     return Array.from(uniqueCoords.values());
   }
 
-  place(tile: Tile, coord: HexCoordinate): BoardTile {
+  /**
+   * Returns a new Board instance with the given tile placed at the specified coordinate.
+   * @param tile - The tile to place.
+   * @param coord - The coordinate where the tile should be placed.
+   * @returns An object containing the new Board instance and the newly created BoardTile.
+   * @throws Error if the position is already occupied.
+   */
+  place(tile: Tile, coord: HexCoordinate): { board: Board; placedTile: BoardTile } {
     if (!this.canPlace(coord)) {
       throw new Error(`Position ${coord.getKey()} is already occupied`);
     }
@@ -51,8 +70,21 @@ export class Board {
       tile,
       coordinate: coord,
     };
-    this.tiles.set(id, boardTile);
-    return boardTile;
+
+    const newTiles = new Map(this.tiles);
+    newTiles.set(id, boardTile);
+
+    return {
+      board: new Board(newTiles),
+      placedTile: boardTile,
+    };
+  }
+
+  /**
+   * Fluent convenience for immutable board transitions when only the next Board is needed.
+   */
+  withTile(tile: Tile, coord: HexCoordinate): Board {
+    return this.place(tile, coord).board;
   }
 
   canPlace(coord: HexCoordinate): boolean {
@@ -71,8 +103,8 @@ export class Board {
     return this.tiles.values();
   }
 
-  clear(): void {
-    this.tiles.clear();
+  clear(): Board {
+    return new Board();
   }
 
   private getAllValidNeighbors(tile: Tile): HexCoordinate[] {

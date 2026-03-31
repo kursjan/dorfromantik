@@ -41,3 +41,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Highlight Valid Placement Coordinates**
       _Link: [./archive/valid-placement-highlight_20260328/](./archive/valid-placement-highlight_20260328/)_
+
+- [x] **Track: Immutable Game Model (#65)**
+      _Link: [./archive/immutable_game_20260331/index.md](./archive/immutable_game_20260331/index.md)_

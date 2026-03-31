@@ -37,6 +37,16 @@ describe('CanvasController', () => {
   let controller: CanvasController;
   let activeGame: Game;
 
+  function makeControllerOptions(onSet?: (g: Game) => void) {
+    return {
+      getGameSnapshot: () => activeGame,
+      setGameSnapshot: (g: Game) => {
+        activeGame = g;
+        onSet?.(g);
+      },
+    };
+  }
+
   beforeEach(() => {
     // Set up a basic DOM environment for the canvas element
     const canvasElement = document.createElement('canvas');
@@ -60,7 +70,7 @@ describe('CanvasController', () => {
   });
 
   it('should initialize successfully', () => {
-    controller = new CanvasController(canvas, activeGame);
+    controller = new CanvasController(canvas, makeControllerOptions());
     expect((controller as any).ctx).toBeDefined();
     expect((controller as any).hexRenderer).toBeInstanceOf(HexRenderer);
     expect((controller as any).tileRenderer).toBeInstanceOf(TileRenderer);
@@ -74,7 +84,7 @@ describe('CanvasController', () => {
       .spyOn(window, 'requestAnimationFrame')
       .mockImplementation(() => 0);
 
-    controller = new CanvasController(canvas, activeGame);
+    controller = new CanvasController(canvas, makeControllerOptions());
 
     expect(requestAnimationFrameSpy).toHaveBeenCalled();
     const hexRenderer = (controller as any).hexRenderer as any;
@@ -88,9 +98,17 @@ describe('CanvasController', () => {
   it('should render tiles from the board', () => {
     const tile = new Tile({ id: 't1' });
     const coord = new HexCoordinate(-1, 0, 1);
-    activeGame.board.place(tile, coord);
+    activeGame = new Game({
+      id: activeGame.id,
+      name: activeGame.name,
+      lastPlayed: activeGame.lastPlayed,
+      board: activeGame.board.withTile(tile, coord),
+      rules: activeGame.rules,
+      score: activeGame.score,
+      tileQueue: activeGame.tileQueue,
+    });
 
-    controller = new CanvasController(canvas, activeGame);
+    controller = new CanvasController(canvas, makeControllerOptions());
     const tileRenderer = (controller as any).tileRenderer as any;
 
     // Manually trigger a render
@@ -107,7 +125,7 @@ describe('CanvasController', () => {
   it('should clean up all resources on destroy', () => {
     const cancelAnimationFrameSpy = vi.spyOn(window, 'cancelAnimationFrame');
 
-    controller = new CanvasController(canvas, activeGame);
+    controller = new CanvasController(canvas, makeControllerOptions());
     const inputManager = (controller as any).inputManager as any;
     inputManager.destroy = vi.fn();
 
@@ -120,7 +138,7 @@ describe('CanvasController', () => {
   it('should notify debug stats change and respect throttling', () => {
     vi.useFakeTimers();
 
-    controller = new CanvasController(canvas, activeGame);
+    controller = new CanvasController(canvas, makeControllerOptions());
     const callback = vi.fn();
     controller.subscribeDebug(callback);
 
@@ -157,14 +175,14 @@ describe('CanvasController', () => {
   });
 
   it('should handle camera reset', () => {
-    controller = new CanvasController(canvas, activeGame);
+    controller = new CanvasController(canvas, makeControllerOptions());
     const camera = (controller as any).camera;
     controller.resetCamera();
     expect(camera.reset).toHaveBeenCalled();
   });
 
   it('should allow removing debug stats listener', () => {
-    controller = new CanvasController(canvas, activeGame);
+    controller = new CanvasController(canvas, makeControllerOptions());
     const callback = vi.fn();
     const removeListener = controller.subscribeDebug(callback);
 
@@ -173,14 +191,20 @@ describe('CanvasController', () => {
     expect((controller as any).debugState.listeners.has(callback)).toBe(false);
   });
 
-  it('should throw error in render if active game is missing', () => {
-    controller = new CanvasController(canvas, activeGame);
-    (controller as any).activeGame = undefined;
-    expect(() => (controller as any).render()).toThrow('No active game found in session');
+  it('should throw when render runs without active game snapshot', () => {
+    let missing = false;
+    controller = new CanvasController(canvas, {
+      getGameSnapshot: () => (missing ? (undefined as unknown as Game) : activeGame),
+      setGameSnapshot: (g: Game) => {
+        activeGame = g;
+      },
+    });
+    missing = true;
+    expect(() => (controller as any).render()).toThrow(/Cannot read properties of undefined/);
   });
 
   it('should render ghost preview when hovering over a hex', () => {
-    controller = new CanvasController(canvas, activeGame);
+    controller = new CanvasController(canvas, makeControllerOptions());
     (controller as any).hoveredHex = new HexCoordinate(1, 0, -1);
 
     const tileRenderer = (controller as any).tileRenderer as any;
@@ -195,7 +219,7 @@ describe('CanvasController', () => {
   });
 
   it('should update camera rotation based on input manager continuous rotation', () => {
-    controller = new CanvasController(canvas, activeGame);
+    controller = new CanvasController(canvas, makeControllerOptions());
     const inputManager = (controller as any).inputManager as any;
     const camera = (controller as any).camera;
 
@@ -219,7 +243,7 @@ describe('CanvasController', () => {
       return this;
     } as any);
 
-    controller = new CanvasController(canvas, activeGame);
+    controller = new CanvasController(canvas, makeControllerOptions());
     const camera = (controller as any).camera;
     const zoomSpy = vi.spyOn(controller as any, 'handleZoom');
     const hoverSpy = vi.spyOn(controller as any, 'handleHover');
@@ -265,7 +289,7 @@ describe('CanvasController', () => {
 
   describe('Input Handlers', () => {
     beforeEach(() => {
-      controller = new CanvasController(canvas, activeGame);
+      controller = new CanvasController(canvas, makeControllerOptions());
     });
 
     it('should handle zoom and respect sensitivity bounds', () => {
@@ -305,40 +329,32 @@ describe('CanvasController', () => {
       expect((controller as any).hoveredHex).toBeNull();
     });
 
-    it('should handle rotate clockwise and notify stats change', () => {
+    it('should handle rotate clockwise and persist snapshot via setGameSnapshot', () => {
       const rotateSpy = vi.spyOn(activeGame, 'rotateQueuedTileClockwise');
-      const notifySpy = vi.fn();
-      controller.onStatsChange = notifySpy;
+      const setSpy = vi.fn();
+      controller = new CanvasController(canvas, makeControllerOptions(setSpy));
 
       (controller as any).handleRotateClockwise();
 
       expect(rotateSpy).toHaveBeenCalled();
-      expect(notifySpy).toHaveBeenCalledWith(
-        activeGame.score,
-        activeGame.remainingTurns,
-        activeGame.peek()
-      );
+      expect(setSpy).toHaveBeenCalled();
     });
 
-    it('should handle rotate counter-clockwise and notify stats change', () => {
+    it('should handle rotate counter-clockwise and persist snapshot via setGameSnapshot', () => {
       const rotateSpy = vi.spyOn(activeGame, 'rotateQueuedTileCounterClockwise');
-      const notifySpy = vi.fn();
-      controller.onStatsChange = notifySpy;
+      const setSpy = vi.fn();
+      controller = new CanvasController(canvas, makeControllerOptions(setSpy));
 
       (controller as any).handleRotateCounterClockwise();
 
       expect(rotateSpy).toHaveBeenCalled();
-      expect(notifySpy).toHaveBeenCalledWith(
-        activeGame.score,
-        activeGame.remainingTurns,
-        activeGame.peek()
-      );
+      expect(setSpy).toHaveBeenCalled();
     });
 
     it('should handle mouse click and place tile if placement is valid', () => {
       const placeTileSpy = vi.spyOn(activeGame, 'placeTile');
-      const notifySpy = vi.fn();
-      controller.onStatsChange = notifySpy;
+      const setSpy = vi.fn();
+      controller = new CanvasController(canvas, makeControllerOptions(setSpy));
 
       // Coordinate (1, 0, -1) is adjacent to (0, 0, 0) and likely empty initially
       const targetCoord = new HexCoordinate(1, 0, -1);
@@ -352,13 +368,13 @@ describe('CanvasController', () => {
       (controller as any).handleMouseClick();
 
       expect(placeTileSpy).toHaveBeenCalledWith(targetCoord);
-      expect(notifySpy).toHaveBeenCalled();
+      expect(setSpy).toHaveBeenCalled();
     });
 
     it('should not place tile on mouse click if placement is invalid', () => {
       const placeTileSpy = vi.spyOn(activeGame, 'placeTile');
-      const notifySpy = vi.fn();
-      controller.onStatsChange = notifySpy;
+      const setSpy = vi.fn();
+      controller = new CanvasController(canvas, makeControllerOptions(setSpy));
 
       const targetCoord = new HexCoordinate(0, 0, 0); // Occupied
       const camera = (controller as any).camera;
@@ -371,7 +387,7 @@ describe('CanvasController', () => {
       (controller as any).handleMouseClick(0, 0);
 
       expect(placeTileSpy).not.toHaveBeenCalled();
-      expect(notifySpy).not.toHaveBeenCalled();
+      expect(setSpy).not.toHaveBeenCalled();
     });
   });
 });

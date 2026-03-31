@@ -64,6 +64,7 @@ Ad hoc task can be implement in main.
   - **Task Commit:** Commit the individual task immediately after it is verified to prevent data loss.
   - **Phase Completion:** Once a phase is completed, the **project-orchestrator** will perform a final verification and create a **Phase Checkpoint** commit if necessary.
     - push will happen at the end of the track
+  - **Approval Tracking:** Use a moving tag `approved/<branch-name>` (e.g. `approved/worker1`, `approved/worker2`) as the pointer to the last user-approved commit on that branch. After each new approval, move the tag for that branch to the newly approved commit.
 
 ### **GitHub Integration:**
 
@@ -460,6 +461,12 @@ When requested, the AI will facilitate the creation and execution of tests, ensu
   - The AI will use Vitest as the testing framework and React Testing Library for rendering and interacting with components.
   - Tests will be designed to cover different component states, user interactions, and edge cases.
   - **Keep tests DRY** (shared helpers, setup, fixtures where it helps). **Using `for` loops in tests is discouraged** (prefer clear, explicit cases).
+  - **Test formatting conventions:**
+    - For short tests (roughly 3-6 lines in the test body), do not add `// Arrange`, `// Act`, `// Assert` comments.
+    - For very short tests (about 3 lines), keep the body compact with no extra blank lines.
+    - Use `// Arrange`, `// Act`, `// Assert` comments only when the test body is medium/long and the sections improve readability.
+    - Inside a single test body, keep blank lines only when they separate conceptual blocks.
+    - Keep standard structural spacing between tests and describe blocks (one blank line between adjacent `it(...)` and `describe(...)` blocks).
 - **Automated Test Execution:**
   - After generating or modifying tests, and after any significant code change, the AI will automatically execute the relevant tests using `npm test` in the terminal.
   - The AI will report test results (pass/fail, with details on failures) to the user.

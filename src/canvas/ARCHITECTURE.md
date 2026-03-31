@@ -75,7 +75,7 @@ Understanding the coordinate spaces is critical for this engine:
 
 The central hub. It:
 
-- **Owns State:** Camera, Hovered Hex, (Future: Board).
+- **Owns State:** Camera, hovered hex, debug snapshot publishing, and input wiring. Game board data is read from `getGameSnapshot()` and committed via `setGameSnapshot(game)` (see §5).
 - **Runs Loop:** Manages `requestAnimationFrame`.
 - **Orchestrates:** `InputManager` callbacks -> updates State -> delegates drawing to Renderers.
 - **Validation:** Provides `isValidPlacement(coord)` by delegating to the `Game` model, ensuring the UI only allows valid actions.
@@ -110,7 +110,7 @@ Stateless rendering utilities. They receive the `Context2D` and necessary data t
 
 - **BackgroundRenderer:** Handles clearing the screen and drawing the background color.
 - **HexRenderer:** Draws the game grid and debug highlights. It uses `HexStyles.ts` for configuration.
-- **TileRenderer:** Draws the 6-sided terrain wedges for placed tiles. For each direction it builds a `WedgeDrawContext` and dispatches to `TERRAIN_ID_SEGMENT_RENDERERS[tileSide.id]`, passing the terrain across the shared edge on the neighbor tile when provided (`TileDrawOptions.neighborEdgeTerrains` or `BoardNavigation.neighborEdgeTerrains` when a `board` is passed to `drawTileAtHex`). This keeps hybrid terrains (e.g. `waterOrPasture`) visually consistent with neighbors. When `tile.center` is set, it looks up `TERRAIN_ID_CENTER_SEGMENT_RENDERERS` (e.g. `WaterCenterSegmentRenderer` for water) and draws the inner hex via `CenterDrawContext`.
+- **TileRenderer:** Draws the 6-sided terrain wedges for placed tiles. For each direction it builds a `WedgeDrawContext` and dispatches to `TERRAIN_ID_SEGMENT_RENDERERS[tileSide.id]`, passing the terrain across the shared edge on the neighbor tile when provided (`TileDrawOptions.neighborEdgeTerrains` or `BoardNavigation.neighborEdgeTerrains` when a `board` is passed to `drawTileAtHex`). This keeps hybrid terrains (e.g. `waterOrPasture`) visually consistent with neighbors. When `tile.center` is set, it looks up `TERRAIN_ID_CENTER_SEGMENT_RENDERERS` (e.g. `WaterCenterSegmentRenderer` for water, `RailCenterSegmentRenderer` for rail) and draws the inner hex via `CenterDrawContext`.
 - **(Deprecated) DebugRenderer:** Legacy canvas-based debug text. Replaced by `DebugOverlay` component.
 
 ### Services (`services/*.ts`)
@@ -131,11 +131,10 @@ Configuration files for their respective renderers.
 
 ## 5. React & Controller Synchronization
 
-While the Controller runs independently for performance, the React-based HUD needs to reflect the current game state (score, turns).
+While the Controller runs independently for performance, the React tree must hold the **canonical immutable `Game` snapshot** (via `ActiveGameContext`) so persistence (`GameAutosaver`) and the HUD see the same state.
 
-- **Pattern:** `CanvasController` exposes an `onStatsChange` callback.
-- **Registration:** `CanvasView` (React) registers a listener in its `useEffect` hook.
-- **Execution:** When the game state changes (e.g., tile placed), the Controller invokes the callback, triggering a `useState` update in React.
+- **Pattern:** `CanvasController` is constructed with **`getGameSnapshot()`** and **`setGameSnapshot(game)`**. It does not mirror `Game` on `this`; it reads the latest snapshot from the getter each frame and calls **`setGameSnapshot`** after place / rotate with the returned snapshot.
+- **`CanvasView`:** Receives **`activeGame`** and **`setActiveGame`** from the parent (e.g. **`GameBoard`** from **`useActiveGame()`**). Uses **`useGameSnapshotBridge`**: syncs a **ref** from **`activeGame`** (e.g. **`useLayoutEffect`**) and wraps **`setActiveGame`** into **`setGameSnapshot`**, which updates the ref **synchronously** with each new snapshot (avoids the rAF loop lagging React by one frame). The HUD reads **score / turns / next tile** from the **`activeGame` prop**, not a separate stats callback.
 - **Debug Stats:** `CanvasController` also exposes `subscribeDebug` and `getDebugSnapshot` for high-frequency updates (FPS, Camera) used by `DebugOverlay` via `useSyncExternalStore`.
 
 ## 6. Data Flow Example: Hovering (Magnetic Snapping)

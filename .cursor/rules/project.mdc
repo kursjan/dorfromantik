@@ -32,6 +32,12 @@ alwaysApply: true
 # Tests (Vitest / RTL)
 
 - Keep tests **DRY**. **Using `for` loops in tests is discouraged** (prefer clear, explicit cases).
+- Keep test formatting consistent:
+  - For short tests (roughly 3-6 lines in the test body), do not use `// Arrange`, `// Act`, `// Assert` comments.
+  - For very short tests (about 3 lines), keep the body compact with no extra blank lines.
+  - Use `// Arrange`, `// Act`, `// Assert` comments only for medium/long tests where they improve readability.
+  - Inside a test body, keep blank lines only when they separate conceptual blocks.
+  - Keep normal structural spacing between test/describe blocks (one blank line between adjacent `it(...)` and `describe(...)` blocks).
 
 # Git & Branching
 
@@ -53,6 +59,9 @@ alwaysApply: true
     - Moving to the next Conductor task,
     - Or making further non-trivial edits,
 - Respect phrases like "lgtm", "sgtm", "approved" as signals that the user is satisfied.
+- Approval marker uses a moving Git tag per branch: `approved/<branch-name>` (e.g. `approved/worker1`, `approved/worker2`).
+  - On approval, move that tag to the latest approved commit on the current branch.
+  - Keep one current approval pointer per branch (history can be recovered from commits/PR discussion).
 
 # Terminal & Working Directory
 

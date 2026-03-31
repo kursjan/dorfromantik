@@ -4,22 +4,29 @@ import { ResetViewButton } from './ResetViewButton';
 import { GameHUD } from './GameHUD';
 import { DebugOverlay } from './DebugOverlay';
 import { Game } from '../../models/Game';
-import type { Tile } from '../../models/Tile';
+import { useGameSnapshotBridge } from '../hooks/useGameSnapshotBridge';
 
 interface CanvasViewProps {
   activeGame: Game;
-  /** Called when a tile is placed; e.g. parent may debounce and persist game state. */
+  /** Typically `setActiveGame` from session context; commits snapshots from the canvas. */
+  setActiveGame: (game: Game) => void;
+  /**
+   * @deprecated Tracked for removal in https://github.com/kursjan/dorfromantik/issues/69.
+   * Called when a tile is placed; currently used by parent autosave wiring.
+   */
   onTilePlaced: () => void;
 }
 
-export const CanvasView: React.FC<CanvasViewProps> = ({ activeGame, onTilePlaced }) => {
+export const CanvasView: React.FC<CanvasViewProps> = ({
+  activeGame,
+  setActiveGame,
+  onTilePlaced,
+}) => {
+  const { getGameSnapshot, setGameSnapshot } = useGameSnapshotBridge(activeGame, setActiveGame);
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const controllerRef = useRef<CanvasController | null>(null);
 
-  // State for game stats to ensure React updates when they change
-  const [score, setScore] = useState(activeGame.score);
-  const [remainingTurns, setRemainingTurns] = useState(activeGame.remainingTurns);
-  const [nextTile, setNextTile] = useState<Tile | null>(activeGame.peek() ?? null);
   const [controller, setController] = useState<CanvasController | null>(null);
   const [debugOverlayVisible, setDebugOverlayVisible] = useState(false);
 
@@ -27,32 +34,31 @@ export const CanvasView: React.FC<CanvasViewProps> = ({ activeGame, onTilePlaced
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const newController = new CanvasController(canvas, activeGame, {
+    const newController = new CanvasController(canvas, {
+      getGameSnapshot,
+      setGameSnapshot,
       onToggleDebugOverlay: () => setDebugOverlayVisible((v) => !v),
     });
     setController(newController);
-
-    newController.onStatsChange = (newScore: number, newTurns: number, newNextTile: Tile | null) => {
-      setScore(newScore);
-      setRemainingTurns(newTurns);
-      setNextTile(newNextTile);
-    };
 
     newController.onTilePlaced = onTilePlaced;
 
     controllerRef.current = newController;
 
-    // Unsubscribe function
     return () => {
       newController.destroy();
       controllerRef.current = null;
       setController(null);
     };
-  }, [activeGame, onTilePlaced]);
+  }, [activeGame.id, onTilePlaced, getGameSnapshot, setGameSnapshot]);
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
-      <GameHUD score={score} remainingTurns={remainingTurns} nextTile={nextTile} />
+      <GameHUD
+        score={activeGame.score}
+        remainingTurns={activeGame.remainingTurns}
+        nextTile={activeGame.peek() ?? null}
+      />
       <ResetViewButton onClick={() => controllerRef.current?.resetCamera()} />
       {controller && <DebugOverlay controller={controller} isVisible={debugOverlayVisible} />}
       <canvas

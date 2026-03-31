@@ -25,10 +25,8 @@ describe('BoardPrinter', () => {
         northWest: toTerrain('field'),
       });
       const coord = new HexCoordinate(0, 0, 0);
-      board.place(tile, coord);
-
       const printer = new BoardPrinter();
-      const output = printer.print(board);
+      const output = printer.print(board.withTile(tile, coord));
 
       const expected = String.raw`   _ _   
  /  T  \ 
@@ -51,10 +49,8 @@ describe('BoardPrinter', () => {
         northWest: toTerrain('field'),
       });
       const coord = new HexCoordinate(10, 10, -20);
-      board.place(tile, coord);
-
       const printer = new BoardPrinter();
-      const output = printer.print(board);
+      const output = printer.print(board.withTile(tile, coord));
 
       const expected = String.raw`   _ _   
  /  T  \ 
@@ -77,10 +73,8 @@ describe('BoardPrinter', () => {
         northWest: toTerrain('field'),
       });
       const coord = new HexCoordinate(-10, -10, 20);
-      board.place(tile, coord);
-
       const printer = new BoardPrinter();
-      const output = printer.print(board);
+      const output = printer.print(board.withTile(tile, coord));
 
       const expected = String.raw`   _ _   
  /  T  \ 
@@ -112,11 +106,12 @@ describe('BoardPrinter', () => {
         northWest: toTerrain('house'),
       });
 
-      board.place(tile1, new HexCoordinate(0, 0, 0));
-      board.place(tile2, new HexCoordinate(1, 0, -1));
-
       const printer = new BoardPrinter();
-      const output = printer.print(board);
+      const output = printer.print(
+        board
+          .withTile(tile1, new HexCoordinate(0, 0, 0))
+          .withTile(tile2, new HexCoordinate(1, 0, -1))
+      );
 
       const expected = String.raw`   _ _   
  /  T  \ 
@@ -152,11 +147,12 @@ describe('BoardPrinter', () => {
         northWest: toTerrain('house'),
       });
 
-      board.place(tile1, new HexCoordinate(0, 0, 0));
-      board.place(tile2, new HexCoordinate(0, 1, -1));
-
       const printer = new BoardPrinter();
-      const output = printer.print(board);
+      const output = printer.print(
+        board
+          .withTile(tile1, new HexCoordinate(0, 0, 0))
+          .withTile(tile2, new HexCoordinate(0, 1, -1))
+      );
 
       // Line length must be 16.
       // Spaces must exactly match what Canvas outputs.
@@ -183,10 +179,8 @@ describe('BoardPrinter', () => {
         northWest: toTerrain('field'),
       });
       const coord = new HexCoordinate(-1, -1, 2);
-      board.place(tile, coord);
-
       const printer = new BoardPrinter();
-      const output = printer.print(board);
+      const output = printer.print(board.withTile(tile, coord));
 
       const expected = String.raw`   _ _   
  /  T  \ 

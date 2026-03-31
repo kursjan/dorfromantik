@@ -12,13 +12,20 @@ import {
   INVALID_PREVIEW_STYLE,
   VALID_PLACEMENT_STYLE,
 } from '../graphics/HexStyles';
-import { Tile } from '../../models/Tile';
 import { Game } from '../../models/Game';
 
 export interface DebugStats {
   fps: number;
   camera: { x: number; y: number; zoom: number; rotation: number };
   hoveredHex: HexCoordinate | null;
+}
+
+export interface CanvasControllerOptions {
+  /** Latest immutable game snapshot (typically backed by a React ref updated in sync with context). */
+  getGameSnapshot: () => Game;
+  /** Commit the next immutable `Game` after place/rotate (e.g. ref + context setter from the view bridge). */
+  setGameSnapshot: (game: Game) => void;
+  onToggleDebugOverlay?: () => void;
 }
 
 interface DebugState {
@@ -35,7 +42,9 @@ export class CanvasController {
   private static readonly ROTATION_SPEED = 0.05;
   private static readonly ZOOM_SENSITIVITY = 0.001;
 
-  private readonly activeGame: Game;
+  private readonly getGameSnapshot: () => Game;
+  private readonly setGameSnapshot: (game: Game) => void;
+
   private readonly backgroundRenderer: BackgroundRenderer;
   private readonly canvas: HTMLCanvasElement;
   private readonly camera: Camera;
@@ -48,25 +57,22 @@ export class CanvasController {
   private debugState: DebugState = CanvasController.createDefaultDebugState();
   private hoveredHex: HexCoordinate | null = null;
 
-  // Callbacks for React synchronization
-  public onStatsChange?: (score: number, remainingTurns: number, nextTile: Tile | null) => void;
+  /**
+   * @deprecated Tracked for removal in https://github.com/kursjan/dorfromantik/issues/69.
+   * Prefer deriving autosave/persistence from `activeGame` transitions in React state.
+   */
   public onTilePlaced?: () => void;
 
-  constructor(
-    canvas: HTMLCanvasElement,
-    activeGame: Game,
-    options?: { onToggleDebugOverlay?: () => void }
-  ) {
+  constructor(canvas: HTMLCanvasElement, options: CanvasControllerOptions) {
     this.canvas = canvas;
-    this.activeGame = activeGame;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('Could not get 2d context');
-    this.ctx = ctx;
+    this.getGameSnapshot = options.getGameSnapshot;
+    this.setGameSnapshot = options.setGameSnapshot;
+    this.ctx = this.getRequired2dContext(canvas);
 
     this.camera = new Camera({ x: 0, y: 0, zoom: 1 });
-    this.backgroundRenderer = new BackgroundRenderer(ctx);
-    this.hexRenderer = new HexRenderer(ctx);
-    this.tileRenderer = new TileRenderer(ctx);
+    this.backgroundRenderer = new BackgroundRenderer(this.getRequired2dContext(canvas));
+    this.hexRenderer = new HexRenderer(this.getRequired2dContext(canvas));
+    this.tileRenderer = new TileRenderer(this.getRequired2dContext(canvas));
     this.inputManager = new InputManager(canvas, {
       onPan: (dx, dy) => this.handlePan(dx, dy),
       onZoom: (delta) => this.handleZoom(delta),
@@ -76,7 +82,7 @@ export class CanvasController {
       onRotateClockwise: () => this.handleRotateClockwise(),
       onRotateCounterClockwise: () => this.handleRotateCounterClockwise(),
       onResize: () => this.handleResize(),
-      onToggleDebugOverlay: options?.onToggleDebugOverlay,
+      onToggleDebugOverlay: options.onToggleDebugOverlay,
     });
 
     // Handle Resize (Initial)
@@ -97,6 +103,10 @@ export class CanvasController {
 
   public resetCamera() {
     this.camera.reset();
+  }
+
+  public get activeGame(): Game {
+    return this.getGameSnapshot();
   }
 
   public subscribeDebug(listener: () => void): () => void {
@@ -134,10 +144,7 @@ export class CanvasController {
   }
 
   private render() {
-    const activeGame = this.activeGame;
-    if (!activeGame) {
-      throw new Error('No active game found in session');
-    }
+    const activeGame = this.getGameSnapshot();
 
     // 1. Clear
     this.backgroundRenderer.draw(this.canvas.width, this.canvas.height);
@@ -147,7 +154,6 @@ export class CanvasController {
     this.camera.applyTransform(this.ctx, this.canvas.width, this.canvas.height);
 
     // 3. Draw World
-    // Draw base grid (debug)
     this.hexRenderer.drawDebugGrid(5);
 
     // Draw placed tiles from the board
@@ -199,13 +205,6 @@ export class CanvasController {
     this.debugState.listeners.forEach((listener) => listener());
   }
 
-  private notifyStatsChange() {
-    const activeGame = this.activeGame;
-    if (this.onStatsChange) {
-      this.onStatsChange(activeGame.score, activeGame.remainingTurns, activeGame.peek() || null);
-    }
-  }
-
   // --- Input Handlers ---
 
   private handlePan(dx: number, dy: number) {
@@ -228,7 +227,7 @@ export class CanvasController {
       this.canvas.height
     );
 
-    const validCoords = this.activeGame.hints.validPlacements;
+    const validCoords = this.getGameSnapshot().hints.validPlacements;
 
     if (validCoords.length === 0) {
       this.hoveredHex = null;
@@ -247,36 +246,43 @@ export class CanvasController {
   }
 
   private handleMouseClick() {
-    const activeGame = this.activeGame;
+    const activeGame = this.getGameSnapshot();
+    if (!activeGame.inProgress()) return;
+    if (!this.hoveredHex) return;
+    if (!this.isValidPlacement(this.hoveredHex)) return;
 
-    if (activeGame.inProgress() && this.hoveredHex && this.isValidPlacement(this.hoveredHex)) {
-      activeGame.placeTile(this.hoveredHex);
-      this.notifyStatsChange();
-      this.onTilePlaced?.();
-    }
+    const { game: nextGame } = activeGame.placeTile(this.hoveredHex);
+    this.setGameSnapshot(nextGame);
+    this.onTilePlaced?.();
   }
 
   private handleRotateClockwise() {
-    this.activeGame.rotateQueuedTileClockwise();
-    this.notifyStatsChange();
+    const nextGame = this.getGameSnapshot().rotateQueuedTileClockwise();
+    this.setGameSnapshot(nextGame);
   }
 
   private handleRotateCounterClockwise() {
-    this.activeGame.rotateQueuedTileCounterClockwise();
-    this.notifyStatsChange();
+    const nextGame = this.getGameSnapshot().rotateQueuedTileCounterClockwise();
+    this.setGameSnapshot(nextGame);
   }
 
   private handleResize() {
-    if (this.canvas.width !== window.innerWidth || this.canvas.height !== window.innerHeight) {
-      this.canvas.width = window.innerWidth;
-      this.canvas.height = window.innerHeight;
-    }
+    if (this.canvas.width === window.innerWidth && this.canvas.height === window.innerHeight)
+      return;
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
   }
 
   // --- Helpers ---
 
+  private getRequired2dContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Could not get 2d context');
+    return ctx;
+  }
+
   private isValidPlacement(coord: HexCoordinate): boolean {
-    return this.activeGame.isValidPlacement(coord);
+    return this.getGameSnapshot().isValidPlacement(coord);
   }
 
   private static createDefaultDebugState(): DebugState {
