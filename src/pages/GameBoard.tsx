@@ -10,30 +10,32 @@ const SAVE_DEBOUNCE_MS = import.meta.env.MODE === 'test' ? 10 : 2000;
 const STATUS_CLEAR_TIMEOUT_MS = 1000;
 
 export const GameBoard: React.FC = () => {
-  // 1. Context & Services
+  // Context & services
   const { user } = useUser();
   const { activeGame, setActiveGame } = useActiveGame();
   const firestoreService = useFirestoreService();
 
-  // 2. Component State
+  // UI state
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
-  // 3. Mutable Refs
+  // Mutable refs
   const autosaverRef = useRef<GameAutosaver | null>(null);
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeGameRef = useRef(activeGame);
 
+  // Synchronization effects
   useLayoutEffect(() => {
     // Keep the latest snapshot available to imperative timers (debounce + forceSave)
     // without recreating the autosaver instance.
     activeGameRef.current = activeGame;
   }, [activeGame]);
 
-  // 4. Callbacks
+  // Callbacks
   const debouncedSave = useCallback(() => {
     autosaverRef.current?.handleTilePlaced();
   }, []);
 
+  // Lifecycle effects
   useEffect(() => {
     autosaverRef.current = new GameAutosaver({
       firestoreService,
@@ -65,6 +67,7 @@ export const GameBoard: React.FC = () => {
     };
   }, [firestoreService, user.id]);
 
+  // Render guards
   if (!activeGame) {
     return (
       <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -74,6 +77,7 @@ export const GameBoard: React.FC = () => {
     );
   }
 
+  // Render
   return (
     <main className="game-board">
       <CanvasView
