@@ -5,7 +5,7 @@
 - [ ] Create and switch to feature branch `feat/svg-hextile` using **task-conductor** skill.
 - [x] Implement `src/components/Tiles/SvgHexUtils.ts` to export standard SVG paths for the 6 hexagonal wedges and the center circle using **task-conductor** skill.
 - [x] Define the `TerrainIdSvgSegmentRenderers` interface/registry and create base SVG `<Wedge />` and `<CenterWedge />` wrapper components using **task-conductor** skill.
-- [ ] Create the core `<HexTile tile={tile} />` container component that orchestrates 6 wedges and 1 center component using **task-conductor** skill.
+- [x] Create the core `<HexTile tile={tile} />` container component that orchestrates 6 wedges and 1 center component using **task-conductor** skill.
 - [ ] **Phase Gate**: Verify architecture and test coverage using **project-orchestrator** skill.
 
 ## Phase 2: Terrain Implementations & Storybook
