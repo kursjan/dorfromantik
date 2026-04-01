@@ -1,9 +1,26 @@
+import { HexCoordinate } from '../../models/HexCoordinate';
 import { directions } from '../../models/Navigation';
 
 /** Vertex radius for flat-top hex geometry in SVG user units (shared by wedge paths and edge-midpoint math). */
 export const SVG_HEX_RADIUS = 50;
 const SVG_CENTER_WATER_HEX_RADIUS = SVG_HEX_RADIUS * 0.35;
 const SVG_CENTER_RAIL_HEX_RADIUS = SVG_HEX_RADIUS * 0.15;
+
+/**
+ * Converts a logical HexCoordinate to absolute pixel coordinates (x, y)
+ * based on the standard SVG_HEX_RADIUS.
+ */
+export function hexToPixel(hex: HexCoordinate): { x: number; y: number } {
+  // Flat-topped hex conversion
+  // Adjusted for user coordinate system where (-1, 0, 1) is North.
+  // We swap q and r in the standard flat-topped formula.
+  const effectiveQ = hex.r;
+  const effectiveR = hex.q;
+
+  const x = SVG_HEX_RADIUS * (3.0 / 2.0) * effectiveQ;
+  const y = SVG_HEX_RADIUS * ((Math.sqrt(3.0) / 2.0) * effectiveQ + Math.sqrt(3.0) * effectiveR);
+  return { x, y };
+}
 
 interface Point {
   x: number;

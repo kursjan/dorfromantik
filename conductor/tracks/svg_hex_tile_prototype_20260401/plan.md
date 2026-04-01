@@ -24,7 +24,7 @@
 
 ## Phase 4: SvgBoard Prototype & Review
 
-- [ ] Create `src/components/Tiles/SvgBoard.tsx` that takes a list of tiles and a camera object, and renders them using `<HexTile>` and `SvgHexUtils.ts` for coordinate translation using **task-conductor** skill.
+- [x] Create `src/components/Tiles/SvgBoard.tsx` that takes a list of tiles and a camera object, and renders them using `<HexTile>` and `SvgHexUtils.ts` for coordinate translation using **task-conductor** skill.
 - [ ] Create `src/components/Tiles/SvgBoard.stories.tsx` with mock scenarios (single tile, scattered cluster, interactive camera panning/zooming) using **task-conductor** skill.
 - [ ] Perform a rigorous file-by-file review of all SvgBoard changes against `main` using **quick-review** skill.
 - [ ] Address any feedback from `REVIEW_FEEDBACK.md` using **task-conductor** skill.
