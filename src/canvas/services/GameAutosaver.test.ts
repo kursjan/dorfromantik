@@ -59,8 +59,6 @@ describe('GameAutosaver', () => {
 
   it('saves once after debounce when a tile is placed', async () => {
     autosaver.handleGameChanged(previousGame, nextGame);
-
-    // Move time forward past the debounce delay
     vi.advanceTimersByTime(2000);
 
     expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
@@ -73,9 +71,6 @@ describe('GameAutosaver', () => {
     autosaver.handleGameChanged(previousGame, nextGame);
     vi.advanceTimersByTime(1000);
     autosaver.handleGameChanged(previousGame, nextGame);
-
-    // Total advanced so far: 2000ms; last call scheduled at t=2000.
-    // Advance one more debounce window from the last call.
     vi.advanceTimersByTime(2000);
 
     expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
@@ -92,7 +87,6 @@ describe('GameAutosaver', () => {
       remainingTurns: nextGame.remainingTurns,
     } as unknown as Game;
 
-    // Non-meaningful transition should not clear/restart the active debounce timer.
     autosaver.handleGameChanged(nextGame, equivalentGame);
 
     vi.advanceTimersByTime(1000);
@@ -100,16 +94,16 @@ describe('GameAutosaver', () => {
   });
 
   it('does not save when there is no active game at fire time', () => {
-    // First call uses a game
+    // Arrange
     autosaver.handleGameChanged(previousGame, nextGame);
 
-    // Update provider to simulate game ending before timer fires
+    // Act
     getActiveGame = () => null;
     // @ts-expect-error - overriding for test; autosaver captures the function reference
     autosaver['getActiveGame'] = getActiveGame;
-
     vi.advanceTimersByTime(2000);
 
+    // Assert
     expect(saveGameStateSpy).not.toHaveBeenCalled();
   });
 
@@ -146,23 +140,21 @@ describe('GameAutosaver', () => {
   });
 
   it('triggers onSaveError if save hangs for more than 5 seconds', async () => {
-    // Mock saveGameState to return a promise that never resolves
+    // Arrange
     saveGameStateSpy.mockReturnValueOnce(new Promise(() => {}));
 
+    // Act
     autosaver.handleGameChanged(previousGame, nextGame);
-
-    // Advance past the 2-second debounce to start the save
     await vi.advanceTimersByTimeAsync(2000);
     expect(onSaveStartSpy).toHaveBeenCalledTimes(1);
     expect(onSaveErrorSpy).not.toHaveBeenCalled();
 
-    // Advance 4.9 seconds into the save (total 6.9s)
     await vi.advanceTimersByTimeAsync(4900);
     expect(onSaveErrorSpy).not.toHaveBeenCalled();
 
-    // Advance past the 5-second timeout (total 7s+)
     await vi.advanceTimersByTimeAsync(100);
 
+    // Assert
     expect(onSaveSuccessSpy).not.toHaveBeenCalled();
     expect(onSaveErrorSpy).toHaveBeenCalledTimes(1);
     expect(onSaveErrorSpy).toHaveBeenCalledWith(expect.any(Error));
@@ -170,40 +162,33 @@ describe('GameAutosaver', () => {
   });
 
   it('recovers and calls onSaveSuccess when a hung save eventually succeeds', async () => {
+    // Arrange
     let resolveSave: () => void;
     const hangingPromise = new Promise<void>((resolve) => {
       resolveSave = resolve;
     });
     saveGameStateSpy.mockReturnValueOnce(hangingPromise);
 
+    // Act
     autosaver.handleGameChanged(previousGame, nextGame);
-
-    // Advance past the 2-second debounce to start the save
     await vi.advanceTimersByTimeAsync(2000);
     expect(onSaveStartSpy).toHaveBeenCalledTimes(1);
 
-    // Advance past the 5-second timeout
     await vi.advanceTimersByTimeAsync(5000);
     expect(onSaveErrorSpy).toHaveBeenCalledTimes(1);
 
-    // Now simulate the network returning and the save succeeding
     resolveSave!();
-    // allow microtasks to resolve
     await vi.advanceTimersByTimeAsync(100);
 
-    // The UI should be notified that the save finally succeeded
+    // Assert
     expect(onSaveSuccessSpy).toHaveBeenCalledTimes(1);
   });
 
   it('forces save and clears timer on forceSaveAndDispose', () => {
     autosaver.handleGameChanged(previousGame, nextGame);
-
-    // Do not advance timers; call forceSaveAndDispose directly
     autosaver.forceSaveAndDispose();
 
     expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
-
-    // Timer should be cleared so moving time forward shouldn't trigger another save
     vi.advanceTimersByTime(2000);
     expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
   });
