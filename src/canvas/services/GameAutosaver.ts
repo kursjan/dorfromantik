@@ -33,6 +33,10 @@ export class GameAutosaver {
   }
 
   handleGameChanged = (previousGame: Game | null, currentGame: Game | null) => {
+    if (!previousGame || !currentGame) {
+      return;
+    }
+
     if (!this.didGameplayStateChange(previousGame, currentGame)) {
       return;
     }
@@ -46,10 +50,7 @@ export class GameAutosaver {
     }, this.debounceMs);
   };
 
-  private didGameplayStateChange(previousGame: Game | null, currentGame: Game | null): boolean {
-    if (!previousGame || !currentGame) {
-      return false;
-    }
+  private didGameplayStateChange(previousGame: Game, currentGame: Game): boolean {
     if (previousGame === currentGame) {
       return false;
     }
