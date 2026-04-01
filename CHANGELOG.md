@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **SVG HexTile prototype (Phase 1-2):**
+  - Added `src/components/Tiles/SvgHexUtils.ts` for reusable SVG wedge and center-circle paths.
+  - Added `Wedge`, `CenterWedge`, terrain-id SVG renderer registry, and `HexTile` container to render 6 directional wedges plus optional center terrain.
+  - Added Storybook stories for base terrains, rotation coverage, hybrid parity versus canvas `TilePreview`, and explicit two-tile edge adjacency alignment.
+
 - **Terrain model (class-based edges):** Introduced `Terrain.ts` with concrete terrain classes (`TreeTerrain`, `WaterTerrain` with optional `linkToCenter`, `WaterOrPastureTerrain`, etc.). Edge compatibility uses overlapping sets of base `TerrainType` values so hybrid edges (e.g. water/pasture) can match neighbors without expanding the six-color palette.
 - **Tile validation:** `TileValidator` runs on `Tile` construction to enforce structural rules (for example, water segments that link to the center require a water center terrain).
 - **Canvas terrain segment renderers:** `graphics/segmentRenderers/` holds one stateless wedge renderer per `TerrainId`, wired through `terrainIdSegmentRenderers` and `WedgeDrawContext`. `TileRenderer` accepts optional `neighborEdgeTerrains`; on-board draws use `BoardNavigation.neighborEdgeTerrains` (notably for `waterOrPasture` against neighbors). Water tile centers use `WaterCenterSegmentRenderer` via `terrainIdCenterSegmentRenderers`.

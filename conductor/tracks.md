@@ -47,3 +47,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Autosave from activeGame transitions (#69)**
       _Link: [./archive/autosave_activegame_20260401/index.md](./archive/autosave_activegame_20260401/index.md)_
+
+- [x] **Track: SVG HexTile Prototype (#19)**
+      _Link: [./archive/svg_hex_tile_prototype_20260401/plan.md](./archive/svg_hex_tile_prototype_20260401/plan.md)_

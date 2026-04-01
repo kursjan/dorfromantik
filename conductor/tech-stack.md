@@ -45,6 +45,7 @@ This document defines the core technologies, architectural patterns, and quality
 
 - **Rotated Hexagonal Coordinate System:** "Flat-Top" orientation where North is `(-1, 0, 1)`.
 - **Terrain segment renderers:** `TileRenderer` dispatches each wedge to a per-`TerrainId` renderer under `src/canvas/graphics/segmentRenderers/`, with optional neighbor edge terrain for hybrid drawing.
+- **SVG tile prototype:** `src/components/Tiles/HexTile` renders wedges via declarative SVG paths and a terrain-id renderer registry, including Storybook parity stories against the canvas preview.
 - **Type Safety:** Use `import type` for model imports in graphics files to ensure clean browser stripping.
 
 ## Styling & UI

@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { TilePreview } from '../TilePreview';
-import { Tile } from '../../../models/Tile';
-import { PastureTerrain, WaterTerrain } from '../../../models/Terrain';
+import { Tile } from '../../models/Tile';
+import { PastureTerrain, WaterTerrain } from '../../models/Terrain';
+import { HexTile } from './HexTile';
 
 const pasture = () => new PastureTerrain();
 
-const meta: Meta<typeof TilePreview> = {
-  title: 'UI/Tiles/Water',
-  component: TilePreview,
+const meta: Meta<typeof HexTile> = {
+  title: 'SVG Tiles/Water',
+  component: HexTile,
   parameters: {
     layout: 'centered',
   },
@@ -15,7 +15,7 @@ const meta: Meta<typeof TilePreview> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof TilePreview>;
+type Story = StoryObj<typeof HexTile>;
 
 export const WaterWithoutCenter: Story = {
   args: {
@@ -27,7 +27,8 @@ export const WaterWithoutCenter: Story = {
       southWest: new WaterTerrain(),
       northWest: new WaterTerrain(),
     }),
-    size: 48,
+    width: 120,
+    height: 120,
   },
 };
 
@@ -42,7 +43,8 @@ export const WaterLinkedToCenter: Story = {
       southWest: pasture(),
       northWest: pasture(),
     }),
-    size: 48,
+    width: 120,
+    height: 120,
   },
 };
 
@@ -57,7 +59,8 @@ export const WaterNotLinkedToCenter: Story = {
       southWest: pasture(),
       northWest: pasture(),
     }),
-    size: 48,
+    width: 120,
+    height: 120,
   },
 };
 
@@ -72,6 +75,7 @@ export const MultiWaterMixedLinks: Story = {
       southWest: new WaterTerrain({ linkToCenter: false }),
       northWest: pasture(),
     }),
-    size: 48,
+    width: 120,
+    height: 120,
   },
 };
