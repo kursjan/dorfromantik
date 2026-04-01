@@ -10,7 +10,7 @@
 
 ## Phase 2: Terrain Implementations & Storybook
 
-- [ ] Implement concrete SVG wedge components for all base terrain types (Grass, Forest, Water, Field, House, Rail) mapping colors from `HexStyles.ts` using **task-conductor** skill.
+- [x] Implement concrete SVG wedge components for all base terrain types (Grass, Forest, Water, Field, House, Rail) mapping colors from `HexStyles.ts` using **task-conductor** skill.
 - [ ] Implement complex "hybrid" blending logic for Water and Rail segments based on `neighborEdgeTerrains` using **task-conductor** skill.
 - [ ] Create `HexTile.stories.tsx` showcasing all base terrain types, a fully rotated tile, and complex hybrid tiles side-by-side with the old Canvas renderer (if possible) for visual parity using **task-conductor** skill.
 - [ ] Implement a specific Storybook story demonstrating two `<HexTile />` components placed exactly adjacent to each other (e.g., sharing an edge with matching terrains) to verify spacing and SVG boundary alignment using **task-conductor** skill.
