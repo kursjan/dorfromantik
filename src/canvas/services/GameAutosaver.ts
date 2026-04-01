@@ -1,7 +1,7 @@
 import type { IFirestoreService } from '../../services/firestore/IFirestoreService';
 import type { Game } from '../../models/Game';
 
-type GameProvider = () => Game | undefined;
+type GameProvider = () => Game | null;
 type UserIdProvider = () => string;
 
 export class GameAutosaver {
@@ -32,7 +32,7 @@ export class GameAutosaver {
     this.onSaveError = options.onSaveError;
   }
 
-  handleGameChanged = (previousGame: Game | undefined, currentGame: Game | undefined) => {
+  handleGameChanged = (previousGame: Game | null, currentGame: Game | null) => {
     if (!this.didGameplayStateChange(previousGame, currentGame)) {
       return;
     }
@@ -46,10 +46,7 @@ export class GameAutosaver {
     }, this.debounceMs);
   };
 
-  private didGameplayStateChange(
-    previousGame: Game | undefined,
-    currentGame: Game | undefined
-  ): boolean {
+  private didGameplayStateChange(previousGame: Game | null, currentGame: Game | null): boolean {
     if (!previousGame || !currentGame) {
       return false;
     }

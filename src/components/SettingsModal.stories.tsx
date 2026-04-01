@@ -20,7 +20,7 @@ const mockGames = [
     score: 1500,
     board: new Board(),
     rules: GameRules.createStandard(),
-  })
+  }),
 ];
 
 const meta = {
@@ -37,7 +37,7 @@ const meta = {
           <GameHistoryContext.Provider value={{ games: mockGames }}>
             <ActiveGameContext.Provider
               value={{
-                activeGame: undefined,
+                activeGame: null,
                 setActiveGame: () => {},
               }}
             >
@@ -77,7 +77,7 @@ export const PermanentAccount: Story = {
             <GameHistoryContext.Provider value={{ games: [] }}>
               <ActiveGameContext.Provider
                 value={{
-                  activeGame: undefined,
+                  activeGame: null,
                   setActiveGame: () => {},
                 }}
               >

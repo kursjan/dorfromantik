@@ -7,7 +7,7 @@ describe('GameAutosaver', () => {
   let firestoreService: IFirestoreService;
   let saveGameStateSpy: ReturnType<typeof vi.fn>;
   let getUserId: () => string;
-  let getActiveGame: () => Game | undefined;
+  let getActiveGame: () => Game | null;
   let autosaver: GameAutosaver;
   let onSaveStartSpy: ReturnType<typeof vi.fn>;
   let onSaveSuccessSpy: ReturnType<typeof vi.fn>;
@@ -104,7 +104,7 @@ describe('GameAutosaver', () => {
     autosaver.handleGameChanged(previousGame, nextGame);
 
     // Update provider to simulate game ending before timer fires
-    getActiveGame = () => undefined;
+    getActiveGame = () => null;
     // @ts-expect-error - overriding for test; autosaver captures the function reference
     autosaver['getActiveGame'] = getActiveGame;
 

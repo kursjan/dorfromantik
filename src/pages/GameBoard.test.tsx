@@ -43,7 +43,7 @@ describe('GameBoard', () => {
     vi.useRealTimers();
   });
 
-  function renderWithProviders(activeGame?: Game, games: Game[] = []) {
+  function renderWithProviders(activeGame: Game | null = null, games: Game[] = []) {
     return render(
       <ServiceProvider authService={authService} firestoreService={firestoreService}>
         <UserContext.Provider value={{ user }}>
