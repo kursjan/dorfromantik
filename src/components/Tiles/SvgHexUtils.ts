@@ -1,0 +1,49 @@
+import { directions } from '../../models/Navigation';
+
+const SVG_HEX_RADIUS = 50;
+const SVG_CENTER_CIRCLE_RADIUS = 18;
+
+interface Point {
+  x: number;
+  y: number;
+}
+
+function formatNumber(value: number): string {
+  const rounded = Number(value.toFixed(3));
+  return Number.isInteger(rounded) ? String(rounded) : String(rounded);
+}
+
+function toPoint(point: Point): string {
+  return `${formatNumber(point.x)} ${formatNumber(point.y)}`;
+}
+
+function buildHexCorners(radius: number): Point[] {
+  return Array.from({ length: 6 }, (_, index) => {
+    const angle = (Math.PI / 180) * 60 * index;
+    return {
+      x: radius * Math.cos(angle),
+      y: radius * Math.sin(angle),
+    };
+  });
+}
+
+const HEX_CORNERS = buildHexCorners(SVG_HEX_RADIUS);
+
+function buildWedgePath(segmentIndex: number): string {
+  const startCorner = HEX_CORNERS[(segmentIndex + 4) % 6];
+  const endCorner = HEX_CORNERS[(segmentIndex + 5) % 6];
+  return `M 0 0 L ${toPoint(startCorner)} L ${toPoint(endCorner)} Z`;
+}
+
+function buildCenterCirclePath(radius: number): string {
+  const r = formatNumber(radius);
+  return `M ${r} 0 A ${r} ${r} 0 1 0 -${r} 0 A ${r} ${r} 0 1 0 ${r} 0 Z`;
+}
+
+/** Wedge paths in canonical direction order: north, northEast, southEast, south, southWest, northWest. */
+export const SVG_HEX_WEDGE_PATHS = directions.map((_, segmentIndex) =>
+  buildWedgePath(segmentIndex)
+);
+
+/** Center circle path used by center terrain renderers. */
+export const SVG_HEX_CENTER_CIRCLE_PATH = buildCenterCirclePath(SVG_CENTER_CIRCLE_RADIUS);
