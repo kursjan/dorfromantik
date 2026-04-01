@@ -12,13 +12,14 @@ describe('GameAutosaver', () => {
   let onSaveStartSpy: ReturnType<typeof vi.fn>;
   let onSaveSuccessSpy: ReturnType<typeof vi.fn>;
   let onSaveErrorSpy: ReturnType<typeof vi.fn>;
-  const previousGame = {
+
+  const originalGame = {
     id: 'game-1',
     board: { v: 1 },
     score: 0,
     remainingTurns: 10,
   } as unknown as Game;
-  const nextGame = {
+  const afterPlacementGame = {
     id: 'game-1',
     board: { v: 2 },
     score: 10,
@@ -58,44 +59,52 @@ describe('GameAutosaver', () => {
   });
 
   it('saves once after debounce when a tile is placed', async () => {
-    autosaver.handleGameChanged(previousGame, nextGame);
+    // Act
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
     vi.advanceTimersByTime(2000);
 
+    // Assert
     expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
     expect(saveGameStateSpy).toHaveBeenCalledWith('user-1', expect.any(Object));
   });
 
   it('debounces rapid meaningful transitions into a single save', () => {
-    autosaver.handleGameChanged(previousGame, nextGame);
+    // Act
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
     vi.advanceTimersByTime(1000);
-    autosaver.handleGameChanged(previousGame, nextGame);
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
     vi.advanceTimersByTime(1000);
-    autosaver.handleGameChanged(previousGame, nextGame);
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
     vi.advanceTimersByTime(2000);
 
+    // Assert
     expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
   });
 
   it('does not cancel pending save when transition is non-meaningful', () => {
-    autosaver.handleGameChanged(previousGame, nextGame);
+    // Arrange
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
     vi.advanceTimersByTime(1000);
 
     const equivalentGame = {
-      ...nextGame,
-      board: nextGame.board,
-      score: nextGame.score,
-      remainingTurns: nextGame.remainingTurns,
+      ...afterPlacementGame,
+      board: afterPlacementGame.board,
+      score: afterPlacementGame.score,
+      remainingTurns: afterPlacementGame.remainingTurns,
     } as unknown as Game;
 
-    autosaver.handleGameChanged(nextGame, equivalentGame);
+    // Act
+    autosaver.handleGameChanged(afterPlacementGame, equivalentGame);
 
     vi.advanceTimersByTime(1000);
+
+    // Assert
     expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
   });
 
   it('does not save when there is no active game at fire time', () => {
     // Arrange
-    autosaver.handleGameChanged(previousGame, nextGame);
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
 
     // Act
     getActiveGame = () => null;
@@ -108,31 +117,38 @@ describe('GameAutosaver', () => {
   });
 
   it('cancels pending save on dispose', () => {
-    autosaver.handleGameChanged(previousGame, nextGame);
+    // Arrange
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
 
+    // Act
     autosaver.dispose();
-
     vi.advanceTimersByTime(2000);
 
+    // Assert
     expect(saveGameStateSpy).not.toHaveBeenCalled();
   });
 
   it('invokes callbacks on successful save', async () => {
-    autosaver.handleGameChanged(previousGame, nextGame);
+    // Act
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
     await vi.advanceTimersByTimeAsync(2000);
 
+    // Assert
     expect(onSaveStartSpy).toHaveBeenCalledTimes(1);
     expect(onSaveSuccessSpy).toHaveBeenCalledTimes(1);
     expect(onSaveErrorSpy).not.toHaveBeenCalled();
   });
 
   it('invokes error callback on failed save', async () => {
+    // Arrange
     const error = new Error('Save failed');
     saveGameStateSpy.mockRejectedValueOnce(error);
 
-    autosaver.handleGameChanged(previousGame, nextGame);
+    // Act
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
     await vi.advanceTimersByTimeAsync(2000);
 
+    // Assert
     expect(onSaveStartSpy).toHaveBeenCalledTimes(1);
     expect(onSaveSuccessSpy).not.toHaveBeenCalled();
     expect(onSaveErrorSpy).toHaveBeenCalledTimes(1);
@@ -144,7 +160,7 @@ describe('GameAutosaver', () => {
     saveGameStateSpy.mockReturnValueOnce(new Promise(() => {}));
 
     // Act
-    autosaver.handleGameChanged(previousGame, nextGame);
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
     await vi.advanceTimersByTimeAsync(2000);
     expect(onSaveStartSpy).toHaveBeenCalledTimes(1);
     expect(onSaveErrorSpy).not.toHaveBeenCalled();
@@ -170,7 +186,7 @@ describe('GameAutosaver', () => {
     saveGameStateSpy.mockReturnValueOnce(hangingPromise);
 
     // Act
-    autosaver.handleGameChanged(previousGame, nextGame);
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
     await vi.advanceTimersByTimeAsync(2000);
     expect(onSaveStartSpy).toHaveBeenCalledTimes(1);
 
@@ -185,43 +201,62 @@ describe('GameAutosaver', () => {
   });
 
   it('forces save and clears timer on forceSaveAndDispose', () => {
-    autosaver.handleGameChanged(previousGame, nextGame);
+    // Arrange
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
+
+    // Act
     autosaver.forceSaveAndDispose();
 
+    // Assert
     expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
     vi.advanceTimersByTime(2000);
     expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
   });
 
   it('does not save on forceSaveAndDispose if no timer is pending', () => {
+    // Act
     autosaver.forceSaveAndDispose();
+
+    // Assert
     expect(saveGameStateSpy).not.toHaveBeenCalled();
   });
 
   it('does not schedule save when games are the same reference', () => {
-    autosaver.handleGameChanged(previousGame, previousGame);
+    // Act
+    autosaver.handleGameChanged(originalGame, originalGame);
     vi.advanceTimersByTime(2000);
+
+    // Assert
     expect(saveGameStateSpy).not.toHaveBeenCalled();
   });
 
   it('does not schedule save when game id changes', () => {
-    const differentGame = { ...nextGame, id: 'game-2' } as unknown as Game;
-    autosaver.handleGameChanged(previousGame, differentGame);
+    // Arrange
+    const differentGame = { ...afterPlacementGame, id: 'game-2' } as unknown as Game;
+
+    // Act
+    autosaver.handleGameChanged(originalGame, differentGame);
     vi.advanceTimersByTime(2000);
+
+    // Assert
     expect(saveGameStateSpy).not.toHaveBeenCalled();
   });
 
   it('does not schedule save for rotation-only transition', () => {
+    // Arrange
     const rotationOnlyGame = {
-      ...previousGame,
+      ...originalGame,
       tileQueue: [{ id: 'rotated' }],
-      score: previousGame.score,
-      remainingTurns: previousGame.remainingTurns,
-      board: previousGame.board,
+      score: originalGame.score,
+      remainingTurns: originalGame.remainingTurns,
+      board: originalGame.board,
     } as unknown as Game;
 
-    autosaver.handleGameChanged(previousGame, rotationOnlyGame);
+    // Act
+    autosaver.handleGameChanged(originalGame, rotationOnlyGame);
     vi.advanceTimersByTime(2000);
+
+    // Assert
     expect(saveGameStateSpy).not.toHaveBeenCalled();
   });
 });
