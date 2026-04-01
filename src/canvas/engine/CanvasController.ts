@@ -64,9 +64,9 @@ export class CanvasController {
     this.ctx = this.getRequired2dContext(canvas);
 
     this.camera = new Camera({ x: 0, y: 0, zoom: 1 });
-    this.backgroundRenderer = new BackgroundRenderer(this.getRequired2dContext(canvas));
-    this.hexRenderer = new HexRenderer(this.getRequired2dContext(canvas));
-    this.tileRenderer = new TileRenderer(this.getRequired2dContext(canvas));
+    this.backgroundRenderer = new BackgroundRenderer(this.ctx);
+    this.hexRenderer = new HexRenderer(this.ctx);
+    this.tileRenderer = new TileRenderer(this.ctx);
     this.inputManager = new InputManager(canvas, {
       onPan: (dx, dy) => this.handlePan(dx, dy),
       onZoom: (delta) => this.handleZoom(delta),
