@@ -6,7 +6,7 @@ import { HexTile } from './HexTile';
 const pasture = () => new PastureTerrain();
 
 const meta: Meta<typeof HexTile> = {
-  title: 'SVG Tiles/Rail',
+  title: 'SVG/Tiles/Rail',
   component: HexTile,
   parameters: {
     layout: 'centered',
