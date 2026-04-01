@@ -17,6 +17,20 @@ const meta: Meta<typeof TilePreview> = {
 export default meta;
 type Story = StoryObj<typeof TilePreview>;
 
+export const WaterWithoutCenter: Story = {
+  args: {
+    tile: new Tile({
+      north: new WaterTerrain(),
+      northEast: new WaterTerrain(),
+      southEast: new WaterTerrain(),
+      south: new WaterTerrain(),
+      southWest: new WaterTerrain(),
+      northWest: new WaterTerrain(),
+    }),
+    size: 48,
+  },
+};
+
 export const WaterLinkedToCenter: Story = {
   args: {
     tile: new Tile({

@@ -1,8 +1,9 @@
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { TERRAIN_COLORS } from '../../canvas/graphics/HexStyles';
 import { HouseTerrain, RailTerrain, TreeTerrain, WaterTerrain } from '../../models/Terrain';
 import { Tile } from '../../models/Tile';
-import { SVG_HEX_CENTER_CIRCLE_PATH, SVG_HEX_WEDGE_PATHS } from './SvgHexUtils';
+import { SVG_HEX_CENTER_WATER_PATH, SVG_HEX_WEDGE_PATHS } from './SvgHexUtils';
 import { HexTile } from './HexTile';
 
 describe('HexTile', () => {
@@ -30,10 +31,11 @@ describe('HexTile', () => {
 
     const { container } = render(<HexTile tile={tile} />);
     const centerPath = Array.from(container.querySelectorAll('path')).find(
-      (path) => path.getAttribute('d') === SVG_HEX_CENTER_CIRCLE_PATH
+      (path) => path.getAttribute('d') === SVG_HEX_CENTER_WATER_PATH
     );
 
     expect(centerPath).toBeDefined();
+    expect(centerPath?.getAttribute('fill')).toBe(TERRAIN_COLORS.water);
   });
 
   it('does not render center segment when center terrain has no renderer', () => {
@@ -41,7 +43,7 @@ describe('HexTile', () => {
 
     const { container } = render(<HexTile tile={tile} />);
     const centerPath = Array.from(container.querySelectorAll('path')).find(
-      (path) => path.getAttribute('d') === SVG_HEX_CENTER_CIRCLE_PATH
+      (path) => path.getAttribute('d') === SVG_HEX_CENTER_WATER_PATH
     );
 
     expect(centerPath).toBeUndefined();

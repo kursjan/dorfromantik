@@ -1,8 +1,9 @@
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { Direction } from '../../models/Navigation';
+import { WaterTerrain, RailTerrain } from '../../models/Terrain';
 import { TERRAIN_COLORS } from '../../canvas/graphics/HexStyles';
-import { SVG_HEX_CENTER_CIRCLE_PATH, SVG_HEX_WEDGE_PATHS } from './SvgHexUtils';
+import { SVG_HEX_CENTER_WATER_PATH, SVG_HEX_WEDGE_PATHS } from './SvgHexUtils';
 import { CenterWedge } from './CenterWedge';
 import { TERRAIN_ID_SVG_SEGMENT_RENDERERS } from './TerrainIdSvgSegmentRenderers';
 import { Wedge } from './Wedge';
@@ -20,14 +21,14 @@ describe('Wedge', () => {
 });
 
 describe('CenterWedge', () => {
-  it('renders the center-circle path', () => {
+  it('renders the provided center path', () => {
     const { container } = render(
       <svg>
-        <CenterWedge />
+        <CenterWedge d={SVG_HEX_CENTER_WATER_PATH} />
       </svg>
     );
     const path = container.querySelector('path');
-    expect(path?.getAttribute('d')).toBe(SVG_HEX_CENTER_CIRCLE_PATH);
+    expect(path?.getAttribute('d')).toBe(SVG_HEX_CENTER_WATER_PATH);
   });
 });
 
@@ -45,11 +46,24 @@ describe('TERRAIN_ID_SVG_SEGMENT_RENDERERS', () => {
   it('renders a wedge path with the water terrain renderer', () => {
     const renderer = TERRAIN_ID_SVG_SEGMENT_RENDERERS.wedge.water;
     const { container } = render(
-      <svg>{renderer({ terrainId: 'water', segmentIndex: 0, direction: Direction.North })}</svg>
+      <svg>
+        {renderer({
+          terrainId: 'water',
+          segmentIndex: 0,
+          direction: Direction.North,
+          terrain: new WaterTerrain(),
+        })}
+      </svg>
     );
-    const path = container.querySelector('path');
-    expect(path?.getAttribute('d')).toBe(SVG_HEX_WEDGE_PATHS[0]);
-    expect(path?.getAttribute('fill')).toBe(TERRAIN_COLORS.water);
+    const paths = container.querySelectorAll('path');
+    const wedgePath = Array.from(paths).find(
+      (path) => path.getAttribute('d') === SVG_HEX_WEDGE_PATHS[0]
+    );
+    const riverPath = Array.from(paths).find(
+      (path) => path.getAttribute('stroke') === TERRAIN_COLORS.water
+    );
+    expect(wedgePath?.getAttribute('fill')).toBe(TERRAIN_COLORS.pasture);
+    expect(riverPath).toBeDefined();
   });
 
   it('maps all base terrain wedges to HexStyles colors', () => {
@@ -72,11 +86,12 @@ describe('TERRAIN_ID_SVG_SEGMENT_RENDERERS', () => {
     expect(paths[0]?.getAttribute('fill')).toBe(TERRAIN_COLORS.tree);
     expect(paths[1]?.getAttribute('fill')).toBe(TERRAIN_COLORS.house);
     expect(paths[2]?.getAttribute('fill')).toBe(TERRAIN_COLORS.pasture);
-    expect(paths[3]?.getAttribute('fill')).toBe(TERRAIN_COLORS.rail);
-    expect(paths[4]?.getAttribute('fill')).toBe(TERRAIN_COLORS.field);
+    expect(paths[3]?.getAttribute('fill')).toBe(TERRAIN_COLORS.pasture); // Rail uses pasture base
+    // paths[4], paths[5], paths[6] are the rail tracks/sleepers which have fill="none"
+    expect(paths[7]?.getAttribute('fill')).toBe(TERRAIN_COLORS.field);
   });
 
-  it('blends water wedge with neighbor terrain color', () => {
+  it('renders water as river stroke over pasture base', () => {
     const renderer = TERRAIN_ID_SVG_SEGMENT_RENDERERS.wedge.water;
     const { container } = render(
       <svg>
@@ -84,20 +99,22 @@ describe('TERRAIN_ID_SVG_SEGMENT_RENDERERS', () => {
           terrainId: 'water',
           segmentIndex: 2,
           direction: Direction.SouthEast,
-          neighborEdgeTerrainType: 'pasture',
+          terrain: new WaterTerrain({ linkToCenter: false }),
         })}
       </svg>
     );
-    const gradient = container.querySelector('linearGradient');
-    const stops = container.querySelectorAll('stop');
-    const path = container.querySelector('path');
-    expect(gradient?.getAttribute('id')).toContain('wedge-gradient-water-southEast-2');
-    expect(stops[0]?.getAttribute('stop-color')).toBe(TERRAIN_COLORS.water);
-    expect(stops[1]?.getAttribute('stop-color')).toBe(TERRAIN_COLORS.pasture);
-    expect(path?.getAttribute('fill')).toBe('url(#wedge-gradient-water-southEast-2)');
+    const paths = container.querySelectorAll('path');
+    const wedgePath = Array.from(paths).find(
+      (path) => path.getAttribute('d') === SVG_HEX_WEDGE_PATHS[2]
+    );
+    const riverPath = Array.from(paths).find(
+      (path) => path.getAttribute('stroke') === TERRAIN_COLORS.water
+    );
+    expect(wedgePath?.getAttribute('fill')).toBe(TERRAIN_COLORS.pasture);
+    expect(riverPath?.getAttribute('fill')).toBe('none');
   });
 
-  it('blends rail wedge with neighbor terrain color', () => {
+  it('renders rail as tracks over pasture base', () => {
     const renderer = TERRAIN_ID_SVG_SEGMENT_RENDERERS.wedge.rail;
     const { container } = render(
       <svg>
@@ -105,14 +122,15 @@ describe('TERRAIN_ID_SVG_SEGMENT_RENDERERS', () => {
           terrainId: 'rail',
           segmentIndex: 4,
           direction: Direction.SouthWest,
-          neighborEdgeTerrainType: 'field',
+          terrain: new RailTerrain({ linkToCenter: false }),
         })}
       </svg>
     );
-    const stops = container.querySelectorAll('stop');
-    const path = container.querySelector('path');
-    expect(stops[0]?.getAttribute('stop-color')).toBe(TERRAIN_COLORS.rail);
-    expect(stops[1]?.getAttribute('stop-color')).toBe(TERRAIN_COLORS.field);
-    expect(path?.getAttribute('fill')).toBe('url(#wedge-gradient-rail-southWest-4)');
+    const paths = container.querySelectorAll('path');
+    const wedgePath = Array.from(paths).find(
+      (path) => path.getAttribute('d') === SVG_HEX_WEDGE_PATHS[4]
+    );
+    expect(wedgePath?.getAttribute('fill')).toBe(TERRAIN_COLORS.pasture);
+    expect(paths.length).toBeGreaterThan(3); // wedge + sleepers + 2 tracks
   });
 });

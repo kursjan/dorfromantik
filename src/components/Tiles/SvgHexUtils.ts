@@ -1,7 +1,8 @@
 import { directions } from '../../models/Navigation';
 
 const SVG_HEX_RADIUS = 50;
-const SVG_CENTER_CIRCLE_RADIUS = 18;
+const SVG_CENTER_WATER_HEX_RADIUS = SVG_HEX_RADIUS * 0.35;
+const SVG_CENTER_RAIL_HEX_RADIUS = SVG_HEX_RADIUS * 0.15;
 
 interface Point {
   x: number;
@@ -35,9 +36,11 @@ function buildWedgePath(segmentIndex: number): string {
   return `M 0 0 L ${toPoint(startCorner)} L ${toPoint(endCorner)} Z`;
 }
 
-function buildCenterCirclePath(radius: number): string {
-  const r = formatNumber(radius);
-  return `M ${r} 0 A ${r} ${r} 0 1 0 -${r} 0 A ${r} ${r} 0 1 0 ${r} 0 Z`;
+function buildCenterHexPath(radius: number): string {
+  const corners = buildHexCorners(radius);
+  return `M ${toPoint(corners[0])} L ${toPoint(corners[1])} L ${toPoint(corners[2])} L ${toPoint(
+    corners[3]
+  )} L ${toPoint(corners[4])} L ${toPoint(corners[5])} Z`;
 }
 
 /** Wedge paths in canonical direction order: north, northEast, southEast, south, southWest, northWest. */
@@ -45,5 +48,8 @@ export const SVG_HEX_WEDGE_PATHS = directions.map((_, segmentIndex) =>
   buildWedgePath(segmentIndex)
 );
 
-/** Center circle path used by center terrain renderers. */
-export const SVG_HEX_CENTER_CIRCLE_PATH = buildCenterCirclePath(SVG_CENTER_CIRCLE_RADIUS);
+/** Center hex path for water center terrain. */
+export const SVG_HEX_CENTER_WATER_PATH = buildCenterHexPath(SVG_CENTER_WATER_HEX_RADIUS);
+
+/** Center hex path for rail center terrain. */
+export const SVG_HEX_CENTER_RAIL_PATH = buildCenterHexPath(SVG_CENTER_RAIL_HEX_RADIUS);

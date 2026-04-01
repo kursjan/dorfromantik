@@ -1,8 +1,7 @@
 import type { ComponentPropsWithoutRef } from 'react';
-import { SVG_HEX_CENTER_CIRCLE_PATH } from './SvgHexUtils';
 
-export type CenterWedgeProps = Omit<ComponentPropsWithoutRef<'path'>, 'd'>;
+export type CenterWedgeProps = ComponentPropsWithoutRef<'path'>;
 
-export function CenterWedge(pathProps: CenterWedgeProps) {
-  return <path d={SVG_HEX_CENTER_CIRCLE_PATH} {...pathProps} />;
+export function CenterWedge({ d, ...pathProps }: CenterWedgeProps) {
+  return <path d={d} {...pathProps} />;
 }

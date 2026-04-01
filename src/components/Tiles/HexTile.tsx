@@ -17,7 +17,7 @@ export function HexTile({ tile, neighborEdgeTerrainTypes, ...svgProps }: HexTile
     : undefined;
 
   return (
-    <svg viewBox="-50 -50 100 100" role="img" aria-label="Hex tile" {...svgProps}>
+    <svg viewBox="-50 -43.301 100 86.602" role="img" aria-label="Hex tile" {...svgProps}>
       {directions.map((direction, segmentIndex) => {
         const terrain = terrainsByDirection[direction];
         const renderWedge = TERRAIN_ID_SVG_SEGMENT_RENDERERS.wedge[terrain.id];
@@ -28,6 +28,7 @@ export function HexTile({ tile, neighborEdgeTerrainTypes, ...svgProps }: HexTile
               segmentIndex,
               direction,
               neighborEdgeTerrainType: neighborEdgeTerrainTypes?.[direction],
+              terrain,
             })}
           </g>
         );

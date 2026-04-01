@@ -17,6 +17,20 @@ const meta: Meta<typeof TilePreview> = {
 export default meta;
 type Story = StoryObj<typeof TilePreview>;
 
+export const RailWithoutCenter: Story = {
+  args: {
+    tile: new Tile({
+      north: new RailTerrain(),
+      northEast: new RailTerrain(),
+      southEast: new RailTerrain(),
+      south: new RailTerrain(),
+      southWest: new RailTerrain(),
+      northWest: new RailTerrain(),
+    }),
+    size: 48,
+  },
+};
+
 export const RailLinkedToCenter: Story = {
   args: {
     tile: new Tile({

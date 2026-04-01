@@ -13,7 +13,7 @@ import { TilePreview } from '../../canvas/components/TilePreview';
 import { HexTile } from './HexTile';
 
 const meta: Meta<typeof HexTile> = {
-  title: 'UI/Tiles/HexTile',
+  title: 'SVG Tiles/HexTile',
   component: HexTile,
   parameters: {
     layout: 'centered',
@@ -51,13 +51,13 @@ export const BaseTerrains: Story = {
 };
 
 const mixedTile = new Tile({
-  north: new TreeTerrain(),
+  north: new WaterTerrain({ linkToCenter: false }),
   northEast: new HouseTerrain(),
-  southEast: new WaterTerrain({ linkToCenter: true }),
-  south: new RailTerrain({ linkToCenter: true }),
-  southWest: new FieldTerrain(),
+  southEast: new RailTerrain({ linkToCenter: true }),
+  south: new FieldTerrain(),
+  southWest: new WaterOrPastureTerrain(),
   northWest: new PastureTerrain(),
-  center: new WaterTerrain(),
+  center: new RailTerrain(),
 });
 
 export const FullyRotatedTile: Story = {
@@ -86,7 +86,7 @@ const hybridTile = new Tile({
   northEast: new WaterOrPastureTerrain(),
   southEast: new RailTerrain({ linkToCenter: true }),
   south: new FieldTerrain(),
-  southWest: new HouseTerrain(),
+  southWest: new RailTerrain({ linkToCenter: false }),
   northWest: new TreeTerrain(),
   center: new RailTerrain(),
 });
@@ -104,6 +104,7 @@ export const HybridParityWithCanvas: Story = {
             north: 'water',
             northEast: 'pasture',
             southEast: 'field',
+            southWest: 'rail',
           }}
         />
       </div>
@@ -116,6 +117,7 @@ export const HybridParityWithCanvas: Story = {
             north: new WaterTerrain(),
             northEast: new PastureTerrain(),
             southEast: new FieldTerrain(),
+            southWest: new RailTerrain(),
           }}
         />
       </div>
@@ -128,12 +130,12 @@ const adjacentLeftTile = new Tile({
   northEast: new TreeTerrain(),
   southEast: new HouseTerrain(),
   south: new FieldTerrain(),
-  southWest: new RailTerrain(),
+  southWest: new PastureTerrain(),
   northWest: new PastureTerrain(),
 });
 
 const adjacentRightTile = new Tile({
-  north: new RailTerrain(),
+  north: new FieldTerrain(),
   northEast: new WaterTerrain(),
   southEast: new TreeTerrain(),
   south: new HouseTerrain(),
@@ -144,18 +146,16 @@ const adjacentRightTile = new Tile({
 export const AdjacentAlignment: Story = {
   render: () => (
     <div style={{ padding: 20, border: '1px solid #ddd' }}>
-      <div style={{ width: 175, height: 100, position: 'relative' }}>
+      <div style={{ width: 175, height: 130, position: 'relative' }}>
         <HexTile
           tile={adjacentLeftTile}
           width={100}
-          height={100}
-          style={{ position: 'absolute', left: 0 }}
+          style={{ position: 'absolute', left: 0, top: 0 }}
         />
         <HexTile
           tile={adjacentRightTile}
           width={100}
-          height={100}
-          style={{ position: 'absolute', left: 75 }}
+          style={{ position: 'absolute', left: 75, top: 43.301 }}
         />
       </div>
     </div>

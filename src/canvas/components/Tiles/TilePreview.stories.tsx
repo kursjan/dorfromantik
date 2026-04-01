@@ -2,13 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { TilePreview } from '../TilePreview';
 import { Tile } from '../../../models/Tile';
 import type { Terrain } from '../../../models/Terrain';
-import {
-  FieldTerrain,
-  HouseTerrain,
-  PastureTerrain,
-  RailTerrain,
-  TreeTerrain,
-} from '../../../models/Terrain';
+import { FieldTerrain, HouseTerrain, PastureTerrain, TreeTerrain } from '../../../models/Terrain';
 
 function tileUniformEdges(create: () => Terrain): Tile {
   return new Tile({
@@ -50,13 +44,6 @@ export const House: Story = {
 export const Pasture: Story = {
   args: {
     tile: tileUniformEdges(() => new PastureTerrain()),
-    size: 48,
-  },
-};
-
-export const Rail: Story = {
-  args: {
-    tile: tileUniformEdges(() => new RailTerrain()),
     size: 48,
   },
 };
