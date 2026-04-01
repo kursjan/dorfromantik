@@ -11,19 +11,22 @@ export interface GameHistoryContextType {
 }
 
 export interface ActiveGameContextType {
-  activeGame?: Game;
-  setActiveGame: (game: Game | undefined) => void;
+  activeGame: Game | null;
+  setActiveGame: (game: Game | null) => void;
 }
 
 // Granular Contexts
-export const UserContext: Context<UserContextType | undefined> = 
-  createContext<UserContextType | undefined>(undefined);
+export const UserContext: Context<UserContextType | undefined> = createContext<
+  UserContextType | undefined
+>(undefined);
 
-export const GameHistoryContext: Context<GameHistoryContextType | undefined> = 
-  createContext<GameHistoryContextType | undefined>(undefined);
+export const GameHistoryContext: Context<GameHistoryContextType | undefined> = createContext<
+  GameHistoryContextType | undefined
+>(undefined);
 
-export const ActiveGameContext: Context<ActiveGameContextType | undefined> = 
-  createContext<ActiveGameContextType | undefined>(undefined);
+export const ActiveGameContext: Context<ActiveGameContextType | undefined> = createContext<
+  ActiveGameContextType | undefined
+>(undefined);
 
 // Granular Hooks
 export const useUser = (): UserContextType => {

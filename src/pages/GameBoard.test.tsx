@@ -15,7 +15,7 @@ import { GameAutosaver } from '../canvas/services/GameAutosaver';
 vi.mock('../canvas/services/GameAutosaver', () => {
   return {
     GameAutosaver: vi.fn().mockImplementation(function (this: any, options: any) {
-      this.handleTilePlaced = vi.fn();
+      this.handleGameChanged = vi.fn();
       this.dispose = vi.fn();
       this.forceSaveAndDispose = vi.fn();
       this.options = options;
@@ -25,13 +25,7 @@ vi.mock('../canvas/services/GameAutosaver', () => {
 
 // Mock CanvasView to avoid WebGL/CanvasController overhead in these tests
 vi.mock('../canvas/components/CanvasView', () => ({
-  CanvasView: ({ onTilePlaced }: { onTilePlaced: () => void }) => (
-    <div data-testid="mock-canvas-view">
-      <button data-testid="trigger-tile-placed" onClick={onTilePlaced}>
-        Place Tile
-      </button>
-    </div>
-  ),
+  CanvasView: () => <div data-testid="mock-canvas-view" />,
 }));
 
 describe('GameBoard', () => {
@@ -49,7 +43,7 @@ describe('GameBoard', () => {
     vi.useRealTimers();
   });
 
-  function renderWithProviders(activeGame?: Game, games: Game[] = []) {
+  function renderWithProviders(activeGame: Game | null = null, games: Game[] = []) {
     return render(
       <ServiceProvider authService={authService} firestoreService={firestoreService}>
         <UserContext.Provider value={{ user }}>
@@ -90,7 +84,7 @@ describe('GameBoard', () => {
     expect(screen.queryByText(/No active game session/i)).not.toBeInTheDocument();
   });
 
-  it('initializes GameAutosaver and delegates tile placement', async () => {
+  it('initializes GameAutosaver', async () => {
     const game = new Game({
       board: new Board(),
       rules: new GameRules(),
@@ -103,17 +97,8 @@ describe('GameBoard', () => {
     // Verify autosaver was instantiated
     expect(GameAutosaver).toHaveBeenCalledTimes(1);
 
-    // Get the mock instance
     const autosaverMockInstance = vi.mocked(GameAutosaver).mock.results[0].value;
-
-    // Simulate placing a tile via the mock CanvasView
-    const placeTileButton = screen.getByTestId('trigger-tile-placed');
-    act(() => {
-      placeTileButton.click();
-    });
-
-    // Verify the debounced save method was called on the autosaver
-    expect(autosaverMockInstance.handleTilePlaced).toHaveBeenCalledTimes(1);
+    expect(autosaverMockInstance.handleGameChanged).toHaveBeenCalledTimes(0);
   });
 
   it('cleans up GameAutosaver on unmount using forceSaveAndDispose', () => {
@@ -130,6 +115,48 @@ describe('GameBoard', () => {
     unmount();
 
     // Verify forceSaveAndDispose was called instead of just dispose
+    expect(autosaverMockInstance.forceSaveAndDispose).toHaveBeenCalledTimes(1);
+  });
+
+  it('preserves unmount flush behavior after multiple activeGame transitions', () => {
+    const gameA = new Game({
+      board: new Board(),
+      rules: new GameRules(),
+      tileQueue: [new Tile()],
+      score: 0,
+    });
+    const gameB = new Game({
+      id: gameA.id,
+      board: new Board(),
+      rules: gameA.rules,
+      tileQueue: [new Tile()],
+      score: 5,
+      lastPlayed: gameA.lastPlayed,
+    });
+
+    const { rerender, unmount } = renderWithProviders(gameA);
+    const autosaverMockInstance = vi.mocked(GameAutosaver).mock.results[0].value;
+
+    act(() => {
+      rerender(
+        <ServiceProvider authService={authService} firestoreService={firestoreService}>
+          <UserContext.Provider value={{ user }}>
+            <GameHistoryContext.Provider value={{ games: [] }}>
+              <ActiveGameContext.Provider
+                value={{
+                  activeGame: gameB,
+                  setActiveGame: vi.fn(),
+                }}
+              >
+                <GameBoard />
+              </ActiveGameContext.Provider>
+            </GameHistoryContext.Provider>
+          </UserContext.Provider>
+        </ServiceProvider>
+      );
+    });
+
+    unmount();
     expect(autosaverMockInstance.forceSaveAndDispose).toHaveBeenCalledTimes(1);
   });
 
@@ -176,9 +203,55 @@ describe('GameBoard', () => {
     // Component re-render should not recreate autosaver; ref-backed getter should update.
     expect(GameAutosaver).toHaveBeenCalledTimes(1);
     expect(autosaverMockInstance.options.getActiveGame()).toBe(gameB);
+    expect(autosaverMockInstance.handleGameChanged).toHaveBeenCalledTimes(1);
+    expect(autosaverMockInstance.handleGameChanged).toHaveBeenCalledWith(gameA, gameB);
 
     // No effect cleanup should have happened during rerender.
     expect(autosaverMockInstance.forceSaveAndDispose).toHaveBeenCalledTimes(0);
+  });
+
+  it('does not trigger autosave for non-meaningful activeGame transitions', async () => {
+    const game = new Game({
+      board: new Board(),
+      rules: new GameRules(),
+      tileQueue: [new Tile()],
+      score: 0,
+    });
+
+    const equivalentGame = new Game({
+      id: game.id,
+      board: game.board,
+      rules: game.rules,
+      tileQueue: game.tileQueue,
+      score: game.score,
+      lastPlayed: game.lastPlayed,
+    });
+
+    const { rerender } = renderWithProviders(game);
+    const autosaverMockInstance = vi.mocked(GameAutosaver).mock.results[0].value;
+    expect(autosaverMockInstance.handleGameChanged).toHaveBeenCalledTimes(0);
+
+    act(() => {
+      rerender(
+        <ServiceProvider authService={authService} firestoreService={firestoreService}>
+          <UserContext.Provider value={{ user }}>
+            <GameHistoryContext.Provider value={{ games: [] }}>
+              <ActiveGameContext.Provider
+                value={{
+                  activeGame: equivalentGame,
+                  setActiveGame: vi.fn(),
+                }}
+              >
+                <GameBoard />
+              </ActiveGameContext.Provider>
+            </GameHistoryContext.Provider>
+          </UserContext.Provider>
+        </ServiceProvider>
+      );
+    });
+
+    expect(autosaverMockInstance.handleGameChanged).toHaveBeenCalledTimes(1);
+    expect(autosaverMockInstance.handleGameChanged).toHaveBeenCalledWith(game, equivalentGame);
   });
 
   it('displays save status feedback', async () => {

@@ -57,12 +57,6 @@ export class CanvasController {
   private debugState: DebugState = CanvasController.createDefaultDebugState();
   private hoveredHex: HexCoordinate | null = null;
 
-  /**
-   * @deprecated Tracked for removal in https://github.com/kursjan/dorfromantik/issues/69.
-   * Prefer deriving autosave/persistence from `activeGame` transitions in React state.
-   */
-  public onTilePlaced?: () => void;
-
   constructor(canvas: HTMLCanvasElement, options: CanvasControllerOptions) {
     this.canvas = canvas;
     this.getGameSnapshot = options.getGameSnapshot;
@@ -70,9 +64,9 @@ export class CanvasController {
     this.ctx = this.getRequired2dContext(canvas);
 
     this.camera = new Camera({ x: 0, y: 0, zoom: 1 });
-    this.backgroundRenderer = new BackgroundRenderer(this.getRequired2dContext(canvas));
-    this.hexRenderer = new HexRenderer(this.getRequired2dContext(canvas));
-    this.tileRenderer = new TileRenderer(this.getRequired2dContext(canvas));
+    this.backgroundRenderer = new BackgroundRenderer(this.ctx);
+    this.hexRenderer = new HexRenderer(this.ctx);
+    this.tileRenderer = new TileRenderer(this.ctx);
     this.inputManager = new InputManager(canvas, {
       onPan: (dx, dy) => this.handlePan(dx, dy),
       onZoom: (delta) => this.handleZoom(delta),
@@ -253,7 +247,6 @@ export class CanvasController {
 
     const { game: nextGame } = activeGame.placeTile(this.hoveredHex);
     this.setGameSnapshot(nextGame);
-    this.onTilePlaced?.();
   }
 
   private handleRotateClockwise() {

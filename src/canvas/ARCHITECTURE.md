@@ -135,6 +135,7 @@ While the Controller runs independently for performance, the React tree must hol
 
 - **Pattern:** `CanvasController` is constructed with **`getGameSnapshot()`** and **`setGameSnapshot(game)`**. It does not mirror `Game` on `this`; it reads the latest snapshot from the getter each frame and calls **`setGameSnapshot`** after place / rotate with the returned snapshot.
 - **`CanvasView`:** Receives **`activeGame`** and **`setActiveGame`** from the parent (e.g. **`GameBoard`** from **`useActiveGame()`**). Uses **`useGameSnapshotBridge`**: syncs a **ref** from **`activeGame`** (e.g. **`useLayoutEffect`**) and wraps **`setActiveGame`** into **`setGameSnapshot`**, which updates the ref **synchronously** with each new snapshot (avoids the rAF loop lagging React by one frame). The HUD reads **score / turns / next tile** from the **`activeGame` prop**, not a separate stats callback.
+- **Nullability Convention:** For app state, "no active game" is represented by **`null`** (`Game | null`) across `ActiveGameContext`, `GameBoard`, and `GameAutosaver`. This keeps absence explicit and avoids mixing domain state with optional-property `undefined`.
 - **Debug Stats:** `CanvasController` also exposes `subscribeDebug` and `getDebugSnapshot` for high-frequency updates (FPS, Camera) used by `DebugOverlay` via `useSyncExternalStore`.
 
 ## 6. Data Flow Example: Hovering (Magnetic Snapping)

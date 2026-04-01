@@ -44,3 +44,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Immutable Game Model (#65)**
       _Link: [./archive/immutable_game_20260331/index.md](./archive/immutable_game_20260331/index.md)_
+
+- [x] **Track: Autosave from activeGame transitions (#69)**
+      _Link: [./archive/autosave_activegame_20260401/index.md](./archive/autosave_activegame_20260401/index.md)_

@@ -1,7 +1,7 @@
 import type { IFirestoreService } from '../../services/firestore/IFirestoreService';
 import type { Game } from '../../models/Game';
 
-type GameProvider = () => Game | undefined;
+type GameProvider = () => Game | null;
 type UserIdProvider = () => string;
 
 export class GameAutosaver {
@@ -32,7 +32,15 @@ export class GameAutosaver {
     this.onSaveError = options.onSaveError;
   }
 
-  handleTilePlaced = () => {
+  handleGameChanged = (previousGame: Game | null, currentGame: Game | null) => {
+    if (!previousGame || !currentGame) {
+      return;
+    }
+
+    if (!this.didGameplayStateChange(previousGame, currentGame)) {
+      return;
+    }
+
     if (this.saveTimer) {
       clearTimeout(this.saveTimer);
     }
@@ -41,6 +49,23 @@ export class GameAutosaver {
       this.executeSave();
     }, this.debounceMs);
   };
+
+  private didGameplayStateChange(previousGame: Game, currentGame: Game): boolean {
+    if (previousGame === currentGame) {
+      return false;
+    }
+    // Treat session switches/load restores as non-gameplay transitions.
+    if (previousGame.id !== currentGame.id) {
+      return false;
+    }
+
+    // Rotation-only changes should not schedule autosave.
+    return (
+      previousGame.board !== currentGame.board ||
+      previousGame.score !== currentGame.score ||
+      previousGame.remainingTurns !== currentGame.remainingTurns
+    );
+  }
 
   private executeSave = () => {
     const game = this.getActiveGame();
@@ -57,7 +82,8 @@ export class GameAutosaver {
       }
     }, 5000);
 
-    this.firestoreService.saveGameState(this.getUserId(), game)
+    this.firestoreService
+      .saveGameState(this.getUserId(), game)
       .then(() => {
         isSettled = true;
         clearTimeout(timeoutId);
@@ -86,4 +112,3 @@ export class GameAutosaver {
     }
   }
 }
-

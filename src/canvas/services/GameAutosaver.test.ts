@@ -7,11 +7,24 @@ describe('GameAutosaver', () => {
   let firestoreService: IFirestoreService;
   let saveGameStateSpy: ReturnType<typeof vi.fn>;
   let getUserId: () => string;
-  let getActiveGame: () => Game | undefined;
+  let getActiveGame: () => Game | null;
   let autosaver: GameAutosaver;
   let onSaveStartSpy: ReturnType<typeof vi.fn>;
   let onSaveSuccessSpy: ReturnType<typeof vi.fn>;
   let onSaveErrorSpy: ReturnType<typeof vi.fn>;
+
+  const originalGame = {
+    id: 'game-1',
+    board: { v: 1 },
+    score: 0,
+    remainingTurns: 10,
+  } as unknown as Game;
+  const afterPlacementGame = {
+    id: 'game-1',
+    board: { v: 2 },
+    score: 10,
+    remainingTurns: 9,
+  } as unknown as Game;
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -24,7 +37,7 @@ describe('GameAutosaver', () => {
     } as unknown as IFirestoreService;
 
     getUserId = () => 'user-1';
-    getActiveGame = vi.fn(() => ({ id: 'game-1' } as unknown as Game));
+    getActiveGame = vi.fn(() => ({ id: 'game-1' }) as unknown as Game);
     onSaveStartSpy = vi.fn();
     onSaveSuccessSpy = vi.fn();
     onSaveErrorSpy = vi.fn();
@@ -46,69 +59,96 @@ describe('GameAutosaver', () => {
   });
 
   it('saves once after debounce when a tile is placed', async () => {
-    autosaver.handleTilePlaced();
-
-    // Move time forward past the debounce delay
+    // Act
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
     vi.advanceTimersByTime(2000);
 
+    // Assert
     expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
     expect(saveGameStateSpy).toHaveBeenCalledWith('user-1', expect.any(Object));
   });
 
-  it('debounces multiple tile placements into a single save', () => {
-    autosaver.handleTilePlaced();
+  it('debounces rapid meaningful transitions into a single save', () => {
+    // Act
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
     vi.advanceTimersByTime(1000);
-    autosaver.handleTilePlaced();
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
     vi.advanceTimersByTime(1000);
-    autosaver.handleTilePlaced();
-
-    // Total advanced so far: 2000ms; last call scheduled at t=2000.
-    // Advance one more debounce window from the last call.
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
     vi.advanceTimersByTime(2000);
 
+    // Assert
+    expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not cancel pending save when transition is non-meaningful', () => {
+    // Arrange
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
+    vi.advanceTimersByTime(1000);
+
+    const equivalentGame = {
+      ...afterPlacementGame,
+      board: afterPlacementGame.board,
+      score: afterPlacementGame.score,
+      remainingTurns: afterPlacementGame.remainingTurns,
+    } as unknown as Game;
+
+    // Act
+    autosaver.handleGameChanged(afterPlacementGame, equivalentGame);
+
+    vi.advanceTimersByTime(1000);
+
+    // Assert
     expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
   });
 
   it('does not save when there is no active game at fire time', () => {
-    // First call uses a game
-    autosaver.handleTilePlaced();
+    // Arrange
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
 
-    // Update provider to simulate game ending before timer fires
-    getActiveGame = () => undefined;
+    // Act
+    getActiveGame = () => null;
     // @ts-expect-error - overriding for test; autosaver captures the function reference
     autosaver['getActiveGame'] = getActiveGame;
-
     vi.advanceTimersByTime(2000);
 
+    // Assert
     expect(saveGameStateSpy).not.toHaveBeenCalled();
   });
 
   it('cancels pending save on dispose', () => {
-    autosaver.handleTilePlaced();
+    // Arrange
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
 
+    // Act
     autosaver.dispose();
-
     vi.advanceTimersByTime(2000);
 
+    // Assert
     expect(saveGameStateSpy).not.toHaveBeenCalled();
   });
 
   it('invokes callbacks on successful save', async () => {
-    autosaver.handleTilePlaced();
+    // Act
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
     await vi.advanceTimersByTimeAsync(2000);
 
+    // Assert
     expect(onSaveStartSpy).toHaveBeenCalledTimes(1);
     expect(onSaveSuccessSpy).toHaveBeenCalledTimes(1);
     expect(onSaveErrorSpy).not.toHaveBeenCalled();
   });
 
   it('invokes error callback on failed save', async () => {
+    // Arrange
     const error = new Error('Save failed');
     saveGameStateSpy.mockRejectedValueOnce(error);
 
-    autosaver.handleTilePlaced();
+    // Act
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
     await vi.advanceTimersByTimeAsync(2000);
 
+    // Assert
     expect(onSaveStartSpy).toHaveBeenCalledTimes(1);
     expect(onSaveSuccessSpy).not.toHaveBeenCalled();
     expect(onSaveErrorSpy).toHaveBeenCalledTimes(1);
@@ -116,23 +156,21 @@ describe('GameAutosaver', () => {
   });
 
   it('triggers onSaveError if save hangs for more than 5 seconds', async () => {
-    // Mock saveGameState to return a promise that never resolves
+    // Arrange
     saveGameStateSpy.mockReturnValueOnce(new Promise(() => {}));
 
-    autosaver.handleTilePlaced();
-    
-    // Advance past the 2-second debounce to start the save
+    // Act
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
     await vi.advanceTimersByTimeAsync(2000);
     expect(onSaveStartSpy).toHaveBeenCalledTimes(1);
     expect(onSaveErrorSpy).not.toHaveBeenCalled();
 
-    // Advance 4.9 seconds into the save (total 6.9s)
     await vi.advanceTimersByTimeAsync(4900);
     expect(onSaveErrorSpy).not.toHaveBeenCalled();
 
-    // Advance past the 5-second timeout (total 7s+)
     await vi.advanceTimersByTimeAsync(100);
-    
+
+    // Assert
     expect(onSaveSuccessSpy).not.toHaveBeenCalled();
     expect(onSaveErrorSpy).toHaveBeenCalledTimes(1);
     expect(onSaveErrorSpy).toHaveBeenCalledWith(expect.any(Error));
@@ -140,47 +178,85 @@ describe('GameAutosaver', () => {
   });
 
   it('recovers and calls onSaveSuccess when a hung save eventually succeeds', async () => {
+    // Arrange
     let resolveSave: () => void;
     const hangingPromise = new Promise<void>((resolve) => {
       resolveSave = resolve;
     });
     saveGameStateSpy.mockReturnValueOnce(hangingPromise);
 
-    autosaver.handleTilePlaced();
-    
-    // Advance past the 2-second debounce to start the save
+    // Act
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
     await vi.advanceTimersByTimeAsync(2000);
     expect(onSaveStartSpy).toHaveBeenCalledTimes(1);
 
-    // Advance past the 5-second timeout
     await vi.advanceTimersByTimeAsync(5000);
     expect(onSaveErrorSpy).toHaveBeenCalledTimes(1);
 
-    // Now simulate the network returning and the save succeeding
     resolveSave!();
-    // allow microtasks to resolve
     await vi.advanceTimersByTimeAsync(100);
 
-    // The UI should be notified that the save finally succeeded
+    // Assert
     expect(onSaveSuccessSpy).toHaveBeenCalledTimes(1);
   });
 
   it('forces save and clears timer on forceSaveAndDispose', () => {
-    autosaver.handleTilePlaced();
+    // Arrange
+    autosaver.handleGameChanged(originalGame, afterPlacementGame);
 
-    // Do not advance timers; call forceSaveAndDispose directly
+    // Act
     autosaver.forceSaveAndDispose();
 
+    // Assert
     expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
-    
-    // Timer should be cleared so moving time forward shouldn't trigger another save
     vi.advanceTimersByTime(2000);
     expect(saveGameStateSpy).toHaveBeenCalledTimes(1);
   });
 
   it('does not save on forceSaveAndDispose if no timer is pending', () => {
+    // Act
     autosaver.forceSaveAndDispose();
+
+    // Assert
+    expect(saveGameStateSpy).not.toHaveBeenCalled();
+  });
+
+  it('does not schedule save when games are the same reference', () => {
+    // Act
+    autosaver.handleGameChanged(originalGame, originalGame);
+    vi.advanceTimersByTime(2000);
+
+    // Assert
+    expect(saveGameStateSpy).not.toHaveBeenCalled();
+  });
+
+  it('does not schedule save when game id changes', () => {
+    // Arrange
+    const differentGame = { ...afterPlacementGame, id: 'game-2' } as unknown as Game;
+
+    // Act
+    autosaver.handleGameChanged(originalGame, differentGame);
+    vi.advanceTimersByTime(2000);
+
+    // Assert
+    expect(saveGameStateSpy).not.toHaveBeenCalled();
+  });
+
+  it('does not schedule save for rotation-only transition', () => {
+    // Arrange
+    const rotationOnlyGame = {
+      ...originalGame,
+      tileQueue: [{ id: 'rotated' }],
+      score: originalGame.score,
+      remainingTurns: originalGame.remainingTurns,
+      board: originalGame.board,
+    } as unknown as Game;
+
+    // Act
+    autosaver.handleGameChanged(originalGame, rotationOnlyGame);
+    vi.advanceTimersByTime(2000);
+
+    // Assert
     expect(saveGameStateSpy).not.toHaveBeenCalled();
   });
 });
-

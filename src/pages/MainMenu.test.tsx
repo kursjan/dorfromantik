@@ -46,6 +46,7 @@ describe('MainMenu', () => {
             <GameHistoryContext.Provider value={{ games }}>
               <ActiveGameContext.Provider
                 value={{
+                  activeGame: null,
                   setActiveGame: mockSetActiveGame,
                 }}
               >
