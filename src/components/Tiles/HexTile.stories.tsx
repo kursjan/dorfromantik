@@ -82,7 +82,7 @@ export const FullyRotatedTile: Story = {
 };
 
 const hybridTile = new Tile({
-  north: new WaterTerrain({ linkToCenter: true }),
+  north: new WaterTerrain({ linkToCenter: false }),
   northEast: new WaterOrPastureTerrain(),
   southEast: new RailTerrain({ linkToCenter: true }),
   south: new FieldTerrain(),

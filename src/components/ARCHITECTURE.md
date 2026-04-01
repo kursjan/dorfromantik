@@ -16,6 +16,11 @@ src/components/
 ├── GameCard.tsx         # Card representing a saved game or session
 ├── GameCard.css         # "Lifted" glassmorphism styling for GameCard
 ├── GameCard.stories.tsx # Storybook visualization for GameCard
+├── Tiles/               # SVG HexTile prototype components and stories
+│   ├── HexTile.tsx      # Declarative SVG tile container (6 wedges + optional center)
+│   ├── Wedge.tsx        # Base wedge SVG path wrapper
+│   ├── CenterWedge.tsx  # Base center-circle SVG path wrapper
+│   └── ...              # Renderer registry, geometry utils, tests, stories
 ├── SettingsModal.tsx    # Modal overlay for game configurations
 ├── SettingsModal.css    # Blurred overlay and parchment modal styling
 ├── SettingsModal.stories.tsx # Storybook visualization for SettingsModal
@@ -27,6 +32,7 @@ src/components/
 ### GameCard (`GameCard.tsx`)
 
 A display component used in the Main Menu to list available game sessions.
+
 - **Props:** `id`, `name`, `score`, `lastPlayed`, `onSelect`.
 - **Styling:** Uses a `rgba(244, 234, 213, 0.85)` (Parchment) background with a `backdrop-filter: blur(8px)`. It features a "lifted" hover effect using `transform: translateY(-8px)` and deep shadows.
 - **Interaction:** Entire card is clickable, triggering the `onSelect` callback.
@@ -34,6 +40,7 @@ A display component used in the Main Menu to list available game sessions.
 ### SettingsModal (`SettingsModal.tsx`)
 
 An overlay component for adjusting game settings.
+
 - **Props:** `isOpen`, `onClose`.
 - **Behavior:**
   - Uses a fixed, blurred overlay to focus attention on the modal.
@@ -44,12 +51,16 @@ An overlay component for adjusting game settings.
 ## 4. Theming and Variables
 
 Components share a common color palette defined via CSS variables within their respective `.css` files:
+
 - `--color-forest-green`: `#2d5a27` (Primary text and buttons)
 - `--color-parchment`: `rgba(244, 234, 213, 0.85)` (Main component backgrounds)
 - `--color-sky-blue`: `#87ceeb` (Decorative accents and glows)
 
 ## 5. Integration Pattern
 
-These components are typically composed within **Pages** (e.g., `src/pages/MainMenu.tsx`). 
+These components are typically composed within **Pages** (e.g., `src/pages/MainMenu.tsx`).
+
 - **State Management:** The parent page manages the visibility (e.g., `isSettingsOpen`) and data fetching (e.g., list of games from the `Session` model).
 - **Navigation:** Buttons within components (like "Continue" in `GameCard`) trigger callbacks that the parent page uses to initiate navigation via `react-router-dom`.
+
+`Tiles/HexTile` is currently a prototype surface used in Storybook for visual parity against the canvas `TilePreview` renderer.
