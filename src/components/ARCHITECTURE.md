@@ -20,7 +20,7 @@ src/components/
 │   ├── HexTile.tsx      # Declarative SVG tile container (6 wedges + optional center)
 │   ├── Wedge.tsx        # Base wedge SVG path wrapper
 │   ├── CenterWedge.tsx  # Base center-circle SVG path wrapper
-│   └── ...              # Renderer registry, geometry utils, tests, stories
+│   └── ...              # Renderer registry, geometry utils, stories
 ├── SettingsModal.tsx    # Modal overlay for game configurations
 ├── SettingsModal.css    # Blurred overlay and parchment modal styling
 ├── SettingsModal.stories.tsx # Storybook visualization for SettingsModal
@@ -63,4 +63,4 @@ These components are typically composed within **Pages** (e.g., `src/pages/MainM
 - **State Management:** The parent page manages the visibility (e.g., `isSettingsOpen`) and data fetching (e.g., list of games from the `Session` model).
 - **Navigation:** Buttons within components (like "Continue" in `GameCard`) trigger callbacks that the parent page uses to initiate navigation via `react-router-dom`.
 
-`Tiles/HexTile` is currently a prototype surface used in Storybook for visual parity against the canvas `TilePreview` renderer.
+`Tiles/HexTile` is currently a prototype surface used in Storybook for visual parity against the canvas `TilePreview` renderer. Flat-top hex geometry (radius, corner points, wedge paths) lives in `Tiles/SvgHexUtils.ts` and is reused by `HexTile` and the SVG segment renderers so stroke anchors and view boxes stay aligned.
