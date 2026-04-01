@@ -1,6 +1,7 @@
 import { directions } from '../../models/Navigation';
 
-const SVG_HEX_RADIUS = 50;
+/** Vertex radius for flat-top hex geometry in SVG user units (shared by wedge paths and edge-midpoint math). */
+export const SVG_HEX_RADIUS = 50;
 const SVG_CENTER_WATER_HEX_RADIUS = SVG_HEX_RADIUS * 0.35;
 const SVG_CENTER_RAIL_HEX_RADIUS = SVG_HEX_RADIUS * 0.15;
 
@@ -28,11 +29,12 @@ function buildHexCorners(radius: number): Point[] {
   });
 }
 
-const HEX_CORNERS = buildHexCorners(SVG_HEX_RADIUS);
+/** Corner points in direction order (north vertex index 0, then clockwise). */
+export const SVG_HEX_CORNER_POINTS = buildHexCorners(SVG_HEX_RADIUS);
 
 function buildWedgePath(segmentIndex: number): string {
-  const startCorner = HEX_CORNERS[(segmentIndex + 4) % 6];
-  const endCorner = HEX_CORNERS[(segmentIndex + 5) % 6];
+  const startCorner = SVG_HEX_CORNER_POINTS[(segmentIndex + 4) % 6];
+  const endCorner = SVG_HEX_CORNER_POINTS[(segmentIndex + 5) % 6];
   return `M 0 0 L ${toPoint(startCorner)} L ${toPoint(endCorner)} Z`;
 }
 

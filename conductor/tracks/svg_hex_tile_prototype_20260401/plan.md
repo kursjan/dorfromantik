@@ -18,6 +18,6 @@
 
 ## Phase 3: Adversarial Review
 
-- [ ] Perform a rigorous file-by-file review of all changes in this branch against `main` using **quick-review** skill.
-- [ ] Address any feedback from `REVIEW_FEEDBACK.md` using **task-conductor** skill.
+- [x] Perform a rigorous file-by-file review of all changes in this branch against `main` using **quick-review** skill.
+- [x] Address any feedback from `REVIEW_FEEDBACK.md` using **task-conductor** skill.
 - [ ] **Final Track Gate**: Final verification and Git commit using **project-orchestrator** skill.

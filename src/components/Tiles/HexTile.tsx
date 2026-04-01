@@ -3,10 +3,10 @@ import { directions, type Direction } from '../../models/Navigation';
 import { type TerrainType } from '../../models/Terrain';
 import { type Tile } from '../../models/Tile';
 import { TERRAIN_ID_SVG_SEGMENT_RENDERERS } from './TerrainIdSvgSegmentRenderers';
+import { SVG_HEX_RADIUS } from './SvgHexUtils';
 
-const HEX_RADIUS = 50;
-const HEX_HALF_HEIGHT = (Math.sqrt(3) * HEX_RADIUS) / 2;
-const HEX_VIEWBOX = `${-HEX_RADIUS} ${-HEX_HALF_HEIGHT} ${HEX_RADIUS * 2} ${HEX_HALF_HEIGHT * 2}`;
+const HEX_HALF_HEIGHT = (Math.sqrt(3) * SVG_HEX_RADIUS) / 2;
+const HEX_VIEWBOX = `${-SVG_HEX_RADIUS} ${-HEX_HALF_HEIGHT} ${SVG_HEX_RADIUS * 2} ${HEX_HALF_HEIGHT * 2}`;
 
 export interface HexTileProps extends Omit<ComponentPropsWithoutRef<'svg'>, 'viewBox'> {
   tile: Tile;
