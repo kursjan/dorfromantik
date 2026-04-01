@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { Direction } from '../../models/Navigation';
-import { WaterTerrain, RailTerrain } from '../../models/Terrain';
+import { WaterTerrain, RailTerrain, WaterOrPastureTerrain } from '../../models/Terrain';
 import { TERRAIN_COLORS } from '../../canvas/graphics/HexStyles';
 import { SVG_HEX_CENTER_WATER_PATH, SVG_HEX_WEDGE_PATHS } from './SvgHexUtils';
 import { CenterWedge } from './CenterWedge';
@@ -132,5 +132,49 @@ describe('TERRAIN_ID_SVG_SEGMENT_RENDERERS', () => {
     );
     expect(wedgePath?.getAttribute('fill')).toBe(TERRAIN_COLORS.pasture);
     expect(paths.length).toBeGreaterThan(3); // wedge + sleepers + 2 tracks
+  });
+
+  it('renders waterOrPasture as water when neighbor edge is water', () => {
+    const renderer = TERRAIN_ID_SVG_SEGMENT_RENDERERS.wedge.waterOrPasture;
+    const { container } = render(
+      <svg>
+        {renderer({
+          terrainId: 'waterOrPasture',
+          segmentIndex: 1,
+          direction: Direction.NorthEast,
+          neighborEdgeTerrainType: 'water',
+          terrain: new WaterOrPastureTerrain(),
+        })}
+      </svg>
+    );
+    const paths = container.querySelectorAll('path');
+    const riverPath = Array.from(paths).find(
+      (path) => path.getAttribute('stroke') === TERRAIN_COLORS.water
+    );
+    expect(riverPath).toBeDefined();
+  });
+
+  it('renders waterOrPasture as pasture when neighbor edge is not water', () => {
+    const renderer = TERRAIN_ID_SVG_SEGMENT_RENDERERS.wedge.waterOrPasture;
+    const { container } = render(
+      <svg>
+        {renderer({
+          terrainId: 'waterOrPasture',
+          segmentIndex: 1,
+          direction: Direction.NorthEast,
+          neighborEdgeTerrainType: 'pasture',
+          terrain: new WaterOrPastureTerrain(),
+        })}
+      </svg>
+    );
+    const paths = container.querySelectorAll('path');
+    const riverPath = Array.from(paths).find(
+      (path) => path.getAttribute('stroke') === TERRAIN_COLORS.water
+    );
+    const wedgePath = Array.from(paths).find(
+      (path) => path.getAttribute('d') === SVG_HEX_WEDGE_PATHS[1]
+    );
+    expect(riverPath).toBeUndefined();
+    expect(wedgePath?.getAttribute('fill')).toBe(TERRAIN_COLORS.pasture);
   });
 });

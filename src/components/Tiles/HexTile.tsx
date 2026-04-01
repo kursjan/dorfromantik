@@ -4,6 +4,10 @@ import { type TerrainType } from '../../models/Terrain';
 import { type Tile } from '../../models/Tile';
 import { TERRAIN_ID_SVG_SEGMENT_RENDERERS } from './TerrainIdSvgSegmentRenderers';
 
+const HEX_RADIUS = 50;
+const HEX_HALF_HEIGHT = (Math.sqrt(3) * HEX_RADIUS) / 2;
+const HEX_VIEWBOX = `${-HEX_RADIUS} ${-HEX_HALF_HEIGHT} ${HEX_RADIUS * 2} ${HEX_HALF_HEIGHT * 2}`;
+
 export interface HexTileProps extends Omit<ComponentPropsWithoutRef<'svg'>, 'viewBox'> {
   tile: Tile;
   neighborEdgeTerrainTypes?: Partial<Record<Direction, TerrainType>>;
@@ -17,7 +21,7 @@ export function HexTile({ tile, neighborEdgeTerrainTypes, ...svgProps }: HexTile
     : undefined;
 
   return (
-    <svg viewBox="-50 -43.301 100 86.602" role="img" aria-label="Hex tile" {...svgProps}>
+    <svg viewBox={HEX_VIEWBOX} role="img" aria-label="Hex tile" {...svgProps}>
       {directions.map((direction, segmentIndex) => {
         const terrain = terrainsByDirection[direction];
         const renderWedge = TERRAIN_ID_SVG_SEGMENT_RENDERERS.wedge[terrain.id];
