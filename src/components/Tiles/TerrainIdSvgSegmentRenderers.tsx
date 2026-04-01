@@ -30,7 +30,7 @@ function renderHouseWedge(props: SvgWedgeSegmentRendererProps): ReactElement {
 }
 
 function renderWaterWedge(props: SvgWedgeSegmentRendererProps): ReactElement {
-  return <Wedge segmentIndex={props.segmentIndex} fill={TERRAIN_COLORS.water} />;
+  return renderBlendedWedge(props, TERRAIN_COLORS.water);
 }
 
 function renderPastureWedge(props: SvgWedgeSegmentRendererProps): ReactElement {
@@ -38,7 +38,7 @@ function renderPastureWedge(props: SvgWedgeSegmentRendererProps): ReactElement {
 }
 
 function renderRailWedge(props: SvgWedgeSegmentRendererProps): ReactElement {
-  return <Wedge segmentIndex={props.segmentIndex} fill={TERRAIN_COLORS.rail} />;
+  return renderBlendedWedge(props, TERRAIN_COLORS.rail);
 }
 
 function renderFieldWedge(props: SvgWedgeSegmentRendererProps): ReactElement {
@@ -47,6 +47,27 @@ function renderFieldWedge(props: SvgWedgeSegmentRendererProps): ReactElement {
 
 function renderWaterOrPastureWedge(props: SvgWedgeSegmentRendererProps): ReactElement {
   return <Wedge segmentIndex={props.segmentIndex} fill={TERRAIN_COLORS.pasture} />;
+}
+
+function renderBlendedWedge(props: SvgWedgeSegmentRendererProps, baseColor: string): ReactElement {
+  const neighborType = props.neighborEdgeTerrainType;
+  if (!neighborType || neighborType === props.terrainId) {
+    return <Wedge segmentIndex={props.segmentIndex} fill={baseColor} />;
+  }
+
+  const neighborColor = TERRAIN_COLORS[neighborType];
+  const gradientId = `wedge-gradient-${props.terrainId}-${props.direction}-${props.segmentIndex}`;
+  return (
+    <>
+      <defs>
+        <linearGradient id={gradientId} x1="50%" y1="50%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor={baseColor} />
+          <stop offset="100%" stopColor={neighborColor} />
+        </linearGradient>
+      </defs>
+      <Wedge segmentIndex={props.segmentIndex} fill={`url(#${gradientId})`} />
+    </>
+  );
 }
 
 export const TERRAIN_ID_SVG_SEGMENT_RENDERERS: TerrainIdSvgSegmentRenderers = {

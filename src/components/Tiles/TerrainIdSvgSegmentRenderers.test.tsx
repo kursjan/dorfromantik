@@ -75,4 +75,44 @@ describe('TERRAIN_ID_SVG_SEGMENT_RENDERERS', () => {
     expect(paths[3]?.getAttribute('fill')).toBe(TERRAIN_COLORS.rail);
     expect(paths[4]?.getAttribute('fill')).toBe(TERRAIN_COLORS.field);
   });
+
+  it('blends water wedge with neighbor terrain color', () => {
+    const renderer = TERRAIN_ID_SVG_SEGMENT_RENDERERS.wedge.water;
+    const { container } = render(
+      <svg>
+        {renderer({
+          terrainId: 'water',
+          segmentIndex: 2,
+          direction: Direction.SouthEast,
+          neighborEdgeTerrainType: 'pasture',
+        })}
+      </svg>
+    );
+    const gradient = container.querySelector('linearGradient');
+    const stops = container.querySelectorAll('stop');
+    const path = container.querySelector('path');
+    expect(gradient?.getAttribute('id')).toContain('wedge-gradient-water-southEast-2');
+    expect(stops[0]?.getAttribute('stop-color')).toBe(TERRAIN_COLORS.water);
+    expect(stops[1]?.getAttribute('stop-color')).toBe(TERRAIN_COLORS.pasture);
+    expect(path?.getAttribute('fill')).toBe('url(#wedge-gradient-water-southEast-2)');
+  });
+
+  it('blends rail wedge with neighbor terrain color', () => {
+    const renderer = TERRAIN_ID_SVG_SEGMENT_RENDERERS.wedge.rail;
+    const { container } = render(
+      <svg>
+        {renderer({
+          terrainId: 'rail',
+          segmentIndex: 4,
+          direction: Direction.SouthWest,
+          neighborEdgeTerrainType: 'field',
+        })}
+      </svg>
+    );
+    const stops = container.querySelectorAll('stop');
+    const path = container.querySelector('path');
+    expect(stops[0]?.getAttribute('stop-color')).toBe(TERRAIN_COLORS.rail);
+    expect(stops[1]?.getAttribute('stop-color')).toBe(TERRAIN_COLORS.field);
+    expect(path?.getAttribute('fill')).toBe('url(#wedge-gradient-rail-southWest-4)');
+  });
 });
