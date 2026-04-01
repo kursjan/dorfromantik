@@ -122,3 +122,42 @@ export const HybridParityWithCanvas: Story = {
     </div>
   ),
 };
+
+const adjacentLeftTile = new Tile({
+  north: new WaterTerrain(),
+  northEast: new TreeTerrain(),
+  southEast: new HouseTerrain(),
+  south: new FieldTerrain(),
+  southWest: new RailTerrain(),
+  northWest: new PastureTerrain(),
+});
+
+const adjacentRightTile = new Tile({
+  north: new RailTerrain(),
+  northEast: new WaterTerrain(),
+  southEast: new TreeTerrain(),
+  south: new HouseTerrain(),
+  southWest: new FieldTerrain(),
+  northWest: new HouseTerrain(),
+});
+
+export const AdjacentAlignment: Story = {
+  render: () => (
+    <div style={{ padding: 20, border: '1px solid #ddd' }}>
+      <div style={{ width: 175, height: 100, position: 'relative' }}>
+        <HexTile
+          tile={adjacentLeftTile}
+          width={100}
+          height={100}
+          style={{ position: 'absolute', left: 0 }}
+        />
+        <HexTile
+          tile={adjacentRightTile}
+          width={100}
+          height={100}
+          style={{ position: 'absolute', left: 75 }}
+        />
+      </div>
+    </div>
+  ),
+};
