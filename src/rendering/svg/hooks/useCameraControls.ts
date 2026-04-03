@@ -1,7 +1,8 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import { radians } from '../../../utils/Angle';
-import { Camera, type CameraSnapshot } from '../../common/camera/Camera';
+import { Camera } from '../../common/camera/Camera';
+import type { CameraSnapshot } from '../cameraSnapshot';
 import {
   PointerPanZoomSession,
   applyWheelDeltaYToCamera,

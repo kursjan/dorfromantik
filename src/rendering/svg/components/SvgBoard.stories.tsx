@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Board, type BoardTile } from '../../../models/Board';
 import { radians } from '../../../utils/Angle';
-import type { CameraSnapshot } from '../../common/camera/Camera';
+import type { CameraSnapshot } from '../cameraSnapshot';
 import { SvgBoard } from './SvgBoard';
 import { HexCoordinate } from '../../../models/HexCoordinate';
 import {

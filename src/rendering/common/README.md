@@ -1,6 +1,6 @@
 # `rendering/common`
 
-Shared **view math and bridges** used by both the canvas engine and the SVG board. No `HTMLCanvasElement` or SVG-specific JSX here.
+Code **used by both** the canvas engine and the SVG path (or otherwise engine-level shared math). SVG-only React types (e.g. `CameraSnapshot`) live under `rendering/svg/`. No `HTMLCanvasElement` or SVG-specific JSX here.
 
 - **`camera/`** — `Camera` class and pointer / wheel helpers (`cameraInteraction`).
 - **`bridge/`** — React `useGameSnapshotBridge` for immutable `Game` snapshots.
