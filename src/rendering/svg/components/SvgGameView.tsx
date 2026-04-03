@@ -1,5 +1,6 @@
 import { type FC, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { SvgBoard, type Camera } from './SvgBoard';
+import type { CameraSnapshot } from '../../common/camera/Camera';
+import { SvgBoard } from './SvgBoard';
 import { Game } from '../../../models/Game';
 import { HexCoordinate } from '../../../models/HexCoordinate';
 import { GameHUD } from '../../shell/GameHUD';
@@ -106,7 +107,7 @@ export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame })
   }, []);
 
   const camera = useMemo(
-    (): Camera => ({
+    (): CameraSnapshot => ({
       x: transform.x,
       y: transform.y,
       zoom: transform.zoom,

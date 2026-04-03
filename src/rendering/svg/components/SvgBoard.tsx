@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Board } from '../../../models/Board';
-import { type Radians, radiansToDegrees } from '../../../utils/Angle';
+import { radiansToDegrees } from '../../../utils/Angle';
+import type { CameraSnapshot } from '../../common/camera/Camera';
 import { HexTile } from '../tiles/HexTile';
 import { SVG_HEX_RADIUS, hexToPixel } from '../tiles/SvgHexUtils';
 
@@ -9,16 +10,9 @@ const SVG_HEX_HALF_HEIGHT = (Math.sqrt(3) * SVG_HEX_RADIUS) / 2;
 const SVG_HEX_LAYOUT_WIDTH = SVG_HEX_RADIUS * 2;
 const SVG_HEX_LAYOUT_HEIGHT = SVG_HEX_HALF_HEIGHT * 2;
 
-export interface Camera {
-  x: number;
-  y: number;
-  zoom: number;
-  rotation: Radians;
-}
-
 export interface SvgBoardProps {
   board: Board;
-  camera: Camera;
+  camera: CameraSnapshot;
   viewCenter: { x: number; y: number };
 }
 

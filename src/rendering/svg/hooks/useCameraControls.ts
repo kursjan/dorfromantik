@@ -1,15 +1,12 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import { radians } from '../../../utils/Angle';
-import { Camera } from '../../common/camera/Camera';
+import { Camera, type CameraSnapshot } from '../../common/camera/Camera';
 import {
   PointerPanZoomSession,
   applyWheelDeltaYToCamera,
   bindPointerInteraction,
 } from '../../common/camera/cameraInteraction';
-
-/** React state snapshot of {@link Camera}; synced via `readTransform` in this module. */
-export type CameraTransform = Pick<Camera, 'x' | 'y' | 'zoom' | 'rotation'>;
 
 export interface UseCameraControlsCallbacks {
   onHover: (x: number, y: number) => void;
@@ -27,13 +24,13 @@ export function useCameraControls(
   containerRef: RefObject<HTMLElement | null>,
   callbacks: UseCameraControlsCallbacks
 ): {
-  transform: CameraTransform;
+  transform: CameraSnapshot;
   resetCamera: () => void;
   screenToWorld: (screenX: number, screenY: number) => { x: number; y: number };
 } {
   const cameraRef = useRef(new Camera());
   const panPointerRef = useRef(new PointerPanZoomSession());
-  const [transform, setTransform] = useState<CameraTransform>({
+  const [transform, setTransform] = useState<CameraSnapshot>({
     x: 0,
     y: 0,
     zoom: 1,
@@ -98,7 +95,7 @@ export function useCameraControls(
   return { transform, resetCamera, screenToWorld };
 }
 
-function readTransform(camera: Camera): CameraTransform {
+function readTransform(camera: Camera): CameraSnapshot {
   return {
     x: camera.x,
     y: camera.y,

@@ -2,7 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Board, type BoardTile } from '../../../models/Board';
 import { radians } from '../../../utils/Angle';
-import { SvgBoard, type Camera } from './SvgBoard';
+import type { CameraSnapshot } from '../../common/camera/Camera';
+import { SvgBoard } from './SvgBoard';
 import { HexCoordinate } from '../../../models/HexCoordinate';
 import {
   north,
@@ -180,7 +181,7 @@ const scatteredBoard = boardFromTiles(scatteredTiles);
 /** Story viewport pivot (half of typical fullscreen); interactive stories measure their container. */
 const defaultViewCenter = { x: 960, y: 540 };
 
-const defaultCamera: Camera = { x: 400, y: 300, zoom: 1, rotation: radians(0) };
+const defaultCamera: CameraSnapshot = { x: 400, y: 300, zoom: 1, rotation: radians(0) };
 
 // --- Stories ---
 
@@ -213,7 +214,7 @@ export const ScatteredCluster: Story = {
 const InteractiveBoard = () => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [viewCenter, setViewCenter] = useState(defaultViewCenter);
-  const [camera, setCamera] = useState<Camera>({
+  const [camera, setCamera] = useState<CameraSnapshot>({
     x: 400,
     y: 300,
     zoom: 1,
@@ -353,7 +354,7 @@ const PerspectiveRotationBoard = () => {
     return () => ro.disconnect();
   }, []);
 
-  const boardCamera: Camera = { x: 400, y: 300, zoom: 1, rotation: radians(0) };
+  const boardCamera: CameraSnapshot = { x: 400, y: 300, zoom: 1, rotation: radians(0) };
 
   return (
     <div

@@ -142,3 +142,6 @@ export class Camera {
     this.rotation = this.defaultRotation;
   }
 }
+
+/** Serializable view state (`x`/`y` pan, `zoom`, `rotation`); use with {@link Camera} via `readTransform`-style copy — not a class instance. */
+export type CameraSnapshot = Pick<Camera, 'x' | 'y' | 'zoom' | 'rotation'>;
