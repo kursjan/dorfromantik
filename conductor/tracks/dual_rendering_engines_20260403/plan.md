@@ -43,4 +43,11 @@ The canvas path implements board interaction through `InputManager` + `CanvasCon
 
 - [ ] Perform a rigorous file-by-file review of all changes in this branch against `main` using **quick-review** skill.
 - [ ] Address any feedback from `REVIEW_FEEDBACK.md` using **task-conductor** skill.
-- [ ] **Final Track Gate**: Final verification and Git commit using **project-orchestrator** skill.
+- [ ] **Phase Gate**: Final verification of code review changes using **project-orchestrator** skill.
+
+## Phase 5: E2E Test Migration & Parity
+
+- [ ] Update `e2e/test-utils.ts` and shared selectors to support both `game-canvas` and `game-svg` (or a unified `data-testid`), ensuring navigation and HUD tests pass regardless of the active engine. using **task-conductor** skill.
+- [ ] Refactor or branch canvas-specific E2E tests (e.g., debug grid, ghost preview, rotation) to either run only when the canvas engine is active, or implement equivalent SVG assertions where parity exists. using **task-conductor** skill.
+- [ ] Add new E2E coverage specifically for the engine toggle in settings and the split-view mode (if applicable to the test environment). using **task-conductor** skill.
+- [ ] **Final Track Gate**: Verify `npm run test:e2e:ci` passes reliably and Git commit using **project-orchestrator** skill.
