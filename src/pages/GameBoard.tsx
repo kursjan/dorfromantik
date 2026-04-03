@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useLayoutEffect, useState } from 'react';
-import { CanvasView } from '../canvas/components/CanvasView';
+import { SvgGameView } from '../canvas/components/SvgGameView';
 import { useUser, useActiveGame } from '../context/SessionContext';
 import { useFirestoreService } from '../services/hooks/useServices';
 import { GameAutosaver } from '../canvas/services/GameAutosaver';
@@ -77,7 +77,7 @@ export const GameBoard: React.FC = () => {
   // Render
   return (
     <main className="game-board">
-      <CanvasView activeGame={activeGame} setActiveGame={setActiveGame} />
+      <SvgGameView activeGame={activeGame} setActiveGame={setActiveGame} />
       <SaveStatusIndicator status={saveStatus} />
     </main>
   );

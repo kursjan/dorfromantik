@@ -23,9 +23,9 @@ vi.mock('../canvas/services/GameAutosaver', () => {
   };
 });
 
-// Mock CanvasView to avoid WebGL/CanvasController overhead in these tests
-vi.mock('../canvas/components/CanvasView', () => ({
-  CanvasView: () => <div data-testid="mock-canvas-view" />,
+// Mock SvgGameView to avoid full SVG/camera wiring in these tests
+vi.mock('../canvas/components/SvgGameView', () => ({
+  SvgGameView: () => <div data-testid="mock-svg-game-view" />,
 }));
 
 describe('GameBoard', () => {
@@ -67,10 +67,10 @@ describe('GameBoard', () => {
 
     expect(screen.getByText(/No active game session/i)).toBeInTheDocument();
     expect(screen.getByText(/Please return to the main menu/i)).toBeInTheDocument();
-    expect(screen.queryByTestId('mock-canvas-view')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('mock-svg-game-view')).not.toBeInTheDocument();
   });
 
-  it('renders CanvasView when there is an active game', () => {
+  it('renders SvgGameView when there is an active game', () => {
     const game = new Game({
       board: new Board(),
       rules: new GameRules(),
@@ -80,7 +80,7 @@ describe('GameBoard', () => {
 
     renderWithProviders(game);
 
-    expect(screen.getByTestId('mock-canvas-view')).toBeInTheDocument();
+    expect(screen.getByTestId('mock-svg-game-view')).toBeInTheDocument();
     expect(screen.queryByText(/No active game session/i)).not.toBeInTheDocument();
   });
 
