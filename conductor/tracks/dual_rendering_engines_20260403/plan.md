@@ -2,7 +2,7 @@
 
 ## Phase 1: SVG Engine Integration
 
-- [ ] Ensure we are on the `worker1` branch using **task-conductor** skill.
+- [x] Ensure we are on the `worker1` branch using **task-conductor** skill.
 - [ ] Create a `useCameraControls` hook to manage pan (drag) and zoom (scroll) state using standard DOM events using **task-conductor** skill.
 - [ ] Create `SvgGameView.tsx` (matching `CanvasView` props) that maps `activeGame.board` to `SvgBoardTile[]` and integrates the camera hook. Temporarily hardcode `GameBoard.tsx` to render only `SvgGameView` using **task-conductor** skill.
 - [ ] **Phase Gate**: Verify basic SVG rendering and camera interactions using **project-orchestrator** skill.
