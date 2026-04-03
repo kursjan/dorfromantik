@@ -2,9 +2,13 @@ import { type FC, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { SvgBoard, type SvgBoardTile } from '../../components/Tiles/SvgBoard';
 import { Board } from '../../models/Board';
 import { Game } from '../../models/Game';
+import { HexCoordinate } from '../../models/HexCoordinate';
 import { GameHUD } from './GameHUD';
 import { ResetViewButton } from './ResetViewButton';
 import { useCameraControls } from '../hooks/useCameraControls';
+import { useGameSnapshotBridge } from '../hooks/useGameSnapshotBridge';
+import { distanceToHex } from '../utils/HexUtils';
+import { HEX_SIZE } from '../graphics/HexStyles';
 
 interface SvgGameViewProps {
   activeGame: Game;
@@ -20,18 +24,67 @@ function boardToSvgTiles(board: Board): SvgBoardTile[] {
   }));
 }
 
+function findClosestHexCoordinate(
+  validCoords: HexCoordinate[],
+  x: number,
+  y: number
+): HexCoordinate {
+  return validCoords
+    .map((coord) => ({ coord, dist: distanceToHex(coord, x, y, HEX_SIZE) }))
+    .sort((a, b) => a.dist - b.dist)[0].coord;
+}
+
 /**
  * DOM/SVG game board: renders `activeGame.board` with {@link SvgBoard} and shared pan/zoom via
  * {@link useCameraControls}. Placement and keyboard parity follow in later track tasks.
  */
-export const SvgGameView: FC<SvgGameViewProps> = ({
-  activeGame,
-  setActiveGame: _setActiveGame,
-}) => {
-  // Reserved for Phase 2 (placement / snapshot bridge); must match CanvasView props.
-  void _setActiveGame;
+export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame }) => {
+  const { getGameSnapshot, setGameSnapshot } = useGameSnapshotBridge(activeGame, setActiveGame);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { transform, resetCamera } = useCameraControls(containerRef);
+  const [hoveredHex, setHoveredHex] = useState<HexCoordinate | null>(null);
+  const screenToWorldRef = useRef<((x: number, y: number) => { x: number; y: number }) | undefined>(
+    undefined
+  );
+
+  const { transform, resetCamera, screenToWorld } = useCameraControls(containerRef, {
+    onHover: (mouseX, mouseY) => {
+      if (!screenToWorldRef.current) return;
+      const worldPos = screenToWorldRef.current(mouseX, mouseY);
+      const validCoords = getGameSnapshot().hints.validPlacements;
+
+      if (validCoords.length === 0) {
+        setHoveredHex(null);
+        return;
+      }
+
+      const closest = findClosestHexCoordinate([...validCoords], worldPos.x, worldPos.y);
+      setHoveredHex(closest);
+    },
+    onLeave: () => {
+      setHoveredHex(null);
+    },
+    onClick: () => {
+      const game = getGameSnapshot();
+      if (!game.inProgress()) return;
+      if (!hoveredHex) return;
+      if (!game.isValidPlacement(hoveredHex)) return;
+
+      const { game: nextGame } = game.placeTile(hoveredHex);
+      setGameSnapshot(nextGame);
+    },
+    onRotateClockwise: () => {
+      const nextGame = getGameSnapshot().rotateQueuedTileClockwise();
+      setGameSnapshot(nextGame);
+    },
+    onRotateCounterClockwise: () => {
+      const nextGame = getGameSnapshot().rotateQueuedTileCounterClockwise();
+      setGameSnapshot(nextGame);
+    },
+  });
+
+  useLayoutEffect(() => {
+    screenToWorldRef.current = screenToWorld;
+  }, [screenToWorld]);
 
   const [viewSize, setViewSize] = useState({ width: 0, height: 0 });
 

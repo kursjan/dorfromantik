@@ -36,9 +36,17 @@ export interface SvgBoardProps {
   viewCenter?: { x: number; y: number };
   /** Optional callback for when a tile is clicked */
   onTileClick?: (coordinate: HexCoordinate) => void;
+  /** Optional children to render inside the world transform group (e.g. previews, highlights) */
+  children?: React.ReactNode;
 }
 
-export const SvgBoard: React.FC<SvgBoardProps> = ({ tiles, camera, viewCenter, onTileClick }) => {
+export const SvgBoard: React.FC<SvgBoardProps> = ({
+  tiles,
+  camera,
+  viewCenter,
+  onTileClick,
+  children,
+}) => {
   const onTileClickRef = useRef(onTileClick);
   useEffect(() => {
     onTileClickRef.current = onTileClick;
@@ -86,7 +94,10 @@ export const SvgBoard: React.FC<SvgBoardProps> = ({ tiles, camera, viewCenter, o
         cursor: onTileClick ? 'pointer' : 'default',
       }}
     >
-      <g transform={worldTransform}>{renderedTiles}</g>
+      <g transform={worldTransform}>
+        {renderedTiles}
+        {children}
+      </g>
     </svg>
   );
 };

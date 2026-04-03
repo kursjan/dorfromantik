@@ -3,7 +3,7 @@ import type { RefObject } from 'react';
 import {
   PointerPanZoomSession,
   applyWheelDeltaYToCamera,
-  cursorForPointerPanZoomState,
+  bindPointerInteraction,
 } from '../engine/cameraInteraction';
 import { Camera } from '../engine/Camera';
 
@@ -14,13 +14,25 @@ export interface CameraTransform {
   rotation: number;
 }
 
+export interface UseCameraControlsCallbacks {
+  onHover?: (x: number, y: number) => void;
+  onClick?: (x: number, y: number) => void;
+  onRotateClockwise?: () => void;
+  onRotateCounterClockwise?: () => void;
+  onLeave?: () => void;
+}
+
 /**
  * Pan (left-drag after threshold) and zoom (wheel) using the same rules as canvas {@link InputManager}
  * / {@link Camera}, for SVG or other DOM-based views.
  */
-export function useCameraControls(containerRef: RefObject<HTMLElement | null>): {
+export function useCameraControls(
+  containerRef: RefObject<HTMLElement | null>,
+  callbacks?: UseCameraControlsCallbacks
+): {
   transform: CameraTransform;
   resetCamera: () => void;
+  screenToWorld: (screenX: number, screenY: number) => { x: number; y: number };
 } {
   const cameraRef = useRef(new Camera());
   const panPointerRef = useRef(new PointerPanZoomSession());
@@ -30,6 +42,12 @@ export function useCameraControls(containerRef: RefObject<HTMLElement | null>): 
     zoom: 1,
     rotation: 0,
   });
+
+  // Store callbacks in a ref to avoid re-binding listeners on every render
+  const callbacksRef = useRef(callbacks);
+  useLayoutEffect(() => {
+    callbacksRef.current = callbacks;
+  }, [callbacks]);
 
   const sync = useCallback(() => {
     setTransform(readTransform(cameraRef.current));
@@ -42,61 +60,27 @@ export function useCameraControls(containerRef: RefObject<HTMLElement | null>): 
     const panPointer = panPointerRef.current;
     const camera = cameraRef.current;
 
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      applyWheelDeltaYToCamera(camera, e.deltaY);
-      sync();
-    };
+    const cleanup = bindPointerInteraction(
+      el,
+      {
+        onPan: (dx, dy) => {
+          camera.pan(dx, dy);
+          sync();
+        },
+        onZoom: (deltaY) => {
+          applyWheelDeltaYToCamera(camera, deltaY);
+          sync();
+        },
+        onHover: (x, y) => callbacksRef.current?.onHover?.(x, y),
+        onClick: (x, y) => callbacksRef.current?.onClick?.(x, y),
+        onRotateClockwise: () => callbacksRef.current?.onRotateClockwise?.(),
+        onRotateCounterClockwise: () => callbacksRef.current?.onRotateCounterClockwise?.(),
+        onLeave: () => callbacksRef.current?.onLeave?.(),
+      },
+      panPointer
+    );
 
-    const handleContextMenu = (e: MouseEvent) => {
-      e.preventDefault();
-    };
-
-    const handleMouseDown = (e: MouseEvent) => {
-      if (e.button !== 0) return;
-      panPointer.beginLeftDrag(e.clientX, e.clientY);
-      el.style.cursor = cursorForPointerPanZoomState(panPointer.state);
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const move = panPointer.move(e.clientX, e.clientY);
-      if (move.type === 'pan') {
-        camera.pan(move.dx, move.dy);
-        sync();
-      }
-      if (move.type === 'entered_pan') {
-        el.style.cursor = cursorForPointerPanZoomState(panPointer.state);
-      }
-    };
-
-    const handleMouseUp = () => {
-      panPointer.endDrag();
-      el.style.cursor = cursorForPointerPanZoomState(panPointer.state);
-    };
-
-    const handleMouseLeave = () => {
-      panPointer.endDrag();
-      el.style.cursor = cursorForPointerPanZoomState(panPointer.state);
-    };
-
-    el.style.cursor = cursorForPointerPanZoomState(panPointer.state);
-    el.addEventListener('wheel', handleWheel, { passive: false });
-    el.addEventListener('mousedown', handleMouseDown);
-    el.addEventListener('mousemove', handleMouseMove);
-    el.addEventListener('mouseup', handleMouseUp);
-    el.addEventListener('mouseleave', handleMouseLeave);
-    el.addEventListener('contextmenu', handleContextMenu);
-
-    return () => {
-      panPointer.endDrag();
-      el.removeEventListener('wheel', handleWheel);
-      el.removeEventListener('mousedown', handleMouseDown);
-      el.removeEventListener('mousemove', handleMouseMove);
-      el.removeEventListener('mouseup', handleMouseUp);
-      el.removeEventListener('mouseleave', handleMouseLeave);
-      el.removeEventListener('contextmenu', handleContextMenu);
-      el.style.cursor = '';
-    };
+    return cleanup;
   }, [containerRef, sync]);
 
   const resetCamera = useCallback(() => {
@@ -104,7 +88,17 @@ export function useCameraControls(containerRef: RefObject<HTMLElement | null>): 
     sync();
   }, [sync]);
 
-  return { transform, resetCamera };
+  const screenToWorld = useCallback(
+    (screenX: number, screenY: number) => {
+      const el = containerRef.current;
+      if (!el) return { x: 0, y: 0 };
+      const rect = el.getBoundingClientRect();
+      return cameraRef.current.screenToWorld(screenX, screenY, rect.width, rect.height);
+    },
+    [containerRef]
+  );
+
+  return { transform, resetCamera, screenToWorld };
 }
 
 function readTransform(camera: Camera): CameraTransform {

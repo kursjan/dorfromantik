@@ -1,4 +1,4 @@
-import { PointerPanZoomSession, cursorForPointerPanZoomState } from './cameraInteraction';
+import { PointerPanZoomSession, bindPointerInteraction } from './cameraInteraction';
 
 export interface InputCallbacks {
   onPan: (dx: number, dy: number) => void;
@@ -27,6 +27,7 @@ export class InputManager {
   private canvas: HTMLCanvasElement;
   private readonly panPointer = new PointerPanZoomSession();
   private callbacks: InputCallbacks;
+  private cleanupPointer?: () => void;
 
   // Keyboard State
   private keys: Set<string> = new Set();
@@ -38,29 +39,19 @@ export class InputManager {
   }
 
   private attachListeners() {
-    this.canvas.addEventListener('wheel', this.handleWheel, { passive: false });
-    this.canvas.addEventListener('mousedown', this.handleMouseDown);
-    this.canvas.addEventListener('mousemove', this.handleMouseMove);
-    this.canvas.addEventListener('mouseup', this.handleMouseUp);
-    this.canvas.addEventListener('mouseleave', this.handleMouseLeave);
-    this.canvas.addEventListener('contextmenu', this.handleContextMenu);
+    this.cleanupPointer = bindPointerInteraction(this.canvas, this.callbacks, this.panPointer);
 
     // Add resize listener to window to handle layout changes
     window.addEventListener('resize', this.handleResize);
     window.addEventListener('keydown', this.handleKeyDown);
     window.addEventListener('keyup', this.handleKeyUp);
-
-    // Set initial cursor
-    this.canvas.style.cursor = 'grab';
   }
 
   private detachListeners() {
-    this.canvas.removeEventListener('wheel', this.handleWheel);
-    this.canvas.removeEventListener('mousedown', this.handleMouseDown);
-    this.canvas.removeEventListener('mousemove', this.handleMouseMove);
-    this.canvas.removeEventListener('mouseup', this.handleMouseUp);
-    this.canvas.removeEventListener('mouseleave', this.handleMouseLeave);
-    this.canvas.removeEventListener('contextmenu', this.handleContextMenu);
+    if (this.cleanupPointer) {
+      this.cleanupPointer();
+      this.cleanupPointer = undefined;
+    }
 
     window.removeEventListener('resize', this.handleResize);
     window.removeEventListener('keydown', this.handleKeyDown);
@@ -69,10 +60,6 @@ export class InputManager {
 
   public destroy() {
     this.detachListeners();
-  }
-
-  private syncPanPointerCursor() {
-    this.canvas.style.cursor = cursorForPointerPanZoomState(this.panPointer.state);
   }
 
   /**
@@ -106,71 +93,6 @@ export class InputManager {
   private handleKeyUp = (e: KeyboardEvent) => {
     this.keys.delete(e.key);
   };
-
-  private handleWheel = (e: WheelEvent) => {
-    e.preventDefault();
-    this.callbacks.onZoom(e.deltaY);
-  };
-
-  private handleContextMenu = (e: MouseEvent) => {
-    e.preventDefault();
-  };
-
-  private handleMouseDown = (e: MouseEvent) => {
-    // 1. Right Click for rotation
-    if (e.button === 2) {
-      if (e.shiftKey) {
-        this.callbacks.onRotateCounterClockwise();
-      } else {
-        this.callbacks.onRotateClockwise();
-      }
-      return;
-    }
-
-    // 2. Only left click for Panning/Clicking
-    if (e.button !== 0) return;
-
-    this.panPointer.beginLeftDrag(e.clientX, e.clientY);
-    this.syncPanPointerCursor();
-  };
-
-  private handleMouseMove = (e: MouseEvent) => {
-    // 1. Calculate and report local coordinates for Hover
-    const rect = this.canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    this.callbacks.onHover(mouseX, mouseY);
-
-    const move = this.panPointer.move(e.clientX, e.clientY);
-    if (move.type === 'pan') {
-      this.callbacks.onPan(move.dx, move.dy);
-    }
-    if (move.type === 'entered_pan') {
-      this.syncPanPointerCursor();
-    }
-  };
-
-  private handleMouseUp = (e: MouseEvent) => {
-    const rect = this.canvas.getBoundingClientRect();
-    this.finishInteraction(e.clientX - rect.left, e.clientY - rect.top);
-  };
-
-  private handleMouseLeave = () => {
-    this.finishInteraction();
-    this.callbacks.onLeave();
-  };
-
-  /**
-   * Finalizes the current interaction (e.g. on mouseup or mouseleave).
-   */
-  private finishInteraction(mouseX?: number, mouseY?: number) {
-    if (this.panPointer.isAwaitingClick() && mouseX !== undefined && mouseY !== undefined) {
-      this.callbacks.onClick(mouseX, mouseY);
-    }
-
-    this.panPointer.endDrag();
-    this.syncPanPointerCursor();
-  }
 
   private handleResize = () => {
     this.callbacks.onResize();
