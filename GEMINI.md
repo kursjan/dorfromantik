@@ -115,6 +115,7 @@ The AI's workflow is iterative, transparent, and responsive to user input.
 
 - **Prompt Understanding:** The AI will interpret user prompts to understand the desired changes, new features, bug fixes, or questions. It will ask clarifying questions if the prompt is ambiguous.
 - **Track Generation & Plan Management:** Each time the user requests a significant change or feature, the AI will propose a new **Track** or update an existing one using **planning-architect** skill.
+  - During refinement of a draft proposal or a plan based on user feedback, the AI must strictly persist the original format and structure. Do not change the presentation style or layout between iterations.
 - **Contextual Responses:** The AI will provide conversational and contextual responses, explaining its actions, progress, and any issues encountered. It will summarize changes made.
 - **Error Checking Flow:**
   1.  **Code Change:** AI applies a code modification.
