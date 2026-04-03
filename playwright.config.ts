@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-dotenv.config({ path: process.env.TEST_ENV === 'ci' ? '.env.ci' : '.env' });
+dotenv.config({ path: process.env.TEST_ENV === 'ci' ? '.env.ci' : '.env', quiet: true });
 
 // Function to find chromium executable in the system path
 const findChromium = () => {
@@ -27,7 +27,7 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   expect: {
