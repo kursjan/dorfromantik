@@ -1,3 +1,5 @@
+import { PointerPanZoomSession, cursorForPointerPanZoomState } from './cameraInteraction';
+
 export interface InputCallbacks {
   onPan: (dx: number, dy: number) => void;
   onZoom: (delta: number) => void;
@@ -9,8 +11,6 @@ export interface InputCallbacks {
   onResize: () => void;
   onToggleDebugOverlay?: () => void;
 }
-
-type InputState = 'IDLE' | 'MOUSE_DOWN_POTENTIAL_CLICK' | 'PANNING';
 
 /**
  * Manages DOM event listeners for the canvas.
@@ -24,12 +24,8 @@ type InputState = 'IDLE' | 'MOUSE_DOWN_POTENTIAL_CLICK' | 'PANNING';
  * - Track active keys.
  */
 export class InputManager {
-  private static readonly DRAG_THRESHOLD = 5; // pixels
-
   private canvas: HTMLCanvasElement;
-  private state: InputState = 'IDLE';
-  private mouseDownPos: { x: number; y: number } = { x: 0, y: 0 };
-  private lastMousePos: { x: number; y: number } = { x: 0, y: 0 };
+  private readonly panPointer = new PointerPanZoomSession();
   private callbacks: InputCallbacks;
 
   // Keyboard State
@@ -75,19 +71,8 @@ export class InputManager {
     this.detachListeners();
   }
 
-  private transition(newState: InputState) {
-    this.state = newState;
-
-    // Side effects of state changes
-    switch (newState) {
-      case 'IDLE':
-      case 'MOUSE_DOWN_POTENTIAL_CLICK':
-        this.canvas.style.cursor = 'grab';
-        break;
-      case 'PANNING':
-        this.canvas.style.cursor = 'grabbing';
-        break;
-    }
+  private syncPanPointerCursor() {
+    this.canvas.style.cursor = cursorForPointerPanZoomState(this.panPointer.state);
   }
 
   /**
@@ -145,9 +130,8 @@ export class InputManager {
     // 2. Only left click for Panning/Clicking
     if (e.button !== 0) return;
 
-    this.transition('MOUSE_DOWN_POTENTIAL_CLICK');
-    this.mouseDownPos = { x: e.clientX, y: e.clientY };
-    this.lastMousePos = { x: e.clientX, y: e.clientY };
+    this.panPointer.beginLeftDrag(e.clientX, e.clientY);
+    this.syncPanPointerCursor();
   };
 
   private handleMouseMove = (e: MouseEvent) => {
@@ -157,30 +141,12 @@ export class InputManager {
     const mouseY = e.clientY - rect.top;
     this.callbacks.onHover(mouseX, mouseY);
 
-    // 2. Handle State Transitions
-    switch (this.state) {
-      case 'MOUSE_DOWN_POTENTIAL_CLICK': {
-        const dx = Math.abs(e.clientX - this.mouseDownPos.x);
-        const dy = Math.abs(e.clientY - this.mouseDownPos.y);
-
-        if (dx > InputManager.DRAG_THRESHOLD || dy > InputManager.DRAG_THRESHOLD) {
-          this.transition('PANNING');
-          this.lastMousePos = { x: e.clientX, y: e.clientY };
-        }
-        break;
-      }
-
-      case 'PANNING': {
-        const dx = e.clientX - this.lastMousePos.x;
-        const dy = e.clientY - this.lastMousePos.y;
-        this.lastMousePos = { x: e.clientX, y: e.clientY };
-        this.callbacks.onPan(dx, dy);
-        break;
-      }
-
-      case 'IDLE':
-      default:
-        break;
+    const move = this.panPointer.move(e.clientX, e.clientY);
+    if (move.type === 'pan') {
+      this.callbacks.onPan(move.dx, move.dy);
+    }
+    if (move.type === 'entered_pan') {
+      this.syncPanPointerCursor();
     }
   };
 
@@ -198,11 +164,12 @@ export class InputManager {
    * Finalizes the current interaction (e.g. on mouseup or mouseleave).
    */
   private finishInteraction(mouseX?: number, mouseY?: number) {
-    if (this.state === 'MOUSE_DOWN_POTENTIAL_CLICK' && mouseX !== undefined && mouseY !== undefined) {
+    if (this.panPointer.isAwaitingClick() && mouseX !== undefined && mouseY !== undefined) {
       this.callbacks.onClick(mouseX, mouseY);
     }
 
-    this.transition('IDLE');
+    this.panPointer.endDrag();
+    this.syncPanPointerCursor();
   }
 
   private handleResize = () => {

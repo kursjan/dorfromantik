@@ -1,3 +1,4 @@
+import { applyWheelDeltaYToCamera } from './cameraInteraction';
 import { Camera } from './Camera';
 import { InputManager } from './InputManager';
 import { HexRenderer } from '../graphics/HexRenderer';
@@ -37,10 +38,7 @@ interface DebugState {
 }
 
 export class CanvasController {
-  private static readonly MIN_ZOOM = 0.5;
-  private static readonly MAX_ZOOM = 3.0;
   private static readonly ROTATION_SPEED = 0.05;
-  private static readonly ZOOM_SENSITIVITY = 0.001;
 
   private readonly getGameSnapshot: () => Game;
   private readonly setGameSnapshot: (game: Game) => void;
@@ -206,11 +204,7 @@ export class CanvasController {
   }
 
   private handleZoom(delta: number) {
-    this.camera.zoomBy(
-      -delta * CanvasController.ZOOM_SENSITIVITY,
-      CanvasController.MIN_ZOOM,
-      CanvasController.MAX_ZOOM
-    );
+    applyWheelDeltaYToCamera(this.camera, delta);
   }
 
   private handleHover(mouseX: number, mouseY: number) {

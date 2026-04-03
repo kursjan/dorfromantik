@@ -298,7 +298,7 @@ describe('CanvasController', () => {
 
       (controller as any).handleZoom(100);
 
-      // ZOOM_SENSITIVITY is 0.001, MIN_ZOOM is 0.5, MAX_ZOOM is 3.0
+      // Matches CAMERA_INTERACTION in cameraInteraction.ts
       expect(zoomBySpy).toHaveBeenCalledWith(
         -0.1, // -100 * 0.001
         0.5,
