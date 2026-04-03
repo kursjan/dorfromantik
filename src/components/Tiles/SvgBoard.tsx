@@ -36,7 +36,7 @@ export const SvgBoard: React.FC<SvgBoardProps> = ({ tiles, camera, onTileClick }
     onTileClickRef.current = onTileClick;
   }, [onTileClick]);
 
-  // TODO(#19): Memoize per-row rendering or virtualize for large boards (see REVIEW_FEEDBACK.md; file a GitHub issue when this ships beyond Storybook).
+  // TODO(#73): Memoize per-row rendering or virtualize for large boards (see REVIEW_FEEDBACK.md).
   // Rebuild only when tile data changes; click handler is read from a ref so unstable parent lambdas do not invalidate this memo.
   const renderedTiles = useMemo(() => {
     return tiles.map(({ id, tile, coordinate }) => {

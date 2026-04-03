@@ -19,7 +19,7 @@
   - Evidence: `tiles.map` inside `useMemo` always rebuilds full list when deps change; child `HexTile` is plain function component.
   - Suggested fix: `React.memo(HexTile)` with custom compare, or split static terrain vs volatile props; virtualize if tile count grows past hundreds.
 
-USER conclusion: create issue on github and add a TODO comment referncing this...
+USER conclusion: tracked in GitHub issue **#73**; `SvgBoard.tsx` TODO references **#73** (not #19).
 
 - [severity: medium] `onTileClick` in `useMemo` deps encourages full tile-tree rebuilds
   - Why: Inline lambdas from parents (`onTileClick={(c) => ...}`) change every render → `useMemo` invalidates every frame → defeats memoization of rendered tiles.
