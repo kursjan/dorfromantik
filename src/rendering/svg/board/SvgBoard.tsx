@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { Board } from '../../../models/Board';
 import { type Radians, radiansToDegrees } from '../../../utils/Angle';
-import { HexTile } from './HexTile';
-import { SVG_HEX_RADIUS, hexToPixel } from './SvgHexUtils';
+import { HexTile } from '../tiles/HexTile';
+import { SVG_HEX_RADIUS, hexToPixel } from '../tiles/SvgHexUtils';
 
 /** Flat-top hex height in SVG user units (matches {@link HexTile} viewBox). */
 const SVG_HEX_HALF_HEIGHT = (Math.sqrt(3) * SVG_HEX_RADIUS) / 2;
