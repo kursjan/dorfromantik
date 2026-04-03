@@ -19,6 +19,8 @@
   - Evidence: `tiles.map` inside `useMemo` always rebuilds full list when deps change; child `HexTile` is plain function component.
   - Suggested fix: `React.memo(HexTile)` with custom compare, or split static terrain vs volatile props; virtualize if tile count grows past hundreds.
 
+USER conclusion: create issue on github and add a TODO comment referncing this...
+
 - [severity: medium] `onTileClick` in `useMemo` deps encourages full tile-tree rebuilds
   - Why: Inline lambdas from parents (`onTileClick={(c) => ...}`) change every render → `useMemo` invalidates every frame → defeats memoization of rendered tiles.
   - Evidence: Dependency `[tiles, onTileClick]`.
@@ -33,11 +35,6 @@
 
 ### src/components/Tiles/SvgBoard.stories.tsx
 
-- [severity: low] `PerspectiveRotationBoard` drives React state every animation frame
-  - Why: `requestAnimationFrame` + `setRotationZ` re-renders the whole story subtree each frame. Fine for Storybook demos; not a pattern to copy into the live game loop.
-  - Evidence: `useEffect` loop lines 296–304.
-  - Suggested fix: None required for stories; if reused in app, prefer CSS `animation` or imperative transform on a ref.
-
 - [severity: low] `InteractiveBoard` root `div` has no `position: 'relative'`
   - Why: Child panel uses `position: 'absolute'`. Positioning is relative to the nearest positioned ancestor or the initial containing block; layout can differ between Storybook and embedded contexts.
   - Evidence: Lines 249–256 vs overlay 262–277.
@@ -49,7 +46,3 @@
   - Why: Board-level SVG composition (camera group, nested `HexTile` sizing) is part of the public surface; docs still describe only single-tile prototype.
   - Evidence: “Tiles/” section lists `HexTile` and geometry file, not `SvgBoard.tsx`.
   - Suggested fix: Add one short paragraph: `SvgBoard` orchestrates multiple `HexTile` instances with `hexToPixel` and camera `translate`/`scale`.
-
-## Coverage note
-
-- Automated tests for `SvgBoard` / `SvgHexUtils.hexToPixel` parity with canvas were **not** added in this review pass (review-only). Reviewer policy would call for focused unit tests before treating this as production-ready.

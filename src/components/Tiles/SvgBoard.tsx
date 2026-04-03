@@ -1,8 +1,13 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { Tile } from '../../models/Tile';
 import { HexTile } from './HexTile';
-import { hexToPixel } from './SvgHexUtils';
+import { SVG_HEX_RADIUS, hexToPixel } from './SvgHexUtils';
+
+/** Flat-top hex height in SVG user units (matches {@link HexTile} viewBox). */
+const SVG_HEX_HALF_HEIGHT = (Math.sqrt(3) * SVG_HEX_RADIUS) / 2;
+const SVG_HEX_LAYOUT_WIDTH = SVG_HEX_RADIUS * 2;
+const SVG_HEX_LAYOUT_HEIGHT = SVG_HEX_HALF_HEIGHT * 2;
 
 export interface Camera {
   x: number;
@@ -26,8 +31,13 @@ export interface SvgBoardProps {
 }
 
 export const SvgBoard: React.FC<SvgBoardProps> = ({ tiles, camera, onTileClick }) => {
-  // Memoize the rendered tiles to avoid re-rendering all SVG paths when only camera changes.
-  // We use the tile id and its rotation as the dependency.
+  const onTileClickRef = useRef(onTileClick);
+  useEffect(() => {
+    onTileClickRef.current = onTileClick;
+  }, [onTileClick]);
+
+  // TODO(#19): Memoize per-row rendering or virtualize for large boards (see REVIEW_FEEDBACK.md; file a GitHub issue when this ships beyond Storybook).
+  // Rebuild only when tile data changes; click handler is read from a ref so unstable parent lambdas do not invalidate this memo.
   const renderedTiles = useMemo(() => {
     return tiles.map(({ id, tile, coordinate }) => {
       const { x, y } = hexToPixel(coordinate);
@@ -36,17 +46,31 @@ export const SvgBoard: React.FC<SvgBoardProps> = ({ tiles, camera, onTileClick }
         <g
           key={id}
           transform={`translate(${x}, ${y})`}
-          onClick={() => onTileClick?.(coordinate)}
-          style={{ cursor: onTileClick ? 'pointer' : 'default' }}
+          onClick={() => onTileClickRef.current?.(coordinate)}
         >
-          <HexTile tile={tile} />
+          {/* Nested <svg> needs explicit size or it fills the parent canvas; x/y keep hex center on (x,y). */}
+          <HexTile
+            tile={tile}
+            x={-SVG_HEX_RADIUS}
+            y={-SVG_HEX_HALF_HEIGHT}
+            width={SVG_HEX_LAYOUT_WIDTH}
+            height={SVG_HEX_LAYOUT_HEIGHT}
+          />
         </g>
       );
     });
-  }, [tiles, onTileClick]);
+  }, [tiles]);
 
   return (
-    <svg width="100%" height="100%" style={{ overflow: 'hidden', touchAction: 'none' }}>
+    <svg
+      width="100%"
+      height="100%"
+      style={{
+        overflow: 'hidden',
+        touchAction: 'none',
+        cursor: onTileClick ? 'pointer' : 'default',
+      }}
+    >
       <g transform={`translate(${camera.x}, ${camera.y}) scale(${camera.zoom})`}>{renderedTiles}</g>
     </svg>
   );
