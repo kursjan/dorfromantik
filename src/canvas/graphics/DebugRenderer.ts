@@ -3,8 +3,10 @@ import { HexCoordinate } from '../../models/HexCoordinate';
 import { DEBUG_OVERLAY_TEXT_COLOR, DEBUG_OVERLAY_FONT } from './DebugStyles';
 
 /**
- * @deprecated Use the React-based DebugOverlay component instead.
- * This class will be removed once the React overlay is fully integrated.
+ * Legacy debug text drawn with Canvas `Context2D`. Do not add new call sites.
+ *
+ * @deprecated Migrate to an **HTML overlay** (e.g. `src/canvas/components/DebugOverlay.tsx`, fed by
+ * `CanvasController` debug stats). This class exists only until any remaining canvas usage is removed.
  */
 export class DebugRenderer {
   private ctx: CanvasRenderingContext2D;
@@ -13,6 +15,7 @@ export class DebugRenderer {
     this.ctx = ctx;
   }
 
+  /** @deprecated Canvas path; replace with HTML overlay rendering. */
   public drawOverlay(camera: Camera, hoveredHex: HexCoordinate | null) {
     this.ctx.textAlign = 'left';
     this.ctx.textBaseline = 'alphabetic';

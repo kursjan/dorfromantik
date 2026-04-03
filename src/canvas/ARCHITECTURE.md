@@ -35,8 +35,8 @@ src/canvas/
 ├── graphics/          # Rendering Logic
 │   ├── BackgroundRenderer.ts # Clears and draws background
 │   ├── BackgroundStyles.ts   # Background configuration
-│   ├── DebugRenderer.ts      # (DEPRECATED) Draws legacy debug overlay
-│   ├── DebugStyles.ts        # (DEPRECATED) Legacy configuration
+│   ├── DebugRenderer.ts      # (DEPRECATED) Canvas debug text → migrate to HTML overlay, then delete
+│   ├── DebugStyles.ts        # (DEPRECATED) Styles for DebugRenderer only; drop with HTML overlay migration
 │   ├── HexRenderer.ts        # Main game world rendering (Grid, Highlights)
 │   ├── HexStyles.ts          # Hex visual configuration
 │   ├── TileRenderer.ts       # Orchestrates hex wedges; delegates wedge fill to segment renderers
@@ -111,7 +111,7 @@ Stateless rendering utilities. They receive the `Context2D` and necessary data t
 - **BackgroundRenderer:** Handles clearing the screen and drawing the background color.
 - **HexRenderer:** Draws the game grid and debug highlights. It uses `HexStyles.ts` for configuration.
 - **TileRenderer:** Draws the 6-sided terrain wedges for placed tiles. For each direction it builds a `WedgeDrawContext` and dispatches to `TERRAIN_ID_SEGMENT_RENDERERS[tileSide.id]`, passing the terrain across the shared edge on the neighbor tile when provided (`TileDrawOptions.neighborEdgeTerrains` or `BoardNavigation.neighborEdgeTerrains` when a `board` is passed to `drawTileAtHex`). This keeps hybrid terrains (e.g. `waterOrPasture`) visually consistent with neighbors. When `tile.center` is set, it looks up `TERRAIN_ID_CENTER_SEGMENT_RENDERERS` (e.g. `WaterCenterSegmentRenderer` for water, `RailCenterSegmentRenderer` for rail) and draws the inner hex via `CenterDrawContext`.
-- **(Deprecated) DebugRenderer:** Legacy canvas-based debug text. Replaced by `DebugOverlay` component.
+- **(Deprecated) DebugRenderer:** Canvas `Context2D` debug text — **to be migrated** fully to an HTML overlay (`DebugOverlay` + `CanvasController` debug subscription), then removed.
 
 ### Services (`services/*.ts`)
 

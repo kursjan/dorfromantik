@@ -1,6 +1,5 @@
 import { type FC, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { SvgBoard, type SvgBoardTile } from '../../components/Tiles/SvgBoard';
-import { Board } from '../../models/Board';
+import { SvgBoard, type Camera } from '../../components/Tiles/SvgBoard';
 import { Game } from '../../models/Game';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { GameHUD } from './GameHUD';
@@ -14,14 +13,6 @@ interface SvgGameViewProps {
   activeGame: Game;
   /** Typically `setActiveGame` from session context; reserved for Phase 2 placement parity. */
   setActiveGame: (game: Game) => void;
-}
-
-function boardToSvgTiles(board: Board): SvgBoardTile[] {
-  return Array.from(board.getAll(), (bt) => ({
-    id: bt.id,
-    tile: bt.tile,
-    coordinate: bt.coordinate,
-  }));
 }
 
 function findClosestHexCoordinate(
@@ -63,7 +54,7 @@ export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame })
     onLeave: () => {
       setHoveredHex(null);
     },
-    onClick: () => {
+    onClick: (_mouseX, _mouseY) => {
       const game = getGameSnapshot();
       if (!game.inProgress()) return;
       if (!hoveredHex) return;
@@ -114,10 +105,8 @@ export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame })
     return () => ro.disconnect();
   }, []);
 
-  const tiles = useMemo(() => boardToSvgTiles(activeGame.board), [activeGame.board]);
-
   const camera = useMemo(
-    () => ({
+    (): Camera => ({
       x: transform.x,
       y: transform.y,
       zoom: transform.zoom,
@@ -126,10 +115,7 @@ export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame })
     [transform.x, transform.y, transform.zoom, transform.rotation]
   );
 
-  const viewCenter =
-    viewSize.width > 0 && viewSize.height > 0
-      ? { x: viewSize.width / 2, y: viewSize.height / 2 }
-      : undefined;
+  const viewCenter = { x: viewSize.width / 2, y: viewSize.height / 2 };
 
   return (
     <div
@@ -145,7 +131,7 @@ export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame })
         nextTile={activeGame.peek() ?? null}
       />
       <ResetViewButton onClick={() => resetCamera()} />
-      <SvgBoard tiles={tiles} camera={camera} viewCenter={viewCenter} />
+      <SvgBoard board={activeGame.board} camera={camera} viewCenter={viewCenter} />
     </div>
   );
 };

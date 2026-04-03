@@ -1,4 +1,5 @@
 import React from 'react';
+import { radiansToDegrees } from '../../utils/Angle';
 import { CanvasController } from '../engine/CanvasController';
 import { useCanvasControllerDebugStats } from '../hooks/useCanvasControllerDebugStats';
 import './DebugOverlay.css';
@@ -22,13 +23,14 @@ export const DebugOverlay: React.FC<DebugOverlayProps> = ({ controller, isVisibl
     return null;
   }
 
-  const rotationDeg = ((camera.rotation * 180) / Math.PI).toFixed(0);
+  const rotationDeg = radiansToDegrees(camera.rotation).toFixed(0);
 
   return (
     <div className="debug-overlay" data-testid="debug-overlay">
       <div>FPS: {fps}</div>
       <div>
-        Camera: ({camera.x.toFixed(1)}, {camera.y.toFixed(1)}) Zoom: {camera.zoom.toFixed(2)} Rot: {rotationDeg}°
+        Camera: ({camera.x.toFixed(1)}, {camera.y.toFixed(1)}) Zoom: {camera.zoom.toFixed(2)} Rot:{' '}
+        {rotationDeg}°
       </div>
       <div>
         Hover: {hoveredHex ? `(${hoveredHex.q}, ${hoveredHex.r}, ${hoveredHex.s})` : 'None'}

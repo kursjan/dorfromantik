@@ -1,6 +1,14 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { describe, expect, it, afterEach } from 'vitest';
-import { useCameraControls } from './useCameraControls';
+import { useCameraControls, type UseCameraControlsCallbacks } from './useCameraControls';
+
+const stubCallbacks: UseCameraControlsCallbacks = {
+  onHover: () => {},
+  onClick: () => {},
+  onRotateClockwise: () => {},
+  onRotateCounterClockwise: () => {},
+  onLeave: () => {},
+};
 
 describe('useCameraControls', () => {
   afterEach(() => {
@@ -12,7 +20,7 @@ describe('useCameraControls', () => {
     document.body.appendChild(container);
     const ref = { current: container };
 
-    const { result } = renderHook(() => useCameraControls(ref));
+    const { result } = renderHook(() => useCameraControls(ref, stubCallbacks));
 
     expect(result.current.transform.zoom).toBe(1);
 
@@ -32,7 +40,7 @@ describe('useCameraControls', () => {
     document.body.appendChild(container);
     const ref = { current: container };
 
-    const { result } = renderHook(() => useCameraControls(ref));
+    const { result } = renderHook(() => useCameraControls(ref, stubCallbacks));
 
     act(() => {
       container.dispatchEvent(
@@ -57,7 +65,7 @@ describe('useCameraControls', () => {
     document.body.appendChild(container);
     const ref = { current: container };
 
-    const { result } = renderHook(() => useCameraControls(ref));
+    const { result } = renderHook(() => useCameraControls(ref, stubCallbacks));
 
     act(() => {
       container.dispatchEvent(

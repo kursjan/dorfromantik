@@ -1,9 +1,10 @@
 import { useSyncExternalStore, useCallback } from 'react';
+import { radians } from '../../utils/Angle';
 import type { CanvasController, DebugStats } from '../engine/CanvasController';
 
 const emptySnapshot: DebugStats = {
   fps: 0,
-  camera: { x: 0, y: 0, zoom: 1, rotation: 0 },
+  camera: { x: 0, y: 0, zoom: 1, rotation: radians(0) },
   hoveredHex: null,
 };
 

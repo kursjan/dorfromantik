@@ -27,7 +27,7 @@ export class InputManager {
   private canvas: HTMLCanvasElement;
   private readonly panPointer = new PointerPanZoomSession();
   private callbacks: InputCallbacks;
-  private cleanupPointer?: () => void;
+  private cleanupPointer: () => void = () => {};
 
   // Keyboard State
   private keys: Set<string> = new Set();
@@ -48,10 +48,8 @@ export class InputManager {
   }
 
   private detachListeners() {
-    if (this.cleanupPointer) {
-      this.cleanupPointer();
-      this.cleanupPointer = undefined;
-    }
+    this.cleanupPointer();
+    this.cleanupPointer = () => {};
 
     window.removeEventListener('resize', this.handleResize);
     window.removeEventListener('keydown', this.handleKeyDown);

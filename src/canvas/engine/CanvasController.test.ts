@@ -8,6 +8,7 @@ import { CanvasController } from './CanvasController';
 import { InputManager } from './InputManager';
 import { Game } from '../../models/Game';
 import { GameRules } from '../../models/GameRules';
+import type { Radians } from '../../utils/Angle';
 import { pixelToHex } from '../utils/HexUtils';
 
 // Mock dependencies
@@ -28,7 +29,7 @@ vi.mock('./Camera', () => {
   Camera.prototype.x = 0;
   Camera.prototype.y = 0;
   Camera.prototype.zoom = 1;
-  Camera.prototype.rotation = 0;
+  Camera.prototype.rotation = 0 as Radians;
   return { Camera };
 });
 

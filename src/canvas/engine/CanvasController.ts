@@ -14,10 +14,11 @@ import {
   VALID_PLACEMENT_STYLE,
 } from '../graphics/HexStyles';
 import { Game } from '../../models/Game';
+import { type Radians, radians } from '../../utils/Angle';
 
 export interface DebugStats {
   fps: number;
-  camera: { x: number; y: number; zoom: number; rotation: number };
+  camera: { x: number; y: number; zoom: number; rotation: Radians };
   hoveredHex: HexCoordinate | null;
 }
 
@@ -131,7 +132,7 @@ export class CanvasController {
   private processContinuousInput() {
     const rotationDir = this.inputManager.getRotationDirection();
     if (rotationDir !== 0) {
-      this.camera.rotateBy(rotationDir * CanvasController.ROTATION_SPEED);
+      this.camera.rotateBy(radians(rotationDir * CanvasController.ROTATION_SPEED));
     }
   }
 
@@ -280,7 +281,7 @@ export class CanvasController {
       listeners: new Set<() => void>(),
       snapshot: {
         fps: 0,
-        camera: { x: 0, y: 0, zoom: 1, rotation: 0 },
+        camera: { x: 0, y: 0, zoom: 1, rotation: radians(0) },
         hoveredHex: null,
       },
     };

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
+import { radians } from '../../utils/Angle';
 import { DebugOverlay } from './DebugOverlay';
 import { CanvasController } from '../engine/CanvasController';
 import { HexCoordinate } from '../../models/HexCoordinate';
@@ -21,8 +22,8 @@ describe('DebugOverlay', () => {
     });
     (mockController.getDebugSnapshot as any).mockReturnValue({
       fps: 0,
-      camera: { x: 0, y: 0, zoom: 1.0, rotation: 0 },
-      hoveredHex: null
+      camera: { x: 0, y: 0, zoom: 1.0, rotation: radians(0) },
+      hoveredHex: null,
     });
   });
 
@@ -42,8 +43,8 @@ describe('DebugOverlay', () => {
     act(() => {
       (mockController.getDebugSnapshot as any).mockReturnValue({
         fps: 60,
-        camera: { x: 10, y: 20, zoom: 1.5, rotation: 0 },
-        hoveredHex: new HexCoordinate(1, -1, 0)
+        camera: { x: 10, y: 20, zoom: 1.5, rotation: radians(0) },
+        hoveredHex: new HexCoordinate(1, -1, 0),
       });
       if (statsCallback) {
         statsCallback();
@@ -63,8 +64,8 @@ describe('DebugOverlay', () => {
     act(() => {
       (mockController.getDebugSnapshot as any).mockReturnValue({
         fps: 60,
-        camera: { x: 0, y: 0, zoom: 1.0, rotation: 0 },
-        hoveredHex: null
+        camera: { x: 0, y: 0, zoom: 1.0, rotation: radians(0) },
+        hoveredHex: null,
       });
       if (statsCallback) {
         statsCallback();
@@ -76,8 +77,8 @@ describe('DebugOverlay', () => {
     act(() => {
       (mockController.getDebugSnapshot as any).mockReturnValue({
         fps: 30,
-        camera: { x: 100, y: -50, zoom: 2.0, rotation: 0 },
-        hoveredHex: new HexCoordinate(2, -3, 1)
+        camera: { x: 100, y: -50, zoom: 2.0, rotation: radians(0) },
+        hoveredHex: new HexCoordinate(2, -3, 1),
       });
       if (statsCallback) {
         statsCallback();

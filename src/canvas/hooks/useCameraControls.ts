@@ -1,25 +1,22 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
+import { radians } from '../../utils/Angle';
+import { Camera } from '../engine/Camera';
 import {
   PointerPanZoomSession,
   applyWheelDeltaYToCamera,
   bindPointerInteraction,
 } from '../engine/cameraInteraction';
-import { Camera } from '../engine/Camera';
 
-export interface CameraTransform {
-  x: number;
-  y: number;
-  zoom: number;
-  rotation: number;
-}
+/** React state snapshot of {@link Camera}; synced via `readTransform` in this module. */
+export type CameraTransform = Pick<Camera, 'x' | 'y' | 'zoom' | 'rotation'>;
 
 export interface UseCameraControlsCallbacks {
-  onHover?: (x: number, y: number) => void;
-  onClick?: (x: number, y: number) => void;
-  onRotateClockwise?: () => void;
-  onRotateCounterClockwise?: () => void;
-  onLeave?: () => void;
+  onHover: (x: number, y: number) => void;
+  onClick: (x: number, y: number) => void;
+  onRotateClockwise: () => void;
+  onRotateCounterClockwise: () => void;
+  onLeave: () => void;
 }
 
 /**
@@ -28,7 +25,7 @@ export interface UseCameraControlsCallbacks {
  */
 export function useCameraControls(
   containerRef: RefObject<HTMLElement | null>,
-  callbacks?: UseCameraControlsCallbacks
+  callbacks: UseCameraControlsCallbacks
 ): {
   transform: CameraTransform;
   resetCamera: () => void;
@@ -40,7 +37,7 @@ export function useCameraControls(
     x: 0,
     y: 0,
     zoom: 1,
-    rotation: 0,
+    rotation: radians(0),
   });
 
   // Store callbacks in a ref to avoid re-binding listeners on every render
@@ -71,11 +68,11 @@ export function useCameraControls(
           applyWheelDeltaYToCamera(camera, deltaY);
           sync();
         },
-        onHover: (x, y) => callbacksRef.current?.onHover?.(x, y),
-        onClick: (x, y) => callbacksRef.current?.onClick?.(x, y),
-        onRotateClockwise: () => callbacksRef.current?.onRotateClockwise?.(),
-        onRotateCounterClockwise: () => callbacksRef.current?.onRotateCounterClockwise?.(),
-        onLeave: () => callbacksRef.current?.onLeave?.(),
+        onHover: (x, y) => callbacksRef.current.onHover(x, y),
+        onClick: (x, y) => callbacksRef.current.onClick(x, y),
+        onRotateClockwise: () => callbacksRef.current.onRotateClockwise(),
+        onRotateCounterClockwise: () => callbacksRef.current.onRotateCounterClockwise(),
+        onLeave: () => callbacksRef.current.onLeave(),
       },
       panPointer
     );

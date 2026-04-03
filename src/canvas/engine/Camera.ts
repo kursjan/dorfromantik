@@ -1,8 +1,10 @@
+import { type Radians, radians } from '../../utils/Angle';
+
 export interface CameraConfig {
   x?: number;
   y?: number;
   zoom?: number;
-  rotation?: number;
+  rotation?: Radians;
 }
 
 /**
@@ -19,19 +21,19 @@ export class Camera {
   x: number = 0;
   y: number = 0;
   zoom: number = 1;
-  rotation: number = 0; // Radians
+  rotation: Radians = radians(0);
 
   // Default values
   private readonly defaultX: number;
   private readonly defaultY: number;
   private readonly defaultZoom: number;
-  private readonly defaultRotation: number;
+  private readonly defaultRotation: Radians;
 
   constructor(config: CameraConfig = {}) {
     this.x = config.x ?? 0;
     this.y = config.y ?? 0;
     this.zoom = config.zoom ?? 1;
-    this.rotation = config.rotation ?? 0;
+    this.rotation = config.rotation ?? radians(0);
 
     // Store defaults for reset
     this.defaultX = this.x;
@@ -126,8 +128,8 @@ export class Camera {
   /**
    * Rotates the camera.
    */
-  rotateBy(deltaRadians: number) {
-    this.rotation += deltaRadians;
+  rotateBy(deltaRadians: Radians) {
+    this.rotation = radians(this.rotation + deltaRadians);
   }
 
   /**

@@ -4,13 +4,14 @@ import { Board } from '../../models/Board';
 import { Game } from '../../models/Game';
 import { Tile } from '../../models/Tile';
 import { GameRules } from '../../models/GameRules';
+import { radians } from '../../utils/Angle';
 import { CanvasController } from '../engine/CanvasController';
 import { CanvasView } from './CanvasView';
 
 vi.mock('../engine/CanvasController', () => {
   const mockSnapshot = {
     fps: 0,
-    camera: { x: 0, y: 0, zoom: 1, rotation: 0 },
+    camera: { x: 0, y: 0, zoom: 1, rotation: radians(0) },
     hoveredHex: null,
   };
   const MockController = vi.fn();

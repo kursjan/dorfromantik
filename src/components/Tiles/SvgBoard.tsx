@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useRef } from 'react';
-import { HexCoordinate } from '../../models/HexCoordinate';
-import { Tile } from '../../models/Tile';
+import React, { useMemo } from 'react';
+import { Board } from '../../models/Board';
+import { type Radians, radiansToDegrees } from '../../utils/Angle';
 import { HexTile } from './HexTile';
 import { SVG_HEX_RADIUS, hexToPixel } from './SvgHexUtils';
 
@@ -13,57 +13,23 @@ export interface Camera {
   x: number;
   y: number;
   zoom: number;
-  /** Radians; only applied when `viewCenter` is set (canvas parity path). */
-  rotation?: number;
-}
-
-export interface SvgBoardTile {
-  id: string;
-  tile: Tile;
-  coordinate: HexCoordinate;
+  rotation: Radians;
 }
 
 export interface SvgBoardProps {
-  /** The list of tiles to render on the board */
-  tiles: SvgBoardTile[];
-  /** The camera state for panning and zooming */
+  board: Board;
   camera: Camera;
-  /**
-   * Viewport center in SVG user units (typically half of the host `svg` client width/height).
-   * When set, applies the same transform order as canvas `Camera.applyTransform`: translate to
-   * center, rotate, scale, then pan — so world origin stays near the middle of the view.
-   */
-  viewCenter?: { x: number; y: number };
-  /** Optional callback for when a tile is clicked */
-  onTileClick?: (coordinate: HexCoordinate) => void;
-  /** Optional children to render inside the world transform group (e.g. previews, highlights) */
-  children?: React.ReactNode;
+  viewCenter: { x: number; y: number };
 }
 
-export const SvgBoard: React.FC<SvgBoardProps> = ({
-  tiles,
-  camera,
-  viewCenter,
-  onTileClick,
-  children,
-}) => {
-  const onTileClickRef = useRef(onTileClick);
-  useEffect(() => {
-    onTileClickRef.current = onTileClick;
-  }, [onTileClick]);
-
-  // TODO(#73): Memoize per-row rendering or virtualize for large boards (see REVIEW_FEEDBACK.md).
-  // Rebuild only when tile data changes; click handler is read from a ref so unstable parent lambdas do not invalidate this memo.
+export const SvgBoard: React.FC<SvgBoardProps> = ({ board, camera, viewCenter }) => {
+  // TODO(#73): Per-row memoization or virtualize for large boards.
   const renderedTiles = useMemo(() => {
-    return tiles.map(({ id, tile, coordinate }) => {
+    return Array.from(board.getAll(), ({ id, tile, coordinate }) => {
       const { x, y } = hexToPixel(coordinate);
 
       return (
-        <g
-          key={id}
-          transform={`translate(${x}, ${y})`}
-          onClick={() => onTileClickRef.current?.(coordinate)}
-        >
+        <g key={id} transform={`translate(${x}, ${y})`}>
           {/* Nested <svg> needs explicit size or it fills the parent canvas; x/y keep hex center on (x,y). */}
           <HexTile
             tile={tile}
@@ -75,14 +41,12 @@ export const SvgBoard: React.FC<SvgBoardProps> = ({
         </g>
       );
     });
-  }, [tiles]);
+  }, [board]);
 
-  const { x, y, zoom } = camera;
-  const rotationDeg = camera.rotation != null ? (camera.rotation * 180) / Math.PI : 0;
+  const { x, y, zoom, rotation } = camera;
+  const rotationDeg = radiansToDegrees(rotation);
 
-  const worldTransform = viewCenter
-    ? `translate(${viewCenter.x}, ${viewCenter.y}) rotate(${rotationDeg}) scale(${zoom}) translate(${x}, ${y})`
-    : `translate(${x}, ${y}) scale(${zoom})`;
+  const worldTransform = `translate(${viewCenter.x}, ${viewCenter.y}) rotate(${rotationDeg}) scale(${zoom}) translate(${x}, ${y})`;
 
   return (
     <svg
@@ -91,13 +55,9 @@ export const SvgBoard: React.FC<SvgBoardProps> = ({
       style={{
         overflow: 'hidden',
         touchAction: 'none',
-        cursor: onTileClick ? 'pointer' : 'default',
       }}
     >
-      <g transform={worldTransform}>
-        {renderedTiles}
-        {children}
-      </g>
+      <g transform={worldTransform}>{renderedTiles}</g>
     </svg>
   );
 };

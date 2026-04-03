@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { SvgBoard, type SvgBoardTile, type Camera } from './SvgBoard';
+import { Board, type BoardTile } from '../../models/Board';
+import { radians } from '../../utils/Angle';
+import { SvgBoard, type Camera } from './SvgBoard';
 import { HexCoordinate } from '../../models/HexCoordinate';
 import { north, northEast, northWest, south, southEast, southWest } from '../../models/Navigation';
 import { Tile } from '../../models/Tile';
@@ -48,7 +50,7 @@ const createTile = (terrains: Terrain[]): Tile => {
 
 const ORIGIN = new HexCoordinate(0, 0, 0);
 
-const singleTile: SvgBoardTile[] = [
+const singleTile: BoardTile[] = [
   {
     id: '0,0,0',
     coordinate: ORIGIN,
@@ -63,7 +65,7 @@ const singleTile: SvgBoardTile[] = [
   },
 ];
 
-const flowerTiles: SvgBoardTile[] = [
+const flowerTiles: BoardTile[] = [
   {
     id: '0,0,0',
     coordinate: ORIGIN,
@@ -129,7 +131,7 @@ const flowerTiles: SvgBoardTile[] = [
   },
 ];
 
-const scatteredTiles: SvgBoardTile[] = [
+const scatteredTiles: BoardTile[] = [
   ...flowerTiles,
   {
     id: '2,-2,0',
@@ -160,37 +162,69 @@ const scatteredTiles: SvgBoardTile[] = [
   },
 ];
 
-const defaultCamera: Camera = { x: 400, y: 300, zoom: 1 };
+function boardFromTiles(tiles: BoardTile[]): Board {
+  return new Board(new Map(tiles.map((bt) => [bt.coordinate.getKey(), bt])));
+}
+
+const singleTileBoard = boardFromTiles(singleTile);
+const flowerBoard = boardFromTiles(flowerTiles);
+const scatteredBoard = boardFromTiles(scatteredTiles);
+
+/** Story viewport pivot (half of typical fullscreen); interactive stories measure their container. */
+const defaultViewCenter = { x: 960, y: 540 };
+
+const defaultCamera: Camera = { x: 400, y: 300, zoom: 1, rotation: radians(0) };
 
 // --- Stories ---
 
 export const SingleTile: Story = {
   args: {
-    tiles: singleTile,
+    board: singleTileBoard,
     camera: defaultCamera,
+    viewCenter: defaultViewCenter,
   },
 };
 
 export const FlowerCluster: Story = {
   args: {
-    tiles: flowerTiles,
+    board: flowerBoard,
     camera: defaultCamera,
+    viewCenter: defaultViewCenter,
   },
 };
 
 export const ScatteredCluster: Story = {
   args: {
-    tiles: scatteredTiles,
+    board: scatteredBoard,
     camera: defaultCamera,
+    viewCenter: defaultViewCenter,
   },
 };
 
 // --- Interactive Story ---
 
 const InteractiveBoard = () => {
-  const [camera, setCamera] = useState<Camera>({ x: 400, y: 300, zoom: 1 });
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [viewCenter, setViewCenter] = useState(defaultViewCenter);
+  const [camera, setCamera] = useState<Camera>({
+    x: 400,
+    y: 300,
+    zoom: 1,
+    rotation: radians(0),
+  });
   const [isDragging, setIsDragging] = useState(false);
   const lastMouse = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => {
+      const r = el.getBoundingClientRect();
+      setViewCenter({ x: r.width / 2, y: r.height / 2 });
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const handlePointerDown = (e: React.PointerEvent) => {
     setIsDragging(true);
@@ -235,12 +269,13 @@ const InteractiveBoard = () => {
       const newX = mouseX - (mouseX - prev.x) * scaleChange;
       const newY = mouseY - (mouseY - prev.y) * scaleChange;
 
-      return { x: newX, y: newY, zoom: newZoom };
+      return { ...prev, x: newX, y: newY, zoom: newZoom };
     });
   };
 
   return (
     <div
+      ref={wrapRef}
       style={{
         position: 'relative',
         width: '100%',
@@ -252,11 +287,7 @@ const InteractiveBoard = () => {
       onPointerUp={handlePointerUp}
       onWheel={handleWheel}
     >
-      <SvgBoard
-        tiles={scatteredTiles}
-        camera={camera}
-        onTileClick={(coord) => console.log('Clicked tile at', coord.getKey())}
-      />
+      <SvgBoard board={scatteredBoard} camera={camera} viewCenter={viewCenter} />
       <div
         style={{
           position: 'absolute',
@@ -287,6 +318,8 @@ export const InteractiveCamera: Story = {
  * The map stays 2D; the “perspective” is the whole SVG treated as a card seen from an angle.
  */
 const PerspectiveRotationBoard = () => {
+  const boardWrapRef = useRef<HTMLDivElement>(null);
+  const [viewCenter, setViewCenter] = useState(defaultViewCenter);
   const [tiltX, setTiltX] = useState(52);
   const [rotationZ, setRotationZ] = useState(12);
   const [autoRotate, setAutoRotate] = useState(false);
@@ -302,7 +335,18 @@ const PerspectiveRotationBoard = () => {
     return () => cancelAnimationFrame(frame);
   }, [autoRotate]);
 
-  const boardCamera: Camera = { x: 400, y: 300, zoom: 1 };
+  useEffect(() => {
+    const el = boardWrapRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => {
+      const r = el.getBoundingClientRect();
+      setViewCenter({ x: r.width / 2, y: r.height / 2 });
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const boardCamera: Camera = { x: 400, y: 300, zoom: 1, rotation: radians(0) };
 
   return (
     <div
@@ -326,6 +370,7 @@ const PerspectiveRotationBoard = () => {
         }}
       >
         <div
+          ref={boardWrapRef}
           style={{
             width: 'min(92vw, 880px)',
             height: 'min(78vh, 640px)',
@@ -334,7 +379,7 @@ const PerspectiveRotationBoard = () => {
             transition: autoRotate ? undefined : 'transform 0.08s ease-out',
           }}
         >
-          <SvgBoard tiles={scatteredTiles} camera={boardCamera} />
+          <SvgBoard board={scatteredBoard} camera={boardCamera} viewCenter={viewCenter} />
         </div>
       </div>
 
