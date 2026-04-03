@@ -13,6 +13,8 @@ export interface Camera {
   x: number;
   y: number;
   zoom: number;
+  /** Radians; only applied when `viewCenter` is set (canvas parity path). */
+  rotation?: number;
 }
 
 export interface SvgBoardTile {
@@ -26,11 +28,17 @@ export interface SvgBoardProps {
   tiles: SvgBoardTile[];
   /** The camera state for panning and zooming */
   camera: Camera;
+  /**
+   * Viewport center in SVG user units (typically half of the host `svg` client width/height).
+   * When set, applies the same transform order as canvas `Camera.applyTransform`: translate to
+   * center, rotate, scale, then pan — so world origin stays near the middle of the view.
+   */
+  viewCenter?: { x: number; y: number };
   /** Optional callback for when a tile is clicked */
   onTileClick?: (coordinate: HexCoordinate) => void;
 }
 
-export const SvgBoard: React.FC<SvgBoardProps> = ({ tiles, camera, onTileClick }) => {
+export const SvgBoard: React.FC<SvgBoardProps> = ({ tiles, camera, viewCenter, onTileClick }) => {
   const onTileClickRef = useRef(onTileClick);
   useEffect(() => {
     onTileClickRef.current = onTileClick;
@@ -61,6 +69,13 @@ export const SvgBoard: React.FC<SvgBoardProps> = ({ tiles, camera, onTileClick }
     });
   }, [tiles]);
 
+  const { x, y, zoom } = camera;
+  const rotationDeg = camera.rotation != null ? (camera.rotation * 180) / Math.PI : 0;
+
+  const worldTransform = viewCenter
+    ? `translate(${viewCenter.x}, ${viewCenter.y}) rotate(${rotationDeg}) scale(${zoom}) translate(${x}, ${y})`
+    : `translate(${x}, ${y}) scale(${zoom})`;
+
   return (
     <svg
       width="100%"
@@ -71,7 +86,7 @@ export const SvgBoard: React.FC<SvgBoardProps> = ({ tiles, camera, onTileClick }
         cursor: onTileClick ? 'pointer' : 'default',
       }}
     >
-      <g transform={`translate(${camera.x}, ${camera.y}) scale(${camera.zoom})`}>{renderedTiles}</g>
+      <g transform={worldTransform}>{renderedTiles}</g>
     </svg>
   );
 };
