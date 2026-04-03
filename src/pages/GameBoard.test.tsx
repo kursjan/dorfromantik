@@ -10,9 +10,9 @@ import { Game } from '../models/Game';
 import { Board } from '../models/Board';
 import { GameRules } from '../models/GameRules';
 import { Tile } from '../models/Tile';
-import { GameAutosaver } from '../canvas/services/GameAutosaver';
+import { GameAutosaver } from '../services/GameAutosaver';
 
-vi.mock('../canvas/services/GameAutosaver', () => {
+vi.mock('../services/GameAutosaver', () => {
   return {
     GameAutosaver: vi.fn().mockImplementation(function (this: any, options: any) {
       this.handleGameChanged = vi.fn();
@@ -24,7 +24,7 @@ vi.mock('../canvas/services/GameAutosaver', () => {
 });
 
 // Mock SvgGameView to avoid full SVG/camera wiring in these tests
-vi.mock('../canvas/components/SvgGameView', () => ({
+vi.mock('../rendering/svg/components/SvgGameView', () => ({
   SvgGameView: () => <div data-testid="mock-svg-game-view" />,
 }));
 

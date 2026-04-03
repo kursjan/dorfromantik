@@ -1,12 +1,15 @@
 # Product Guide
 
 ## Initial Concept
+
 A web-based, casual strategy game inspired by Dorfromantik, built with React and HTML5 Canvas. The core mechanic involves placing hexagonal tiles to build a sprawling landscape.
 
 ## Vision
+
 To create a relaxing, puzzle-like experience for casual gamers where they can build beautiful landscapes without the pressure of time limits or complex resource management.
 
 ## Key Features
+
 - **Hexagonal Grid System:** A robust coordinate system for tile management.
 - **Tile Placement:** Intuitive drag-and-drop or click-to-place mechanics for expanding the board.
 - **Tile Rotation:** Ability to orient tiles before placement to match terrain edges and maximize score.
@@ -16,6 +19,7 @@ To create a relaxing, puzzle-like experience for casual gamers where they can bu
 ## Technical Architecture
 
 ### Core Data Model
+
 - **Grid System:** Hexagonal Grid using **Cube Coordinates** (`q, r, s`).
 - **Orientation:** **Flat-Top** Hexagons.
 - **Navigation (Cube Coordinates):**
@@ -34,19 +38,22 @@ To create a relaxing, puzzle-like experience for casual gamers where they can bu
   - `Game`: Central orchestrator of an active game, tracking board state, score, and the tile queue.
 
 ### System Architecture
+
 - **Frontend:** React (Vite) + TypeScript.
 - **Routing:** Centralized navigation using `react-router-dom`.
 - **State Management:** Granular React Contexts (User, Game History, Active Game) provided by `SessionProvider`.
 - **Canvas Engine:** Custom Controller Pattern (Decoupled from React).
   - **Pattern:** `React Component` -> `CanvasController` -> `Renderers` / `InputManager`.
-  - **Documentation:** See **[src/canvas/ARCHITECTURE.md](./src/canvas/ARCHITECTURE.md)**.
+  - **Documentation:** See **[src/rendering/canvas/ARCHITECTURE.md](./src/rendering/canvas/ARCHITECTURE.md)** (canvas loop); **`src/rendering/common/README.md`** for shared camera/hex/bridge.
 - **Backend:** Firebase (Hosting, Firestore, Auth).
 
 ## Project Metadata
+
 - **Target Audience:** Casual gamers looking for a low-stress, creative outlet.
 - **Platform:** Desktop Web (Mouse/Keyboard controls).
 
 ## Roadmap & Planning
+
 The project roadmap is managed via **Conductor**. See **[conductor/tracks.md](./tracks.md)** for current and planned tracks.
 
 ## Implemented Features

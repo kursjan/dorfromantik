@@ -16,12 +16,6 @@ src/components/
 ├── GameCard.tsx         # Card representing a saved game or session
 ├── GameCard.css         # "Lifted" glassmorphism styling for GameCard
 ├── GameCard.stories.tsx # Storybook visualization for GameCard
-├── Tiles/               # SVG HexTile prototype components and stories
-│   ├── SvgBoard.tsx     # Multi-tile SVG layer: hexToPixel layout + camera translate/scale
-│   ├── HexTile.tsx      # Declarative SVG tile container (6 wedges + optional center)
-│   ├── Wedge.tsx        # Base wedge SVG path wrapper
-│   ├── CenterWedge.tsx  # Base center-circle SVG path wrapper
-│   └── ...              # Renderer registry, geometry utils, stories
 ├── SettingsModal.tsx    # Modal overlay for game configurations
 ├── SettingsModal.css    # Blurred overlay and parchment modal styling
 ├── SettingsModal.stories.tsx # Storybook visualization for SettingsModal
@@ -64,4 +58,4 @@ These components are typically composed within **Pages** (e.g., `src/pages/MainM
 - **State Management:** The parent page manages the visibility (e.g., `isSettingsOpen`) and data fetching (e.g., list of games from the `Session` model).
 - **Navigation:** Buttons within components (like "Continue" in `GameCard`) trigger callbacks that the parent page uses to initiate navigation via `react-router-dom`.
 
-`Tiles/HexTile` is currently a prototype surface used in Storybook for visual parity against the canvas `TilePreview` renderer. Flat-top hex geometry (radius, corner points, wedge paths) lives in `Tiles/SvgHexUtils.ts` and is reused by `HexTile` and the SVG segment renderers so stroke anchors and view boxes stay aligned. `Tiles/SvgBoard.tsx` composes many `HexTile` instances at positions from `SvgHexUtils.hexToPixel` (delegating to `canvas/utils/HexUtils.hexToPixel` with `SVG_HEX_RADIUS`) and applies an SVG camera group (`translate` + `scale`).
+SVG board tiles (`HexTile`, `SvgBoard`, segment renderers) live under **`src/rendering/svg/tiles/`** for parity with the canvas `TilePreview` in **`src/rendering/canvas/components/TilePreview.tsx`**. Layout uses `SvgHexUtils.hexToPixel`, delegating to **`src/rendering/common/hex/HexUtils.hexToPixel`** with `SVG_HEX_RADIUS`.

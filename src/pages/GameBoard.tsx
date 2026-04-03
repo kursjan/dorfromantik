@@ -1,9 +1,9 @@
 import React, { useRef, useEffect, useLayoutEffect, useState } from 'react';
-import { SvgGameView } from '../canvas/components/SvgGameView';
+import { SvgGameView } from '../rendering/svg/components/SvgGameView';
 import { useUser, useActiveGame } from '../context/SessionContext';
 import { useFirestoreService } from '../services/hooks/useServices';
-import { GameAutosaver } from '../canvas/services/GameAutosaver';
-import { SaveStatusIndicator, type SaveStatus } from '../canvas/components/SaveStatusIndicator';
+import { GameAutosaver } from '../services/GameAutosaver';
+import { SaveStatusIndicator, type SaveStatus } from '../rendering/shell/SaveStatusIndicator';
 import './GameBoard.css';
 
 const SAVE_DEBOUNCE_MS = import.meta.env.MODE === 'test' ? 10 : 2000;

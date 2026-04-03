@@ -1,0 +1,73 @@
+import { HEX_SIZE } from '../../common/hex/hexLayout';
+
+export { TERRAIN_COLORS } from '../../common/hex/terrainPalette';
+
+export interface HexStyle {
+  size: number;
+  strokeColor: string;
+  fillColor: string;
+  font: string;
+  textColor: string;
+  lineWidth: number;
+  opacity?: number;
+}
+
+export { HEX_SIZE };
+
+export const DEFAULT_HEX_STYLE: HexStyle = {
+  size: HEX_SIZE,
+  strokeColor: '#000000',
+  fillColor: '#FFFFFF',
+  font: '12px Arial',
+  textColor: '#000000',
+  lineWidth: 1,
+  opacity: 1,
+};
+
+export const GRID_HEX_STYLE: HexStyle = {
+  ...DEFAULT_HEX_STYLE,
+  strokeColor: '#ccc',
+  textColor: '#666',
+  fillColor: 'transparent',
+};
+
+export const CENTER_HEX_STYLE: HexStyle = {
+  ...DEFAULT_HEX_STYLE,
+  strokeColor: 'red',
+  lineWidth: 2,
+  fillColor: 'rgba(255,0,0,0.1)',
+};
+
+export const HOVER_HEX_STYLE: HexStyle = {
+  ...DEFAULT_HEX_STYLE,
+  strokeColor: '#FFD700', // Gold
+  lineWidth: 3,
+  fillColor: 'rgba(255, 215, 0, 0.2)',
+  textColor: '#000',
+};
+
+export const VALID_PREVIEW_STYLE: HexStyle = {
+  ...DEFAULT_HEX_STYLE,
+  strokeColor: '#00FF00', // Green
+  lineWidth: 2,
+  fillColor: 'rgba(0, 255, 0, 0.2)',
+  textColor: '#000',
+  opacity: 0.6,
+};
+
+export const VALID_PLACEMENT_STYLE: HexStyle = {
+  ...DEFAULT_HEX_STYLE,
+  strokeColor: 'rgba(0, 255, 0, 0.4)', // Faint Green
+  lineWidth: 1,
+  fillColor: 'rgba(0, 255, 0, 0.05)', // Very subtle Green
+  textColor: 'transparent',
+};
+
+export const INVALID_PREVIEW_STYLE: HexStyle = {
+  ...DEFAULT_HEX_STYLE,
+  strokeColor: '#FF0000', // Red
+  lineWidth: 2,
+  fillColor: 'rgba(255, 0, 0, 0.2)',
+  textColor: '#000',
+  opacity: 0.3,
+};

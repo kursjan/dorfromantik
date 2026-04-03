@@ -2,7 +2,7 @@
 
 ## Input parity scope (canvas reference)
 
-The canvas path implements board interaction through `InputManager` + `CanvasController` (`src/canvas/engine/`). SVG must match this **behavior** (not necessarily the same class layout):
+The canvas path implements board interaction through `InputManager` + `CanvasController` (`src/rendering/canvas/engine/`). SVG must match this **behavior** (not necessarily the same class layout):
 
 | Channel  | Canvas behavior (reference)                                                                                                                                                         |
 | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
