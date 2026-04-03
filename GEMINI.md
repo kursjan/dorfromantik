@@ -65,6 +65,7 @@ Ad hoc task can be implement in main.
   - **Phase Completion:** Once a phase is completed, the **project-orchestrator** will perform a final verification and create a **Phase Checkpoint** commit if necessary.
     - push will happen at the end of the track
   - **Approval Tracking:** Use a moving tag `approved/<branch-name>` (e.g. `approved/worker1`, `approved/worker2`) as the pointer to the last user-approved commit on that branch. After each new approval, move the tag for that branch to the newly approved commit.
+    - Move `approved/<branch>` only when the user approves, and only to the commit that was waiting for approval—not to commits created after that approval until the next approval.
 
 ### **GitHub Integration:**
 

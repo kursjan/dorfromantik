@@ -61,7 +61,7 @@ alwaysApply: true
 - When updating a draft proposal, plan, or responding to user feedback during refinement, **persist the original format and structure**. Do not change the presentation style or layout between iterations.
 - Respect phrases like "lgtm", "sgtm", "approved" as signals that the user is satisfied.
 - Approval marker uses a moving Git tag per branch: `approved/<branch-name>` (e.g. `approved/worker1`, `approved/worker2`).
-  - On approval, move that tag to the latest approved commit on the current branch.
+  - On approval, move that tag to the latest approved commit on the current branch and only to the commit that was waiting for approval—not to commits created after that approval until the next approval.
   - Keep one current approval pointer per branch (history can be recovered from commits/PR discussion).
 
 # Terminal & Working Directory
