@@ -17,6 +17,7 @@ src/components/
 ├── GameCard.css         # "Lifted" glassmorphism styling for GameCard
 ├── GameCard.stories.tsx # Storybook visualization for GameCard
 ├── Tiles/               # SVG HexTile prototype components and stories
+│   ├── SvgBoard.tsx     # Multi-tile SVG layer: hexToPixel layout + camera translate/scale
 │   ├── HexTile.tsx      # Declarative SVG tile container (6 wedges + optional center)
 │   ├── Wedge.tsx        # Base wedge SVG path wrapper
 │   ├── CenterWedge.tsx  # Base center-circle SVG path wrapper
@@ -63,4 +64,4 @@ These components are typically composed within **Pages** (e.g., `src/pages/MainM
 - **State Management:** The parent page manages the visibility (e.g., `isSettingsOpen`) and data fetching (e.g., list of games from the `Session` model).
 - **Navigation:** Buttons within components (like "Continue" in `GameCard`) trigger callbacks that the parent page uses to initiate navigation via `react-router-dom`.
 
-`Tiles/HexTile` is currently a prototype surface used in Storybook for visual parity against the canvas `TilePreview` renderer. Flat-top hex geometry (radius, corner points, wedge paths) lives in `Tiles/SvgHexUtils.ts` and is reused by `HexTile` and the SVG segment renderers so stroke anchors and view boxes stay aligned.
+`Tiles/HexTile` is currently a prototype surface used in Storybook for visual parity against the canvas `TilePreview` renderer. Flat-top hex geometry (radius, corner points, wedge paths) lives in `Tiles/SvgHexUtils.ts` and is reused by `HexTile` and the SVG segment renderers so stroke anchors and view boxes stay aligned. `Tiles/SvgBoard.tsx` composes many `HexTile` instances at positions from `SvgHexUtils.hexToPixel` (delegating to `canvas/utils/HexUtils.hexToPixel` with `SVG_HEX_RADIUS`) and applies an SVG camera group (`translate` + `scale`).

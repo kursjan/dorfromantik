@@ -1,9 +1,19 @@
+import { hexToPixel as hexToPixelWithSize } from '../../canvas/utils/HexUtils';
+import { HexCoordinate } from '../../models/HexCoordinate';
 import { directions } from '../../models/Navigation';
 
 /** Vertex radius for flat-top hex geometry in SVG user units (shared by wedge paths and edge-midpoint math). */
 export const SVG_HEX_RADIUS = 50;
 const SVG_CENTER_WATER_HEX_RADIUS = SVG_HEX_RADIUS * 0.35;
 const SVG_CENTER_RAIL_HEX_RADIUS = SVG_HEX_RADIUS * 0.15;
+
+/**
+ * Converts a logical HexCoordinate to SVG user-space (x, y) using the same flat-top mapping as
+ * `canvas/utils/HexUtils.hexToPixel` with {@link SVG_HEX_RADIUS} as hex size.
+ */
+export function hexToPixel(hex: HexCoordinate): { x: number; y: number } {
+  return hexToPixelWithSize(hex, SVG_HEX_RADIUS);
+}
 
 interface Point {
   x: number;

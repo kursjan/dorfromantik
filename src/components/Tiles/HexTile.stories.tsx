@@ -13,7 +13,7 @@ import { TilePreview } from '../../canvas/components/TilePreview';
 import { HexTile } from './HexTile';
 
 const meta: Meta<typeof HexTile> = {
-  title: 'SVG Tiles/HexTile',
+  title: 'SVG/Tiles/HexTile',
   component: HexTile,
   parameters: {
     layout: 'centered',
