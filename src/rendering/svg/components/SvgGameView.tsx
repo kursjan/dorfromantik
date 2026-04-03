@@ -1,5 +1,5 @@
 import { type FC, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { SvgBoard, type Camera } from '../board/SvgBoard';
+import { SvgBoard, type Camera } from './SvgBoard';
 import { Game } from '../../../models/Game';
 import { HexCoordinate } from '../../../models/HexCoordinate';
 import { GameHUD } from '../../shell/GameHUD';
