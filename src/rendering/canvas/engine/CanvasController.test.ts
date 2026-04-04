@@ -11,8 +11,14 @@ import { GameRules } from '../../../models/GameRules';
 import type { Radians } from '../../../utils/Angle';
 import { pixelToHex } from '../../common/hex/HexUtils';
 
-// Mock dependencies
-vi.mock('../../common/hex/HexUtils');
+// Mock dependencies — keep real `closestHexByWorldDistance` / `distanceToHex`; tests stub `pixelToHex` where needed.
+vi.mock('../../common/hex/HexUtils', async (importOriginal) => {
+  const mod = await importOriginal<typeof import('../../common/hex/HexUtils')>();
+  return {
+    ...mod,
+    pixelToHex: vi.fn(),
+  };
+});
 vi.mock('../graphics/HexRenderer');
 vi.mock('../graphics/TileRenderer');
 vi.mock('../graphics/DebugRenderer');
@@ -316,8 +322,7 @@ describe('CanvasController', () => {
 
       (controller as any).handleHover(100, 100);
 
-      // Based on pixelToHex(0, 0)
-      // Snaps to nearest valid coordinate, which is not (0, 0, 0) because it is occupied
+      // World (0,0): nearest valid placement is not the occupied origin
       expect((controller as any).hoveredHex).not.toEqual(new HexCoordinate(0, 0, 0));
       expect(activeGame.isValidPlacement((controller as any).hoveredHex)).toBe(true);
     });

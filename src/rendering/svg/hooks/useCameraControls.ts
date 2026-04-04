@@ -17,10 +17,6 @@ export interface UseCameraControlsCallbacks {
   onLeave: () => void;
 }
 
-/**
- * Pan (left-drag after threshold) and zoom (wheel) using the same rules as canvas {@link InputManager}
- * / {@link Camera}, for SVG or other DOM-based views.
- */
 export function useCameraControls(
   containerRef: RefObject<HTMLElement | null>,
   callbacks: UseCameraControlsCallbacks
@@ -49,14 +45,14 @@ export function useCameraControls(
   }, []);
 
   useLayoutEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
+    const container = containerRef.current;
+    if (!container) return;
 
     const panPointer = panPointerRef.current;
     const camera = cameraRef.current;
 
     const cleanup = bindPointerInteraction(
-      el,
+      container,
       {
         onPan: (dx, dy) => {
           camera.pan(dx, dy);
@@ -85,9 +81,9 @@ export function useCameraControls(
 
   const screenToWorld = useCallback(
     (screenX: number, screenY: number) => {
-      const el = containerRef.current;
-      if (!el) return { x: 0, y: 0 };
-      const rect = el.getBoundingClientRect();
+      const container = containerRef.current;
+      if (!container) return { x: 0, y: 0 };
+      const rect = container.getBoundingClientRect();
       return cameraRef.current.screenToWorld(screenX, screenY, rect.width, rect.height);
     },
     [containerRef]

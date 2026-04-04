@@ -25,6 +25,21 @@ export function distanceToHex(
   return Math.sqrt(dx * dx + dy * dy);
 }
 
+/**
+ * Coordinate in `candidates` whose hex center is closest to `(worldX, worldY)`.
+ * Requires `candidates.length > 0` (callers must guard empty lists).
+ */
+export function closestHexByWorldDistance(
+  candidates: readonly HexCoordinate[],
+  worldX: number,
+  worldY: number,
+  hexSize: number
+): HexCoordinate {
+  return candidates
+    .map((coord) => ({ coord, dist: distanceToHex(coord, worldX, worldY, hexSize) }))
+    .sort((a, b) => a.dist - b.dist)[0].coord;
+}
+
 export function pixelToHex(x: number, y: number, size: number): HexCoordinate {
   // Inverse flat-topped hex conversion
   // Adjusted for user coordinate system where (-1, 0, 1) is North.

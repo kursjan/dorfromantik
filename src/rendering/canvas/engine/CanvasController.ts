@@ -5,7 +5,7 @@ import { HexRenderer } from '../graphics/HexRenderer';
 import { TileRenderer } from '../graphics/TileRenderer';
 import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexCoordinate } from '../../../models/HexCoordinate';
-import { distanceToHex } from '../../common/hex/HexUtils';
+import { closestHexByWorldDistance } from '../../common/hex/HexUtils';
 import {
   HEX_SIZE,
   DEFAULT_HEX_STYLE,
@@ -223,11 +223,7 @@ export class CanvasController {
       return;
     }
 
-    this.hoveredHex = CanvasController.findClosestHexCoordinate(
-      [...validCoords],
-      worldPos.x,
-      worldPos.y
-    );
+    this.hoveredHex = closestHexByWorldDistance(validCoords, worldPos.x, worldPos.y, HEX_SIZE);
   }
 
   private handleLeave() {
@@ -285,15 +281,5 @@ export class CanvasController {
         hoveredHex: null,
       },
     };
-  }
-
-  private static findClosestHexCoordinate(
-    validCoords: HexCoordinate[],
-    x: number,
-    y: number
-  ): HexCoordinate {
-    return validCoords
-      .map((coord) => ({ coord, dist: distanceToHex(coord, x, y, HEX_SIZE) }))
-      .sort((a, b) => a.dist - b.dist)[0].coord;
   }
 }

@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { hexToPixel, pixelToHex, getHexCorners, distanceToHex } from './HexUtils';
+import {
+  hexToPixel,
+  pixelToHex,
+  getHexCorners,
+  distanceToHex,
+  closestHexByWorldDistance,
+} from './HexUtils';
 import { HexCoordinate } from '../../../models/HexCoordinate';
 import {
   north,
@@ -37,6 +43,40 @@ describe('HexUtils', () => {
 
       const distToCenter = distanceToHex(center, neighborPixel.x, neighborPixel.y, HEX_SIZE);
       expect(distToCenter).toBeCloseTo(HEX_SIZE * SQRT3);
+    });
+  });
+
+  describe('closestHexByWorldDistance', () => {
+    it('returns the only candidate when there is one', () => {
+      const only = new HexCoordinate(0, 0, 0);
+      const { x, y } = hexToPixel(only, HEX_SIZE);
+      const picked = closestHexByWorldDistance([only], x, y, HEX_SIZE);
+      expect(picked.equals(only)).toBe(true);
+    });
+
+    it('returns the hex whose center is nearest to the world point', () => {
+      const origin = new HexCoordinate(0, 0, 0);
+      const neighbor = north(origin);
+      const originPixel = hexToPixel(origin, HEX_SIZE);
+      const neighborPixel = hexToPixel(neighbor, HEX_SIZE);
+
+      expect(
+        closestHexByWorldDistance(
+          [origin, neighbor],
+          neighborPixel.x,
+          neighborPixel.y,
+          HEX_SIZE
+        ).equals(neighbor)
+      ).toBe(true);
+
+      expect(
+        closestHexByWorldDistance(
+          [origin, neighbor],
+          originPixel.x,
+          originPixel.y,
+          HEX_SIZE
+        ).equals(origin)
+      ).toBe(true);
     });
   });
 
