@@ -36,7 +36,7 @@ export class TileRenderer {
     const originalAlpha = this.ctx.globalAlpha;
     this.ctx.globalAlpha = style.opacity ?? 1;
 
-    const corners = getHexCorners(x, y, style.size);
+    const corners = getHexCorners({ x, y }, style.size);
     const terrainsMap = tile.getTerrains();
 
     for (let i = 0; i < directions.length; i++) {

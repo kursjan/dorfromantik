@@ -24,19 +24,22 @@ vi.mock('../graphics/TileRenderer');
 vi.mock('../graphics/DebugRenderer');
 vi.mock('../graphics/BackgroundRenderer');
 vi.mock('./InputManager');
+vi.mock('../applyCameraTransform', () => ({
+  applyCameraTransformToCanvas: vi.fn(),
+}));
 vi.mock('../../common/camera/Camera', () => {
-  const Camera = vi.fn();
-  Camera.prototype.applyTransform = vi.fn();
-  Camera.prototype.screenToWorld = vi.fn((coords) => coords);
-  Camera.prototype.pan = vi.fn();
-  Camera.prototype.zoomBy = vi.fn();
-  Camera.prototype.rotateBy = vi.fn();
-  Camera.prototype.reset = vi.fn();
-  Camera.prototype.x = 0;
-  Camera.prototype.y = 0;
-  Camera.prototype.zoom = 1;
-  Camera.prototype.rotation = 0 as Radians;
-  return { Camera };
+  function MockCamera(this: { zoom: number; rotation: Radians; pan: { x: number; y: number } }) {
+    const pan = { x: 0, y: 0 };
+    this.pan = pan;
+    this.zoom = 1;
+    this.rotation = 0 as Radians;
+  }
+  MockCamera.prototype.containerToWorld = vi.fn((point: { x: number; y: number }) => point);
+  MockCamera.prototype.panBy = vi.fn();
+  MockCamera.prototype.zoomBy = vi.fn();
+  MockCamera.prototype.rotateBy = vi.fn();
+  MockCamera.prototype.reset = vi.fn();
+  return { Camera: MockCamera };
 });
 
 describe('CanvasController', () => {
@@ -259,18 +262,18 @@ describe('CanvasController', () => {
     const rotateCCWSpy = vi.spyOn(controller as any, 'handleRotateCounterClockwise');
     const leaveSpy = vi.spyOn(controller as any, 'handleLeave');
 
-    capturedCallbacks.onPan(10, 20);
-    expect(camera.pan).toHaveBeenCalledWith(10, 20);
+    capturedCallbacks.onPan({ x: 10, y: 20 });
+    expect(camera.panBy).toHaveBeenCalledWith({ x: 10, y: 20 });
 
     capturedCallbacks.onZoom(100);
     expect(zoomSpy).toHaveBeenCalledWith(100);
 
     vi.mocked(pixelToHex).mockReturnValue(new HexCoordinate(0, 0, 0));
 
-    capturedCallbacks.onHover(50, 50);
-    expect(hoverSpy).toHaveBeenCalledWith(50, 50);
+    capturedCallbacks.onHover({ x: 50, y: 50 });
+    expect(hoverSpy).toHaveBeenCalledWith({ x: 50, y: 50 });
 
-    capturedCallbacks.onClick(50, 50);
+    capturedCallbacks.onClick({ x: 50, y: 50 });
     expect(clickSpy).toHaveBeenCalled();
 
     capturedCallbacks.onRotateClockwise();
@@ -314,13 +317,13 @@ describe('CanvasController', () => {
     });
 
     it('should handle hover and update hoveredHex', () => {
-      // Mock screenToWorld to return predictable coords
+      // Mock containerToWorld to return predictable coords
       const camera = (controller as any).camera;
       // Depending on HexSize, 0,0 is hex 0,0,0
-      camera.screenToWorld = vi.fn().mockReturnValue({ x: 0, y: 0 });
+      camera.containerToWorld = vi.fn().mockReturnValue({ x: 0, y: 0 });
       vi.mocked(pixelToHex).mockReturnValue(new HexCoordinate(0, 0, 0));
 
-      (controller as any).handleHover(100, 100);
+      (controller as any).handleHover({ x: 100, y: 100 });
 
       // World (0,0): nearest valid placement is not the occupied origin
       expect((controller as any).hoveredHex).not.toEqual(new HexCoordinate(0, 0, 0));
@@ -384,7 +387,7 @@ describe('CanvasController', () => {
 
       const targetCoord = new HexCoordinate(0, 0, 0); // Occupied
       const camera = (controller as any).camera;
-      camera.screenToWorld = vi.fn().mockReturnValue({ x: 0, y: 0 });
+      camera.containerToWorld = vi.fn().mockReturnValue({ x: 0, y: 0 });
       vi.mocked(pixelToHex).mockReturnValue(targetCoord);
 
       // Mock isValidPlacement to return false

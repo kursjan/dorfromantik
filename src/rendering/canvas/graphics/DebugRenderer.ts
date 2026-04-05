@@ -22,7 +22,7 @@ export class DebugRenderer {
     this.ctx.fillStyle = DEBUG_OVERLAY_TEXT_COLOR;
     this.ctx.font = DEBUG_OVERLAY_FONT;
 
-    let debugText = `Camera: (${Math.round(camera.x)},${Math.round(camera.y)}) Zoom: ${camera.zoom.toFixed(2)}`;
+    let debugText = `Camera: (${Math.round(camera.pan.x)},${Math.round(camera.pan.y)}) Zoom: ${camera.zoom.toFixed(2)}`;
     if (hoveredHex) {
       debugText += ` | Hover: (${hoveredHex.q},${hoveredHex.r},${hoveredHex.s})`;
     }

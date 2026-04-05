@@ -11,10 +11,11 @@ The canvas visualization logic is separated from the React component tree to ens
 
 ## 2. Directory Structure
 
-Canvas-only code lives under **`src/rendering/canvas/`**. Shared camera / hex math / React game bridge is in **`src/rendering/common/`**. Game chrome (HUD, reset, save status) is in **`src/rendering/shell/`**. Firestore debounced saves: **`src/services/GameAutosaver.ts`** (see `src/services/ARCHITECTURE.md`).
+Canvas-only code lives under **`src/rendering/canvas/`**. Shared camera / hex math / React game bridge is in **`src/rendering/common/`**. Game chrome (HUD, reset, save status) is in **`src/rendering/shell/`**. Firestore debounced saves: **`src/services/GameAutosaver.ts`** (see `src/services/ARCHITECTURE.md`). Cross-cutting **coordinate types, `Camera`, and pointer binding** are summarized in **`../ARCHITECTURE.md`** (rendering root).
 
 ```
 src/rendering/canvas/
+├── applyCameraTransform.ts # Viewport-centered Context2D chain (center → rotate → scale → pan)
 ├── components/
 │   ├── TilePreview.tsx     # Small canvas preview of a tile (optional neighborEdgeTerrains for hybrid edges)
 │   ├── Tiles/              # Storybook stories (canvas tile previews)
@@ -30,24 +31,27 @@ src/rendering/canvas/
 
 ## 3. Coordinate Systems
 
-Understanding the coordinate spaces is critical for this engine:
+Understanding the coordinate spaces is critical for this engine. TypeScript names for pixel tuples live in **`src/rendering/common/`** (see **`../ARCHITECTURE.md`**).
 
-1.  **Screen Space (Pixels):**
-    - Origin `(0, 0)` is the top-left corner of the canvas.
-    - Used for mouse events (`InputManager`).
-    - Positive Y is **Down**.
+1.  **Container-local pixels (`ContainerPoint`):**
+    - Origin `(0, 0)` is the **top-left of the canvas element** (after subtracting `getBoundingClientRect()` from `clientX` / `clientY`).
+    - **`InputManager`** passes **`ContainerPoint`** to **`onHover`** / **`onClick`**.
+    - **`Camera.containerToWorld(point, canvas.width, canvas.height)`** expects this space for `point`.
 
-2.  **World Space (Logical Units):**
-    - Infinite 2D plane.
-    - Origin `(0, 0)` is the center of the initial view.
-    - Used for camera positioning.
-    - **Transformation:** `Screen = Center + Rotate((World + CameraPos) * Zoom)`
-      - Note the rotation step, which complicates `screenToWorld` mapping.
+2.  **Pointer drag delta (`ContainerDelta` for pan):**
+    - **`onPan(delta)`** receives **`ContainerDelta`**: step between moves in the same pixel axes as **`ContainerPoint`** (implementation uses Δ`clientX` / Δ`clientY`, which matches when the element’s rect is stable).
+    - **`Camera.panBy(delta)`** rotates that vector and applies it to world **`pan`**.
 
-3.  **Hex Space (Cube Coordinates):**
+3.  **World space (`WorldPoint`):**
+    - Infinite 2D plane in **layout units** (hex geometry, camera pan).
+    - Origin `(0, 0)` is the center of the initial view before pan.
+    - **Transformation (conceptual):** container pixel = center + rotate + scale × (world + camera pan). Inverting that chain is **`containerToWorld`**.
+    - Camera pan is exposed as **`camera.pan`** (`WorldPoint`). The SVG path mirrors the same numbers as **`CameraSnapshot.position`**.
+
+4.  **Hex space (cube coordinates):**
     - Integer coordinates `(q, r, s)` where `q + r + s = 0`.
     - Used for game logic (Tile storage, Adjacency).
-    - _Conversion:_ `World -> Hex` via `HexUtils.pixelToHex`.
+    - _Conversion:_ world → hex via **`HexUtils.pixelToHex`** (argument is **`WorldPoint`**).
     - **CRITICAL:** This project uses a **Rotated Coordinate System**.
       - **North is (-1, 0, 1)**.
       - Standard "Flat Top" usually implies North is `(0, -1, 1)`.
@@ -70,19 +74,20 @@ The central hub. It:
 
 ### Camera (`../common/camera/Camera.ts`)
 
-Manages the view transform.
+Manages the view transform (shared with the SVG board path).
 
-- **Pan:** `x, y` (World Units).
-- **Zoom:** Scalar value (clamped).
-- **Rotation:** Radians (for rotating the view).
-- **Methods:** `screenToWorld()`, `applyTransform()`, `pan()`, `rotateBy()`.
+- **Pan:** **`pan`** getter — world-space offset (**`WorldPoint`**); same values as SVG **`CameraSnapshot.position`** (see **`useCameraControls`** → **`readTransform`**).
+- **Zoom / rotation:** scalars; **`zoomBy`**, **`rotateBy`**, **`reset`** match config defaults.
+- **Canvas draw path:** **`applyCameraTransformToCanvas(camera, ctx, w, h)`** in **`applyCameraTransform.ts`** applies center translate → rotate → scale → **`camera.pan`** translate (matches SVG **`SvgBoard`** transform order).
+- **Methods:** **`containerToWorld(point, w, h)`**, **`panBy(ContainerDelta)`**, **`zoomBy`**, **`rotateBy`**, **`reset`**.
 
 ### InputManager (`engine/InputManager.ts`)
 
-DOM abstraction layer.
+DOM abstraction layer. Pointer behavior is delegated to **`../common/camera/cameraInteraction`** (`bindPointerInteraction`, **`PointerPanZoomSession`**) — the same primitives as the SVG **`useCameraControls`** path.
 
-- **Role:** Translates raw DOM events (`mousedown`, `wheel`, `keydown`, etc.) into abstract Game Actions (`onPan`, `onZoom`, `onHover`, `getRotationDirection`, `onRotateClockwise`, `onRotateCounterClockwise`, `onToggleDebugOverlay`). F3 is handled here and invokes the optional `onToggleDebugOverlay` callback (wired from `CanvasView` for the debug overlay).
-- **State Machine:** Uses an explicit state machine (`IDLE`, `MOUSE_DOWN_POTENTIAL_CLICK`, `PANNING`) to distinguish between clicks and pans. This centralizes transition logic and cursor management.
+- **Role:** Translates raw DOM events (`wheel`, `keydown`, etc.) into abstract actions. Pointer move/down/up go through the shared pan/zoom session.
+- **Callbacks (types):** **`onPan(delta: ContainerDelta)`**, **`onZoom(deltaY: number)`**, **`onHover` / `onClick(point: ContainerPoint)`**, rotation and **`onToggleDebugOverlay`** (F3 from **`CanvasView`**).
+- **State machine:** `IDLE`, `MOUSE_DOWN_POTENTIAL_CLICK`, `PANNING` — distinguishes click vs pan and drives cursor style via **`cameraInteraction`** helpers.
 - **Context Menu:** The browser's default context menu is disabled to support right-click-based tile rotation.
 - **Hygiene:** Explicitly attaches and detaches listeners to prevent memory leaks.
 - **Normalization:** Handles cross-browser differences (e.g., wheel delta).
@@ -120,20 +125,20 @@ While the Controller runs independently for performance, the React tree must hol
 - **Pattern:** `CanvasController` is constructed with **`getGameSnapshot()`** and **`setGameSnapshot(game)`**. It does not mirror `Game` on `this`; it reads the latest snapshot from the getter each frame and calls **`setGameSnapshot`** after place / rotate with the returned snapshot.
 - **`CanvasView`:** Receives **`activeGame`** and **`setActiveGame`** from the parent (e.g. **`GameBoard`** from **`useActiveGame()`**). Uses **`useGameSnapshotBridge`**: syncs a **ref** from **`activeGame`** (e.g. **`useLayoutEffect`**) and wraps **`setActiveGame`** into **`setGameSnapshot`**, which updates the ref **synchronously** with each new snapshot (avoids the rAF loop lagging React by one frame). The HUD reads **score / turns / next tile** from the **`activeGame` prop**, not a separate stats callback.
 - **Nullability Convention:** For app state, "no active game" is represented by **`null`** (`Game | null`) across `ActiveGameContext`, `GameBoard`, and `GameAutosaver`. This keeps absence explicit and avoids mixing domain state with optional-property `undefined`.
-- **Debug Stats:** `CanvasController` also exposes `subscribeDebug` and `getDebugSnapshot` for high-frequency updates (FPS, Camera) used by `DebugOverlay` via `useSyncExternalStore`.
+- **Debug stats:** `CanvasController` exposes **`subscribeDebug`** and **`getDebugSnapshot`** for high-frequency updates (FPS, camera pan as flat **`x`/`y`**, zoom, rotation, hover) consumed by **`DebugOverlay`** via **`useSyncExternalStore`**. Those **`x`/`y`** match **`camera.pan`**.
 
 ## 6. Data Flow Example: Hovering (Magnetic Snapping)
 
-1.  **Browser:** User moves mouse to pixel `(500, 300)`.
-2.  **InputManager:** Catches `mousemove`, calls `callbacks.onHover(500, 300)`.
+1.  **Browser:** User moves mouse; position relative to the canvas is **`ContainerPoint`** e.g. `{ x: 500, y: 300 }`.
+2.  **InputManager / `bindPointerInteraction`:** Emits **`onHover`** with that **`ContainerPoint`**.
 3.  **CanvasController:**
-    - Calls `camera.screenToWorld(500, 300)` -> applies Inverse Rotate, Inverse Scale, Inverse Translate -> gets World `(120.5, -40.2)`.
+    - Calls `camera.containerToWorld({ x: 500, y: 300 }, canvas.width, canvas.height)` → applies inverse rotate, inverse scale, inverse translate → world `(120.5, -40.2)`.
     - Reads `activeGame.hints.validPlacements` (immutable pre-computed array).
     - Finds the valid coordinate with the minimum `distanceToHex` from the World `(120.5, -40.2)`.
     - Updates `this.hoveredHex` to that closest valid coordinate (snapping effect).
 4.  **Render Loop:**
     - Calls `backgroundRenderer.draw()`.
-    - Calls `camera.applyTransform()` (Translate Center -> Rotate -> Scale -> Translate Camera).
+    - Calls `applyCameraTransformToCanvas(this.camera, ctx, canvas.width, canvas.height)` (center → rotate → scale → pan).
     - Calls `hexRenderer.drawHighlight(this.hoveredHex)`.
     - Calls `ctx.restore()` (Reverts transform).
     - Publishes debug snapshot.

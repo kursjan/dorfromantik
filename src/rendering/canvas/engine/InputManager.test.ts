@@ -42,7 +42,7 @@ describe('InputManager', () => {
 
     // 4. Mouse Move (Actual Pan)
     canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: 115, clientY: 100 }));
-    expect(callbacks.onPan).toHaveBeenCalledWith(5, 0); // 115 - 110
+    expect(callbacks.onPan).toHaveBeenCalledWith({ x: 5, y: 0 }); // 115 - 110
 
     // 5. Mouse Up
     canvas.dispatchEvent(new MouseEvent('mouseup'));
@@ -66,7 +66,7 @@ describe('InputManager', () => {
     // 2. Mouse Up (No move)
     canvas.dispatchEvent(new MouseEvent('mouseup', { clientX: 100, clientY: 100 }));
 
-    expect(callbacks.onClick).toHaveBeenCalledWith(90, 90); // 100 - 10
+    expect(callbacks.onClick).toHaveBeenCalledWith({ x: 90, y: 90 }); // 100 - 10
     expect(callbacks.onPan).not.toHaveBeenCalled();
   });
 
@@ -97,7 +97,7 @@ describe('InputManager', () => {
     canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: 60, clientY: 60 }));
 
     // 60 - 10 = 50
-    expect(callbacks.onHover).toHaveBeenCalledWith(50, 50);
+    expect(callbacks.onHover).toHaveBeenCalledWith({ x: 50, y: 50 });
   });
 
   it('stops dragging on mouse leave', () => {

@@ -55,8 +55,8 @@ describe('useCameraControls', () => {
     });
 
     await waitFor(() => {
-      expect(result.current.transform.x).toBeCloseTo(10, 5);
-      expect(result.current.transform.y).toBe(0);
+      expect(result.current.transform.position.x).toBeCloseTo(10, 5);
+      expect(result.current.transform.position.y).toBe(0);
     });
   });
 
@@ -82,7 +82,7 @@ describe('useCameraControls', () => {
     });
 
     expect(result.current.transform.zoom).toBe(1);
-    expect(result.current.transform.x).toBe(0);
-    expect(result.current.transform.y).toBe(0);
+    expect(result.current.transform.position.x).toBe(0);
+    expect(result.current.transform.position.y).toBe(0);
   });
 });

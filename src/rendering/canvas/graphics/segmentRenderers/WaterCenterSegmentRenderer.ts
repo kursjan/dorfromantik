@@ -6,7 +6,7 @@ import { type CenterDrawContext, type CenterSegmentRenderer } from './CenterDraw
 export class WaterCenterSegmentRenderer implements CenterSegmentRenderer {
   render(context: CenterDrawContext, _centerTerrain: Terrain): void {
     const { ctx, centerX, centerY, style } = context;
-    const centerHexCorners = getHexCorners(centerX, centerY, style.size * 0.35);
+    const centerHexCorners = getHexCorners({ x: centerX, y: centerY }, style.size * 0.35);
     ctx.beginPath();
     ctx.moveTo(centerHexCorners[0].x, centerHexCorners[0].y);
     for (let i = 1; i < 6; i++) {

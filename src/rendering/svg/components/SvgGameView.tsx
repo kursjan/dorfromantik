@@ -1,4 +1,5 @@
 import { type FC, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import type { ContainerPoint } from '../../common/ContainerPoint';
 import type { CameraSnapshot } from '../cameraSnapshot';
 import { SvgBoard } from './SvgBoard';
 import { Game } from '../../../models/Game';
@@ -10,31 +11,26 @@ import { useGameSnapshotBridge } from '../../common/bridge/useGameSnapshotBridge
 
 interface SvgGameViewProps {
   activeGame: Game;
-  /** Typically `setActiveGame` from session context; reserved for Phase 2 placement parity. */
   setActiveGame: (game: Game) => void;
 }
 
-/**
- * DOM/SVG game board: composition of shell + viewport + {@link SvgBoard}; pointer → game rules live in
- * {@link useSvgBoardInteraction}, camera in {@link useCameraControls}.
- */
 export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame }) => {
   const { getGameSnapshot, setGameSnapshot } = useGameSnapshotBridge(activeGame, setActiveGame);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { cameraPointerCallbacks, screenToWorldRef } = useSvgBoardInteraction(
+  const { cameraPointerCallbacks, containerToWorldRef } = useSvgBoardInteraction(
     getGameSnapshot,
     setGameSnapshot
   );
 
-  const { transform, resetCamera, screenToWorld } = useCameraControls(
+  const { transform, resetCamera, containerToWorld } = useCameraControls(
     containerRef,
     cameraPointerCallbacks
   );
 
   useLayoutEffect(() => {
-    screenToWorldRef.current = screenToWorld;
-  }, [screenToWorld, screenToWorldRef]);
+    containerToWorldRef.current = containerToWorld;
+  }, [containerToWorld, containerToWorldRef]);
 
   const [viewSize, setViewSize] = useState({ width: 0, height: 0 });
 
@@ -66,15 +62,14 @@ export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame })
 
   const camera = useMemo(
     (): CameraSnapshot => ({
-      x: transform.x,
-      y: transform.y,
+      position: { x: transform.position.x, y: transform.position.y },
       zoom: transform.zoom,
       rotation: transform.rotation,
     }),
-    [transform.x, transform.y, transform.zoom, transform.rotation]
+    [transform.position.x, transform.position.y, transform.zoom, transform.rotation]
   );
 
-  const viewCenter = { x: viewSize.width / 2, y: viewSize.height / 2 };
+  const viewCenter: ContainerPoint = { x: viewSize.width / 2, y: viewSize.height / 2 };
 
   return (
     <div

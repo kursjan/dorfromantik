@@ -23,14 +23,14 @@ describe('HexUtils', () => {
 
   describe('distanceToHex', () => {
     it('returns 0 when point is exactly at hex center', () => {
-      const { x, y } = hexToPixel(center, HEX_SIZE);
-      const dist = distanceToHex(center, x, y, HEX_SIZE);
+      const p = hexToPixel(center, HEX_SIZE);
+      const dist = distanceToHex(center, p, HEX_SIZE);
       expect(dist).toBeCloseTo(0);
     });
 
     it('returns correct distance for a point offset from center', () => {
       const { x, y } = hexToPixel(center, HEX_SIZE);
-      const dist = distanceToHex(center, x + 30, y + 40, HEX_SIZE);
+      const dist = distanceToHex(center, { x: x + 30, y: y + 40 }, HEX_SIZE);
       expect(dist).toBeCloseTo(50); // 3-4-5 triangle
     });
 
@@ -38,10 +38,10 @@ describe('HexUtils', () => {
       const neighbor = north(center);
       const neighborPixel = hexToPixel(neighbor, HEX_SIZE);
 
-      const dist = distanceToHex(neighbor, neighborPixel.x, neighborPixel.y, HEX_SIZE);
+      const dist = distanceToHex(neighbor, neighborPixel, HEX_SIZE);
       expect(dist).toBeCloseTo(0);
 
-      const distToCenter = distanceToHex(center, neighborPixel.x, neighborPixel.y, HEX_SIZE);
+      const distToCenter = distanceToHex(center, neighborPixel, HEX_SIZE);
       expect(distToCenter).toBeCloseTo(HEX_SIZE * SQRT3);
     });
   });
@@ -49,8 +49,8 @@ describe('HexUtils', () => {
   describe('closestHexByWorldDistance', () => {
     it('returns the only candidate when there is one', () => {
       const only = new HexCoordinate(0, 0, 0);
-      const { x, y } = hexToPixel(only, HEX_SIZE);
-      const picked = closestHexByWorldDistance([only], x, y, HEX_SIZE);
+      const p = hexToPixel(only, HEX_SIZE);
+      const picked = closestHexByWorldDistance([only], p, HEX_SIZE);
       expect(picked.equals(only)).toBe(true);
     });
 
@@ -61,21 +61,11 @@ describe('HexUtils', () => {
       const neighborPixel = hexToPixel(neighbor, HEX_SIZE);
 
       expect(
-        closestHexByWorldDistance(
-          [origin, neighbor],
-          neighborPixel.x,
-          neighborPixel.y,
-          HEX_SIZE
-        ).equals(neighbor)
+        closestHexByWorldDistance([origin, neighbor], neighborPixel, HEX_SIZE).equals(neighbor)
       ).toBe(true);
 
       expect(
-        closestHexByWorldDistance(
-          [origin, neighbor],
-          originPixel.x,
-          originPixel.y,
-          HEX_SIZE
-        ).equals(origin)
+        closestHexByWorldDistance([origin, neighbor], originPixel, HEX_SIZE).equals(origin)
       ).toBe(true);
     });
   });
@@ -154,24 +144,24 @@ describe('HexUtils', () => {
 
   describe('cubeRound (indirectly via pixelToHex)', () => {
     it('handles qDiff > rDiff && qDiff > sDiff', () => {
-      const coord = pixelToHex(-10, -25, HEX_SIZE);
+      const coord = pixelToHex({ x: -10, y: -25 }, HEX_SIZE);
       expect(coord).toBeDefined();
     });
 
     it('handles rDiff > sDiff', () => {
-      const coord = pixelToHex(25, 0, HEX_SIZE);
+      const coord = pixelToHex({ x: 25, y: 0 }, HEX_SIZE);
       expect(coord).toBeDefined();
     });
 
     it('handles sDiff > rDiff && sDiff > qDiff', () => {
-      const coord = pixelToHex(-10, 25, HEX_SIZE);
+      const coord = pixelToHex({ x: -10, y: 25 }, HEX_SIZE);
       expect(coord).toBeDefined();
     });
   });
 
   describe('pixelToHex', () => {
-    it('converts pixel (0,0) to center hex (0,0,0)', () => {
-      const hex = pixelToHex(0, 0, HEX_SIZE);
+    it('converts world origin to center hex (0,0,0)', () => {
+      const hex = pixelToHex({ x: 0, y: 0 }, HEX_SIZE);
       expect(hex.q).toBe(0);
       expect(hex.r).toBe(0);
       expect(hex.s).toBe(0);
@@ -181,7 +171,7 @@ describe('HexUtils', () => {
       const target = north(center);
       const centerPixel = hexToPixel(target, HEX_SIZE);
 
-      const result = pixelToHex(centerPixel.x + 5, centerPixel.y + 5, HEX_SIZE);
+      const result = pixelToHex({ x: centerPixel.x + 5, y: centerPixel.y + 5 }, HEX_SIZE);
       expect(result.equals(target)).toBe(true);
     });
 
@@ -196,8 +186,7 @@ describe('HexUtils', () => {
       ];
 
       neighbors.forEach((neighbor) => {
-        const { x, y } = hexToPixel(neighbor, HEX_SIZE);
-        const result = pixelToHex(x, y, HEX_SIZE);
+        const result = pixelToHex(hexToPixel(neighbor, HEX_SIZE), HEX_SIZE);
         expect(result.equals(neighbor)).toBe(true);
       });
     });
@@ -205,12 +194,12 @@ describe('HexUtils', () => {
 
   describe('getHexCorners', () => {
     it('returns 6 corners', () => {
-      const corners = getHexCorners(0, 0, HEX_SIZE);
+      const corners = getHexCorners({ x: 0, y: 0 }, HEX_SIZE);
       expect(corners.length).toBe(6);
     });
 
     it('returns correct coordinates for Flat-Top hex at origin', () => {
-      const corners = getHexCorners(0, 0, HEX_SIZE);
+      const corners = getHexCorners({ x: 0, y: 0 }, HEX_SIZE);
 
       // Corner 0 (0 degrees): (size, 0)
       expect(corners[0].x).toBeCloseTo(HEX_SIZE);
@@ -228,7 +217,7 @@ describe('HexUtils', () => {
     it('offsets corners by center position', () => {
       const x = 100;
       const y = 200;
-      const corners = getHexCorners(x, y, HEX_SIZE);
+      const corners = getHexCorners({ x, y }, HEX_SIZE);
 
       // Corner 0: (x + size, y)
       expect(corners[0].x).toBeCloseTo(x + HEX_SIZE);
@@ -255,14 +244,13 @@ describe('HexUtils', () => {
 
     it('round trips correctly with different size', () => {
       const target = southEast(center);
-      const { x, y } = hexToPixel(target, CUSTOM_SIZE);
-      const result = pixelToHex(x, y, CUSTOM_SIZE);
+      const result = pixelToHex(hexToPixel(target, CUSTOM_SIZE), CUSTOM_SIZE);
 
       expect(result.equals(target)).toBe(true);
     });
 
     it('calculates corners correctly with different size', () => {
-      const corners = getHexCorners(0, 0, CUSTOM_SIZE);
+      const corners = getHexCorners({ x: 0, y: 0 }, CUSTOM_SIZE);
       // Corner 0: (size, 0) -> (10, 0)
       expect(corners[0].x).toBeCloseTo(CUSTOM_SIZE);
 

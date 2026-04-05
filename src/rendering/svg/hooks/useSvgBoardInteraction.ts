@@ -1,9 +1,10 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, type MutableRefObject } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, type RefObject } from 'react';
 import type { Game } from '../../../models/Game';
 import type { HexCoordinate } from '../../../models/HexCoordinate';
+import type { ContainerPoint } from '../../common/ContainerPoint';
 import { closestHexByWorldDistance } from '../../common/hex/HexUtils';
 import { HEX_SIZE } from '../../common/hex/hexLayout';
-import type { UseCameraControlsCallbacks } from './useCameraControls';
+import type { ContainerToWorldFn, UseCameraControlsCallbacks } from './useCameraControls';
 
 /**
  * Pointer-driven game actions for the SVG board (hover → valid hex, click → place, rotate queue).
@@ -14,13 +15,9 @@ export function useSvgBoardInteraction(
   setGameSnapshot: (game: Game) => void
 ): {
   cameraPointerCallbacks: UseCameraControlsCallbacks;
-  screenToWorldRef: MutableRefObject<
-    ((x: number, y: number) => { x: number; y: number }) | undefined
-  >;
+  containerToWorldRef: RefObject<ContainerToWorldFn | undefined>;
 } {
-  const screenToWorldRef = useRef<((x: number, y: number) => { x: number; y: number }) | undefined>(
-    undefined
-  );
+  const containerToWorldRef = useRef<ContainerToWorldFn | undefined>(undefined);
 
   const getSnapshotRef = useRef(getGameSnapshot);
   const setSnapshotRef = useRef(setGameSnapshot);
@@ -31,28 +28,23 @@ export function useSvgBoardInteraction(
 
   const hoveredHexRef = useRef<HexCoordinate | null>(null);
 
-  const onHover = useCallback((mouseX: number, mouseY: number) => {
-    const stw = screenToWorldRef.current;
-    if (!stw) return;
-    const worldPos = stw(mouseX, mouseY);
+  const onHover = useCallback((point: ContainerPoint) => {
+    const toWorld = containerToWorldRef.current;
+    if (!toWorld) return;
+    const worldPos = toWorld(point);
     const validCoords = getSnapshotRef.current().hints.validPlacements;
     if (validCoords.length === 0) {
       hoveredHexRef.current = null;
       return;
     }
-    hoveredHexRef.current = closestHexByWorldDistance(
-      validCoords,
-      worldPos.x,
-      worldPos.y,
-      HEX_SIZE
-    );
+    hoveredHexRef.current = closestHexByWorldDistance(validCoords, worldPos, HEX_SIZE);
   }, []);
 
   const onLeave = useCallback(() => {
     hoveredHexRef.current = null;
   }, []);
 
-  const onClick = useCallback((_mouseX: number, _mouseY: number) => {
+  const onClick = useCallback((_point: ContainerPoint) => {
     const game = getSnapshotRef.current();
     if (!game.inProgress()) return;
     const hex = hoveredHexRef.current;
@@ -83,5 +75,5 @@ export function useSvgBoardInteraction(
     [onClick, onHover, onLeave, onRotateClockwise, onRotateCounterClockwise]
   );
 
-  return { cameraPointerCallbacks, screenToWorldRef };
+  return { cameraPointerCallbacks, containerToWorldRef };
 }

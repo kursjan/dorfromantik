@@ -2,6 +2,8 @@ import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import { radians } from '../../../utils/Angle';
 import { Camera } from '../../common/camera/Camera';
+import type { ContainerDelta, ContainerPoint } from '../../common/ContainerPoint';
+import { WORLD_ORIGIN, type WorldPoint } from '../../common/WorldPoint';
 import type { CameraSnapshot } from '../cameraSnapshot';
 import {
   PointerPanZoomSession,
@@ -9,9 +11,14 @@ import {
   bindPointerInteraction,
 } from '../../common/camera/cameraInteraction';
 
+/**
+ * Unproject a **container-local** pointer position ({@link ContainerPoint}) to {@link WorldPoint}.
+ */
+export type ContainerToWorldFn = (point: ContainerPoint) => WorldPoint;
+
 export interface UseCameraControlsCallbacks {
-  onHover: (x: number, y: number) => void;
-  onClick: (x: number, y: number) => void;
+  onHover: (point: ContainerPoint) => void;
+  onClick: (point: ContainerPoint) => void;
   onRotateClockwise: () => void;
   onRotateCounterClockwise: () => void;
   onLeave: () => void;
@@ -23,13 +30,12 @@ export function useCameraControls(
 ): {
   transform: CameraSnapshot;
   resetCamera: () => void;
-  screenToWorld: (screenX: number, screenY: number) => { x: number; y: number };
+  containerToWorld: ContainerToWorldFn;
 } {
   const cameraRef = useRef(new Camera());
   const panPointerRef = useRef(new PointerPanZoomSession());
   const [transform, setTransform] = useState<CameraSnapshot>({
-    x: 0,
-    y: 0,
+    position: WORLD_ORIGIN,
     zoom: 1,
     rotation: radians(0),
   });
@@ -54,16 +60,16 @@ export function useCameraControls(
     const cleanup = bindPointerInteraction(
       container,
       {
-        onPan: (dx, dy) => {
-          camera.pan(dx, dy);
+        onPan: (delta: ContainerDelta) => {
+          camera.panBy(delta);
           sync();
         },
         onZoom: (deltaY) => {
           applyWheelDeltaYToCamera(camera, deltaY);
           sync();
         },
-        onHover: (x, y) => callbacksRef.current.onHover(x, y),
-        onClick: (x, y) => callbacksRef.current.onClick(x, y),
+        onHover: (point) => callbacksRef.current.onHover(point),
+        onClick: (point) => callbacksRef.current.onClick(point),
         onRotateClockwise: () => callbacksRef.current.onRotateClockwise(),
         onRotateCounterClockwise: () => callbacksRef.current.onRotateCounterClockwise(),
         onLeave: () => callbacksRef.current.onLeave(),
@@ -79,23 +85,22 @@ export function useCameraControls(
     sync();
   }, [sync]);
 
-  const screenToWorld = useCallback(
-    (screenX: number, screenY: number) => {
+  const containerToWorld = useCallback(
+    (point: ContainerPoint) => {
       const container = containerRef.current;
-      if (!container) return { x: 0, y: 0 };
+      if (!container) return WORLD_ORIGIN;
       const rect = container.getBoundingClientRect();
-      return cameraRef.current.screenToWorld(screenX, screenY, rect.width, rect.height);
+      return cameraRef.current.containerToWorld(point, rect.width, rect.height);
     },
     [containerRef]
   );
 
-  return { transform, resetCamera, screenToWorld };
+  return { transform, resetCamera, containerToWorld };
 }
 
 function readTransform(camera: Camera): CameraSnapshot {
   return {
-    x: camera.x,
-    y: camera.y,
+    position: { x: camera.pan.x, y: camera.pan.y } satisfies WorldPoint,
     zoom: camera.zoom,
     rotation: camera.rotation,
   };

@@ -19,8 +19,8 @@ export class HexRenderer {
    * Draws a single hex with the given style.
    */
   drawHex(hex: HexCoordinate, style: HexStyle = DEFAULT_HEX_STYLE, label?: string) {
-    const { x, y } = hexToPixel(hex, style.size);
-    const corners = getHexCorners(x, y, style.size);
+    const center = hexToPixel(hex, style.size);
+    const corners = getHexCorners(center, style.size);
     const ctx = this.ctx;
 
     ctx.beginPath();
@@ -44,7 +44,7 @@ export class HexRenderer {
     ctx.textBaseline = 'middle';
     ctx.font = style.font;
     ctx.fillStyle = style.textColor;
-    ctx.fillText(text, x, y);
+    ctx.fillText(text, center.x, center.y);
   }
 
   /**

@@ -1,6 +1,7 @@
 import { HexCoordinate } from '../../../models/HexCoordinate';
+import type { WorldPoint } from '../WorldPoint';
 
-export function hexToPixel(hex: HexCoordinate, size: number): { x: number; y: number } {
+export function hexToPixel(hex: HexCoordinate, size: number): WorldPoint {
   // Flat-topped hex conversion
   // Adjusted for user coordinate system where (-1, 0, 1) is North.
   // We swap q and r in the standard flat-topped formula.
@@ -13,55 +14,50 @@ export function hexToPixel(hex: HexCoordinate, size: number): { x: number; y: nu
   return { x, y };
 }
 
-export function distanceToHex(
-  hex: HexCoordinate,
-  worldX: number,
-  worldY: number,
-  hexSize: number
-): number {
+export function distanceToHex(hex: HexCoordinate, point: WorldPoint, hexSize: number): number {
   const center = hexToPixel(hex, hexSize);
-  const dx = center.x - worldX;
-  const dy = center.y - worldY;
+  const dx = center.x - point.x;
+  const dy = center.y - point.y;
   return Math.sqrt(dx * dx + dy * dy);
 }
 
 /**
- * Coordinate in `candidates` whose hex center is closest to `(worldX, worldY)`.
+ * Coordinate in `candidates` whose hex center is closest to `world`.
  * Requires `candidates.length > 0` (callers must guard empty lists).
  */
 export function closestHexByWorldDistance(
   candidates: readonly HexCoordinate[],
-  worldX: number,
-  worldY: number,
+  point: WorldPoint,
   hexSize: number
 ): HexCoordinate {
   return candidates
-    .map((coord) => ({ coord, dist: distanceToHex(coord, worldX, worldY, hexSize) }))
+    .map((coord) => ({ coord, dist: distanceToHex(coord, point, hexSize) }))
     .sort((a, b) => a.dist - b.dist)[0].coord;
 }
 
-export function pixelToHex(x: number, y: number, size: number): HexCoordinate {
+/** Inverse of {@link hexToPixel}; `world` is the same {@link WorldPoint} plane. */
+export function pixelToHex(point: WorldPoint, size: number): HexCoordinate {
   // Inverse flat-topped hex conversion
   // Adjusted for user coordinate system where (-1, 0, 1) is North.
 
-  const r = ((2.0 / 3.0) * x) / size;
-  const q = ((-1.0 / 3.0) * x + (Math.sqrt(3.0) / 3.0) * y) / size;
+  const r = ((2.0 / 3.0) * point.x) / size;
+  const q = ((-1.0 / 3.0) * point.x + (Math.sqrt(3.0) / 3.0) * point.y) / size;
   const s = -q - r;
   return cubeRound(q, r, s);
 }
 
 /**
- * Returns the 6 corner points of a hex relative to its center (x, y).
- * For Flat-Top orientation, corners are at 0°, 60°, 120°, 180°, 240°, 300°.
+ * Returns the 6 corner points of a flat-top hex around `center`.
+ * Corners are at 0°, 60°, …, 300° from +x.
  */
-export function getHexCorners(x: number, y: number, size: number): { x: number; y: number }[] {
-  const corners: { x: number; y: number }[] = [];
+export function getHexCorners(center: WorldPoint, size: number): WorldPoint[] {
+  const corners: WorldPoint[] = [];
   for (let i = 0; i < 6; i++) {
     const angle_deg = 60 * i;
     const angle_rad = (Math.PI / 180) * angle_deg;
     corners.push({
-      x: x + size * Math.cos(angle_rad),
-      y: y + size * Math.sin(angle_rad),
+      x: center.x + size * Math.cos(angle_rad),
+      y: center.y + size * Math.sin(angle_rad),
     });
   }
   return corners;

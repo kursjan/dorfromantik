@@ -1,3 +1,5 @@
+import type { ClientPoint } from '../ClientPoint';
+import type { ContainerDelta, ContainerPoint } from '../ContainerPoint';
 import type { Camera } from './Camera';
 
 /**
@@ -24,7 +26,7 @@ export type PointerPanZoomState = 'IDLE' | 'MOUSE_DOWN_POTENTIAL_CLICK' | 'PANNI
 export type PointerPanZoomMoveResult =
   | { type: 'none' }
   | { type: 'entered_pan' }
-  | { type: 'pan'; dx: number; dy: number };
+  | { type: 'pan'; delta: ContainerDelta };
 
 export function cursorForPointerPanZoomState(state: PointerPanZoomState): 'grab' | 'grabbing' {
   return state === 'PANNING' ? 'grabbing' : 'grab';
@@ -35,37 +37,39 @@ export function cursorForPointerPanZoomState(state: PointerPanZoomState): 'grab'
  */
 export class PointerPanZoomSession {
   state: PointerPanZoomState = 'IDLE';
-  private mouseDownPos = { x: 0, y: 0 };
-  private lastMousePos = { x: 0, y: 0 };
+  private mouseDownClient: ClientPoint = { x: 0, y: 0 };
+  private lastClient: ClientPoint = { x: 0, y: 0 };
   private readonly dragThresholdPx: number;
 
   constructor(dragThresholdPx: number = CAMERA_INTERACTION.dragThresholdPx) {
     this.dragThresholdPx = dragThresholdPx;
   }
 
-  beginLeftDrag(clientX: number, clientY: number): void {
+  beginLeftDrag(client: ClientPoint): void {
     this.state = 'MOUSE_DOWN_POTENTIAL_CLICK';
-    this.mouseDownPos = { x: clientX, y: clientY };
-    this.lastMousePos = { x: clientX, y: clientY };
+    this.mouseDownClient = { x: client.x, y: client.y };
+    this.lastClient = { x: client.x, y: client.y };
   }
 
-  move(clientX: number, clientY: number): PointerPanZoomMoveResult {
+  move(client: ClientPoint): PointerPanZoomMoveResult {
     switch (this.state) {
       case 'MOUSE_DOWN_POTENTIAL_CLICK': {
-        const dx = Math.abs(clientX - this.mouseDownPos.x);
-        const dy = Math.abs(clientY - this.mouseDownPos.y);
+        const dx = Math.abs(client.x - this.mouseDownClient.x);
+        const dy = Math.abs(client.y - this.mouseDownClient.y);
         if (dx > this.dragThresholdPx || dy > this.dragThresholdPx) {
           this.state = 'PANNING';
-          this.lastMousePos = { x: clientX, y: clientY };
+          this.lastClient = { x: client.x, y: client.y };
           return { type: 'entered_pan' };
         }
         return { type: 'none' };
       }
       case 'PANNING': {
-        const dx = clientX - this.lastMousePos.x;
-        const dy = clientY - this.lastMousePos.y;
-        this.lastMousePos = { x: clientX, y: clientY };
-        return { type: 'pan', dx, dy };
+        const delta: ContainerDelta = {
+          x: client.x - this.lastClient.x,
+          y: client.y - this.lastClient.y,
+        };
+        this.lastClient = { x: client.x, y: client.y };
+        return { type: 'pan', delta };
       }
       default:
         return { type: 'none' };
@@ -83,10 +87,10 @@ export class PointerPanZoomSession {
 }
 
 export interface PointerInteractionCallbacks {
-  onPan: (dx: number, dy: number) => void;
+  onPan: (delta: ContainerDelta) => void;
   onZoom: (deltaY: number) => void;
-  onHover: (x: number, y: number) => void;
-  onClick: (x: number, y: number) => void;
+  onHover: (point: ContainerPoint) => void;
+  onClick: (point: ContainerPoint) => void;
   onRotateClockwise: () => void;
   onRotateCounterClockwise: () => void;
   onLeave: () => void;
@@ -122,28 +126,28 @@ export function bindPointerInteraction(
 
     if (e.button !== 0) return;
 
-    panPointer.beginLeftDrag(e.clientX, e.clientY);
+    panPointer.beginLeftDrag({ x: e.clientX, y: e.clientY } satisfies ClientPoint);
     syncCursor();
   };
 
   const handleMouseMove = (e: MouseEvent) => {
     const rect = element.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    callbacks.onHover(mouseX, mouseY);
+    const containerX = e.clientX - rect.left;
+    const containerY = e.clientY - rect.top;
+    callbacks.onHover({ x: containerX, y: containerY } satisfies ContainerPoint);
 
-    const move = panPointer.move(e.clientX, e.clientY);
+    const move = panPointer.move({ x: e.clientX, y: e.clientY } satisfies ClientPoint);
     if (move.type === 'pan') {
-      callbacks.onPan(move.dx, move.dy);
+      callbacks.onPan(move.delta);
     }
     if (move.type === 'entered_pan') {
       syncCursor();
     }
   };
 
-  const finishInteraction = (mouseX?: number, mouseY?: number) => {
-    if (panPointer.isAwaitingClick() && mouseX !== undefined && mouseY !== undefined) {
-      callbacks.onClick(mouseX, mouseY);
+  const finishInteraction = (containerPoint?: ContainerPoint) => {
+    if (panPointer.isAwaitingClick() && containerPoint !== undefined) {
+      callbacks.onClick(containerPoint);
     }
     panPointer.endDrag();
     syncCursor();
@@ -151,7 +155,10 @@ export function bindPointerInteraction(
 
   const handleMouseUp = (e: MouseEvent) => {
     const rect = element.getBoundingClientRect();
-    finishInteraction(e.clientX - rect.left, e.clientY - rect.top);
+    finishInteraction({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    } satisfies ContainerPoint);
   };
 
   const handleMouseLeave = () => {

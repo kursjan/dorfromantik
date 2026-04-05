@@ -1,13 +1,14 @@
+import type { ContainerDelta, ContainerPoint } from '../../common/ContainerPoint';
 import {
   PointerPanZoomSession,
   bindPointerInteraction,
 } from '../../common/camera/cameraInteraction';
 
 export interface InputCallbacks {
-  onPan: (dx: number, dy: number) => void;
+  onPan: (delta: ContainerDelta) => void;
   onZoom: (delta: number) => void;
-  onHover: (x: number, y: number) => void;
-  onClick: (x: number, y: number) => void;
+  onHover: (point: ContainerPoint) => void;
+  onClick: (point: ContainerPoint) => void;
   onRotateClockwise: () => void;
   onRotateCounterClockwise: () => void;
   onLeave: () => void;

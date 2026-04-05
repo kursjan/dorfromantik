@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Board, type BoardTile } from '../../../models/Board';
 import { radians } from '../../../utils/Angle';
+import type { ContainerPoint } from '../../common/ContainerPoint';
 import type { CameraSnapshot } from '../cameraSnapshot';
 import { SvgBoard } from './SvgBoard';
 import { HexCoordinate } from '../../../models/HexCoordinate';
@@ -179,9 +180,13 @@ const flowerBoard = boardFromTiles(flowerTiles);
 const scatteredBoard = boardFromTiles(scatteredTiles);
 
 /** Story viewport pivot (half of typical fullscreen); interactive stories measure their container. */
-const defaultViewCenter = { x: 960, y: 540 };
+const defaultViewCenter: ContainerPoint = { x: 960, y: 540 };
 
-const defaultCamera: CameraSnapshot = { x: 400, y: 300, zoom: 1, rotation: radians(0) };
+const defaultCamera: CameraSnapshot = {
+  position: { x: 400, y: 300 },
+  zoom: 1,
+  rotation: radians(0),
+};
 
 // --- Stories ---
 
@@ -215,8 +220,7 @@ const InteractiveBoard = () => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [viewCenter, setViewCenter] = useState(defaultViewCenter);
   const [camera, setCamera] = useState<CameraSnapshot>({
-    x: 400,
-    y: 300,
+    position: { x: 400, y: 300 },
     zoom: 1,
     rotation: radians(0),
   });
@@ -248,8 +252,10 @@ const InteractiveBoard = () => {
 
     setCamera((prev) => ({
       ...prev,
-      x: prev.x + dx,
-      y: prev.y + dy,
+      position: {
+        x: prev.position.x + dx,
+        y: prev.position.y + dy,
+      },
     }));
 
     lastMouse.current = { x: e.clientX, y: e.clientY };
@@ -272,12 +278,16 @@ const InteractiveBoard = () => {
     setCamera((prev) => {
       const newZoom = Math.max(0.2, Math.min(prev.zoom * zoomDelta, 3));
 
-      // Adjust x and y so the point under the mouse stays in the same place
+      // Adjust position so the point under the mouse stays in the same place
       const scaleChange = newZoom / prev.zoom;
-      const newX = mouseX - (mouseX - prev.x) * scaleChange;
-      const newY = mouseY - (mouseY - prev.y) * scaleChange;
+      const newX = mouseX - (mouseX - prev.position.x) * scaleChange;
+      const newY = mouseY - (mouseY - prev.position.y) * scaleChange;
 
-      return { ...prev, x: newX, y: newY, zoom: newZoom };
+      return {
+        ...prev,
+        position: { x: newX, y: newY },
+        zoom: newZoom,
+      };
     });
   };
 
@@ -310,7 +320,7 @@ const InteractiveBoard = () => {
         <p style={{ margin: 0, fontWeight: 'bold' }}>Interactive Camera</p>
         <p style={{ margin: '4px 0 0 0', fontSize: 12 }}>Drag to pan, scroll to zoom.</p>
         <p style={{ margin: '4px 0 0 0', fontSize: 12, fontFamily: 'monospace' }}>
-          x: {Math.round(camera.x)}, y: {Math.round(camera.y)}, zoom: {camera.zoom.toFixed(2)}x
+          {`x: ${Math.round(camera.position.x)}, y: ${Math.round(camera.position.y)}, zoom: ${camera.zoom.toFixed(2)}x`}
         </p>
       </div>
     </div>
@@ -354,7 +364,11 @@ const PerspectiveRotationBoard = () => {
     return () => ro.disconnect();
   }, []);
 
-  const boardCamera: CameraSnapshot = { x: 400, y: 300, zoom: 1, rotation: radians(0) };
+  const boardCamera: CameraSnapshot = {
+    position: { x: 400, y: 300 },
+    zoom: 1,
+    rotation: radians(0),
+  };
 
   return (
     <div

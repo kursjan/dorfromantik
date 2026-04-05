@@ -1,78 +1,48 @@
 import { type Radians, radians } from '../../../utils/Angle';
+import type { ContainerDelta, ContainerPoint } from '../ContainerPoint';
+import type { WorldPoint } from '../WorldPoint';
 
 export interface CameraConfig {
-  x?: number;
-  y?: number;
+  position?: WorldPoint;
   zoom?: number;
   rotation?: Radians;
 }
 
-/**
- * Manages the 2D view transformation (Pan, Zoom, & Rotation).
- *
- * Coordinate Spaces:
- * 1. Screen Space: Pixels, Origin top-left.
- * 2. World Space: Logical units, Origin (0,0) is the center of the world.
- *
- * Transform Chain:
- * Screen = ScreenCenter + Rotate((WorldPosition + CameraOffset) * Zoom)
- */
 export class Camera {
-  x: number = 0;
-  y: number = 0;
-  zoom: number = 1;
-  rotation: Radians = radians(0);
+  private readonly defaultPan: WorldPoint = { x: 0, y: 0 } satisfies WorldPoint;
+  private readonly defaultZoom: number = 1;
+  private readonly defaultRotation: Radians = radians(0);
 
-  // Default values
-  private readonly defaultX: number;
-  private readonly defaultY: number;
-  private readonly defaultZoom: number;
-  private readonly defaultRotation: Radians;
+  /** World-space pan offset (layout plane; SVG path mirrors these as `CameraSnapshot.position`). */
+  private worldPan: WorldPoint = this.defaultPan;
+  zoom: number = this.defaultZoom;
+  rotation: Radians = this.defaultRotation;
 
   constructor(config: CameraConfig = {}) {
-    this.x = config.x ?? 0;
-    this.y = config.y ?? 0;
-    this.zoom = config.zoom ?? 1;
-    this.rotation = config.rotation ?? radians(0);
+    this.worldPan = config.position ?? this.defaultPan;
+    this.zoom = config.zoom ?? this.defaultZoom;
+    this.rotation = config.rotation ?? this.defaultRotation;
+  }
 
-    // Store defaults for reset
-    this.defaultX = this.x;
-    this.defaultY = this.y;
-    this.defaultZoom = this.zoom;
-    this.defaultRotation = this.rotation;
+  get pan(): WorldPoint {
+    return this.worldPan;
   }
 
   /**
-   * Applies the current camera transform to the canvas context.
-   * Logic:
-   * 1. Move origin to center of canvas.
-   * 2. Rotate.
-   * 3. Scale world by zoom level.
-   * 4. Move world by camera position (panning).
+   * Unproject a container-local pixel to world space. `containerWidth` / `containerHeight` must match
+   * the same element as `point` (e.g. canvas `width`/`height` or host `getBoundingClientRect()`).
    */
-  applyTransform(ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number) {
-    ctx.translate(canvasWidth / 2, canvasHeight / 2);
-    ctx.rotate(this.rotation);
-    ctx.scale(this.zoom, this.zoom);
-    ctx.translate(this.x, this.y);
-  }
-
-  /**
-   * Converts a screen pixel coordinate (e.g. mouse event) to World Space.
-   * Inverts the transformation chain of applyTransform.
-   */
-  screenToWorld(
-    screenX: number,
-    screenY: number,
-    canvasWidth: number,
-    canvasHeight: number
-  ): { x: number; y: number } {
-    const centerX = canvasWidth / 2;
-    const centerY = canvasHeight / 2;
+  containerToWorld(
+    point: ContainerPoint,
+    containerWidth: number,
+    containerHeight: number
+  ): WorldPoint {
+    const centerX = containerWidth / 2;
+    const centerY = containerHeight / 2;
 
     // 1. Translate relative to center
-    const relX = screenX - centerX;
-    const relY = screenY - centerY;
+    const relX = point.x - centerX;
+    const relY = point.y - centerY;
 
     // 2. Inverse Rotate: Rotate by -rotation
     // x' = x cos(-θ) - y sin(-θ)
@@ -87,57 +57,42 @@ export class Camera {
     const scaledY = rotY / this.zoom;
 
     // 4. Inverse Translate
-    const worldX = scaledX - this.x;
-    const worldY = scaledY - this.y;
+    const worldX = scaledX - this.worldPan.x;
+    const worldY = scaledY - this.worldPan.y;
 
-    return { x: worldX, y: worldY };
+    return { x: worldX, y: worldY } satisfies WorldPoint;
   }
 
   /**
-   * Pans the camera by the given delta in screen pixels.
-   * We must rotate the delta vector to match the world orientation,
-   * then divide by zoom.
+   * Adds a container-pixel drag step ({@link ContainerDelta}) to `pan`.
+   * Rotates the delta to match world axes, then divides by zoom.
    */
-  pan(dx: number, dy: number) {
+  panBy(delta: ContainerDelta) {
     // We want the drag to feel like "grabbing the world".
     // If the camera is rotated 90 deg, dragging "Up" on screen should move world "Up" relative to screen.
-    // Screen Delta (dx, dy) is in Screen Space.
-    // We need to apply the INVERSE rotation to the delta vector to align it with World Axes.
-
+    // We apply the INVERSE rotation to the delta vector to align it with world axes.
     const cos = Math.cos(-this.rotation);
     const sin = Math.sin(-this.rotation);
 
-    // Rotate the delta vector
-    const rotDx = dx * cos - dy * sin;
-    const rotDy = dx * sin + dy * cos;
+    const rotDx = delta.x * cos - delta.y * sin;
+    const rotDy = delta.x * sin + delta.y * cos;
 
-    // Apply to camera position (divided by zoom)
-    this.x += rotDx / this.zoom;
-    this.y += rotDy / this.zoom;
+    const nextX = this.worldPan.x + rotDx / this.zoom;
+    const nextY = this.worldPan.y + rotDy / this.zoom;
+    this.worldPan = { x: nextX, y: nextY };
   }
 
-  /**
-   * Zooms the camera, clamping to min/max values.
-   * Currently performs a center-screen zoom.
-   */
   zoomBy(delta: number, min: number, max: number) {
     const newZoom = this.zoom + delta;
     this.zoom = Math.max(min, Math.min(max, newZoom));
   }
 
-  /**
-   * Rotates the camera.
-   */
   rotateBy(deltaRadians: Radians) {
     this.rotation = radians(this.rotation + deltaRadians);
   }
 
-  /**
-   * Resets the camera to its initial state.
-   */
   reset() {
-    this.x = this.defaultX;
-    this.y = this.defaultY;
+    this.worldPan = { x: this.defaultPan.x, y: this.defaultPan.y };
     this.zoom = this.defaultZoom;
     this.rotation = this.defaultRotation;
   }

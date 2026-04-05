@@ -1,3 +1,4 @@
+import type { WorldPoint } from '../../common/WorldPoint';
 import { hexToPixel as hexToPixelWithSize } from '../../common/hex/HexUtils';
 import { HexCoordinate } from '../../../models/HexCoordinate';
 import { directions } from '../../../models/Navigation';
@@ -11,7 +12,7 @@ const SVG_CENTER_RAIL_HEX_RADIUS = SVG_HEX_RADIUS * 0.15;
  * Converts a logical HexCoordinate to SVG user-space (x, y) using the same flat-top mapping as
  * `rendering/common/hex/HexUtils.hexToPixel` with {@link SVG_HEX_RADIUS} as hex size.
  */
-export function hexToPixel(hex: HexCoordinate): { x: number; y: number } {
+export function hexToPixel(hex: HexCoordinate): WorldPoint {
   return hexToPixelWithSize(hex, SVG_HEX_RADIUS);
 }
 

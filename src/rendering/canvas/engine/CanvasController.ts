@@ -1,10 +1,12 @@
 import { applyWheelDeltaYToCamera } from '../../common/camera/cameraInteraction';
 import { Camera } from '../../common/camera/Camera';
+import { applyCameraTransformToCanvas } from '../applyCameraTransform';
 import { InputManager } from './InputManager';
 import { HexRenderer } from '../graphics/HexRenderer';
 import { TileRenderer } from '../graphics/TileRenderer';
 import { BackgroundRenderer } from '../graphics/BackgroundRenderer';
 import { HexCoordinate } from '../../../models/HexCoordinate';
+import type { ContainerDelta, ContainerPoint } from '../../common/ContainerPoint';
 import { closestHexByWorldDistance } from '../../common/hex/HexUtils';
 import {
   HEX_SIZE,
@@ -15,6 +17,7 @@ import {
 } from '../graphics/HexStyles';
 import { Game } from '../../../models/Game';
 import { type Radians, radians } from '../../../utils/Angle';
+import { WORLD_ORIGIN } from '../../common/WorldPoint';
 
 export interface DebugStats {
   fps: number;
@@ -62,16 +65,16 @@ export class CanvasController {
     this.setGameSnapshot = options.setGameSnapshot;
     this.ctx = this.getRequired2dContext(canvas);
 
-    this.camera = new Camera({ x: 0, y: 0, zoom: 1 });
+    this.camera = new Camera({ position: WORLD_ORIGIN, zoom: 1 });
     this.backgroundRenderer = new BackgroundRenderer(this.ctx);
     this.hexRenderer = new HexRenderer(this.ctx);
     this.tileRenderer = new TileRenderer(this.ctx);
     this.inputManager = new InputManager(canvas, {
-      onPan: (dx, dy) => this.handlePan(dx, dy),
+      onPan: (delta) => this.handlePan(delta),
       onZoom: (delta) => this.handleZoom(delta),
-      onHover: (x, y) => this.handleHover(x, y),
+      onHover: (point) => this.handleHover(point),
       onLeave: () => this.handleLeave(),
-      onClick: () => this.handleMouseClick(),
+      onClick: (_point) => this.handleMouseClick(),
       onRotateClockwise: () => this.handleRotateClockwise(),
       onRotateCounterClockwise: () => this.handleRotateCounterClockwise(),
       onResize: () => this.handleResize(),
@@ -144,7 +147,7 @@ export class CanvasController {
 
     // 2. Camera Transform
     this.ctx.save();
-    this.camera.applyTransform(this.ctx, this.canvas.width, this.canvas.height);
+    applyCameraTransformToCanvas(this.camera, this.ctx, this.canvas.width, this.canvas.height);
 
     // 3. Draw World
     this.hexRenderer.drawDebugGrid(5);
@@ -187,8 +190,8 @@ export class CanvasController {
     this.debugState.snapshot = {
       fps: Math.round(this.debugState.fps),
       camera: {
-        x: this.camera.x,
-        y: this.camera.y,
+        x: this.camera.pan.x,
+        y: this.camera.pan.y,
         zoom: this.camera.zoom,
         rotation: this.camera.rotation,
       },
@@ -200,21 +203,16 @@ export class CanvasController {
 
   // --- Input Handlers ---
 
-  private handlePan(dx: number, dy: number) {
-    this.camera.pan(dx, dy);
+  private handlePan(delta: ContainerDelta) {
+    this.camera.panBy(delta);
   }
 
   private handleZoom(delta: number) {
     applyWheelDeltaYToCamera(this.camera, delta);
   }
 
-  private handleHover(mouseX: number, mouseY: number) {
-    const worldPos = this.camera.screenToWorld(
-      mouseX,
-      mouseY,
-      this.canvas.width,
-      this.canvas.height
-    );
+  private handleHover(point: ContainerPoint) {
+    const worldPos = this.camera.containerToWorld(point, this.canvas.width, this.canvas.height);
 
     const validCoords = this.getGameSnapshot().hints.validPlacements;
 
@@ -223,7 +221,7 @@ export class CanvasController {
       return;
     }
 
-    this.hoveredHex = closestHexByWorldDistance(validCoords, worldPos.x, worldPos.y, HEX_SIZE);
+    this.hoveredHex = closestHexByWorldDistance(validCoords, worldPos, HEX_SIZE);
   }
 
   private handleLeave() {
