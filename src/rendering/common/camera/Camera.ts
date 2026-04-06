@@ -1,30 +1,26 @@
 import { type Radians, radians } from '../../../utils/Angle';
 import type { ContainerDelta, ContainerPoint } from '../ContainerPoint';
 import { WorldPoint } from '../WorldPoint';
+import { DEFAULT_CAMERA_SNAPSHOT, type CameraSnapshot } from './CameraSnapshot';
 
-export interface CameraConfig {
-  position?: WorldPoint;
-  zoom?: number;
-  rotation?: Radians;
-}
-
+/** View math over a mutable {@link CameraSnapshot} (constructor clones input; {@link reset} restores {@link DEFAULT_CAMERA_SNAPSHOT}). */
 export class Camera {
-  private readonly defaultPan: WorldPoint = WorldPoint.xy(0, 0);
-  private readonly defaultZoom: number = 1;
-  private readonly defaultRotation: Radians = radians(0);
+  private snapshot: CameraSnapshot;
 
-  private worldPan: WorldPoint = this.defaultPan;
-  zoom: number = this.defaultZoom;
-  rotation: Radians = this.defaultRotation;
-
-  constructor(config: CameraConfig = {}) {
-    this.worldPan = config.position ?? this.defaultPan;
-    this.zoom = config.zoom ?? this.defaultZoom;
-    this.rotation = config.rotation ?? this.defaultRotation;
+  constructor(snapshot: CameraSnapshot) {
+    this.snapshot = { ...snapshot } satisfies CameraSnapshot;
   }
 
   get pan(): WorldPoint {
-    return this.worldPan;
+    return this.snapshot.position;
+  }
+
+  get zoom(): number {
+    return this.snapshot.zoom;
+  }
+
+  get rotation(): Radians {
+    return this.snapshot.rotation;
   }
 
   containerToWorld(
@@ -38,44 +34,42 @@ export class Camera {
     const relX = point.x - centerX;
     const relY = point.y - centerY;
 
-    const cos = Math.cos(-this.rotation);
-    const sin = Math.sin(-this.rotation);
+    const cos = Math.cos(-this.snapshot.rotation);
+    const sin = Math.sin(-this.snapshot.rotation);
     const rotX = relX * cos - relY * sin;
     const rotY = relX * sin + relY * cos;
 
-    const scaledX = rotX / this.zoom;
-    const scaledY = rotY / this.zoom;
+    const scaledX = rotX / this.snapshot.zoom;
+    const scaledY = rotY / this.snapshot.zoom;
 
-    const worldX = scaledX - this.worldPan.x;
-    const worldY = scaledY - this.worldPan.y;
+    const worldX = scaledX - this.snapshot.position.x;
+    const worldY = scaledY - this.snapshot.position.y;
 
     return WorldPoint.xy(worldX, worldY);
   }
 
   panBy(delta: ContainerDelta) {
-    const cos = Math.cos(-this.rotation);
-    const sin = Math.sin(-this.rotation);
+    const cos = Math.cos(-this.snapshot.rotation);
+    const sin = Math.sin(-this.snapshot.rotation);
 
     const rotDx = delta.x * cos - delta.y * sin;
     const rotDy = delta.x * sin + delta.y * cos;
 
-    const nextX = this.worldPan.x + rotDx / this.zoom;
-    const nextY = this.worldPan.y + rotDy / this.zoom;
-    this.worldPan = WorldPoint.xy(nextX, nextY);
+    const nextX = this.snapshot.position.x + rotDx / this.snapshot.zoom;
+    const nextY = this.snapshot.position.y + rotDy / this.snapshot.zoom;
+    this.snapshot.position = WorldPoint.xy(nextX, nextY);
   }
 
   zoomBy(delta: number, min: number, max: number) {
-    const newZoom = this.zoom + delta;
-    this.zoom = Math.max(min, Math.min(max, newZoom));
+    const newZoom = this.snapshot.zoom + delta;
+    this.snapshot.zoom = Math.max(min, Math.min(max, newZoom));
   }
 
   rotateBy(deltaRadians: Radians) {
-    this.rotation = radians(this.rotation + deltaRadians);
+    this.snapshot.rotation = radians(this.snapshot.rotation + deltaRadians);
   }
 
   reset() {
-    this.worldPan = WorldPoint.xy(this.defaultPan.x, this.defaultPan.y);
-    this.zoom = this.defaultZoom;
-    this.rotation = this.defaultRotation;
+    this.snapshot = DEFAULT_CAMERA_SNAPSHOT;
   }
 }

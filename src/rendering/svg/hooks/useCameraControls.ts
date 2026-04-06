@@ -1,10 +1,9 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
-import { radians } from '../../../utils/Angle';
 import { Camera } from '../../common/camera/Camera';
 import type { ContainerDelta, ContainerPoint } from '../../common/ContainerPoint';
 import { WORLD_ORIGIN, WorldPoint } from '../../common/WorldPoint';
-import type { CameraSnapshot } from '../../common/camera/CameraSnapshot';
+import { DEFAULT_CAMERA_SNAPSHOT, type CameraSnapshot } from '../../common/camera/CameraSnapshot';
 import {
   PointerPanZoomSession,
   applyWheelDeltaYToCamera,
@@ -30,13 +29,9 @@ export function useCameraControls(
   resetCamera: () => void;
   containerToWorld: ContainerToWorldFn;
 } {
-  const cameraRef = useRef(new Camera());
+  const cameraRef = useRef(new Camera(DEFAULT_CAMERA_SNAPSHOT));
   const panPointerRef = useRef(new PointerPanZoomSession());
-  const [camera, setCamera] = useState<CameraSnapshot>({
-    position: WORLD_ORIGIN,
-    zoom: 1,
-    rotation: radians(0),
-  } satisfies CameraSnapshot);
+  const [camera, setCamera] = useState<CameraSnapshot>({ ...DEFAULT_CAMERA_SNAPSHOT });
 
   // Store callbacks in a ref to avoid re-binding listeners on every render
   const callbacksRef = useRef(callbacks);

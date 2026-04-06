@@ -1,14 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ClientDelta } from '../ClientPoint';
 import { ContainerDelta, ContainerPoint } from '../ContainerPoint';
-import { WORLD_ORIGIN } from '../WorldPoint';
 import { Camera } from './Camera';
+import { DEFAULT_CAMERA_SNAPSHOT } from './CameraSnapshot';
 
 describe('Camera', () => {
   let camera: Camera;
 
   beforeEach(() => {
-    camera = new Camera({ position: WORLD_ORIGIN, zoom: 1 });
+    camera = new Camera(DEFAULT_CAMERA_SNAPSHOT);
   });
 
   it('initializes with default values', () => {

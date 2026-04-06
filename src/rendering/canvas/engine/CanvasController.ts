@@ -17,7 +17,7 @@ import {
 } from '../graphics/HexStyles';
 import { Game } from '../../../models/Game';
 import { radians } from '../../../utils/Angle';
-import { WORLD_ORIGIN } from '../../common/WorldPoint';
+import { DEFAULT_CAMERA_SNAPSHOT } from '../../common/camera/CameraSnapshot';
 
 export interface DebugStats {
   fps: number;
@@ -65,7 +65,7 @@ export class CanvasController {
     this.setGameSnapshot = options.setGameSnapshot;
     this.ctx = this.getRequired2dContext(canvas);
 
-    this.camera = new Camera({ position: WORLD_ORIGIN, zoom: 1 });
+    this.camera = new Camera(DEFAULT_CAMERA_SNAPSHOT);
     this.backgroundRenderer = new BackgroundRenderer(this.ctx);
     this.hexRenderer = new HexRenderer(this.ctx);
     this.tileRenderer = new TileRenderer(this.ctx);
@@ -287,7 +287,7 @@ export class CanvasController {
       listeners: new Set<() => void>(),
       snapshot: {
         fps: 0,
-        camera: { position: WORLD_ORIGIN, zoom: 1, rotation: radians(0) },
+        camera: DEFAULT_CAMERA_SNAPSHOT,
         hoveredHex: null,
       },
     };

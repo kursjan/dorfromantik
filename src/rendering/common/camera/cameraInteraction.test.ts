@@ -1,11 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ClientDelta, ClientPoint } from '../ClientPoint';
 import { Camera } from './Camera';
+import { DEFAULT_CAMERA_SNAPSHOT } from './CameraSnapshot';
 import { PointerPanZoomSession, applyWheelDeltaYToCamera } from './cameraInteraction';
 
 describe('applyWheelDeltaYToCamera', () => {
   it('applies wheel delta via zoomBy with shared limits', () => {
-    const camera = new Camera();
+    const camera = new Camera(DEFAULT_CAMERA_SNAPSHOT);
     const zoomBy = vi.spyOn(camera, 'zoomBy');
 
     applyWheelDeltaYToCamera(camera, 100);

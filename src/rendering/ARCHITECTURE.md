@@ -22,10 +22,11 @@ Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** 
 
 ## `Camera` (`common/camera/Camera.ts`)
 
-- **`pan`** (getter): world-space **pan** offset (`WorldPoint`). **`useCameraControls`** copies these values into React-facing **`CameraSnapshot.position`** for **`SvgBoard`**.
+- **Construction:** **`new Camera(snapshot)`** clones an initial **`CameraSnapshot`** (typically **`DEFAULT_CAMERA_SNAPSHOT`**). Internal state stays a single mutable snapshot object.
+- **`pan`**, **`zoom`**, **`rotation`** (getters): read through from that snapshot (**`pan`** is **`snapshot.position`**).
 - **`containerToWorld(point, containerWidth, containerHeight)`**: inverse of the canvas/SVG camera transform — **container-local** pixel → **`WorldPoint`**.
 - **`panBy(delta: ContainerDelta)`**: drag step in container/client pixel axes, rotated/scaled into world pan.
-- **`zoomBy`**, **`rotateBy`**, **`reset`**: zoom limits, rotation, restore constructor defaults.
+- **`zoomBy`**, **`rotateBy`**, **`reset`**: zoom limits, rotation, **`reset`** restores **`DEFAULT_CAMERA_SNAPSHOT`** (cloned).
 
 ## Pointer wiring (`common/camera/cameraInteraction.ts`)
 
@@ -33,7 +34,7 @@ Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** 
 
 ## `CameraSnapshot` (`common/camera/CameraSnapshot.ts`)
 
-**`CameraSnapshot`**: `{ position: WorldPoint; zoom; rotation }` — shared immutable pose for **`SvgBoard`** (via **`useCameraControls`**) and canvas **`DebugStats.camera`**. **`position`** matches **`Camera.pan`**.
+**`CameraSnapshot`**: `{ position: WorldPoint; zoom; rotation }` — shared pose type for **`SvgBoard`** (via **`useCameraControls`**), canvas **`DebugStats.camera`**, and **`Camera`**. **`DEFAULT_CAMERA_SNAPSHOT`** is the app-wide default (matches **`WORLD_ORIGIN`** pan). **`position`** matches **`Camera.pan`**.
 
 ## Hooks (SVG)
 
