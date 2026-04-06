@@ -11,9 +11,6 @@ import {
   bindPointerInteraction,
 } from '../../common/camera/cameraInteraction';
 
-/**
- * Unproject a **container-local** pointer position ({@link ContainerPoint}) to {@link WorldPoint}.
- */
 export type ContainerToWorldFn = (point: ContainerPoint) => WorldPoint;
 
 export interface UseCameraControlsCallbacks {
