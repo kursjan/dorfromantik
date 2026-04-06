@@ -22,7 +22,7 @@ describe('useCameraControls', () => {
 
     const { result } = renderHook(() => useCameraControls(ref, stubCallbacks));
 
-    expect(result.current.transform.zoom).toBe(1);
+    expect(result.current.camera.zoom).toBe(1);
 
     act(() => {
       container.dispatchEvent(
@@ -31,7 +31,7 @@ describe('useCameraControls', () => {
     });
 
     await waitFor(() => {
-      expect(result.current.transform.zoom).toBeCloseTo(0.9, 5);
+      expect(result.current.camera.zoom).toBeCloseTo(0.9, 5);
     });
   });
 
@@ -55,8 +55,8 @@ describe('useCameraControls', () => {
     });
 
     await waitFor(() => {
-      expect(result.current.transform.position.x).toBeCloseTo(10, 5);
-      expect(result.current.transform.position.y).toBe(0);
+      expect(result.current.camera.position.x).toBeCloseTo(10, 5);
+      expect(result.current.camera.position.y).toBe(0);
     });
   });
 
@@ -74,15 +74,15 @@ describe('useCameraControls', () => {
     });
 
     await waitFor(() => {
-      expect(result.current.transform.zoom).toBeGreaterThan(1);
+      expect(result.current.camera.zoom).toBeGreaterThan(1);
     });
 
     act(() => {
       result.current.resetCamera();
     });
 
-    expect(result.current.transform.zoom).toBe(1);
-    expect(result.current.transform.position.x).toBe(0);
-    expect(result.current.transform.position.y).toBe(0);
+    expect(result.current.camera.zoom).toBe(1);
+    expect(result.current.camera.position.x).toBe(0);
+    expect(result.current.camera.position.y).toBe(0);
   });
 });

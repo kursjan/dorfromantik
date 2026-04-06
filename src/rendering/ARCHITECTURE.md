@@ -37,7 +37,7 @@ Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** 
 
 ## Hooks (SVG)
 
-- **`useCameraControls`**: owns a **`Camera`** instance, returns **`transform`**, **`resetCamera`**, and **`containerToWorld`** (`ContainerToWorldFn`: `ContainerPoint` → `WorldPoint`).
+- **`useCameraControls`**: owns a **`Camera`** instance, returns **`camera`** (**`CameraSnapshot`**), **`resetCamera`**, and **`containerToWorld`** (`ContainerToWorldFn`: `ContainerPoint` → `WorldPoint`). **`SvgGameView`** passes that snapshot straight into **`SvgBoard`** as the **`camera`** prop.
 - **`useSvgBoardInteraction`**: game actions from pointer; holds **`containerToWorldRef`** so hover can map **`ContainerPoint`** → world before **`closestHexByWorldDistance`**.
 
 ## Debug stats (canvas)

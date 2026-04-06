@@ -26,13 +26,13 @@ export function useCameraControls(
   containerRef: RefObject<HTMLElement | null>,
   callbacks: UseCameraControlsCallbacks
 ): {
-  transform: CameraSnapshot;
+  camera: CameraSnapshot;
   resetCamera: () => void;
   containerToWorld: ContainerToWorldFn;
 } {
   const cameraRef = useRef(new Camera());
   const panPointerRef = useRef(new PointerPanZoomSession());
-  const [transform, setTransform] = useState<CameraSnapshot>({
+  const [camera, setCamera] = useState<CameraSnapshot>({
     position: WORLD_ORIGIN,
     zoom: 1,
     rotation: radians(0),
@@ -45,7 +45,7 @@ export function useCameraControls(
   }, [callbacks]);
 
   const sync = useCallback(() => {
-    setTransform(readTransform(cameraRef.current));
+    setCamera(readCameraSnapshot(cameraRef.current));
   }, []);
 
   useLayoutEffect(() => {
@@ -53,15 +53,15 @@ export function useCameraControls(
     if (!container) return;
 
     const panPointer = panPointerRef.current;
-    const camera = cameraRef.current;
+    const cameraModel = cameraRef.current;
 
     const pointerCallbacks = {
       onPan: (delta: ContainerDelta) => {
-        camera.panBy(delta);
+        cameraModel.panBy(delta);
         sync();
       },
       onZoom: (deltaY) => {
-        applyWheelDeltaYToCamera(camera, deltaY);
+        applyWheelDeltaYToCamera(cameraModel, deltaY);
         sync();
       },
       onHover: (point) => callbacksRef.current.onHover(point),
@@ -91,12 +91,12 @@ export function useCameraControls(
     [containerRef]
   ) satisfies ContainerToWorldFn;
 
-  return { transform, resetCamera, containerToWorld };
+  return { camera, resetCamera, containerToWorld };
 }
 
-function readTransform(camera: Camera): CameraSnapshot {
+function readCameraSnapshot(camera: Camera): CameraSnapshot {
   return {
-    position: WorldPoint.xy(camera.pan.x, camera.pan.y),
+    position: camera.pan,
     zoom: camera.zoom,
     rotation: camera.rotation,
   } satisfies CameraSnapshot;

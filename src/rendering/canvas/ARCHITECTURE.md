@@ -81,7 +81,7 @@ The central hub. It:
 
 Manages the view transform (shared with the SVG board path).
 
-- **Pan:** **`pan`** getter — world-space offset (**`WorldPoint`**); same values as SVG **`CameraSnapshot.position`** (see **`useCameraControls`** → **`readTransform`**).
+- **Pan:** **`pan`** getter — world-space offset (**`WorldPoint`**); same values as SVG **`CameraSnapshot.position`** (see **`useCameraControls`** → **`readCameraSnapshot`**).
 - **Zoom / rotation:** scalars; **`zoomBy`**, **`rotateBy`**, **`reset`** match config defaults.
 - **Canvas draw path:** **`CanvasController`** applies center translate → rotate → scale → **`camera.pan`** translate on the `Context2D` (matches SVG **`SvgBoard`** transform order).
 - **Methods:** **`containerToWorld(point, w, h)`**, **`panBy(ContainerDelta)`**, **`zoomBy`**, **`rotateBy`**, **`reset`**.
