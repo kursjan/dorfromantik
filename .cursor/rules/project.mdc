@@ -73,4 +73,5 @@ alwaysApply: true
 - Assume a Vite + React + Firebase project with Node 20+.
 - Respect per-worktree `.env` configuration (e.g. `PORT=5174` for this worker).
 - Do not introduce new global tools or services without first confirming with the user.
+- TypeScript: Prefer `satisfies` for object validation and "Branding" (e.g., `__brand`) for nominal typing of domain primitives (like coordinates).
 

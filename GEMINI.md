@@ -201,6 +201,7 @@ The AI is empowered to modify the React codebase and manage its dependencies aut
   - Effective use of functional components and hooks.
   - Appropriate state management solutions (e.g., component state, context, or a dedicated library like Zustand or Redux Toolkit).
   - Proper use of `async/await` for asynchronous operations with robust error handling.
+  - TypeScript: Prefer `satisfies` for complex object validation and "Branding" for nominal typing (e.g., coordinates, IDs).
 
 ## **Automated Error Detection & Remediation**
 
