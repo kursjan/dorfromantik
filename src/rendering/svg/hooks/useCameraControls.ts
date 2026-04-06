@@ -9,6 +9,7 @@ import {
   PointerPanZoomSession,
   applyWheelDeltaYToCamera,
   bindPointerInteraction,
+  type PointerInteractionCallbacks,
 } from '../../common/camera/cameraInteraction';
 
 export type ContainerToWorldFn = (point: ContainerPoint) => WorldPoint;
@@ -54,25 +55,23 @@ export function useCameraControls(
     const panPointer = panPointerRef.current;
     const camera = cameraRef.current;
 
-    const cleanup = bindPointerInteraction(
-      container,
-      {
-        onPan: (delta: ContainerDelta) => {
-          camera.panBy(delta);
-          sync();
-        },
-        onZoom: (deltaY) => {
-          applyWheelDeltaYToCamera(camera, deltaY);
-          sync();
-        },
-        onHover: (point) => callbacksRef.current.onHover(point),
-        onClick: (point) => callbacksRef.current.onClick(point),
-        onRotateClockwise: () => callbacksRef.current.onRotateClockwise(),
-        onRotateCounterClockwise: () => callbacksRef.current.onRotateCounterClockwise(),
-        onLeave: () => callbacksRef.current.onLeave(),
+    const pointerCallbacks = {
+      onPan: (delta: ContainerDelta) => {
+        camera.panBy(delta);
+        sync();
       },
-      panPointer
-    );
+      onZoom: (deltaY) => {
+        applyWheelDeltaYToCamera(camera, deltaY);
+        sync();
+      },
+      onHover: (point) => callbacksRef.current.onHover(point),
+      onClick: (point) => callbacksRef.current.onClick(point),
+      onRotateClockwise: () => callbacksRef.current.onRotateClockwise(),
+      onRotateCounterClockwise: () => callbacksRef.current.onRotateCounterClockwise(),
+      onLeave: () => callbacksRef.current.onLeave(),
+    } satisfies PointerInteractionCallbacks;
+
+    const cleanup = bindPointerInteraction(container, pointerCallbacks, panPointer);
 
     return cleanup;
   }, [containerRef, sync]);

@@ -2,6 +2,7 @@ import type { ContainerDelta, ContainerPoint } from '../../common/ContainerPoint
 import {
   PointerPanZoomSession,
   bindPointerInteraction,
+  type PointerInteractionCallbacks,
 } from '../../common/camera/cameraInteraction';
 
 export interface InputCallbacks {
@@ -43,7 +44,8 @@ export class InputManager {
   }
 
   private attachListeners() {
-    this.cleanupPointer = bindPointerInteraction(this.canvas, this.callbacks, this.panPointer);
+    const pointerCallbacks = this.callbacks satisfies PointerInteractionCallbacks;
+    this.cleanupPointer = bindPointerInteraction(this.canvas, pointerCallbacks, this.panPointer);
 
     // Add resize listener to window to handle layout changes
     window.addEventListener('resize', this.handleResize);

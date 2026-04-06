@@ -79,7 +79,7 @@ export class PointerPanZoomSession {
   }
 }
 
-interface PointerInteractionCallbacks {
+export interface PointerInteractionCallbacks {
   onPan: (delta: ContainerDelta) => void;
   onZoom: (zoomDelta: number) => void;
   onHover: (point: ContainerPoint) => void;
