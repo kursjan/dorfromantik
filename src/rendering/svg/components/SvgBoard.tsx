@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Board } from '../../../models/Board';
 import { radiansToDegrees } from '../../../utils/Angle';
 import type { ContainerPoint } from '../../common/ContainerPoint';
@@ -19,29 +19,6 @@ export interface SvgBoardProps {
 }
 
 export const SvgBoard: React.FC<SvgBoardProps> = ({ board, camera, viewCenter }) => {
-  useEffect(() => {
-    if (import.meta.env.DEV) {
-      console.table([
-        {
-          label: 'effect',
-          viewCenterX: viewCenter.x,
-          viewCenterY: viewCenter.y,
-          positionX: camera.position.x,
-          positionY: camera.position.y,
-          zoom: camera.zoom,
-          rotationDeg: radiansToDegrees(camera.rotation),
-        },
-      ]);
-    }
-  }, [
-    viewCenter.x,
-    viewCenter.y,
-    camera.position.x,
-    camera.position.y,
-    camera.zoom,
-    camera.rotation,
-  ]);
-
   // TODO(#73): Per-row memoization or virtualize for large boards.
   const renderedTiles = useMemo(() => {
     return Array.from(board.getAll(), ({ id, tile, coordinate }) => {
@@ -63,22 +40,8 @@ export const SvgBoard: React.FC<SvgBoardProps> = ({ board, camera, viewCenter })
   }, [board]);
 
   const position: WorldPoint = camera.position;
-  const { zoom } = camera;
+  const zoom = camera.zoom;
   const rotationDeg = radiansToDegrees(camera.rotation);
-
-  if (import.meta.env.DEV) {
-    console.table([
-      {
-        label: 'render',
-        viewCenterX: viewCenter.x,
-        viewCenterY: viewCenter.y,
-        positionX: position.x,
-        positionY: position.y,
-        zoom,
-        rotationDeg,
-      },
-    ]);
-  }
 
   const worldTransform = `translate(${viewCenter.x}, ${viewCenter.y}) rotate(${rotationDeg}) scale(${zoom}) translate(${position.x}, ${position.y})`;
 

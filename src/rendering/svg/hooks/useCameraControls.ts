@@ -36,7 +36,7 @@ export function useCameraControls(
     position: WORLD_ORIGIN,
     zoom: 1,
     rotation: radians(0),
-  });
+  } satisfies CameraSnapshot);
 
   // Store callbacks in a ref to avoid re-binding listeners on every render
   const callbacksRef = useRef(callbacks);
@@ -89,7 +89,7 @@ export function useCameraControls(
       return cameraRef.current.containerToWorld(point, rect.width, rect.height);
     },
     [containerRef]
-  );
+  ) satisfies ContainerToWorldFn;
 
   return { transform, resetCamera, containerToWorld };
 }
@@ -99,5 +99,5 @@ function readTransform(camera: Camera): CameraSnapshot {
     position: WorldPoint.xy(camera.pan.x, camera.pan.y),
     zoom: camera.zoom,
     rotation: camera.rotation,
-  };
+  } satisfies CameraSnapshot;
 }

@@ -65,13 +65,14 @@ export function useSvgBoardInteraction(
   }, []);
 
   const cameraPointerCallbacks = useMemo(
-    (): UseCameraControlsCallbacks => ({
-      onHover,
-      onLeave,
-      onClick,
-      onRotateClockwise,
-      onRotateCounterClockwise,
-    }),
+    () =>
+      ({
+        onHover,
+        onLeave,
+        onClick,
+        onRotateClockwise,
+        onRotateCounterClockwise,
+      }) satisfies UseCameraControlsCallbacks,
     [onClick, onHover, onLeave, onRotateClockwise, onRotateCounterClockwise]
   );
 

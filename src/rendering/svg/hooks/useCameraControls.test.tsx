@@ -2,13 +2,13 @@ import { renderHook, waitFor, act } from '@testing-library/react';
 import { describe, expect, it, afterEach } from 'vitest';
 import { useCameraControls, type UseCameraControlsCallbacks } from './useCameraControls';
 
-const stubCallbacks: UseCameraControlsCallbacks = {
+const stubCallbacks = {
   onHover: () => {},
   onClick: () => {},
   onRotateClockwise: () => {},
   onRotateCounterClockwise: () => {},
   onLeave: () => {},
-};
+} satisfies UseCameraControlsCallbacks;
 
 describe('useCameraControls', () => {
   afterEach(() => {
