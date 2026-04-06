@@ -1,4 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+import { ClientDelta } from '../ClientPoint';
+import { ContainerDelta, ContainerPoint } from '../ContainerPoint';
 import { WORLD_ORIGIN } from '../WorldPoint';
 import { Camera } from './Camera';
 
@@ -16,7 +18,7 @@ describe('Camera', () => {
   });
 
   it('pans the camera correctly', () => {
-    camera.panBy({ x: 10, y: 20 });
+    camera.panBy(ContainerDelta.fromClientDelta(ClientDelta.xy(10, 20)));
     expect(camera.pan.x).toBe(10);
     expect(camera.pan.y).toBe(20);
   });
@@ -34,7 +36,7 @@ describe('Camera', () => {
 
   it('converts container coordinates to world coordinates', () => {
     // Center of 800×600 viewport (container-local pixels)
-    const result = camera.containerToWorld({ x: 400, y: 300 }, 800, 600);
+    const result = camera.containerToWorld(ContainerPoint.xy(400, 300), 800, 600);
     expect(result.x).toBe(0);
     expect(result.y).toBe(0);
   });

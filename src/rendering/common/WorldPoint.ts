@@ -1,7 +1,14 @@
-/**
- * x/y in the camera **world** plane (layout units, not CSS pixels).
- * Same space as hex centers from `hexToPixel` and as `Camera.containerToWorld` output.
- */
-export type WorldPoint = Readonly<{ x: number; y: number }>;
+type WorldPointBrand = { readonly __brand: 'WorldPoint' };
+export type WorldPoint = Readonly<{ x: number; y: number }> & WorldPointBrand;
 
-export const WORLD_ORIGIN = { x: 0, y: 0 } as const satisfies WorldPoint;
+function createWorldPoint(x: number, y: number): WorldPoint {
+  return Object.freeze({ x, y }) as WorldPoint;
+}
+
+export const WorldPoint = {
+  xy(x: number, y: number): WorldPoint {
+    return createWorldPoint(x, y);
+  },
+};
+
+export const WORLD_ORIGIN = WorldPoint.xy(0, 0);

@@ -3,7 +3,7 @@ import type { RefObject } from 'react';
 import { radians } from '../../../utils/Angle';
 import { Camera } from '../../common/camera/Camera';
 import type { ContainerDelta, ContainerPoint } from '../../common/ContainerPoint';
-import { WORLD_ORIGIN, type WorldPoint } from '../../common/WorldPoint';
+import { WORLD_ORIGIN, WorldPoint } from '../../common/WorldPoint';
 import type { CameraSnapshot } from '../cameraSnapshot';
 import {
   PointerPanZoomSession,
@@ -97,7 +97,7 @@ export function useCameraControls(
 
 function readTransform(camera: Camera): CameraSnapshot {
   return {
-    position: { x: camera.pan.x, y: camera.pan.y } satisfies WorldPoint,
+    position: WorldPoint.xy(camera.pan.x, camera.pan.y),
     zoom: camera.zoom,
     rotation: camera.rotation,
   };

@@ -1,5 +1,6 @@
 import { type FC, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import type { ContainerPoint } from '../../common/ContainerPoint';
+import { ContainerPoint } from '../../common/ContainerPoint';
+import { WorldPoint } from '../../common/WorldPoint';
 import type { CameraSnapshot } from '../cameraSnapshot';
 import { SvgBoard } from './SvgBoard';
 import { Game } from '../../../models/Game';
@@ -62,14 +63,14 @@ export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame })
 
   const camera = useMemo(
     (): CameraSnapshot => ({
-      position: { x: transform.position.x, y: transform.position.y },
+      position: WorldPoint.xy(transform.position.x, transform.position.y),
       zoom: transform.zoom,
       rotation: transform.rotation,
     }),
     [transform.position.x, transform.position.y, transform.zoom, transform.rotation]
   );
 
-  const viewCenter: ContainerPoint = { x: viewSize.width / 2, y: viewSize.height / 2 };
+  const viewCenter: ContainerPoint = ContainerPoint.xy(viewSize.width / 2, viewSize.height / 2);
 
   return (
     <div

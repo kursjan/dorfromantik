@@ -10,6 +10,9 @@ import { Game } from '../../../models/Game';
 import { GameRules } from '../../../models/GameRules';
 import type { Radians } from '../../../utils/Angle';
 import { pixelToHex } from '../../common/hex/HexUtils';
+import { ClientDelta } from '../../common/ClientPoint';
+import { ContainerDelta, ContainerPoint } from '../../common/ContainerPoint';
+import { WorldPoint } from '../../common/WorldPoint';
 
 // Mock dependencies — keep real `closestHexByWorldDistance` / `distanceToHex`; tests stub `pixelToHex` where needed.
 vi.mock('../../common/hex/HexUtils', async (importOriginal) => {
@@ -262,18 +265,19 @@ describe('CanvasController', () => {
     const rotateCCWSpy = vi.spyOn(controller as any, 'handleRotateCounterClockwise');
     const leaveSpy = vi.spyOn(controller as any, 'handleLeave');
 
-    capturedCallbacks.onPan({ x: 10, y: 20 });
-    expect(camera.panBy).toHaveBeenCalledWith({ x: 10, y: 20 });
+    const panStep = ContainerDelta.fromClientDelta(ClientDelta.xy(10, 20));
+    capturedCallbacks.onPan(panStep);
+    expect(camera.panBy).toHaveBeenCalledWith(panStep);
 
     capturedCallbacks.onZoom(100);
     expect(zoomSpy).toHaveBeenCalledWith(100);
 
     vi.mocked(pixelToHex).mockReturnValue(new HexCoordinate(0, 0, 0));
 
-    capturedCallbacks.onHover({ x: 50, y: 50 });
+    capturedCallbacks.onHover(ContainerPoint.xy(50, 50));
     expect(hoverSpy).toHaveBeenCalledWith({ x: 50, y: 50 });
 
-    capturedCallbacks.onClick({ x: 50, y: 50 });
+    capturedCallbacks.onClick(ContainerPoint.xy(50, 50));
     expect(clickSpy).toHaveBeenCalled();
 
     capturedCallbacks.onRotateClockwise();
@@ -308,7 +312,7 @@ describe('CanvasController', () => {
 
       (controller as any).handleZoom(100);
 
-      // Matches CAMERA_INTERACTION in cameraInteraction.ts
+      // Matches wheel zoom tuning in cameraInteraction.ts (applyWheelDeltaYToCamera)
       expect(zoomBySpy).toHaveBeenCalledWith(
         -0.1, // -100 * 0.001
         0.5,
@@ -320,10 +324,10 @@ describe('CanvasController', () => {
       // Mock containerToWorld to return predictable coords
       const camera = (controller as any).camera;
       // Depending on HexSize, 0,0 is hex 0,0,0
-      camera.containerToWorld = vi.fn().mockReturnValue({ x: 0, y: 0 });
+      camera.containerToWorld = vi.fn().mockReturnValue(WorldPoint.xy(0, 0));
       vi.mocked(pixelToHex).mockReturnValue(new HexCoordinate(0, 0, 0));
 
-      (controller as any).handleHover({ x: 100, y: 100 });
+      (controller as any).handleHover(ContainerPoint.xy(100, 100));
 
       // World (0,0): nearest valid placement is not the occupied origin
       expect((controller as any).hoveredHex).not.toEqual(new HexCoordinate(0, 0, 0));
@@ -387,7 +391,7 @@ describe('CanvasController', () => {
 
       const targetCoord = new HexCoordinate(0, 0, 0); // Occupied
       const camera = (controller as any).camera;
-      camera.containerToWorld = vi.fn().mockReturnValue({ x: 0, y: 0 });
+      camera.containerToWorld = vi.fn().mockReturnValue(WorldPoint.xy(0, 0));
       vi.mocked(pixelToHex).mockReturnValue(targetCoord);
 
       // Mock isValidPlacement to return false

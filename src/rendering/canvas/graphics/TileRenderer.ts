@@ -1,5 +1,6 @@
 import { Tile } from '../../../models/Tile';
 import { getHexCorners, hexToPixel } from '../../common/hex/HexUtils';
+import { WorldPoint } from '../../common/WorldPoint';
 import { type HexStyle, DEFAULT_HEX_STYLE } from './HexStyles';
 import type { CenterDrawContext } from './segmentRenderers/CenterDrawContext';
 import type { WedgeDrawContext } from './segmentRenderers/WedgeDrawContext';
@@ -36,7 +37,7 @@ export class TileRenderer {
     const originalAlpha = this.ctx.globalAlpha;
     this.ctx.globalAlpha = style.opacity ?? 1;
 
-    const corners = getHexCorners({ x, y }, style.size);
+    const corners = getHexCorners(WorldPoint.xy(x, y), style.size);
     const terrainsMap = tile.getTerrains();
 
     for (let i = 0; i < directions.length; i++) {

@@ -31,24 +31,28 @@ src/rendering/canvas/
 
 ## 3. Coordinate Systems
 
-Understanding the coordinate spaces is critical for this engine. TypeScript names for pixel tuples live in **`src/rendering/common/`** (see **`../ARCHITECTURE.md`**).
+Understanding the coordinate spaces is critical for this engine. Branded **`Client*`** / **`Container*`** / **`WorldPoint`** types and factories live in **`src/rendering/common/`** (see **`../ARCHITECTURE.md`**).
 
-1.  **Container-local pixels (`ContainerPoint`):**
-    - Origin `(0, 0)` is the **top-left of the canvas element** (after subtracting `getBoundingClientRect()` from `clientX` / `clientY`).
+1.  **Client viewport (`ClientPoint` / `ClientDelta`):**
+    - Used inside **`PointerPanZoomSession`** (threshold vs pan) before the canvas callbacks run.
+    - **`bindPointerInteraction`** converts to container types on the way in/out.
+
+2.  **Container-local pixels (`ContainerPoint`):**
+    - Origin `(0, 0)` is the **top-left of the canvas element** (**`ContainerPoint.fromClientInElement`** with `getBoundingClientRect()`).
     - **`InputManager`** passes **`ContainerPoint`** to **`onHover`** / **`onClick`**.
     - **`Camera.containerToWorld(point, canvas.width, canvas.height)`** expects this space for `point`.
 
-2.  **Pointer drag delta (`ContainerDelta` for pan):**
-    - **`onPan(delta)`** receives **`ContainerDelta`**: step between moves in the same pixel axes as **`ContainerPoint`** (implementation uses Δ`clientX` / Δ`clientY`, which matches when the element’s rect is stable).
+3.  **Pointer drag delta (`ContainerDelta` for pan):**
+    - **`onPan(delta)`** receives **`ContainerDelta`** produced by **`ContainerDelta.fromClientDelta`** (same components as Δ`clientX` / Δ`clientY` when layout is stable).
     - **`Camera.panBy(delta)`** rotates that vector and applies it to world **`pan`**.
 
-3.  **World space (`WorldPoint`):**
+4.  **World space (`WorldPoint`):**
     - Infinite 2D plane in **layout units** (hex geometry, camera pan).
     - Origin `(0, 0)` is the center of the initial view before pan.
     - **Transformation (conceptual):** container pixel = center + rotate + scale × (world + camera pan). Inverting that chain is **`containerToWorld`**.
     - Camera pan is exposed as **`camera.pan`** (`WorldPoint`). The SVG path mirrors the same numbers as **`CameraSnapshot.position`**.
 
-4.  **Hex space (cube coordinates):**
+5.  **Hex space (cube coordinates):**
     - Integer coordinates `(q, r, s)` where `q + r + s = 0`.
     - Used for game logic (Tile storage, Adjacency).
     - _Conversion:_ world → hex via **`HexUtils.pixelToHex`** (argument is **`WorldPoint`**).

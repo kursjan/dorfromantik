@@ -2,7 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Board, type BoardTile } from '../../../models/Board';
 import { radians } from '../../../utils/Angle';
-import type { ContainerPoint } from '../../common/ContainerPoint';
+import { ContainerPoint } from '../../common/ContainerPoint';
+import { WorldPoint } from '../../common/WorldPoint';
 import type { CameraSnapshot } from '../cameraSnapshot';
 import { SvgBoard } from './SvgBoard';
 import { HexCoordinate } from '../../../models/HexCoordinate';
@@ -180,10 +181,10 @@ const flowerBoard = boardFromTiles(flowerTiles);
 const scatteredBoard = boardFromTiles(scatteredTiles);
 
 /** Story viewport pivot (half of typical fullscreen); interactive stories measure their container. */
-const defaultViewCenter: ContainerPoint = { x: 960, y: 540 };
+const defaultViewCenter: ContainerPoint = ContainerPoint.xy(960, 540);
 
 const defaultCamera: CameraSnapshot = {
-  position: { x: 400, y: 300 },
+  position: WorldPoint.xy(400, 300),
   zoom: 1,
   rotation: radians(0),
 };
@@ -220,7 +221,7 @@ const InteractiveBoard = () => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [viewCenter, setViewCenter] = useState(defaultViewCenter);
   const [camera, setCamera] = useState<CameraSnapshot>({
-    position: { x: 400, y: 300 },
+    position: WorldPoint.xy(400, 300),
     zoom: 1,
     rotation: radians(0),
   });
@@ -232,7 +233,7 @@ const InteractiveBoard = () => {
     if (!el || typeof ResizeObserver === 'undefined') return;
     const ro = new ResizeObserver(() => {
       const r = el.getBoundingClientRect();
-      setViewCenter({ x: r.width / 2, y: r.height / 2 });
+      setViewCenter(ContainerPoint.xy(r.width / 2, r.height / 2));
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -252,10 +253,7 @@ const InteractiveBoard = () => {
 
     setCamera((prev) => ({
       ...prev,
-      position: {
-        x: prev.position.x + dx,
-        y: prev.position.y + dy,
-      },
+      position: WorldPoint.xy(prev.position.x + dx, prev.position.y + dy),
     }));
 
     lastMouse.current = { x: e.clientX, y: e.clientY };
@@ -285,7 +283,7 @@ const InteractiveBoard = () => {
 
       return {
         ...prev,
-        position: { x: newX, y: newY },
+        position: WorldPoint.xy(newX, newY),
         zoom: newZoom,
       };
     });
@@ -358,14 +356,14 @@ const PerspectiveRotationBoard = () => {
     if (!el || typeof ResizeObserver === 'undefined') return;
     const ro = new ResizeObserver(() => {
       const r = el.getBoundingClientRect();
-      setViewCenter({ x: r.width / 2, y: r.height / 2 });
+      setViewCenter(ContainerPoint.xy(r.width / 2, r.height / 2));
     });
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
 
   const boardCamera: CameraSnapshot = {
-    position: { x: 400, y: 300 },
+    position: WorldPoint.xy(400, 300),
     zoom: 1,
     rotation: radians(0),
   };

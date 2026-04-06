@@ -1,4 +1,5 @@
 import { getHexCorners } from '../../../common/hex/HexUtils';
+import { WorldPoint } from '../../../common/WorldPoint';
 import { TERRAIN_COLORS } from '../HexStyles';
 import { type Terrain, type RailTerrain } from '../../../../models/Terrain';
 import { type CenterDrawContext, type CenterSegmentRenderer } from './CenterDrawContext';
@@ -7,7 +8,7 @@ import { directions } from '../../../../models/Navigation';
 export class RailCenterSegmentRenderer implements CenterSegmentRenderer {
   render(context: CenterDrawContext, _centerTerrain: Terrain): void {
     const { ctx, centerX, centerY, style, corners, tile } = context;
-    const centerHexCorners = getHexCorners({ x: centerX, y: centerY }, style.size * 0.15);
+    const centerHexCorners = getHexCorners(WorldPoint.xy(centerX, centerY), style.size * 0.15);
 
     ctx.beginPath();
     ctx.moveTo(centerHexCorners[0].x, centerHexCorners[0].y);

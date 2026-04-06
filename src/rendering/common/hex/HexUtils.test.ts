@@ -7,6 +7,7 @@ import {
   closestHexByWorldDistance,
 } from './HexUtils';
 import { HexCoordinate } from '../../../models/HexCoordinate';
+import { WorldPoint } from '../WorldPoint';
 import {
   north,
   northEast,
@@ -30,7 +31,7 @@ describe('HexUtils', () => {
 
     it('returns correct distance for a point offset from center', () => {
       const { x, y } = hexToPixel(center, HEX_SIZE);
-      const dist = distanceToHex(center, { x: x + 30, y: y + 40 }, HEX_SIZE);
+      const dist = distanceToHex(center, WorldPoint.xy(x + 30, y + 40), HEX_SIZE);
       expect(dist).toBeCloseTo(50); // 3-4-5 triangle
     });
 
@@ -144,24 +145,24 @@ describe('HexUtils', () => {
 
   describe('cubeRound (indirectly via pixelToHex)', () => {
     it('handles qDiff > rDiff && qDiff > sDiff', () => {
-      const coord = pixelToHex({ x: -10, y: -25 }, HEX_SIZE);
+      const coord = pixelToHex(WorldPoint.xy(-10, -25), HEX_SIZE);
       expect(coord).toBeDefined();
     });
 
     it('handles rDiff > sDiff', () => {
-      const coord = pixelToHex({ x: 25, y: 0 }, HEX_SIZE);
+      const coord = pixelToHex(WorldPoint.xy(25, 0), HEX_SIZE);
       expect(coord).toBeDefined();
     });
 
     it('handles sDiff > rDiff && sDiff > qDiff', () => {
-      const coord = pixelToHex({ x: -10, y: 25 }, HEX_SIZE);
+      const coord = pixelToHex(WorldPoint.xy(-10, 25), HEX_SIZE);
       expect(coord).toBeDefined();
     });
   });
 
   describe('pixelToHex', () => {
     it('converts world origin to center hex (0,0,0)', () => {
-      const hex = pixelToHex({ x: 0, y: 0 }, HEX_SIZE);
+      const hex = pixelToHex(WorldPoint.xy(0, 0), HEX_SIZE);
       expect(hex.q).toBe(0);
       expect(hex.r).toBe(0);
       expect(hex.s).toBe(0);
@@ -171,7 +172,7 @@ describe('HexUtils', () => {
       const target = north(center);
       const centerPixel = hexToPixel(target, HEX_SIZE);
 
-      const result = pixelToHex({ x: centerPixel.x + 5, y: centerPixel.y + 5 }, HEX_SIZE);
+      const result = pixelToHex(WorldPoint.xy(centerPixel.x + 5, centerPixel.y + 5), HEX_SIZE);
       expect(result.equals(target)).toBe(true);
     });
 
@@ -194,12 +195,12 @@ describe('HexUtils', () => {
 
   describe('getHexCorners', () => {
     it('returns 6 corners', () => {
-      const corners = getHexCorners({ x: 0, y: 0 }, HEX_SIZE);
+      const corners = getHexCorners(WorldPoint.xy(0, 0), HEX_SIZE);
       expect(corners.length).toBe(6);
     });
 
     it('returns correct coordinates for Flat-Top hex at origin', () => {
-      const corners = getHexCorners({ x: 0, y: 0 }, HEX_SIZE);
+      const corners = getHexCorners(WorldPoint.xy(0, 0), HEX_SIZE);
 
       // Corner 0 (0 degrees): (size, 0)
       expect(corners[0].x).toBeCloseTo(HEX_SIZE);
@@ -217,7 +218,7 @@ describe('HexUtils', () => {
     it('offsets corners by center position', () => {
       const x = 100;
       const y = 200;
-      const corners = getHexCorners({ x, y }, HEX_SIZE);
+      const corners = getHexCorners(WorldPoint.xy(x, y), HEX_SIZE);
 
       // Corner 0: (x + size, y)
       expect(corners[0].x).toBeCloseTo(x + HEX_SIZE);
@@ -250,7 +251,7 @@ describe('HexUtils', () => {
     });
 
     it('calculates corners correctly with different size', () => {
-      const corners = getHexCorners({ x: 0, y: 0 }, CUSTOM_SIZE);
+      const corners = getHexCorners(WorldPoint.xy(0, 0), CUSTOM_SIZE);
       // Corner 0: (size, 0) -> (10, 0)
       expect(corners[0].x).toBeCloseTo(CUSTOM_SIZE);
 

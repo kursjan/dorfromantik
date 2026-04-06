@@ -1,6 +1,6 @@
 import { type Radians, radians } from '../../../utils/Angle';
 import type { ContainerDelta, ContainerPoint } from '../ContainerPoint';
-import type { WorldPoint } from '../WorldPoint';
+import { WorldPoint } from '../WorldPoint';
 
 export interface CameraConfig {
   position?: WorldPoint;
@@ -9,7 +9,7 @@ export interface CameraConfig {
 }
 
 export class Camera {
-  private readonly defaultPan: WorldPoint = { x: 0, y: 0 } satisfies WorldPoint;
+  private readonly defaultPan: WorldPoint = WorldPoint.xy(0, 0);
   private readonly defaultZoom: number = 1;
   private readonly defaultRotation: Radians = radians(0);
 
@@ -60,7 +60,7 @@ export class Camera {
     const worldX = scaledX - this.worldPan.x;
     const worldY = scaledY - this.worldPan.y;
 
-    return { x: worldX, y: worldY } satisfies WorldPoint;
+    return WorldPoint.xy(worldX, worldY);
   }
 
   /**
@@ -79,7 +79,7 @@ export class Camera {
 
     const nextX = this.worldPan.x + rotDx / this.zoom;
     const nextY = this.worldPan.y + rotDy / this.zoom;
-    this.worldPan = { x: nextX, y: nextY };
+    this.worldPan = WorldPoint.xy(nextX, nextY);
   }
 
   zoomBy(delta: number, min: number, max: number) {
@@ -92,7 +92,7 @@ export class Camera {
   }
 
   reset() {
-    this.worldPan = { x: this.defaultPan.x, y: this.defaultPan.y };
+    this.worldPan = WorldPoint.xy(this.defaultPan.x, this.defaultPan.y);
     this.zoom = this.defaultZoom;
     this.rotation = this.defaultRotation;
   }

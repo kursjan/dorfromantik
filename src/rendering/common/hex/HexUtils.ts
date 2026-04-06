@@ -1,5 +1,5 @@
 import { HexCoordinate } from '../../../models/HexCoordinate';
-import type { WorldPoint } from '../WorldPoint';
+import { WorldPoint } from '../WorldPoint';
 
 export function hexToPixel(hex: HexCoordinate, size: number): WorldPoint {
   // Flat-topped hex conversion
@@ -11,7 +11,7 @@ export function hexToPixel(hex: HexCoordinate, size: number): WorldPoint {
 
   const x = size * (3.0 / 2.0) * effectiveQ;
   const y = size * ((Math.sqrt(3.0) / 2.0) * effectiveQ + Math.sqrt(3.0) * effectiveR);
-  return { x, y };
+  return WorldPoint.xy(x, y);
 }
 
 export function distanceToHex(hex: HexCoordinate, point: WorldPoint, hexSize: number): number {
@@ -55,10 +55,9 @@ export function getHexCorners(center: WorldPoint, size: number): WorldPoint[] {
   for (let i = 0; i < 6; i++) {
     const angle_deg = 60 * i;
     const angle_rad = (Math.PI / 180) * angle_deg;
-    corners.push({
-      x: center.x + size * Math.cos(angle_rad),
-      y: center.y + size * Math.sin(angle_rad),
-    });
+    corners.push(
+      WorldPoint.xy(center.x + size * Math.cos(angle_rad), center.y + size * Math.sin(angle_rad))
+    );
   }
   return corners;
 }

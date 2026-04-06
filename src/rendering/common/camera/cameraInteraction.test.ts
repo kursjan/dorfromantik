@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { ClientPoint } from '../ClientPoint';
+import { ClientDelta, ClientPoint } from '../ClientPoint';
 import { Camera } from './Camera';
 import { PointerPanZoomSession, applyWheelDeltaYToCamera } from './cameraInteraction';
 
@@ -18,12 +18,12 @@ describe('applyWheelDeltaYToCamera', () => {
 });
 
 function cp(x: number, y: number): ClientPoint {
-  return { x, y } satisfies ClientPoint;
+  return ClientPoint.xy(x, y);
 }
 
 describe('PointerPanZoomSession', () => {
   it('does not pan until drag passes threshold', () => {
-    const session = new PointerPanZoomSession(5);
+    const session = new PointerPanZoomSession(ClientDelta.xy(5, 5));
     session.beginLeftButton(cp(100, 100));
 
     expect(session.onClientMove(cp(104, 100))).toEqual({ type: 'none' });
@@ -31,7 +31,7 @@ describe('PointerPanZoomSession', () => {
   });
 
   it('enters pan and resets anchor when threshold is crossed', () => {
-    const session = new PointerPanZoomSession(5);
+    const session = new PointerPanZoomSession(ClientDelta.xy(5, 5));
     session.beginLeftButton(cp(100, 100));
 
     expect(session.onClientMove(cp(110, 100))).toEqual({ type: 'entered_pan' });
@@ -39,15 +39,18 @@ describe('PointerPanZoomSession', () => {
   });
 
   it('emits pan deltas from movement after panning', () => {
-    const session = new PointerPanZoomSession(5);
+    const session = new PointerPanZoomSession(ClientDelta.xy(5, 5));
     session.beginLeftButton(cp(100, 100));
     session.onClientMove(cp(110, 100));
 
-    expect(session.onClientMove(cp(120, 100))).toEqual({ type: 'pan', delta: { x: 10, y: 0 } });
+    expect(session.onClientMove(cp(120, 100))).toMatchObject({
+      type: 'pan',
+      delta: { x: 10, y: 0 },
+    });
   });
 
   it('isAwaitingClick only in potential-click state', () => {
-    const session = new PointerPanZoomSession(5);
+    const session = new PointerPanZoomSession(ClientDelta.xy(5, 5));
     expect(session.isAwaitingClick()).toBe(false);
 
     session.beginLeftButton(cp(0, 0));

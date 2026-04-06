@@ -10,14 +10,15 @@ Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** 
 
 ## Coordinate types (`common/*.ts`)
 
-**`ContainerPoint`** and **`ContainerDelta`** both live in **`common/ContainerPoint.ts`**. All of these shapes are **`Readonly<{ x: number; y: number }>`** with different meanings:
+**`ClientPoint`** / **`ClientDelta`** → `common/ClientPoint.ts` (**`ClientPoint.xy`**, **`fromMouseEvent`**, **`ClientDelta.xy`** / **`between`** / **`absolute()`**). **`ContainerPoint`** / **`ContainerDelta`** → `common/ContainerPoint.ts` (**`ContainerPoint.xy`**, **`fromClientInElement`**, **`ContainerDelta.fromClientDelta`**). **`WorldPoint`** → `common/WorldPoint.ts` (**`WorldPoint.xy`**, **`WORLD_ORIGIN`**). Shapes are branded **`Readonly<{ x, y }>`** (plus **`ClientDelta.absolute()`**) with these meanings:
 
-| Type                 | Meaning                                                                                                                                                                                                         |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`ClientPoint`**    | Viewport pixels (`PointerEvent.clientX` / `clientY`). Used inside **`PointerPanZoomSession`** to compute **`ContainerDelta`** for pan.                                                                          |
-| **`ContainerPoint`** | Pointer position **relative to the interaction element** (`clientX/Y − getBoundingClientRect().left/top`). Same space as the first argument to **`Camera.containerToWorld`**, with that element’s width/height. |
-| **`ContainerDelta`** | `{x,y}` **delta** in the same axes as **`ContainerPoint`** (pan step between moves; numerically Δ`clientX`/`clientY` when layout is stable). Not a position.                                                    |
-| **`WorldPoint`**     | Camera / hex **layout plane** (same as `hexToPixel` centers, `pixelToHex` input). **`WORLD_ORIGIN`** is `{ x: 0, y: 0 }`.                                                                                       |
+| Type                 | Meaning                                                                                                                                                                                                      |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`ClientPoint`**    | Viewport pixels (`PointerEvent.clientX` / `clientY`). Built with **`ClientPoint.xy`** or **`fromMouseEvent`**. Used inside **`PointerPanZoomSession`** for drag threshold and pan steps (**`ClientDelta`**). |
+| **`ClientDelta`**    | Δ in client axes (**`xy`**, **`between`**, **`absolute()`** for threshold checks). Session emits these for pan; **`bindPointerInteraction`** copies them to **`ContainerDelta`**.                            |
+| **`ContainerPoint`** | Element-local pointer position via **`ContainerPoint.xy`** or **`fromClientInElement(client, rect)`**. Same space as **`Camera.containerToWorld`**, with that element’s width/height.                        |
+| **`ContainerDelta`** | Pan step for **`Camera.panBy`**, from **`ContainerDelta.fromClientDelta`** (same numeric `x`/`y` as **`ClientDelta`** when the element’s rect is stable between moves).                                      |
+| **`WorldPoint`**     | Camera / hex **layout plane** (**`WorldPoint.xy`**, **`hexToPixel`** / **`pixelToHex`** / corner math). **`WORLD_ORIGIN`** is **`WorldPoint.xy(0, 0)`**.                                                     |
 
 ## `Camera` (`common/camera/Camera.ts`)
 
@@ -28,7 +29,7 @@ Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** 
 
 ## Pointer wiring (`common/camera/cameraInteraction.ts`)
 
-**`bindPointerInteraction`** (and **`PointerPanZoomSession`**) normalize pointer events on a DOM element: they emit **`ContainerPoint`** for hover/click and **`ContainerDelta`** for pan. **Canvas `InputManager`** and **SVG `useCameraControls`** both use this stack so behavior stays aligned.
+**`PointerPanZoomSession`** runs in **client** space: **`ClientPoint`** anchors and **`ClientDelta.between`** / **`absolute()`** implement the click-vs-pan threshold (default **`ClientDelta.xy(5, 5)`** in module config). **`bindPointerInteraction`** maps each event with **`ClientPoint.fromMouseEvent`**, converts hover/click to **`ContainerPoint.fromClientInElement`**, and passes **`ContainerDelta.fromClientDelta`** into **`onPan`** so **`Camera.panBy`** stays in container-aligned pixel axes. **Canvas `InputManager`** and **SVG `useCameraControls`** both use this stack.
 
 ## SVG camera snapshot (`svg/cameraSnapshot.ts`)
 
