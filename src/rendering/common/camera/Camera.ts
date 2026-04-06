@@ -3,7 +3,7 @@ import type { ContainerDelta, ContainerPoint } from '../ContainerPoint';
 import { WorldPoint } from '../WorldPoint';
 import { DEFAULT_CAMERA_SNAPSHOT, type CameraSnapshot } from './CameraSnapshot';
 
-/** View math over a mutable {@link CameraSnapshot} (constructor clones input; {@link reset} restores {@link DEFAULT_CAMERA_SNAPSHOT}). */
+/** View math; internal pose is an immutable {@link CameraSnapshot} replaced on every change. */
 export class Camera {
   private snapshot: CameraSnapshot;
 
@@ -57,19 +57,28 @@ export class Camera {
 
     const nextX = this.snapshot.position.x + rotDx / this.snapshot.zoom;
     const nextY = this.snapshot.position.y + rotDy / this.snapshot.zoom;
-    this.snapshot.position = WorldPoint.xy(nextX, nextY);
+    this.snapshot = {
+      ...this.snapshot,
+      position: WorldPoint.xy(nextX, nextY),
+    } satisfies CameraSnapshot;
   }
 
   zoomBy(delta: number, min: number, max: number) {
     const newZoom = this.snapshot.zoom + delta;
-    this.snapshot.zoom = Math.max(min, Math.min(max, newZoom));
+    this.snapshot = {
+      ...this.snapshot,
+      zoom: Math.max(min, Math.min(max, newZoom)),
+    } satisfies CameraSnapshot;
   }
 
   rotateBy(deltaRadians: Radians) {
-    this.snapshot.rotation = radians(this.snapshot.rotation + deltaRadians);
+    this.snapshot = {
+      ...this.snapshot,
+      rotation: radians(this.snapshot.rotation + deltaRadians),
+    } satisfies CameraSnapshot;
   }
 
   reset() {
-    this.snapshot = DEFAULT_CAMERA_SNAPSHOT;
+    this.snapshot = { ...DEFAULT_CAMERA_SNAPSHOT } satisfies CameraSnapshot;
   }
 }

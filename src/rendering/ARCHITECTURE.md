@@ -22,8 +22,8 @@ Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** 
 
 ## `Camera` (`common/camera/Camera.ts`)
 
-- **Construction:** **`new Camera(snapshot)`** clones an initial **`CameraSnapshot`** (typically **`DEFAULT_CAMERA_SNAPSHOT`**). Internal state stays a single mutable snapshot object.
-- **`pan`**, **`zoom`**, **`rotation`** (getters): read through from that snapshot (**`pan`** is **`snapshot.position`**).
+- **Construction:** **`new Camera(snapshot)`** shallow-clones the initial **`CameraSnapshot`** (typically **`DEFAULT_CAMERA_SNAPSHOT`**). Each **`panBy` / `zoomBy` / `rotateBy` / `reset`** assigns a **new** snapshot object (immutable-by-convention).
+- **`pan`**, **`zoom`**, **`rotation`** (getters): read the current snapshot (**`pan`** is **`snapshot.position`**).
 - **`containerToWorld(point, containerWidth, containerHeight)`**: inverse of the canvas/SVG camera transform — **container-local** pixel → **`WorldPoint`**.
 - **`panBy(delta: ContainerDelta)`**: drag step in container/client pixel axes, rotated/scaled into world pan.
 - **`zoomBy`**, **`rotateBy`**, **`reset`**: zoom limits, rotation, **`reset`** restores **`DEFAULT_CAMERA_SNAPSHOT`** (cloned).
@@ -34,7 +34,7 @@ Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** 
 
 ## `CameraSnapshot` (`common/camera/CameraSnapshot.ts`)
 
-**`CameraSnapshot`**: `{ position: WorldPoint; zoom; rotation }` — shared pose type for **`SvgBoard`** (via **`useCameraControls`**), canvas **`DebugStats.camera`**, and **`Camera`**. **`DEFAULT_CAMERA_SNAPSHOT`** is the app-wide default (matches **`WORLD_ORIGIN`** pan). **`position`** matches **`Camera.pan`**.
+**`CameraSnapshot`**: **`Readonly<{ position; zoom; rotation }>`** — treat as immutable; replace the whole object to change pose. Shared by **`SvgBoard`** (via **`useCameraControls`**), canvas **`DebugStats.camera`**, and **`Camera`**. **`DEFAULT_CAMERA_SNAPSHOT`** is the app-wide default (matches **`WORLD_ORIGIN`** pan). **`position`** matches **`Camera.pan`**.
 
 ## Hooks (SVG)
 

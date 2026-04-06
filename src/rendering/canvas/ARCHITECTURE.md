@@ -81,7 +81,7 @@ The central hub. It:
 
 Manages the view transform (shared with the SVG board path).
 
-- **Construction:** **`new Camera(DEFAULT_CAMERA_SNAPSHOT)`** (see **`../common/camera/CameraSnapshot.ts`**); internal mutable **`CameraSnapshot`** drives **`pan`**, **`zoom`**, and **`rotation`** getters.
+- **Construction:** **`new Camera(DEFAULT_CAMERA_SNAPSHOT)`** (see **`../common/camera/CameraSnapshot.ts`**); holds the latest **`CameraSnapshot`** and replaces it on each pan/zoom/rotate/reset (**immutable snapshot** pattern).
 - **Pan:** **`pan`** — world-space offset (**`WorldPoint`**); same values as SVG **`CameraSnapshot.position`** (see **`useCameraControls`** → **`readCameraSnapshot`**).
 - **Zoom / rotation:** via getters; **`zoomBy`**, **`rotateBy`**, **`reset`** (restore default snapshot).
 - **Canvas draw path:** **`CanvasController`** applies center translate → rotate → scale → **`camera.pan`** translate on the `Context2D` (matches SVG **`SvgBoard`** transform order).
