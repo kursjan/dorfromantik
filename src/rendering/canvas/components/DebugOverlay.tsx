@@ -6,7 +6,6 @@ import './DebugOverlay.css';
 
 interface DebugOverlayProps {
   controller: CanvasController;
-  /** Visibility is toggled by F3 via InputManager. */
   isVisible: boolean;
 }
 
@@ -18,8 +17,13 @@ export const DebugOverlay: React.FC<DebugOverlayProps> = ({ controller, isVisibl
   }
 
   const { fps, camera, hoveredHex } = stats;
-  // Don't render if it's the initial empty snapshot
-  if (fps === 0 && camera.zoom === 1 && hoveredHex === null && camera.x === 0 && camera.y === 0) {
+  if (
+    fps === 0 &&
+    camera.zoom === 1 &&
+    hoveredHex === null &&
+    camera.position.x === 0 &&
+    camera.position.y === 0
+  ) {
     return null;
   }
 
@@ -29,8 +33,8 @@ export const DebugOverlay: React.FC<DebugOverlayProps> = ({ controller, isVisibl
     <div className="debug-overlay" data-testid="debug-overlay">
       <div>FPS: {fps}</div>
       <div>
-        Camera: ({camera.x.toFixed(1)}, {camera.y.toFixed(1)}) Zoom: {camera.zoom.toFixed(2)} Rot:{' '}
-        {rotationDeg}°
+        Camera: ({camera.position.x.toFixed(1)}, {camera.position.y.toFixed(1)}) Zoom:{' '}
+        {camera.zoom.toFixed(2)} Rot: {rotationDeg}°
       </div>
       <div>
         Hover: {hoveredHex ? `(${hoveredHex.q}, ${hoveredHex.r}, ${hoveredHex.s})` : 'None'}

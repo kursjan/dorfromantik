@@ -3,7 +3,7 @@ import { Board } from '../../../models/Board';
 import { radiansToDegrees } from '../../../utils/Angle';
 import type { ContainerPoint } from '../../common/ContainerPoint';
 import type { WorldPoint } from '../../common/WorldPoint';
-import type { CameraSnapshot } from '../cameraSnapshot';
+import type { CameraSnapshot } from '../../common/camera/CameraSnapshot';
 import { HexTile } from '../tiles/HexTile';
 import { SVG_HEX_RADIUS, hexToPixel } from '../tiles/SvgHexUtils';
 

@@ -2,11 +2,11 @@
 
 Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** (DOM game surface), and **common** math/types. Game chrome (HUD, reset, save status) lives in **`src/rendering/shell/`**.
 
-| Area          | Role                                                                                                       |
-| ------------- | ---------------------------------------------------------------------------------------------------------- |
-| **`canvas/`** | `CanvasController` game loop, `InputManager`, `Context2D` renderers. See **`canvas/ARCHITECTURE.md`**.     |
-| **`svg/`**    | `SvgGameView` composition, `SvgBoard`, `HexTile`, hooks (`useCameraControls`, `useSvgBoardInteraction`).   |
-| **`common/`** | `Camera`, `cameraInteraction`, hex layout (`HexUtils`, `hexLayout`), `useGameSnapshotBridge`, point types. |
+| Area          | Role                                                                                                                         |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **`canvas/`** | `CanvasController` game loop, `InputManager`, `Context2D` renderers. See **`canvas/ARCHITECTURE.md`**.                       |
+| **`svg/`**    | `SvgGameView` composition, `SvgBoard`, `HexTile`, hooks (`useCameraControls`, `useSvgBoardInteraction`).                     |
+| **`common/`** | `Camera`, `CameraSnapshot`, `cameraInteraction`, hex layout (`HexUtils`, `hexLayout`), `useGameSnapshotBridge`, point types. |
 
 ## Coordinate types (`common/*.ts`)
 
@@ -31,9 +31,9 @@ Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** 
 
 **`PointerPanZoomSession`** runs in **client** space: **`ClientPoint`** anchors and **`ClientDelta.between`** / **`absolute()`** implement the click-vs-pan threshold (default **`ClientDelta.xy(5, 5)`** in module config). **`bindPointerInteraction`** maps each event with **`ClientPoint.fromMouseEvent`**, converts hover/click to **`ContainerPoint.fromClientInElement`**, and passes **`ContainerDelta.fromClientDelta`** into **`onPan`** so **`Camera.panBy`** stays in container-aligned pixel axes. **Canvas `InputManager`** and **SVG `useCameraControls`** both use this stack.
 
-## SVG camera snapshot (`svg/cameraSnapshot.ts`)
+## `CameraSnapshot` (`common/camera/CameraSnapshot.ts`)
 
-**`CameraSnapshot`**: `{ position: WorldPoint; zoom; rotation }` — React-facing pose for **`SvgBoard`** transforms (not used by the canvas rAF loop).
+**`CameraSnapshot`**: `{ position: WorldPoint; zoom; rotation }` — shared immutable pose for **`SvgBoard`** (via **`useCameraControls`**) and canvas **`DebugStats.camera`**. **`position`** matches **`Camera.pan`**.
 
 ## Hooks (SVG)
 
@@ -42,4 +42,4 @@ Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** 
 
 ## Debug stats (canvas)
 
-**`CanvasController`** publishes **`DebugStats.camera`** as a **flat** `{ x, y, zoom, rotation }` for the overlay; values come from **`camera.pan.x` / `.y`** (same numbers as **`WorldPoint`** pan and **`CameraSnapshot.position`**).
+**`CanvasController`** publishes **`DebugStats.camera`** as **`CameraSnapshot`** for the overlay (**`position`** is **`Camera.pan`**).

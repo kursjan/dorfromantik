@@ -13,7 +13,6 @@ export class Camera {
   private readonly defaultZoom: number = 1;
   private readonly defaultRotation: Radians = radians(0);
 
-  /** World-space pan offset (layout plane; SVG path mirrors these as `CameraSnapshot.position`). */
   private worldPan: WorldPoint = this.defaultPan;
   zoom: number = this.defaultZoom;
   rotation: Radians = this.defaultRotation;
@@ -28,10 +27,6 @@ export class Camera {
     return this.worldPan;
   }
 
-  /**
-   * Unproject a container-local pixel to world space. `containerWidth` / `containerHeight` must match
-   * the same element as `point` (e.g. canvas `width`/`height` or host `getBoundingClientRect()`).
-   */
   containerToWorld(
     point: ContainerPoint,
     containerWidth: number,
@@ -40,37 +35,24 @@ export class Camera {
     const centerX = containerWidth / 2;
     const centerY = containerHeight / 2;
 
-    // 1. Translate relative to center
     const relX = point.x - centerX;
     const relY = point.y - centerY;
 
-    // 2. Inverse Rotate: Rotate by -rotation
-    // x' = x cos(-θ) - y sin(-θ)
-    // y' = x sin(-θ) + y cos(-θ)
     const cos = Math.cos(-this.rotation);
     const sin = Math.sin(-this.rotation);
     const rotX = relX * cos - relY * sin;
     const rotY = relX * sin + relY * cos;
 
-    // 3. Inverse Scale
     const scaledX = rotX / this.zoom;
     const scaledY = rotY / this.zoom;
 
-    // 4. Inverse Translate
     const worldX = scaledX - this.worldPan.x;
     const worldY = scaledY - this.worldPan.y;
 
     return WorldPoint.xy(worldX, worldY);
   }
 
-  /**
-   * Adds a container-pixel drag step ({@link ContainerDelta}) to `pan`.
-   * Rotates the delta to match world axes, then divides by zoom.
-   */
   panBy(delta: ContainerDelta) {
-    // We want the drag to feel like "grabbing the world".
-    // If the camera is rotated 90 deg, dragging "Up" on screen should move world "Up" relative to screen.
-    // We apply the INVERSE rotation to the delta vector to align it with world axes.
     const cos = Math.cos(-this.rotation);
     const sin = Math.sin(-this.rotation);
 

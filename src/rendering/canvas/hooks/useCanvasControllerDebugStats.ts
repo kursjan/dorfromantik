@@ -1,10 +1,12 @@
 import { useSyncExternalStore, useCallback } from 'react';
 import { radians } from '../../../utils/Angle';
+import { WORLD_ORIGIN } from '../../common/WorldPoint';
 import type { CanvasController, DebugStats } from '../engine/CanvasController';
+import type { CameraSnapshot } from '@/rendering/common/camera/CameraSnapshot';
 
 const emptySnapshot: DebugStats = {
   fps: 0,
-  camera: { x: 0, y: 0, zoom: 1, rotation: radians(0) },
+  camera: { position: WORLD_ORIGIN, zoom: 1, rotation: radians(0) } satisfies CameraSnapshot,
   hoveredHex: null,
 };
 

@@ -4,7 +4,7 @@ import { radians } from '../../../utils/Angle';
 import { Camera } from '../../common/camera/Camera';
 import type { ContainerDelta, ContainerPoint } from '../../common/ContainerPoint';
 import { WORLD_ORIGIN, WorldPoint } from '../../common/WorldPoint';
-import type { CameraSnapshot } from '../cameraSnapshot';
+import type { CameraSnapshot } from '../../common/camera/CameraSnapshot';
 import {
   PointerPanZoomSession,
   applyWheelDeltaYToCamera,

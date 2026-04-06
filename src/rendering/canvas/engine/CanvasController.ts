@@ -1,6 +1,6 @@
 import { applyWheelDeltaYToCamera } from '../../common/camera/cameraInteraction';
 import { Camera } from '../../common/camera/Camera';
-import { applyCameraTransformToCanvas } from '../applyCameraTransform';
+import type { CameraSnapshot } from '../../common/camera/CameraSnapshot';
 import { InputManager } from './InputManager';
 import { HexRenderer } from '../graphics/HexRenderer';
 import { TileRenderer } from '../graphics/TileRenderer';
@@ -16,12 +16,12 @@ import {
   VALID_PLACEMENT_STYLE,
 } from '../graphics/HexStyles';
 import { Game } from '../../../models/Game';
-import { type Radians, radians } from '../../../utils/Angle';
+import { radians } from '../../../utils/Angle';
 import { WORLD_ORIGIN } from '../../common/WorldPoint';
 
 export interface DebugStats {
   fps: number;
-  camera: { x: number; y: number; zoom: number; rotation: Radians };
+  camera: CameraSnapshot;
   hoveredHex: HexCoordinate | null;
 }
 
@@ -70,11 +70,11 @@ export class CanvasController {
     this.hexRenderer = new HexRenderer(this.ctx);
     this.tileRenderer = new TileRenderer(this.ctx);
     this.inputManager = new InputManager(canvas, {
-      onPan: (delta) => this.handlePan(delta),
-      onZoom: (delta) => this.handleZoom(delta),
-      onHover: (point) => this.handleHover(point),
+      onPan: (containerDelta) => this.handlePan(containerDelta),
+      onZoom: (zoomDelta) => this.handleZoom(zoomDelta),
+      onHover: (containerPoint) => this.handleHover(containerPoint),
       onLeave: () => this.handleLeave(),
-      onClick: (_point) => this.handleMouseClick(),
+      onClick: (_containerPoint) => this.handleMouseClick(),
       onRotateClockwise: () => this.handleRotateClockwise(),
       onRotateCounterClockwise: () => this.handleRotateCounterClockwise(),
       onResize: () => this.handleResize(),
@@ -147,7 +147,7 @@ export class CanvasController {
 
     // 2. Camera Transform
     this.ctx.save();
-    applyCameraTransformToCanvas(this.camera, this.ctx, this.canvas.width, this.canvas.height);
+    this.applyCameraTransformToCanvas();
 
     // 3. Draw World
     this.hexRenderer.drawDebugGrid(5);
@@ -182,6 +182,15 @@ export class CanvasController {
     this.publishDebugSnapshot();
   }
 
+  private applyCameraTransformToCanvas(): void {
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+    this.ctx.translate(w / 2, h / 2);
+    this.ctx.rotate(this.camera.rotation);
+    this.ctx.scale(this.camera.zoom, this.camera.zoom);
+    this.ctx.translate(this.camera.pan.x, this.camera.pan.y);
+  }
+
   private publishDebugSnapshot() {
     const now = performance.now();
     if (this.debugState.listeners.size === 0 || now - this.debugState.lastDebugUpdateTime <= 500) {
@@ -190,8 +199,7 @@ export class CanvasController {
     this.debugState.snapshot = {
       fps: Math.round(this.debugState.fps),
       camera: {
-        x: this.camera.pan.x,
-        y: this.camera.pan.y,
+        position: this.camera.pan,
         zoom: this.camera.zoom,
         rotation: this.camera.rotation,
       },
@@ -203,16 +211,20 @@ export class CanvasController {
 
   // --- Input Handlers ---
 
-  private handlePan(delta: ContainerDelta) {
-    this.camera.panBy(delta);
+  private handlePan(containerDelta: ContainerDelta) {
+    this.camera.panBy(containerDelta);
   }
 
-  private handleZoom(delta: number) {
-    applyWheelDeltaYToCamera(this.camera, delta);
+  private handleZoom(zoomDelta: number) {
+    applyWheelDeltaYToCamera(this.camera, zoomDelta);
   }
 
-  private handleHover(point: ContainerPoint) {
-    const worldPos = this.camera.containerToWorld(point, this.canvas.width, this.canvas.height);
+  private handleHover(containerPoint: ContainerPoint) {
+    const worldPos = this.camera.containerToWorld(
+      containerPoint,
+      this.canvas.width,
+      this.canvas.height
+    );
 
     const validCoords = this.getGameSnapshot().hints.validPlacements;
 
@@ -275,7 +287,7 @@ export class CanvasController {
       listeners: new Set<() => void>(),
       snapshot: {
         fps: 0,
-        camera: { x: 0, y: 0, zoom: 1, rotation: radians(0) },
+        camera: { position: WORLD_ORIGIN, zoom: 1, rotation: radians(0) },
         hoveredHex: null,
       },
     };

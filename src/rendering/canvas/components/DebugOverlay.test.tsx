@@ -4,6 +4,7 @@ import { radians } from '../../../utils/Angle';
 import { DebugOverlay } from './DebugOverlay';
 import { CanvasController } from '../engine/CanvasController';
 import { HexCoordinate } from '../../../models/HexCoordinate';
+import { WorldPoint } from '../../common/WorldPoint';
 
 // Mock CanvasController
 const mockController = {
@@ -22,7 +23,7 @@ describe('DebugOverlay', () => {
     });
     (mockController.getDebugSnapshot as any).mockReturnValue({
       fps: 0,
-      camera: { x: 0, y: 0, zoom: 1.0, rotation: radians(0) },
+      camera: { position: WorldPoint.xy(0, 0), zoom: 1.0, rotation: radians(0) },
       hoveredHex: null,
     });
   });
@@ -43,7 +44,7 @@ describe('DebugOverlay', () => {
     act(() => {
       (mockController.getDebugSnapshot as any).mockReturnValue({
         fps: 60,
-        camera: { x: 10, y: 20, zoom: 1.5, rotation: radians(0) },
+        camera: { position: WorldPoint.xy(10, 20), zoom: 1.5, rotation: radians(0) },
         hoveredHex: new HexCoordinate(1, -1, 0),
       });
       if (statsCallback) {
@@ -64,7 +65,7 @@ describe('DebugOverlay', () => {
     act(() => {
       (mockController.getDebugSnapshot as any).mockReturnValue({
         fps: 60,
-        camera: { x: 0, y: 0, zoom: 1.0, rotation: radians(0) },
+        camera: { position: WorldPoint.xy(0, 0), zoom: 1.0, rotation: radians(0) },
         hoveredHex: null,
       });
       if (statsCallback) {
@@ -77,7 +78,7 @@ describe('DebugOverlay', () => {
     act(() => {
       (mockController.getDebugSnapshot as any).mockReturnValue({
         fps: 30,
-        camera: { x: 100, y: -50, zoom: 2.0, rotation: radians(0) },
+        camera: { position: WorldPoint.xy(100, -50), zoom: 2.0, rotation: radians(0) },
         hoveredHex: new HexCoordinate(2, -3, 1),
       });
       if (statsCallback) {

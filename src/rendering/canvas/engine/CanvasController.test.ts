@@ -27,9 +27,6 @@ vi.mock('../graphics/TileRenderer');
 vi.mock('../graphics/DebugRenderer');
 vi.mock('../graphics/BackgroundRenderer');
 vi.mock('./InputManager');
-vi.mock('../applyCameraTransform', () => ({
-  applyCameraTransformToCanvas: vi.fn(),
-}));
 vi.mock('../../common/camera/Camera', () => {
   function MockCamera(this: { zoom: number; rotation: Radians; pan: { x: number; y: number } }) {
     const pan = { x: 0, y: 0 };
@@ -165,8 +162,7 @@ describe('CanvasController', () => {
       expect.objectContaining({
         fps: expect.any(Number),
         camera: expect.objectContaining({
-          x: expect.any(Number),
-          y: expect.any(Number),
+          position: expect.objectContaining({ x: expect.any(Number), y: expect.any(Number) }),
           zoom: expect.any(Number),
         }),
         hoveredHex: null,

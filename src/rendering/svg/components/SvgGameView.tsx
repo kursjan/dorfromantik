@@ -1,7 +1,7 @@
 import { type FC, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ContainerPoint } from '../../common/ContainerPoint';
 import { WorldPoint } from '../../common/WorldPoint';
-import type { CameraSnapshot } from '../cameraSnapshot';
+import type { CameraSnapshot } from '../../common/camera/CameraSnapshot';
 import { SvgBoard } from './SvgBoard';
 import { Game } from '../../../models/Game';
 import { GameHUD } from '../../shell/GameHUD';

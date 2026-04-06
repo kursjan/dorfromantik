@@ -11,19 +11,20 @@ The canvas visualization logic is separated from the React component tree to ens
 
 ## 2. Directory Structure
 
-Canvas-only code lives under **`src/rendering/canvas/`**. Shared camera / hex math / React game bridge is in **`src/rendering/common/`**. Game chrome (HUD, reset, save status) is in **`src/rendering/shell/`**. Firestore debounced saves: **`src/services/GameAutosaver.ts`** (see `src/services/ARCHITECTURE.md`). Cross-cutting **coordinate types, `Camera`, and pointer binding** are summarized in **`../ARCHITECTURE.md`** (rendering root).
+Canvas-only code lives under **`src/rendering/canvas/`**. Shared camera / hex math / React game bridge is in **`src/rendering/common/`**. Game chrome (HUD, reset, save status) is in **`src/rendering/shell/`**. Firestore debounced saves: **`src/services/GameAutosaver.ts`** (see `src/services/ARCHITECTURE.md`). Cross-cutting **coordinate types, `Camera`, `CameraSnapshot`, and pointer binding** are summarized in **`../ARCHITECTURE.md`** (rendering root).
 
 ```
 src/rendering/canvas/
-├── applyCameraTransform.ts # Viewport-centered Context2D chain (center → rotate → scale → pan)
 ├── components/
 │   ├── TilePreview.tsx     # Small canvas preview of a tile (optional neighborEdgeTerrains for hybrid edges)
 │   ├── Tiles/              # Storybook stories (canvas tile previews)
 │   ├── CanvasView.tsx      # Entry: canvas + shell imports + debug overlay
 │   ├── DebugOverlay.tsx    # React technical overlay (FPS, camera); fed by CanvasController
 │   └── DebugOverlay.css
+├── hooks/
+│   └── useCanvasControllerDebugStats.ts  # useSyncExternalStore bridge for DebugOverlay
 ├── engine/
-│   ├── CanvasController.ts # rAF loop & state holder
+│   ├── CanvasController.ts # rAF loop, state holder, viewport-centered Context2D camera chain
 │   └── InputManager.ts       # Canvas DOM listeners
 ├── graphics/               # Context2D renderers + HexStyles (imports shared hex layout / palette from ../common)
 └── ARCHITECTURE.md         # This file
@@ -50,7 +51,7 @@ Understanding the coordinate spaces is critical for this engine. Branded **`Clie
     - Infinite 2D plane in **layout units** (hex geometry, camera pan).
     - Origin `(0, 0)` is the center of the initial view before pan.
     - **Transformation (conceptual):** container pixel = center + rotate + scale × (world + camera pan). Inverting that chain is **`containerToWorld`**.
-    - Camera pan is exposed as **`camera.pan`** (`WorldPoint`). The SVG path mirrors the same numbers as **`CameraSnapshot.position`**.
+    - **`Camera.pan`** is the world offset (`WorldPoint`). **`DebugStats.camera`** is **`CameraSnapshot`** with **`position`** equal to **`camera.pan`**; SVG uses the same **`CameraSnapshot`** type.
 
 5.  **Hex space (cube coordinates):**
     - Integer coordinates `(q, r, s)` where `q + r + s = 0`.
@@ -82,7 +83,7 @@ Manages the view transform (shared with the SVG board path).
 
 - **Pan:** **`pan`** getter — world-space offset (**`WorldPoint`**); same values as SVG **`CameraSnapshot.position`** (see **`useCameraControls`** → **`readTransform`**).
 - **Zoom / rotation:** scalars; **`zoomBy`**, **`rotateBy`**, **`reset`** match config defaults.
-- **Canvas draw path:** **`applyCameraTransformToCanvas(camera, ctx, w, h)`** in **`applyCameraTransform.ts`** applies center translate → rotate → scale → **`camera.pan`** translate (matches SVG **`SvgBoard`** transform order).
+- **Canvas draw path:** **`CanvasController`** applies center translate → rotate → scale → **`camera.pan`** translate on the `Context2D` (matches SVG **`SvgBoard`** transform order).
 - **Methods:** **`containerToWorld(point, w, h)`**, **`panBy(ContainerDelta)`**, **`zoomBy`**, **`rotateBy`**, **`reset`**.
 
 ### InputManager (`engine/InputManager.ts`)
@@ -129,7 +130,7 @@ While the Controller runs independently for performance, the React tree must hol
 - **Pattern:** `CanvasController` is constructed with **`getGameSnapshot()`** and **`setGameSnapshot(game)`**. It does not mirror `Game` on `this`; it reads the latest snapshot from the getter each frame and calls **`setGameSnapshot`** after place / rotate with the returned snapshot.
 - **`CanvasView`:** Receives **`activeGame`** and **`setActiveGame`** from the parent (e.g. **`GameBoard`** from **`useActiveGame()`**). Uses **`useGameSnapshotBridge`**: syncs a **ref** from **`activeGame`** (e.g. **`useLayoutEffect`**) and wraps **`setActiveGame`** into **`setGameSnapshot`**, which updates the ref **synchronously** with each new snapshot (avoids the rAF loop lagging React by one frame). The HUD reads **score / turns / next tile** from the **`activeGame` prop**, not a separate stats callback.
 - **Nullability Convention:** For app state, "no active game" is represented by **`null`** (`Game | null`) across `ActiveGameContext`, `GameBoard`, and `GameAutosaver`. This keeps absence explicit and avoids mixing domain state with optional-property `undefined`.
-- **Debug stats:** `CanvasController` exposes **`subscribeDebug`** and **`getDebugSnapshot`** for high-frequency updates (FPS, camera pan as flat **`x`/`y`**, zoom, rotation, hover) consumed by **`DebugOverlay`** via **`useSyncExternalStore`**. Those **`x`/`y`** match **`camera.pan`**.
+- **Debug stats:** `CanvasController` exposes **`subscribeDebug`** and **`getDebugSnapshot`** for high-frequency updates (FPS, camera **`pan` as `WorldPoint`**, zoom, rotation, hover) consumed by **`DebugOverlay`** via **`useSyncExternalStore`**. **`pan`** matches **`Camera.pan`**.
 
 ## 6. Data Flow Example: Hovering (Magnetic Snapping)
 
@@ -142,7 +143,7 @@ While the Controller runs independently for performance, the React tree must hol
     - Updates `this.hoveredHex` to that closest valid coordinate (snapping effect).
 4.  **Render Loop:**
     - Calls `backgroundRenderer.draw()`.
-    - Calls `applyCameraTransformToCanvas(this.camera, ctx, canvas.width, canvas.height)` (center → rotate → scale → pan).
+    - Applies the camera transform on `ctx` (center → rotate → scale → pan).
     - Calls `hexRenderer.drawHighlight(this.hoveredHex)`.
     - Calls `ctx.restore()` (Reverts transform).
     - Publishes debug snapshot.

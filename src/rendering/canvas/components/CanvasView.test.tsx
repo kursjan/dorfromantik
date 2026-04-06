@@ -5,13 +5,14 @@ import { Game } from '../../../models/Game';
 import { Tile } from '../../../models/Tile';
 import { GameRules } from '../../../models/GameRules';
 import { radians } from '../../../utils/Angle';
+import { WorldPoint } from '../../common/WorldPoint';
 import { CanvasController } from '../engine/CanvasController';
 import { CanvasView } from './CanvasView';
 
 vi.mock('../engine/CanvasController', () => {
   const mockSnapshot = {
     fps: 0,
-    camera: { x: 0, y: 0, zoom: 1, rotation: radians(0) },
+    camera: { position: WorldPoint.xy(0, 0), zoom: 1, rotation: radians(0) },
     hoveredHex: null,
   };
   const MockController = vi.fn();
