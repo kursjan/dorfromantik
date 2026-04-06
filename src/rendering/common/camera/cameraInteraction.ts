@@ -43,7 +43,7 @@ export class PointerPanZoomSession {
     if (this.state === 'PANNING') {
       return this.moveWhilePanning(point);
     }
-    return { type: 'none' };
+    return { type: 'none' } satisfies PanZoomMoveResult;
   }
 
   endLeftButton(): void {
@@ -58,23 +58,23 @@ export class PointerPanZoomSession {
     return this.state === 'PANNING' ? 'grabbing' : 'grab';
   }
 
-  private moveWhilePotentialClick(point: ClientPoint): PanZoomMoveResult {
+  private moveWhilePotentialClick(point: ClientPoint) {
     if (!this.exceedsDragThreshold(point)) {
-      return { type: 'none' };
+      return { type: 'none' } satisfies PanZoomMoveResult;
     }
     this.state = 'PANNING';
     this.lastPoint = point;
-    return { type: 'entered_pan' };
+    return { type: 'entered_pan' } satisfies PanZoomMoveResult;
   }
 
-  private moveWhilePanning(point: ClientPoint): PanZoomMoveResult {
+  private moveWhilePanning(point: ClientPoint) {
     const delta = ClientDelta.between(this.lastPoint, point);
     this.lastPoint = point;
-    return { type: 'pan', delta };
+    return { type: 'pan', delta } satisfies PanZoomMoveResult;
   }
 
   private exceedsDragThreshold(point: ClientPoint): boolean {
-    const d = ClientDelta.between(this.mouseDownPoint, point).absolute();
+    const d = ClientDelta.absolute(ClientDelta.between(this.mouseDownPoint, point));
     return d.x > this.dragThresholdClient.x || d.y > this.dragThresholdClient.y;
   }
 }
@@ -108,27 +108,27 @@ export function bindPointerInteraction(
   };
 
   const handleMouseDown = (e: MouseEvent) => {
-    if (e.button === MOUSE_BUTTON_SECONDARY) {
-      if (e.shiftKey) {
-        callbacks.onRotateCounterClockwise();
-      } else {
-        callbacks.onRotateClockwise();
-      }
-      return;
+    switch (e.button) {
+      case MOUSE_BUTTON_SECONDARY:
+        if (e.shiftKey) {
+          callbacks.onRotateCounterClockwise();
+        } else {
+          callbacks.onRotateClockwise();
+        }
+        break;
+      case MOUSE_BUTTON_PRIMARY:
+        panPointer.beginLeftButton(ClientPoint.fromMouseEvent(e));
+        syncCursor();
+        break;
+      default:
+        // Middle/auxiliary buttons — no camera action
+        break;
     }
-
-    if (e.button !== MOUSE_BUTTON_PRIMARY) return;
-
-    panPointer.beginLeftButton(ClientPoint.fromMouseEvent(e));
-    syncCursor();
   };
 
   const handleMouseMove = (e: MouseEvent) => {
     callbacks.onHover(
-      ContainerPoint.fromClientInElement(
-        ClientPoint.fromMouseEvent(e),
-        element.getBoundingClientRect()
-      )
+      ContainerPoint.fromClient(ClientPoint.fromMouseEvent(e), element.getBoundingClientRect())
     );
 
     const panMove = panPointer.onClientMove(ClientPoint.fromMouseEvent(e));
@@ -150,7 +150,7 @@ export function bindPointerInteraction(
 
   const handleMouseUp = (e: MouseEvent) => {
     const rect = element.getBoundingClientRect();
-    finishInteraction(ContainerPoint.fromClientInElement(ClientPoint.fromMouseEvent(e), rect));
+    finishInteraction(ContainerPoint.fromClient(ClientPoint.fromMouseEvent(e), rect));
   };
 
   const handleMouseLeave = () => {

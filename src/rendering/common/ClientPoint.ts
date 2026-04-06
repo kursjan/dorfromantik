@@ -1,41 +1,29 @@
 type ClientPointBrand = { readonly __brand: 'ClientPoint' };
 export type ClientPoint = Readonly<{ x: number; y: number }> & ClientPointBrand;
 
-function createClientPoint(x: number, y: number): ClientPoint {
-  return Object.freeze({ x, y }) as ClientPoint;
-}
-
 export const ClientPoint = {
   xy(x: number, y: number): ClientPoint {
-    return createClientPoint(x, y);
+    return Object.freeze({ x, y }) as ClientPoint;
   },
 
   fromMouseEvent(e: Pick<MouseEvent, 'clientX' | 'clientY'>): ClientPoint {
-    return createClientPoint(e.clientX, e.clientY);
+    return Object.freeze({ x: e.clientX, y: e.clientY }) as ClientPoint;
   },
 };
 
 type ClientDeltaBrand = { readonly __brand: 'ClientDelta' };
-export type ClientDelta = Readonly<{ x: number; y: number; absolute(): ClientDelta }> &
-  ClientDeltaBrand;
-
-function createClientDelta(x: number, y: number): ClientDelta {
-  const delta = Object.freeze({
-    x,
-    y,
-    absolute(): ClientDelta {
-      return createClientDelta(Math.abs(x), Math.abs(y));
-    },
-  });
-  return delta as ClientDelta;
-}
+export type ClientDelta = Readonly<{ x: number; y: number }> & ClientDeltaBrand;
 
 export const ClientDelta = {
   xy(x: number, y: number): ClientDelta {
-    return createClientDelta(x, y);
+    return Object.freeze({ x, y }) as ClientDelta;
   },
 
   between(from: ClientPoint, to: ClientPoint): ClientDelta {
-    return createClientDelta(to.x - from.x, to.y - from.y);
+    return Object.freeze({ x: to.x - from.x, y: to.y - from.y }) as ClientDelta;
+  },
+
+  absolute(delta: ClientDelta): ClientDelta {
+    return Object.freeze({ x: Math.abs(delta.x), y: Math.abs(delta.y) }) as ClientDelta;
   },
 };
