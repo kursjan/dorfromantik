@@ -23,25 +23,25 @@ export class PointerPanZoomSession {
   private readonly dragThresholdClient: ClientDelta;
 
   private state: PanZoomState = 'IDLE';
-  private mouseDownClient: ClientPoint = ClientPoint.xy(0, 0);
-  private lastClient: ClientPoint = ClientPoint.xy(0, 0);
+  private mouseDownPoint: ClientPoint = ClientPoint.xy(0, 0);
+  private lastPoint: ClientPoint = ClientPoint.xy(0, 0);
 
   constructor(dragThresholdClient: ClientDelta = CAMERA_INTERACTION.dragThresholdClient) {
     this.dragThresholdClient = dragThresholdClient;
   }
 
-  beginLeftButton(client: ClientPoint): void {
+  beginLeftButton(clientPoint: ClientPoint): void {
     this.state = 'MOUSE_DOWN_POTENTIAL_CLICK';
-    this.mouseDownClient = ClientPoint.xy(client.x, client.y);
-    this.lastClient = ClientPoint.xy(client.x, client.y);
+    this.mouseDownPoint = clientPoint;
+    this.lastPoint = clientPoint;
   }
 
-  onClientMove(client: ClientPoint): PanZoomMoveResult {
+  onClientMove(point: ClientPoint): PanZoomMoveResult {
     if (this.state === 'MOUSE_DOWN_POTENTIAL_CLICK') {
-      return this.moveWhilePotentialClick(client);
+      return this.moveWhilePotentialClick(point);
     }
     if (this.state === 'PANNING') {
-      return this.moveWhilePanning(client);
+      return this.moveWhilePanning(point);
     }
     return { type: 'none' };
   }
@@ -58,30 +58,30 @@ export class PointerPanZoomSession {
     return this.state === 'PANNING' ? 'grabbing' : 'grab';
   }
 
-  private moveWhilePotentialClick(client: ClientPoint): PanZoomMoveResult {
-    if (!this.exceedsDragThreshold(client)) {
+  private moveWhilePotentialClick(point: ClientPoint): PanZoomMoveResult {
+    if (!this.exceedsDragThreshold(point)) {
       return { type: 'none' };
     }
     this.state = 'PANNING';
-    this.lastClient = ClientPoint.xy(client.x, client.y);
+    this.lastPoint = point;
     return { type: 'entered_pan' };
   }
 
-  private moveWhilePanning(client: ClientPoint): PanZoomMoveResult {
-    const delta = ClientDelta.between(this.lastClient, client);
-    this.lastClient = ClientPoint.xy(client.x, client.y);
+  private moveWhilePanning(point: ClientPoint): PanZoomMoveResult {
+    const delta = ClientDelta.between(this.lastPoint, point);
+    this.lastPoint = point;
     return { type: 'pan', delta };
   }
 
-  private exceedsDragThreshold(client: ClientPoint): boolean {
-    const d = ClientDelta.between(this.mouseDownClient, client).absolute();
+  private exceedsDragThreshold(point: ClientPoint): boolean {
+    const d = ClientDelta.between(this.mouseDownPoint, point).absolute();
     return d.x > this.dragThresholdClient.x || d.y > this.dragThresholdClient.y;
   }
 }
 
 interface PointerInteractionCallbacks {
   onPan: (delta: ContainerDelta) => void;
-  onZoom: (deltaY: number) => void;
+  onZoom: (zoomDelta: number) => void;
   onHover: (point: ContainerPoint) => void;
   onClick: (point: ContainerPoint) => void;
   onRotateClockwise: () => void;

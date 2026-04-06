@@ -2,18 +2,15 @@ import { useRef, useCallback, useLayoutEffect } from 'react';
 import type { Game } from '../../../models/Game';
 
 export interface GameSnapshotBridge {
-  /** Always returns the latest immutable snapshot (ref), for imperative canvas code that outlives renders. */
+  /** Latest `Game` from a ref (rAF, pointer handlers, etc.—not tied to the last render). */
   getGameSnapshot: () => Game;
-  /** Updates ref synchronously and React context so canvas + UI stay aligned. */
+  /** Updates ref and calls `setActiveGame` so imperative code and React stay aligned. */
   setGameSnapshot: (newGame: Game) => void;
 }
 
 /**
- * Bridge between React’s `activeGame` (context) and the imperative {@link CanvasController}:
- * stable `getGameSnapshot` / `setGameSnapshot` so the rAF render loop always sees the latest
- * immutable snapshot without waiting for React to commit, while `setGameSnapshot` still updates
- * context for the HUD and autosaver. Ref is synced from the `activeGame` prop via `useLayoutEffect`
- * when context updates (e.g. load game); controller-driven updates still use synchronous ref writes in `setGameSnapshot`.
+ * Ref mirror of `activeGame`: imperative code sees the current snapshot immediately; `setGameSnapshot` keeps
+ * context in sync for HUD/autosave. Prop changes (e.g. load game) copy in via `useLayoutEffect`.
  */
 export function useGameSnapshotBridge(
   activeGame: Game,

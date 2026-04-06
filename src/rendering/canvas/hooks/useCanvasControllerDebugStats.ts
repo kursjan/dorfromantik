@@ -2,7 +2,7 @@ import { useSyncExternalStore, useCallback } from 'react';
 import { radians } from '../../../utils/Angle';
 import { WORLD_ORIGIN } from '../../common/WorldPoint';
 import type { CanvasController, DebugStats } from '../engine/CanvasController';
-import type { CameraSnapshot } from '@/rendering/common/camera/CameraSnapshot';
+import type { CameraSnapshot } from '../../common/camera/CameraSnapshot';
 
 const emptySnapshot: DebugStats = {
   fps: 0,
