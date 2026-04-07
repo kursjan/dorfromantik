@@ -3,7 +3,6 @@ import type { CameraSnapshot } from '../../common/camera/CameraSnapshot';
 import {
   cameraContainerToWorld,
   panCameraSnapshotBy,
-  resetCameraSnapshot,
   rotateCameraSnapshotBy,
 } from '../../common/camera/cameraTransforms';
 import { InputManager } from './InputManager';
@@ -103,7 +102,7 @@ export class CanvasController {
   }
 
   public resetCamera() {
-    this.cameraSnapshot = resetCameraSnapshot();
+    this.cameraSnapshot = { ...DEFAULT_CAMERA_SNAPSHOT };
   }
 
   public get activeGame(): Game {

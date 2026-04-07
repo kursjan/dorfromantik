@@ -9,11 +9,7 @@ import {
   bindPointerInteraction,
   type PointerInteractionCallbacks,
 } from '../../common/camera/cameraInteraction';
-import {
-  cameraContainerToWorld,
-  panCameraSnapshotBy,
-  resetCameraSnapshot,
-} from '../../common/camera/cameraTransforms';
+import { cameraContainerToWorld, panCameraSnapshotBy } from '../../common/camera/cameraTransforms';
 
 export type ContainerToWorldFn = (point: ContainerPoint) => WorldPoint;
 
@@ -74,7 +70,7 @@ export function useCameraControls(
   }, [containerRef, sync]);
 
   const resetCamera = useCallback(() => {
-    cameraRef.current = resetCameraSnapshot();
+    cameraRef.current = { ...DEFAULT_CAMERA_SNAPSHOT };
     sync();
   }, [sync]);
 

@@ -1,7 +1,7 @@
 import { type Radians, radians } from '../../../utils/Angle';
 import type { ContainerDelta, ContainerPoint } from '../ContainerPoint';
 import { WorldPoint } from '../WorldPoint';
-import { DEFAULT_CAMERA_SNAPSHOT, type CameraSnapshot } from './CameraSnapshot';
+import type { CameraSnapshot } from './CameraSnapshot';
 
 /** Map container-local pixels to world space for the given camera pose. */
 export function cameraContainerToWorld(
@@ -69,8 +69,4 @@ export function rotateCameraSnapshotBy(
     ...snapshot,
     rotation: radians(snapshot.rotation + deltaRadians),
   } satisfies CameraSnapshot;
-}
-
-export function resetCameraSnapshot(): CameraSnapshot {
-  return { ...DEFAULT_CAMERA_SNAPSHOT } satisfies CameraSnapshot;
 }
