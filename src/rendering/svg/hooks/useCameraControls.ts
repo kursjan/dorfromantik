@@ -1,8 +1,7 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
-import { Camera } from '../../common/camera/Camera';
 import type { ContainerDelta, ContainerPoint } from '../../common/ContainerPoint';
-import { WORLD_ORIGIN, WorldPoint } from '../../common/WorldPoint';
+import { WORLD_ORIGIN, type WorldPoint } from '../../common/WorldPoint';
 import { DEFAULT_CAMERA_SNAPSHOT, type CameraSnapshot } from '../../common/camera/CameraSnapshot';
 import {
   PointerPanZoomSession,
@@ -10,6 +9,11 @@ import {
   bindPointerInteraction,
   type PointerInteractionCallbacks,
 } from '../../common/camera/cameraInteraction';
+import {
+  cameraContainerToWorld,
+  panCameraSnapshotBy,
+  resetCameraSnapshot,
+} from '../../common/camera/cameraTransforms';
 
 export type ContainerToWorldFn = (point: ContainerPoint) => WorldPoint;
 
@@ -29,7 +33,7 @@ export function useCameraControls(
   resetCamera: () => void;
   containerToWorld: ContainerToWorldFn;
 } {
-  const cameraRef = useRef(new Camera(DEFAULT_CAMERA_SNAPSHOT));
+  const cameraRef = useRef<CameraSnapshot>({ ...DEFAULT_CAMERA_SNAPSHOT });
   const panPointerRef = useRef(new PointerPanZoomSession());
   const [camera, setCamera] = useState<CameraSnapshot>({ ...DEFAULT_CAMERA_SNAPSHOT });
 
@@ -40,7 +44,7 @@ export function useCameraControls(
   }, [callbacks]);
 
   const sync = useCallback(() => {
-    setCamera(readCameraSnapshot(cameraRef.current));
+    setCamera({ ...cameraRef.current });
   }, []);
 
   useLayoutEffect(() => {
@@ -48,15 +52,13 @@ export function useCameraControls(
     if (!container) return;
 
     const panPointer = panPointerRef.current;
-    const cameraModel = cameraRef.current;
-
     const pointerCallbacks = {
       onPan: (delta: ContainerDelta) => {
-        cameraModel.panBy(delta);
+        cameraRef.current = panCameraSnapshotBy(cameraRef.current, delta);
         sync();
       },
       onZoom: (deltaY) => {
-        applyWheelDeltaYToCamera(cameraModel, deltaY);
+        cameraRef.current = applyWheelDeltaYToCamera(cameraRef.current, deltaY);
         sync();
       },
       onHover: (point) => callbacksRef.current.onHover(point),
@@ -72,7 +74,7 @@ export function useCameraControls(
   }, [containerRef, sync]);
 
   const resetCamera = useCallback(() => {
-    cameraRef.current.reset();
+    cameraRef.current = resetCameraSnapshot();
     sync();
   }, [sync]);
 
@@ -81,18 +83,10 @@ export function useCameraControls(
       const container = containerRef.current;
       if (!container) return WORLD_ORIGIN;
       const rect = container.getBoundingClientRect();
-      return cameraRef.current.containerToWorld(point, rect.width, rect.height);
+      return cameraContainerToWorld(cameraRef.current, point, rect.width, rect.height);
     },
     [containerRef]
   ) satisfies ContainerToWorldFn;
 
   return { camera, resetCamera, containerToWorld };
-}
-
-function readCameraSnapshot(camera: Camera): CameraSnapshot {
-  return {
-    position: camera.pan,
-    zoom: camera.zoom,
-    rotation: camera.rotation,
-  } satisfies CameraSnapshot;
 }

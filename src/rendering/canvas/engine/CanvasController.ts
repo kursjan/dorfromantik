@@ -1,6 +1,11 @@
 import { applyWheelDeltaYToCamera } from '../../common/camera/cameraInteraction';
-import { Camera } from '../../common/camera/Camera';
 import type { CameraSnapshot } from '../../common/camera/CameraSnapshot';
+import {
+  cameraContainerToWorld,
+  panCameraSnapshotBy,
+  resetCameraSnapshot,
+  rotateCameraSnapshotBy,
+} from '../../common/camera/cameraTransforms';
 import { InputManager } from './InputManager';
 import { HexRenderer } from '../graphics/HexRenderer';
 import { TileRenderer } from '../graphics/TileRenderer';
@@ -49,7 +54,7 @@ export class CanvasController {
 
   private readonly backgroundRenderer: BackgroundRenderer;
   private readonly canvas: HTMLCanvasElement;
-  private readonly camera: Camera;
+  private cameraSnapshot: CameraSnapshot;
   private readonly ctx: CanvasRenderingContext2D;
   private readonly inputManager: InputManager;
   private readonly hexRenderer: HexRenderer;
@@ -65,7 +70,7 @@ export class CanvasController {
     this.setGameSnapshot = options.setGameSnapshot;
     this.ctx = this.getRequired2dContext(canvas);
 
-    this.camera = new Camera(DEFAULT_CAMERA_SNAPSHOT);
+    this.cameraSnapshot = { ...DEFAULT_CAMERA_SNAPSHOT };
     this.backgroundRenderer = new BackgroundRenderer(this.ctx);
     this.hexRenderer = new HexRenderer(this.ctx);
     this.tileRenderer = new TileRenderer(this.ctx);
@@ -98,7 +103,7 @@ export class CanvasController {
   }
 
   public resetCamera() {
-    this.camera.reset();
+    this.cameraSnapshot = resetCameraSnapshot();
   }
 
   public get activeGame(): Game {
@@ -134,8 +139,11 @@ export class CanvasController {
 
   private processContinuousInput() {
     const rotationDir = this.inputManager.getRotationDirection();
-    if (rotationDir !== 0) {
-      this.camera.rotateBy(radians(rotationDir * CanvasController.ROTATION_SPEED));
+    if (rotationDir !== 0 && Number.isFinite(rotationDir)) {
+      this.cameraSnapshot = rotateCameraSnapshotBy(
+        this.cameraSnapshot,
+        radians(rotationDir * CanvasController.ROTATION_SPEED)
+      );
     }
   }
 
@@ -186,9 +194,9 @@ export class CanvasController {
     const w = this.canvas.width;
     const h = this.canvas.height;
     this.ctx.translate(w / 2, h / 2);
-    this.ctx.rotate(this.camera.rotation);
-    this.ctx.scale(this.camera.zoom, this.camera.zoom);
-    this.ctx.translate(this.camera.pan.x, this.camera.pan.y);
+    this.ctx.rotate(this.cameraSnapshot.rotation);
+    this.ctx.scale(this.cameraSnapshot.zoom, this.cameraSnapshot.zoom);
+    this.ctx.translate(this.cameraSnapshot.position.x, this.cameraSnapshot.position.y);
   }
 
   private publishDebugSnapshot() {
@@ -198,11 +206,7 @@ export class CanvasController {
     }
     this.debugState.snapshot = {
       fps: Math.round(this.debugState.fps),
-      camera: {
-        position: this.camera.pan,
-        zoom: this.camera.zoom,
-        rotation: this.camera.rotation,
-      },
+      camera: this.cameraSnapshot,
       hoveredHex: this.hoveredHex,
     };
     this.debugState.lastDebugUpdateTime = now;
@@ -212,15 +216,16 @@ export class CanvasController {
   // --- Input Handlers ---
 
   private handlePan(containerDelta: ContainerDelta) {
-    this.camera.panBy(containerDelta);
+    this.cameraSnapshot = panCameraSnapshotBy(this.cameraSnapshot, containerDelta);
   }
 
   private handleZoom(zoomDelta: number) {
-    applyWheelDeltaYToCamera(this.camera, zoomDelta);
+    this.cameraSnapshot = applyWheelDeltaYToCamera(this.cameraSnapshot, zoomDelta);
   }
 
   private handleHover(containerPoint: ContainerPoint) {
-    const worldPos = this.camera.containerToWorld(
+    const worldPos = cameraContainerToWorld(
+      this.cameraSnapshot,
       containerPoint,
       this.canvas.width,
       this.canvas.height

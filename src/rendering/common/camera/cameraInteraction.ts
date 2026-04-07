@@ -1,6 +1,7 @@
 import { ClientDelta, ClientPoint } from '../ClientPoint';
 import { ContainerDelta, ContainerPoint } from '../ContainerPoint';
-import type { Camera } from './Camera';
+import type { CameraSnapshot } from './CameraSnapshot';
+import { zoomCameraSnapshotBy } from './cameraTransforms';
 
 const CAMERA_INTERACTION = {
   minZoom: 0.5,
@@ -178,8 +179,9 @@ export function bindPointerInteraction(
   };
 }
 
-export function applyWheelDeltaYToCamera(camera: Camera, deltaY: number): void {
-  camera.zoomBy(
+export function applyWheelDeltaYToCamera(snapshot: CameraSnapshot, deltaY: number): CameraSnapshot {
+  return zoomCameraSnapshotBy(
+    snapshot,
     -deltaY * CAMERA_INTERACTION.zoomSensitivity,
     CAMERA_INTERACTION.minZoom,
     CAMERA_INTERACTION.maxZoom

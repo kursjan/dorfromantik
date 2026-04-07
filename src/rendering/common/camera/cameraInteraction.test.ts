@@ -1,20 +1,13 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { ClientDelta, ClientPoint } from '../ClientPoint';
-import { Camera } from './Camera';
 import { DEFAULT_CAMERA_SNAPSHOT } from './CameraSnapshot';
+import { zoomCameraSnapshotBy } from './cameraTransforms';
 import { PointerPanZoomSession, applyWheelDeltaYToCamera } from './cameraInteraction';
 
 describe('applyWheelDeltaYToCamera', () => {
-  it('applies wheel delta via zoomBy with shared limits', () => {
-    const camera = new Camera(DEFAULT_CAMERA_SNAPSHOT);
-    const zoomBy = vi.spyOn(camera, 'zoomBy');
-
-    applyWheelDeltaYToCamera(camera, 100);
-
-    const expectedDelta = -0.1;
-    const expectedMin = 0.5;
-    const expectedMax = 3.0;
-    expect(zoomBy).toHaveBeenCalledWith(expectedDelta, expectedMin, expectedMax);
+  it('returns snapshot zoomed with shared limits', () => {
+    const next = applyWheelDeltaYToCamera(DEFAULT_CAMERA_SNAPSHOT, 100);
+    expect(next).toEqual(zoomCameraSnapshotBy(DEFAULT_CAMERA_SNAPSHOT, -0.1, 0.5, 3.0));
   });
 });
 

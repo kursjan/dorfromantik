@@ -8,7 +8,7 @@ export type CameraSnapshot = Readonly<{
   rotation: Radians;
 }>;
 
-/** Canonical initial pose: origin pan, zoom 1, rotation 0. Used by {@link Camera}, canvas controller, and hooks. */
+/** Canonical initial pose: origin pan, zoom 1, rotation 0. Used by camera transforms, canvas controller, and hooks. */
 export const DEFAULT_CAMERA_SNAPSHOT = {
   position: WORLD_ORIGIN,
   zoom: 1,

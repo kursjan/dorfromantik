@@ -1,4 +1,4 @@
-import { Camera } from '../../common/camera/Camera';
+import type { CameraSnapshot } from '../../common/camera/CameraSnapshot';
 import { HexCoordinate } from '../../../models/HexCoordinate';
 import { DEBUG_OVERLAY_TEXT_COLOR, DEBUG_OVERLAY_FONT } from './DebugStyles';
 
@@ -16,13 +16,13 @@ export class DebugRenderer {
   }
 
   /** @deprecated Canvas path; replace with HTML overlay rendering. */
-  public drawOverlay(camera: Camera, hoveredHex: HexCoordinate | null) {
+  public drawOverlay(camera: CameraSnapshot, hoveredHex: HexCoordinate | null) {
     this.ctx.textAlign = 'left';
     this.ctx.textBaseline = 'alphabetic';
     this.ctx.fillStyle = DEBUG_OVERLAY_TEXT_COLOR;
     this.ctx.font = DEBUG_OVERLAY_FONT;
 
-    let debugText = `Camera: (${Math.round(camera.pan.x)},${Math.round(camera.pan.y)}) Zoom: ${camera.zoom.toFixed(2)}`;
+    let debugText = `Camera: (${Math.round(camera.position.x)},${Math.round(camera.position.y)}) Zoom: ${camera.zoom.toFixed(2)}`;
     if (hoveredHex) {
       debugText += ` | Hover: (${hoveredHex.q},${hoveredHex.r},${hoveredHex.s})`;
     }
