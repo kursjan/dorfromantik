@@ -1,11 +1,10 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useState, useRef } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Board, type BoardTile } from '../../../models/Board';
-import { radians } from '../../../utils/Angle';
 import { ContainerPoint } from '../../common/ContainerPoint';
 import { WorldPoint } from '../../common/WorldPoint';
-import type { CameraSnapshot } from '../../common/camera/CameraSnapshot';
-import { SvgBoard } from './SvgBoard';
+import { DEFAULT_CAMERA_SNAPSHOT, type CameraSnapshot } from '../../common/camera/CameraSnapshot';
+import { SvgBoardCameraShell } from './SvgBoardCameraShell';
 import { HexCoordinate } from '../../../models/HexCoordinate';
 import {
   north,
@@ -26,9 +25,9 @@ import {
   Terrain,
 } from '../../../models/Terrain';
 
-const meta: Meta<typeof SvgBoard> = {
+const meta: Meta<typeof SvgBoardCameraShell> = {
   title: 'SVG/Board',
-  component: SvgBoard,
+  component: SvgBoardCameraShell,
   parameters: {
     layout: 'fullscreen',
   },
@@ -42,7 +41,7 @@ const meta: Meta<typeof SvgBoard> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof SvgBoard>;
+type Story = StoryObj<typeof SvgBoardCameraShell>;
 
 // Helper to create a basic tile
 const createTile = (terrains: Terrain[]): Tile => {
@@ -180,51 +179,61 @@ const singleTileBoard = boardFromTiles(singleTile);
 const flowerBoard = boardFromTiles(flowerTiles);
 const scatteredBoard = boardFromTiles(scatteredTiles);
 
-/** Story viewport pivot (half of typical fullscreen); interactive stories measure their container. */
-const defaultViewCenter: ContainerPoint = ContainerPoint.xy(960, 540);
+/**
+ * Fills the story viewport and sets `viewCenter` from the container size so the board stays
+ * centered (static stories used to hardcode 960×540 + camera offset and drew off-screen).
+ */
+function SvgBoardMeasuredView({
+  board,
+  camera = DEFAULT_CAMERA_SNAPSHOT,
+}: {
+  board: Board;
+  camera?: CameraSnapshot;
+}) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [viewCenter, setViewCenter] = useState(() => ContainerPoint.xy(400, 300));
 
-const defaultCamera: CameraSnapshot = {
-  position: WorldPoint.xy(400, 300),
-  zoom: 1,
-  rotation: radians(0),
-};
+  useLayoutEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const measure = () => {
+      const r = el.getBoundingClientRect();
+      setViewCenter(ContainerPoint.xy(r.width / 2, r.height / 2));
+    };
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  return (
+    <div ref={wrapRef} style={{ width: '100%', height: '100%' }}>
+      <SvgBoardCameraShell board={board} camera={camera} viewCenter={viewCenter} />
+    </div>
+  );
+}
 
 // --- Stories ---
 
 export const SingleTile: Story = {
-  args: {
-    board: singleTileBoard,
-    camera: defaultCamera,
-    viewCenter: defaultViewCenter,
-  },
+  render: () => <SvgBoardMeasuredView board={singleTileBoard} />,
 };
 
 export const FlowerCluster: Story = {
-  args: {
-    board: flowerBoard,
-    camera: defaultCamera,
-    viewCenter: defaultViewCenter,
-  },
+  render: () => <SvgBoardMeasuredView board={flowerBoard} />,
 };
 
 export const ScatteredCluster: Story = {
-  args: {
-    board: scatteredBoard,
-    camera: defaultCamera,
-    viewCenter: defaultViewCenter,
-  },
+  render: () => <SvgBoardMeasuredView board={scatteredBoard} />,
 };
 
 // --- Interactive Story ---
 
 const InteractiveBoard = () => {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [viewCenter, setViewCenter] = useState(defaultViewCenter);
-  const [camera, setCamera] = useState<CameraSnapshot>({
-    position: WorldPoint.xy(400, 300),
-    zoom: 1,
-    rotation: radians(0),
-  });
+  const [viewCenter, setViewCenter] = useState(() => ContainerPoint.xy(400, 300));
+  const [camera, setCamera] = useState<CameraSnapshot>(() => ({ ...DEFAULT_CAMERA_SNAPSHOT }));
   const [isDragging, setIsDragging] = useState(false);
   const lastMouse = useRef({ x: 0, y: 0 });
 
@@ -303,7 +312,7 @@ const InteractiveBoard = () => {
       onPointerUp={handlePointerUp}
       onWheel={handleWheel}
     >
-      <SvgBoard board={scatteredBoard} camera={camera} viewCenter={viewCenter} />
+      <SvgBoardCameraShell board={scatteredBoard} camera={camera} viewCenter={viewCenter} />
       <div
         style={{
           position: 'absolute',
@@ -330,12 +339,12 @@ export const InteractiveCamera: Story = {
 };
 
 /**
- * CSS 3D tilt (rotateX) + spin (rotateZ) around the board plane. SvgBoard camera zoom stays 1 — no zoom.
+ * CSS 3D tilt (rotateX) + spin (rotateZ) around the board plane. Camera zoom stays 1 — no zoom.
  * The map stays 2D; the “perspective” is the whole SVG treated as a card seen from an angle.
  */
 const PerspectiveRotationBoard = () => {
   const boardWrapRef = useRef<HTMLDivElement>(null);
-  const [viewCenter, setViewCenter] = useState(defaultViewCenter);
+  const [viewCenter, setViewCenter] = useState(() => ContainerPoint.xy(400, 300));
   const [tiltX, setTiltX] = useState(52);
   const [rotationZ, setRotationZ] = useState(12);
   const [autoRotate, setAutoRotate] = useState(false);
@@ -362,11 +371,7 @@ const PerspectiveRotationBoard = () => {
     return () => ro.disconnect();
   }, []);
 
-  const boardCamera: CameraSnapshot = {
-    position: WorldPoint.xy(400, 300),
-    zoom: 1,
-    rotation: radians(0),
-  };
+  const boardCamera: CameraSnapshot = DEFAULT_CAMERA_SNAPSHOT;
 
   return (
     <div
@@ -399,7 +404,11 @@ const PerspectiveRotationBoard = () => {
             transition: autoRotate ? undefined : 'transform 0.08s ease-out',
           }}
         >
-          <SvgBoard board={scatteredBoard} camera={boardCamera} viewCenter={viewCenter} />
+          <SvgBoardCameraShell
+            board={scatteredBoard}
+            camera={boardCamera}
+            viewCenter={viewCenter}
+          />
         </div>
       </div>
 
@@ -455,7 +464,7 @@ const PerspectiveRotationBoard = () => {
         </label>
         <p style={{ margin: '10px 0 0 0', fontSize: 11, color: '#555', lineHeight: 1.35 }}>
           Zoom is fixed (camera.zoom = 1). Foreshortening comes from CSS perspective + rotateX, not
-          from SvgBoard scaling.
+          from board camera scaling.
         </p>
       </div>
     </div>

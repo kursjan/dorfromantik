@@ -2,11 +2,11 @@
 
 Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** (DOM game surface), and **common** math/types. Game chrome (HUD, reset, save status) lives in **`src/rendering/shell/`**.
 
-| Area          | Role                                                                                                                                                         |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **`canvas/`** | `CanvasController` game loop, `InputManager`, `Context2D` renderers. See **`canvas/ARCHITECTURE.md`**.                                                       |
-| **`svg/`**    | `SvgGameView` composition, `SvgBoard`, `HexTile`, hooks (`useSvgBoardPointerCamera`, `useSvgWindowInput`, `useSvgGameViewLayout`, `useSvgBoardInteraction`). |
-| **`common/`** | `CameraSnapshot`, `cameraTransforms`, `cameraInteraction`, hex layout (`HexUtils`, `hexLayout`), `useGameSnapshotBridge`, point types.                       |
+| Area          | Role                                                                                                                                                                                |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`canvas/`** | `CanvasController` game loop, `InputManager`, `Context2D` renderers. See **`canvas/ARCHITECTURE.md`**.                                                                              |
+| **`svg/`**    | `SvgGameView` composition, `SvgBoardCameraShell`, `SvgBoard`, `HexTile`, hooks (`useSvgBoardPointerCamera`, `useSvgWindowInput`, `useSvgGameViewLayout`, `useSvgBoardInteraction`). |
+| **`common/`** | `CameraSnapshot`, `cameraTransforms`, `cameraInteraction`, hex layout (`HexUtils`, `hexLayout`), `useGameSnapshotBridge`, point types.                                              |
 
 ## Coordinate types (`common/*.ts`)
 
@@ -33,13 +33,13 @@ Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** 
 
 ## `CameraSnapshot` (`common/camera/CameraSnapshot.ts`)
 
-**`CameraSnapshot`**: **`Readonly<{ position; zoom; rotation }>`** — treat as immutable; replace the whole object to change pose. Shared by **`SvgBoard`** (via **`useSvgBoardPointerCamera`** / **`SvgGameView`**), canvas **`DebugStats.camera`**, and **`CanvasController.cameraSnapshot`**. **`DEFAULT_CAMERA_SNAPSHOT`** is the app-wide default (matches **`WORLD_ORIGIN`** pan).
+**`CameraSnapshot`**: **`Readonly<{ position; zoom; rotation }>`** — treat as immutable; replace the whole object to change pose. Shared by **`SvgBoardCameraShell`** (via **`useSvgBoardPointerCamera`** / **`SvgGameView`**), canvas **`DebugStats.camera`**, and **`CanvasController.cameraSnapshot`**. **`DEFAULT_CAMERA_SNAPSHOT`** is the app-wide default (matches **`WORLD_ORIGIN`** pan).
 
 ## Hooks (SVG)
 
-- **`useSvgBoardPointerCamera`**: keeps **`CameraSnapshot`** in a ref, returns **`camera`** (React state copy), **`cameraRef`**, **`syncCameraToReact`**, **`resetCamera`**, and **`containerToWorld`** (`ContainerToWorldFn`: `ContainerPoint` → `WorldPoint`). **`SvgGameView`** passes that snapshot into **`SvgBoard`** as the **`camera`** prop (with **`deferWorldTransformToParent`** for keyboard rotation).
+- **`useSvgBoardPointerCamera`**: keeps **`CameraSnapshot`** in a ref, returns **`camera`** (React state copy), **`cameraRef`**, **`syncCameraToReact`**, **`resetCamera`**, and **`containerToWorld`** (`ContainerToWorldFn`: `ContainerPoint` → `WorldPoint`). **`SvgGameView`** passes these into **`SvgBoardCameraShell`** with **`getRotationDirection`** from **`useSvgWindowInput`**.
 - **`useSvgWindowInput`**: window **`keydown` / `keyup` / `resize`** parity with canvas **`InputManager`** (Q/E/R/F/F3).
-- **`SvgGameView`**: continuous Q/E camera rotation via a **`requestAnimationFrame`** loop that mutates the world `<g>` **`transform`** and calls **`syncCameraToReact`** when rotation keys release (no `setState` in the hot path).
+- **`SvgBoardCameraShell`**: applies world `<g>` **`transform`** via **`buildSvgWorldTransformString`**; continuous Q/E rotation in **`requestAnimationFrame`** (mutates **`cameraRef`**, updates DOM **`transform`**, **`syncCameraToReact`** when keys release). Wraps **`SvgBoard`** (hex tiles only; shell owns camera **`transform`**). Storybook and **`SvgGameView`** both use this shell; omit **`cameraRef`** to sync an internal ref from **`camera`**.
 - **`useSvgGameViewLayout`**: **`ResizeObserver`** + **`viewSize`** / **`measureContainer`** for **`viewCenter`**.
 - **`useSvgBoardInteraction`**: game actions from pointer; holds **`containerToWorldRef`** so hover can map **`ContainerPoint`** → world before **`closestHexByWorldDistance`**.
 
