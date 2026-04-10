@@ -7,7 +7,9 @@ import { ResetViewButton } from '../../shell/ResetViewButton';
 import { useCameraControls } from '../hooks/useCameraControls';
 import { useSvgBoardInteraction } from '../hooks/useSvgBoardInteraction';
 import { useSvgGameViewLayout } from '../hooks/useSvgGameViewLayout';
+import { useSvgCameraKeyboardRotationRaf } from '../hooks/useSvgCameraKeyboardRotationRaf';
 import { useWindowLevelGameInput } from '../hooks/useWindowLevelGameInput';
+import { applySvgWorldTransformToGroup } from '../svgBoardWorldTransform';
 import { useGameSnapshotBridge } from '../../common/bridge/useGameSnapshotBridge';
 
 interface SvgGameViewProps {
@@ -26,13 +28,13 @@ export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame })
 
   const { viewSize, measureContainer } = useSvgGameViewLayout(containerRef);
 
-  useWindowLevelGameInput({
+  const { getRotationDirection } = useWindowLevelGameInput({
     onRotateClockwise: cameraPointerCallbacks.onRotateClockwise,
     onRotateCounterClockwise: cameraPointerCallbacks.onRotateCounterClockwise,
     onResize: measureContainer,
   });
 
-  const { camera, resetCamera, containerToWorld } = useCameraControls(
+  const { camera, cameraRef, syncCameraToReact, resetCamera, containerToWorld } = useCameraControls(
     containerRef,
     cameraPointerCallbacks
   );
@@ -42,6 +44,25 @@ export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame })
   }, [containerToWorld, containerToWorldRef]);
 
   const viewCenter: ContainerPoint = ContainerPoint.xy(viewSize.width / 2, viewSize.height / 2);
+
+  const viewCenterRef = useRef(viewCenter);
+  useLayoutEffect(() => {
+    viewCenterRef.current = viewCenter;
+  }, [viewCenter]);
+
+  const worldGroupRef = useRef<SVGGElement>(null);
+
+  useLayoutEffect(() => {
+    applySvgWorldTransformToGroup(worldGroupRef.current, cameraRef.current, viewCenter);
+  }, [camera, viewCenter, cameraRef]);
+
+  useSvgCameraKeyboardRotationRaf({
+    worldGroupRef,
+    cameraRef,
+    viewCenterRef,
+    getRotationDirection,
+    syncCameraToReact,
+  });
 
   return (
     <div
@@ -57,7 +78,13 @@ export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame })
         nextTile={activeGame.peek() ?? null}
       />
       <ResetViewButton onClick={() => resetCamera()} />
-      <SvgBoard board={activeGame.board} camera={camera} viewCenter={viewCenter} />
+      <SvgBoard
+        ref={worldGroupRef}
+        board={activeGame.board}
+        camera={camera}
+        viewCenter={viewCenter}
+        deferWorldTransformToParent
+      />
     </div>
   );
 };

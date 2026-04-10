@@ -1,5 +1,5 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-import type { RefObject } from 'react';
+import type { MutableRefObject, RefObject } from 'react';
 import type { ContainerDelta, ContainerPoint } from '../../common/ContainerPoint';
 import { WORLD_ORIGIN, type WorldPoint } from '../../common/WorldPoint';
 import { DEFAULT_CAMERA_SNAPSHOT, type CameraSnapshot } from '../../common/camera/CameraSnapshot';
@@ -26,6 +26,8 @@ export function useCameraControls(
   callbacks: UseCameraControlsCallbacks
 ): {
   camera: CameraSnapshot;
+  cameraRef: MutableRefObject<CameraSnapshot>;
+  syncCameraToReact: () => void;
   resetCamera: () => void;
   containerToWorld: ContainerToWorldFn;
 } {
@@ -84,5 +86,5 @@ export function useCameraControls(
     [containerRef]
   ) satisfies ContainerToWorldFn;
 
-  return { camera, resetCamera, containerToWorld };
+  return { camera, cameraRef, syncCameraToReact: sync, resetCamera, containerToWorld };
 }

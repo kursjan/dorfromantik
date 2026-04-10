@@ -1,11 +1,10 @@
-import React, { useMemo } from 'react';
+import { forwardRef, useMemo } from 'react';
 import { Board } from '../../../models/Board';
-import { radiansToDegrees } from '../../../utils/Angle';
 import type { ContainerPoint } from '../../common/ContainerPoint';
-import type { WorldPoint } from '../../common/WorldPoint';
 import type { CameraSnapshot } from '../../common/camera/CameraSnapshot';
 import { HexTile } from '../tiles/HexTile';
 import { SVG_HEX_RADIUS, hexToPixel } from '../tiles/SvgHexUtils';
+import { buildSvgWorldTransformString } from '../svgBoardWorldTransform';
 
 /** Flat-top hex height in SVG user units (matches {@link HexTile} viewBox). */
 const SVG_HEX_HALF_HEIGHT = (Math.sqrt(3) * SVG_HEX_RADIUS) / 2;
@@ -16,9 +15,17 @@ export interface SvgBoardProps {
   board: Board;
   camera: CameraSnapshot;
   viewCenter: ContainerPoint;
+  /**
+   * When set, the world `<g>` has no `transform` attribute; the parent must set it (e.g. rAF keyboard
+   * rotation + `applySvgWorldTransformToGroup`). Stories and tests keep the default `false`.
+   */
+  deferWorldTransformToParent?: boolean;
 }
 
-export const SvgBoard: React.FC<SvgBoardProps> = ({ board, camera, viewCenter }) => {
+export const SvgBoard = forwardRef<SVGGElement, SvgBoardProps>(function SvgBoard(
+  { board, camera, viewCenter, deferWorldTransformToParent = false },
+  ref
+) {
   // TODO(#73): Per-row memoization or virtualize for large boards.
   const renderedTiles = useMemo(() => {
     return Array.from(board.getAll(), ({ id, tile, coordinate }) => {
@@ -40,11 +47,9 @@ export const SvgBoard: React.FC<SvgBoardProps> = ({ board, camera, viewCenter })
     });
   }, [board]);
 
-  const position: WorldPoint = camera.position;
-  const zoom = camera.zoom;
-  const rotationDeg = radiansToDegrees(camera.rotation);
-
-  const worldTransform = `translate(${viewCenter.x}, ${viewCenter.y}) rotate(${rotationDeg}) scale(${zoom}) translate(${position.x}, ${position.y})`;
+  const worldTransform = deferWorldTransformToParent
+    ? undefined
+    : buildSvgWorldTransformString(camera, viewCenter);
 
   return (
     <svg
@@ -55,7 +60,9 @@ export const SvgBoard: React.FC<SvgBoardProps> = ({ board, camera, viewCenter })
         touchAction: 'none',
       }}
     >
-      <g transform={worldTransform}>{renderedTiles}</g>
+      <g ref={ref} transform={worldTransform}>
+        {renderedTiles}
+      </g>
     </svg>
   );
-};
+});
