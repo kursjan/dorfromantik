@@ -30,7 +30,7 @@ The canvas path implements board interaction through `InputManager` + `CanvasCon
 ## Phase 3: In-the-Middle Adversarial Review
 
 - [x] Perform a rigorous file-by-file review of all changes in this branch against `main` using **quick-review** skill.
-- [x] Address any feedback from `REVIEW_FEEDBACK.md` using **task-conductor** skill.
+- [x] Triage in-the-middle adversarial review findings using **task-conductor** skill (no persistent `REVIEW_FEEDBACK.md` in repo).
 - [ ] **Phase Gate**: Final verification of the in-the-middle code review changes using **project-orchestrator** skill.
 
 ## Phase 4: SVG Input Parity (Keyboard & Window)
@@ -52,7 +52,7 @@ The canvas path implements board interaction through `InputManager` + `CanvasCon
 ## Phase 6: Adversarial Review
 
 - [ ] Perform a rigorous file-by-file review of all changes in this branch against `main` using **quick-review** skill.
-- [ ] Address any feedback from `REVIEW_FEEDBACK.md` using **task-conductor** skill.
+- [ ] Address findings from Phase 6 adversarial review using **task-conductor** skill.
 - [ ] **Phase Gate**: Final verification of code review changes using **project-orchestrator** skill.
 
 ## Phase 7: E2E Test Migration & Parity
