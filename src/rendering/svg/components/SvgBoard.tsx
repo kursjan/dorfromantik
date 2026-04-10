@@ -29,6 +29,7 @@ export const SvgBoard: React.FC<SvgBoardProps> = ({ board, camera, viewCenter })
           {/* Nested <svg> needs explicit size or it fills the parent canvas; x/y keep hex center on (x,y). */}
           <HexTile
             tile={tile}
+            neighborEdgeTerrainTypes={{}}
             x={-SVG_HEX_RADIUS}
             y={-SVG_HEX_HALF_HEIGHT}
             width={SVG_HEX_LAYOUT_WIDTH}

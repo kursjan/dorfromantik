@@ -40,12 +40,42 @@ function tileWithSingleTerrain(
 export const BaseTerrains: Story = {
   render: () => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(130px, 1fr))', gap: 16 }}>
-      <HexTile tile={tileWithSingleTerrain(new TreeTerrain())} width={120} height={120} />
-      <HexTile tile={tileWithSingleTerrain(new HouseTerrain())} width={120} height={120} />
-      <HexTile tile={tileWithSingleTerrain(new WaterTerrain())} width={120} height={120} />
-      <HexTile tile={tileWithSingleTerrain(new PastureTerrain())} width={120} height={120} />
-      <HexTile tile={tileWithSingleTerrain(new RailTerrain())} width={120} height={120} />
-      <HexTile tile={tileWithSingleTerrain(new FieldTerrain())} width={120} height={120} />
+      <HexTile
+        tile={tileWithSingleTerrain(new TreeTerrain())}
+        neighborEdgeTerrainTypes={{}}
+        width={120}
+        height={120}
+      />
+      <HexTile
+        tile={tileWithSingleTerrain(new HouseTerrain())}
+        neighborEdgeTerrainTypes={{}}
+        width={120}
+        height={120}
+      />
+      <HexTile
+        tile={tileWithSingleTerrain(new WaterTerrain())}
+        neighborEdgeTerrainTypes={{}}
+        width={120}
+        height={120}
+      />
+      <HexTile
+        tile={tileWithSingleTerrain(new PastureTerrain())}
+        neighborEdgeTerrainTypes={{}}
+        width={120}
+        height={120}
+      />
+      <HexTile
+        tile={tileWithSingleTerrain(new RailTerrain())}
+        neighborEdgeTerrainTypes={{}}
+        width={120}
+        height={120}
+      />
+      <HexTile
+        tile={tileWithSingleTerrain(new FieldTerrain())}
+        neighborEdgeTerrainTypes={{}}
+        width={120}
+        height={120}
+      />
     </div>
   ),
 };
@@ -63,20 +93,37 @@ const mixedTile = new Tile({
 export const FullyRotatedTile: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: 16 }}>
-      <HexTile tile={mixedTile} width={120} height={120} />
-      <HexTile tile={mixedTile.rotateClockwise()} width={120} height={120} />
-      <HexTile tile={mixedTile.rotateClockwise().rotateClockwise()} width={120} height={120} />
+      <HexTile tile={mixedTile} neighborEdgeTerrainTypes={{}} width={120} height={120} />
+      <HexTile
+        tile={mixedTile.rotateClockwise()}
+        neighborEdgeTerrainTypes={{}}
+        width={120}
+        height={120}
+      />
+      <HexTile
+        tile={mixedTile.rotateClockwise().rotateClockwise()}
+        neighborEdgeTerrainTypes={{}}
+        width={120}
+        height={120}
+      />
       <HexTile
         tile={mixedTile.rotateClockwise().rotateClockwise().rotateClockwise()}
+        neighborEdgeTerrainTypes={{}}
         width={120}
         height={120}
       />
       <HexTile
         tile={mixedTile.rotateClockwise().rotateClockwise().rotateClockwise().rotateClockwise()}
+        neighborEdgeTerrainTypes={{}}
         width={120}
         height={120}
       />
-      <HexTile tile={mixedTile.rotateCounterClockwise()} width={120} height={120} />
+      <HexTile
+        tile={mixedTile.rotateCounterClockwise()}
+        neighborEdgeTerrainTypes={{}}
+        width={120}
+        height={120}
+      />
     </div>
   ),
 };
@@ -149,11 +196,13 @@ export const AdjacentAlignment: Story = {
       <div style={{ width: 175, height: 130, position: 'relative' }}>
         <HexTile
           tile={adjacentLeftTile}
+          neighborEdgeTerrainTypes={{}}
           width={100}
           style={{ position: 'absolute', left: 0, top: 0 }}
         />
         <HexTile
           tile={adjacentRightTile}
+          neighborEdgeTerrainTypes={{}}
           width={100}
           style={{ position: 'absolute', left: 75, top: 43.301 }}
         />

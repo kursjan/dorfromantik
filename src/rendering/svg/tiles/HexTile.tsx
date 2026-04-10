@@ -10,7 +10,8 @@ const HEX_VIEWBOX = `${-SVG_HEX_RADIUS} ${-HEX_HALF_HEIGHT} ${SVG_HEX_RADIUS * 2
 
 export interface HexTileProps extends Omit<ComponentPropsWithoutRef<'svg'>, 'viewBox'> {
   tile: Tile;
-  neighborEdgeTerrainTypes?: Partial<Record<Direction, TerrainType>>;
+  /** Neighbor terrains per edge for blending; use `{}` when none apply. */
+  neighborEdgeTerrainTypes: Partial<Record<Direction, TerrainType>>;
 }
 
 export function HexTile({ tile, neighborEdgeTerrainTypes, ...svgProps }: HexTileProps) {
@@ -31,7 +32,7 @@ export function HexTile({ tile, neighborEdgeTerrainTypes, ...svgProps }: HexTile
               terrainId: terrain.id,
               segmentIndex,
               direction,
-              neighborEdgeTerrainType: neighborEdgeTerrainTypes?.[direction],
+              neighborEdgeTerrainType: neighborEdgeTerrainTypes[direction],
               terrain,
             })}
           </g>

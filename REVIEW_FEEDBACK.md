@@ -1,15 +1,5 @@
 # Review Feedback
 
-## Disposition (Phase 3 triage, dual rendering / #75)
-
-Triaged with no code changes from this document in the current pass. Findings below remain the historical review record.
-
-- **Performance (`React.memo`, `setCamera` cadence, `useMemo` notes):** Deferred until profiling or real jank on large boards; not adopted solely on reviewer preference.
-- **Hover / ghost / highlights:** Deferred; planned to align with upcoming `Game` / preview-state work rather than ad hoc SVG state.
-- **Keyboard (R/F/Q/E/F3):** Already tracked as Phase 4 in `conductor/tracks/dual_rendering_engines_20260403/plan.md`.
-- **E2E selectors / canvas assumptions:** Already tracked as Phase 7 in the same plan.
-- **Docs clarity:** Low priority; plan already states pointer-only parity for SVG until Phase 4.
-
 Branch: `worker1` vs `main` (dual rendering / #75). Standards: `.gemini/reviewer.md`.
 
 ## Summary
