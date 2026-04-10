@@ -35,7 +35,7 @@ The canvas path implements board interaction through `InputManager` + `CanvasCon
 
 ## Phase 4: SVG Input Parity (Keyboard & Window)
 
-- [ ] Implement **window-level** parity: `keydown` / `keyup` for **Q**, **E**, **R**, **F**, and **F3** with the same semantics and `preventDefault` behavior as `InputManager`; track held keys for Q/E; subscribe to **`resize`** and refresh layout/hit-testing as the canvas path does. using **task-conductor** skill.
+- [x] Implement **window-level** parity: `keydown` / `keyup` for **Q**, **E**, **R**, **F**, and **F3** with the same semantics and `preventDefault` behavior as `InputManager`; track held keys for Q/E; subscribe to **`resize`** and refresh layout/hit-testing as the canvas path does. using **task-conductor** skill.
 - [ ] Add an **`requestAnimationFrame` loop** (or equivalent) on the SVG path that applies **continuous camera rotation** from held Q/E, mirroring `CanvasController.processContinuousInput`. **CRITICAL for SVG performance:** Do NOT trigger React renders (`setState`) inside this loop. Instead, use a `ref` to directly mutate the SVG `<g>` transform attribute frame-by-frame, and only sync the final rotation back to **`CameraSnapshot`** / React when the key is released. using **task-conductor** skill.
 - [ ] Wire **F3** to the same debug overlay behavior as `CanvasView` (toggle visibility; overlay consumes `CanvasController` today — extend or abstract so SVG mode is supported without regressing canvas). using **task-conductor** skill.
 - [ ] Add **unit tests** (and hook tests where practical) for new shared modules and critical input paths; keep tests explicit (no gratuitous loops per project test style). using **task-conductor** skill.
