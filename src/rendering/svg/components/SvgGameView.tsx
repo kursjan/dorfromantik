@@ -4,11 +4,11 @@ import { SvgBoard } from './SvgBoard';
 import { Game } from '../../../models/Game';
 import { GameHUD } from '../../shell/GameHUD';
 import { ResetViewButton } from '../../shell/ResetViewButton';
-import { useCameraControls } from '../hooks/useCameraControls';
 import { useSvgBoardInteraction } from '../hooks/useSvgBoardInteraction';
+import { useSvgBoardPointerCamera } from '../hooks/useSvgBoardPointerCamera';
+import { useSvgCameraRotationRaf } from '../hooks/useSvgCameraRotationRaf';
 import { useSvgGameViewLayout } from '../hooks/useSvgGameViewLayout';
-import { useSvgCameraKeyboardRotationRaf } from '../hooks/useSvgCameraKeyboardRotationRaf';
-import { useWindowLevelGameInput } from '../hooks/useWindowLevelGameInput';
+import { useSvgWindowInput } from '../hooks/useSvgWindowInput';
 import { applySvgWorldTransformToGroup } from '../svgBoardWorldTransform';
 import { useGameSnapshotBridge } from '../../common/bridge/useGameSnapshotBridge';
 
@@ -28,16 +28,14 @@ export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame })
 
   const { viewSize, measureContainer } = useSvgGameViewLayout(containerRef);
 
-  const { getRotationDirection } = useWindowLevelGameInput({
+  const { getRotationDirection } = useSvgWindowInput({
     onRotateClockwise: cameraPointerCallbacks.onRotateClockwise,
     onRotateCounterClockwise: cameraPointerCallbacks.onRotateCounterClockwise,
     onResize: measureContainer,
   });
 
-  const { camera, cameraRef, syncCameraToReact, resetCamera, containerToWorld } = useCameraControls(
-    containerRef,
-    cameraPointerCallbacks
-  );
+  const { camera, cameraRef, syncCameraToReact, resetCamera, containerToWorld } =
+    useSvgBoardPointerCamera(containerRef, cameraPointerCallbacks);
 
   useLayoutEffect(() => {
     containerToWorldRef.current = containerToWorld;
@@ -56,7 +54,7 @@ export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame })
     applySvgWorldTransformToGroup(worldGroupRef.current, cameraRef.current, viewCenter);
   }, [camera, viewCenter, cameraRef]);
 
-  useSvgCameraKeyboardRotationRaf({
+  useSvgCameraRotationRaf({
     worldGroupRef,
     cameraRef,
     viewCenterRef,

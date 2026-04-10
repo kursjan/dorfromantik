@@ -18,13 +18,13 @@ The canvas path implements board interaction through `InputManager` + `CanvasCon
 ## Phase 1: SVG Engine Integration
 
 - [x] Ensure we are on the `worker1` branch using **task-conductor** skill.
-- [x] Create a `useCameraControls` hook to manage pan (drag) and zoom (scroll) state using standard DOM events using **task-conductor** skill.
+- [x] Create a `useSvgBoardPointerCamera` hook to manage pan (drag) and zoom (scroll) state using standard DOM events using **task-conductor** skill.
 - [x] Create `SvgGameView.tsx` (matching `CanvasView` props) that maps `activeGame.board` to `SvgBoardTile[]` and integrates the camera hook. Temporarily hardcode `GameBoard.tsx` to render only `SvgGameView` using **task-conductor** skill.
 - [x] **Phase Gate**: Verify basic SVG rendering and camera (pan/zoom) interactions using **project-orchestrator** skill.
 
 ## Phase 2: SVG Input Parity (Pointer & Basic)
 
-- [x] Implement a single coordinated **pointer layer** on the SVG board surface: hover with local coordinates, **wheel** zoom and **left-drag pan** after the shared drag threshold (reuse `PointerPanZoomSession` / `useCameraControls` patterns), **left-click** placement when below threshold, **right-click** / **Shift+right-click** tile rotation, and `contextmenu` prevention — equivalent to canvas pointer handling. Prefer **DRY** shared helpers over duplicating `InputManager` line-by-line. using **task-conductor** skill.
+- [x] Implement a single coordinated **pointer layer** on the SVG board surface: hover with local coordinates, **wheel** zoom and **left-drag pan** after the shared drag threshold (reuse `PointerPanZoomSession` / `useSvgBoardPointerCamera` patterns), **left-click** placement when below threshold, **right-click** / **Shift+right-click** tile rotation, and `contextmenu` prevention — equivalent to canvas pointer handling. Prefer **DRY** shared helpers over duplicating `InputManager` line-by-line. using **task-conductor** skill.
 - [x] **Phase Gate**: Verify pointer interactions using **project-orchestrator** skill.
 
 ## Phase 3: In-the-Middle Adversarial Review

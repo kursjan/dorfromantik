@@ -1,4 +1,4 @@
-import { type RefObject, useLayoutEffect, useRef } from 'react';
+import { type MutableRefObject, type RefObject, useLayoutEffect, useRef } from 'react';
 import type { ContainerPoint } from '../../common/ContainerPoint';
 import type { CameraSnapshot } from '../../common/camera/CameraSnapshot';
 import { radians } from '../../../utils/Angle';
@@ -8,9 +8,9 @@ import {
   applySvgWorldTransformToGroup,
 } from '../svgBoardWorldTransform';
 
-export function useSvgCameraKeyboardRotationRaf(options: {
+export function useSvgCameraRotationRaf(options: {
   worldGroupRef: RefObject<SVGGElement | null>;
-  cameraRef: RefObject<CameraSnapshot>;
+  cameraRef: MutableRefObject<CameraSnapshot>;
   viewCenterRef: RefObject<ContainerPoint>;
   getRotationDirection: () => number;
   syncCameraToReact: () => void;

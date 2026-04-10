@@ -4,7 +4,10 @@ import type { HexCoordinate } from '../../../models/HexCoordinate';
 import type { ContainerPoint } from '../../common/ContainerPoint';
 import { closestHexByWorldDistance } from '../../common/hex/HexUtils';
 import { HEX_SIZE } from '../../common/hex/hexLayout';
-import type { ContainerToWorldFn, UseCameraControlsCallbacks } from './useCameraControls';
+import type {
+  ContainerToWorldFn,
+  SvgBoardPointerCameraCallbacks,
+} from './useSvgBoardPointerCamera';
 
 /**
  * Pointer-driven game actions for the SVG board (hover → valid hex, click → place, rotate queue).
@@ -14,7 +17,7 @@ export function useSvgBoardInteraction(
   getGameSnapshot: () => Game,
   setGameSnapshot: (game: Game) => void
 ): {
-  cameraPointerCallbacks: UseCameraControlsCallbacks;
+  cameraPointerCallbacks: SvgBoardPointerCameraCallbacks;
   containerToWorldRef: RefObject<ContainerToWorldFn | undefined>;
 } {
   const containerToWorldRef = useRef<ContainerToWorldFn | undefined>(undefined);
@@ -72,7 +75,7 @@ export function useSvgBoardInteraction(
         onClick,
         onRotateClockwise,
         onRotateCounterClockwise,
-      }) satisfies UseCameraControlsCallbacks,
+      }) satisfies SvgBoardPointerCameraCallbacks,
     [onClick, onHover, onLeave, onRotateClockwise, onRotateCounterClockwise]
   );
 

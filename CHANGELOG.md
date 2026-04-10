@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- **Rendering (#75):** Replaced the mutable `Camera` class with pure **`CameraSnapshot`** updates via **`cameraTransforms`** (shared by canvas `CanvasController` and SVG **`useCameraControls`**). Docs under **`src/rendering/ARCHITECTURE.md`** / **`canvas/ARCHITECTURE.md`** updated accordingly.
+- **Rendering (#75):** Replaced the mutable `Camera` class with pure **`CameraSnapshot`** updates via **`cameraTransforms`** (shared by canvas `CanvasController` and SVG **`useSvgBoardPointerCamera`**). Docs under **`src/rendering/ARCHITECTURE.md`** / **`canvas/ARCHITECTURE.md`** updated accordingly.
 
 ### Added
 

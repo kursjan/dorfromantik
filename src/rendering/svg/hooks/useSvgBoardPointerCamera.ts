@@ -13,7 +13,7 @@ import { cameraContainerToWorld, panCameraSnapshotBy } from '../../common/camera
 
 export type ContainerToWorldFn = (point: ContainerPoint) => WorldPoint;
 
-export interface UseCameraControlsCallbacks {
+export interface SvgBoardPointerCameraCallbacks {
   onHover: (point: ContainerPoint) => void;
   onClick: (point: ContainerPoint) => void;
   onRotateClockwise: () => void;
@@ -21,9 +21,9 @@ export interface UseCameraControlsCallbacks {
   onLeave: () => void;
 }
 
-export function useCameraControls(
+export function useSvgBoardPointerCamera(
   containerRef: RefObject<HTMLElement | null>,
-  callbacks: UseCameraControlsCallbacks
+  callbacks: SvgBoardPointerCameraCallbacks
 ): {
   camera: CameraSnapshot;
   cameraRef: MutableRefObject<CameraSnapshot>;
@@ -35,7 +35,6 @@ export function useCameraControls(
   const panPointerRef = useRef(new PointerPanZoomSession());
   const [camera, setCamera] = useState<CameraSnapshot>({ ...DEFAULT_CAMERA_SNAPSHOT });
 
-  // Store callbacks in a ref to avoid re-binding listeners on every render
   const callbacksRef = useRef(callbacks);
   useLayoutEffect(() => {
     callbacksRef.current = callbacks;

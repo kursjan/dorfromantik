@@ -4,14 +4,14 @@ import { useCallback, useLayoutEffect, useRef } from 'react';
  * Window-level keyboard and resize handling aligned with {@link InputManager}
  * (Q/E held-state, R/F rotation, F3 + preventDefault, window resize).
  */
-export interface WindowLevelGameInputCallbacks {
+export interface SvgWindowInputCallbacks {
   onRotateClockwise: () => void;
   onRotateCounterClockwise: () => void;
   onResize: () => void;
   onToggleDebugOverlay?: () => void;
 }
 
-export function useWindowLevelGameInput(callbacks: WindowLevelGameInputCallbacks): {
+export function useSvgWindowInput(callbacks: SvgWindowInputCallbacks): {
   getRotationDirection: () => number;
 } {
   const keysRef = useRef<Set<string>>(new Set());

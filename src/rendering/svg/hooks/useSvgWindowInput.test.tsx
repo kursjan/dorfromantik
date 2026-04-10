@@ -1,8 +1,8 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, expect, it, vi, afterEach } from 'vitest';
-import { useWindowLevelGameInput } from './useWindowLevelGameInput';
+import { useSvgWindowInput } from './useSvgWindowInput';
 
-describe('useWindowLevelGameInput', () => {
+describe('useSvgWindowInput', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -10,7 +10,7 @@ describe('useWindowLevelGameInput', () => {
   it('invokes onRotateClockwise when R is pressed', () => {
     const onRotateClockwise = vi.fn();
     renderHook(() =>
-      useWindowLevelGameInput({
+      useSvgWindowInput({
         onRotateClockwise,
         onRotateCounterClockwise: vi.fn(),
         onResize: vi.fn(),
@@ -27,7 +27,7 @@ describe('useWindowLevelGameInput', () => {
   it('invokes onRotateCounterClockwise when F is pressed', () => {
     const onRotateCounterClockwise = vi.fn();
     renderHook(() =>
-      useWindowLevelGameInput({
+      useSvgWindowInput({
         onRotateClockwise: vi.fn(),
         onRotateCounterClockwise,
         onResize: vi.fn(),
@@ -44,7 +44,7 @@ describe('useWindowLevelGameInput', () => {
   it('calls onToggleDebugOverlay and preventDefault for F3', () => {
     const onToggleDebugOverlay = vi.fn();
     renderHook(() =>
-      useWindowLevelGameInput({
+      useSvgWindowInput({
         onRotateClockwise: vi.fn(),
         onRotateCounterClockwise: vi.fn(),
         onResize: vi.fn(),
@@ -62,7 +62,7 @@ describe('useWindowLevelGameInput', () => {
 
   it('reports rotation direction for held Q and E', () => {
     const { result, unmount } = renderHook(() =>
-      useWindowLevelGameInput({
+      useSvgWindowInput({
         onRotateClockwise: vi.fn(),
         onRotateCounterClockwise: vi.fn(),
         onResize: vi.fn(),
@@ -91,7 +91,7 @@ describe('useWindowLevelGameInput', () => {
 
   it('still cancels F3 when onToggleDebugOverlay is omitted', () => {
     renderHook(() =>
-      useWindowLevelGameInput({
+      useSvgWindowInput({
         onRotateClockwise: vi.fn(),
         onRotateCounterClockwise: vi.fn(),
         onResize: vi.fn(),
@@ -107,7 +107,7 @@ describe('useWindowLevelGameInput', () => {
   it('invokes onResize on window resize', () => {
     const onResize = vi.fn();
     renderHook(() =>
-      useWindowLevelGameInput({
+      useSvgWindowInput({
         onRotateClockwise: vi.fn(),
         onRotateCounterClockwise: vi.fn(),
         onResize,

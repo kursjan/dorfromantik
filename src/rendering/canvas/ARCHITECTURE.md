@@ -51,7 +51,7 @@ Understanding the coordinate spaces is critical for this engine. Branded **`Clie
     - Infinite 2D plane in **layout units** (hex geometry, camera pan).
     - Origin `(0, 0)` is the center of the initial view before pan.
     - **Transformation (conceptual):** container pixel = center + rotate + scale × (world + camera pan). Inverting that chain is **`cameraContainerToWorld`**.
-    - **`CameraSnapshot.position`** is the world offset (`WorldPoint`). **`DebugStats.camera`** is the same **`CameraSnapshot`** the controller mutates by replacement; SVG uses the same type via **`useCameraControls`**.
+    - **`CameraSnapshot.position`** is the world offset (`WorldPoint`). **`DebugStats.camera`** is the same **`CameraSnapshot`** the controller mutates by replacement; SVG uses the same type via **`useSvgBoardPointerCamera`**.
 
 5.  **Hex space (cube coordinates):**
     - Integer coordinates `(q, r, s)` where `q + r + s = 0`.
@@ -83,12 +83,12 @@ Pure view math shared with the SVG board path (**`cameraTransforms.ts`**, **`cam
 
 - **Canvas state:** **`CanvasController`** holds **`cameraSnapshot: CameraSnapshot`** and replaces it on each pan / zoom / wheel / rotate / reset.
 - **Updates:** **`panCameraSnapshotBy`**, **`zoomCameraSnapshotBy`**, **`rotateCameraSnapshotBy`**; wheel zoom via **`applyWheelDeltaYToCamera(snapshot, deltaY)`** → new snapshot; reset uses **`{ ...DEFAULT_CAMERA_SNAPSHOT }`**.
-- **Hit testing:** **`cameraContainerToWorld(snapshot, point, w, h)`** — container-local pixel → **`WorldPoint`** (same idea as SVG **`useCameraControls` → `containerToWorld`**).
+- **Hit testing:** **`cameraContainerToWorld(snapshot, point, w, h)`** — container-local pixel → **`WorldPoint`** (same idea as SVG **`useSvgBoardPointerCamera` → `containerToWorld`**).
 - **Canvas draw path:** center translate → **`cameraSnapshot.rotation`** / **`zoom`** / **`position`** on **`Context2D`** (matches SVG **`SvgBoard`** transform order).
 
 ### InputManager (`engine/InputManager.ts`)
 
-DOM abstraction layer. Pointer behavior is delegated to **`../common/camera/cameraInteraction`** (`bindPointerInteraction`, **`PointerPanZoomSession`**) — the same primitives as the SVG **`useCameraControls`** path.
+DOM abstraction layer. Pointer behavior is delegated to **`../common/camera/cameraInteraction`** (`bindPointerInteraction`, **`PointerPanZoomSession`**) — the same primitives as the SVG **`useSvgBoardPointerCamera`** path.
 
 - **Role:** Translates raw DOM events (`wheel`, `keydown`, etc.) into abstract actions. Pointer move/down/up go through the shared pan/zoom session.
 - **Callbacks (types):** **`onPan(delta: ContainerDelta)`**, **`onZoom(deltaY: number)`**, **`onHover` / `onClick(point: ContainerPoint)`**, rotation and **`onToggleDebugOverlay`** (F3 from **`CanvasView`**).

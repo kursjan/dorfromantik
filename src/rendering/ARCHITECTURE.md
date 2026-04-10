@@ -2,11 +2,11 @@
 
 Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** (DOM game surface), and **common** math/types. Game chrome (HUD, reset, save status) lives in **`src/rendering/shell/`**.
 
-| Area          | Role                                                                                                                                   |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| **`canvas/`** | `CanvasController` game loop, `InputManager`, `Context2D` renderers. See **`canvas/ARCHITECTURE.md`**.                                 |
-| **`svg/`**    | `SvgGameView` composition, `SvgBoard`, `HexTile`, hooks (`useCameraControls`, `useSvgBoardInteraction`).                               |
-| **`common/`** | `CameraSnapshot`, `cameraTransforms`, `cameraInteraction`, hex layout (`HexUtils`, `hexLayout`), `useGameSnapshotBridge`, point types. |
+| Area          | Role                                                                                                                                                                                    |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`canvas/`** | `CanvasController` game loop, `InputManager`, `Context2D` renderers. See **`canvas/ARCHITECTURE.md`**.                                                                                  |
+| **`svg/`**    | `SvgGameView` composition, `SvgBoard`, `HexTile`, hooks (`useSvgBoardPointerCamera`, `useSvgWindowInput`, `useSvgCameraRotationRaf`, `useSvgGameViewLayout`, `useSvgBoardInteraction`). |
+| **`common/`** | `CameraSnapshot`, `cameraTransforms`, `cameraInteraction`, hex layout (`HexUtils`, `hexLayout`), `useGameSnapshotBridge`, point types.                                                  |
 
 ## Coordinate types (`common/*.ts`)
 
@@ -29,15 +29,18 @@ Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** 
 
 ## Pointer wiring (`common/camera/cameraInteraction.ts`)
 
-**`PointerPanZoomSession`** runs in **client** space: **`ClientPoint`** anchors and **`ClientDelta.between`** / **`absolute()`** implement the click-vs-pan threshold (default **`ClientDelta.xy(5, 5)`** in module config). **`bindPointerInteraction`** maps each event with **`ClientPoint.fromMouseEvent`**, converts hover/click to **`ContainerPoint.fromClientInElement`**, and passes **`ContainerDelta.fromClientDelta`** into **`onPan`** so **`panCameraSnapshotBy`** stays in container-aligned pixel axes. **Canvas `InputManager`** and **SVG `useCameraControls`** both use this stack.
+**`PointerPanZoomSession`** runs in **client** space: **`ClientPoint`** anchors and **`ClientDelta.between`** / **`absolute()`** implement the click-vs-pan threshold (default **`ClientDelta.xy(5, 5)`** in module config). **`bindPointerInteraction`** maps each event with **`ClientPoint.fromMouseEvent`**, converts hover/click to **`ContainerPoint.fromClientInElement`**, and passes **`ContainerDelta.fromClientDelta`** into **`onPan`** so **`panCameraSnapshotBy`** stays in container-aligned pixel axes. **Canvas `InputManager`** and **SVG `useSvgBoardPointerCamera`** both use this stack.
 
 ## `CameraSnapshot` (`common/camera/CameraSnapshot.ts`)
 
-**`CameraSnapshot`**: **`Readonly<{ position; zoom; rotation }>`** — treat as immutable; replace the whole object to change pose. Shared by **`SvgBoard`** (via **`useCameraControls`**), canvas **`DebugStats.camera`**, and **`CanvasController.cameraSnapshot`**. **`DEFAULT_CAMERA_SNAPSHOT`** is the app-wide default (matches **`WORLD_ORIGIN`** pan).
+**`CameraSnapshot`**: **`Readonly<{ position; zoom; rotation }>`** — treat as immutable; replace the whole object to change pose. Shared by **`SvgBoard`** (via **`useSvgBoardPointerCamera`** / **`SvgGameView`**), canvas **`DebugStats.camera`**, and **`CanvasController.cameraSnapshot`**. **`DEFAULT_CAMERA_SNAPSHOT`** is the app-wide default (matches **`WORLD_ORIGIN`** pan).
 
 ## Hooks (SVG)
 
-- **`useCameraControls`**: keeps **`CameraSnapshot`** in a ref, returns **`camera`** (React state copy), **`resetCamera`**, and **`containerToWorld`** (`ContainerToWorldFn`: `ContainerPoint` → `WorldPoint`). **`SvgGameView`** passes that snapshot into **`SvgBoard`** as the **`camera`** prop.
+- **`useSvgBoardPointerCamera`**: keeps **`CameraSnapshot`** in a ref, returns **`camera`** (React state copy), **`cameraRef`**, **`syncCameraToReact`**, **`resetCamera`**, and **`containerToWorld`** (`ContainerToWorldFn`: `ContainerPoint` → `WorldPoint`). **`SvgGameView`** passes that snapshot into **`SvgBoard`** as the **`camera`** prop (with **`deferWorldTransformToParent`** for keyboard rotation).
+- **`useSvgWindowInput`**: window **`keydown` / `keyup` / `resize`** parity with canvas **`InputManager`** (Q/E/R/F/F3).
+- **`useSvgCameraRotationRaf`**: continuous Q/E rotation via DOM **`transform`** on the world `<g>`, **`syncCameraToReact`** on key release.
+- **`useSvgGameViewLayout`**: **`ResizeObserver`** + **`viewSize`** / **`measureContainer`** for **`viewCenter`**.
 - **`useSvgBoardInteraction`**: game actions from pointer; holds **`containerToWorldRef`** so hover can map **`ContainerPoint`** → world before **`closestHexByWorldDistance`**.
 
 ## Debug stats (canvas)

@@ -1,6 +1,9 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { describe, expect, it, afterEach } from 'vitest';
-import { useCameraControls, type UseCameraControlsCallbacks } from './useCameraControls';
+import {
+  useSvgBoardPointerCamera,
+  type SvgBoardPointerCameraCallbacks,
+} from './useSvgBoardPointerCamera';
 
 const stubCallbacks = {
   onHover: () => {},
@@ -8,9 +11,9 @@ const stubCallbacks = {
   onRotateClockwise: () => {},
   onRotateCounterClockwise: () => {},
   onLeave: () => {},
-} satisfies UseCameraControlsCallbacks;
+} satisfies SvgBoardPointerCameraCallbacks;
 
-describe('useCameraControls', () => {
+describe('useSvgBoardPointerCamera', () => {
   afterEach(() => {
     document.body.replaceChildren();
   });
@@ -20,7 +23,7 @@ describe('useCameraControls', () => {
     document.body.appendChild(container);
     const ref = { current: container };
 
-    const { result } = renderHook(() => useCameraControls(ref, stubCallbacks));
+    const { result } = renderHook(() => useSvgBoardPointerCamera(ref, stubCallbacks));
 
     expect(result.current.camera.zoom).toBe(1);
 
@@ -40,7 +43,7 @@ describe('useCameraControls', () => {
     document.body.appendChild(container);
     const ref = { current: container };
 
-    const { result } = renderHook(() => useCameraControls(ref, stubCallbacks));
+    const { result } = renderHook(() => useSvgBoardPointerCamera(ref, stubCallbacks));
 
     act(() => {
       container.dispatchEvent(
@@ -65,7 +68,7 @@ describe('useCameraControls', () => {
     document.body.appendChild(container);
     const ref = { current: container };
 
-    const { result } = renderHook(() => useCameraControls(ref, stubCallbacks));
+    const { result } = renderHook(() => useSvgBoardPointerCamera(ref, stubCallbacks));
 
     act(() => {
       container.dispatchEvent(
