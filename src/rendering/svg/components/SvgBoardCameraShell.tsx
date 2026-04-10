@@ -1,56 +1,38 @@
-import { type FC, type MutableRefObject, useLayoutEffect, useRef } from 'react';
-import { radians } from '../../../utils/Angle';
+import { type FC, type RefObject, useLayoutEffect, useRef } from 'react';
+import { radians, radiansToDegrees } from '../../../utils/Angle';
 import { Board } from '../../../models/Board';
 import type { ContainerPoint } from '../../common/ContainerPoint';
 import type { CameraSnapshot } from '../../common/camera/CameraSnapshot';
 import { rotateCameraSnapshotBy } from '../../common/camera/cameraTransforms';
 import { SvgBoard } from './SvgBoard';
-import {
-  SVG_CAMERA_KEYBOARD_ROTATION_RADIANS_PER_FRAME,
-  buildSvgWorldTransformString,
-} from '../svgBoardWorldTransform';
+import { useSvgWindowInput, type SvgWindowInputCallbacks } from '../hooks/useSvgWindowInput';
+
+/** Keep in sync with `CanvasController.ROTATION_SPEED`. */
+const SVG_CAMERA_KEYBOARD_ROTATION_RADIANS_PER_FRAME = 0.05;
 
 export interface SvgBoardCameraShellProps {
   board: Board;
   camera: CameraSnapshot;
   viewCenter: ContainerPoint;
-  /**
-   * From `useSvgBoardPointerCamera` in the game. When omitted, an internal ref is kept in sync
-   * with the `camera` prop (Storybook / declarative demos).
-   */
-  cameraRef?: MutableRefObject<CameraSnapshot>;
-  /** When Q/E release after rotating; no-op by default. */
-  syncCameraToReact?: () => void;
-  /** Held Q/E → -1 / 0 / +1; default no keyboard orbit. */
-  getRotationDirection?: () => number;
+  cameraSnapshotRef: RefObject<CameraSnapshot>;
+  syncCameraToReact: () => void;
+  windowInputCallbacks: SvgWindowInputCallbacks;
 }
 
-/**
- * Owns the world `<g>` camera transform: React-driven updates from `camera` / `cameraRef`, plus an
- * rAF loop for continuous Q/E rotation without `setState` per frame. Composes {@link SvgBoard}
- * (tiles only; world `transform` is set here via `setAttribute`).
- */
 export const SvgBoardCameraShell: FC<SvgBoardCameraShellProps> = ({
   board,
   camera,
   viewCenter,
-  cameraRef: cameraRefProp,
-  syncCameraToReact = () => {},
-  getRotationDirection: getRotationDirectionProp,
+  cameraSnapshotRef: cameraSnapshotRef,
+  syncCameraToReact,
+  windowInputCallbacks,
 }) => {
-  const fallbackCameraRef = useRef<CameraSnapshot>(camera);
-  useLayoutEffect(() => {
-    if (!cameraRefProp) {
-      fallbackCameraRef.current = camera;
-    }
-  }, [camera, cameraRefProp]);
+  const { getRotationDirection } = useSvgWindowInput(windowInputCallbacks);
 
-  const cameraRef = cameraRefProp ?? fallbackCameraRef;
-
-  const getRotationDirectionRef = useRef(getRotationDirectionProp ?? (() => 0));
+  const getRotationDirectionRef = useRef(getRotationDirection);
   useLayoutEffect(() => {
-    getRotationDirectionRef.current = getRotationDirectionProp ?? (() => 0);
-  }, [getRotationDirectionProp]);
+    getRotationDirectionRef.current = getRotationDirection;
+  }, [getRotationDirection]);
 
   const syncCameraToReactRef = useRef(syncCameraToReact);
   useLayoutEffect(() => {
@@ -62,44 +44,54 @@ export const SvgBoardCameraShell: FC<SvgBoardCameraShellProps> = ({
     viewCenterRef.current = viewCenter;
   }, [viewCenter]);
 
-  const worldGroupRef = useRef<SVGGElement>(null);
+  const worldTransformGroupRef = useRef<SVGGElement>(null);
 
   useLayoutEffect(() => {
-    const group = worldGroupRef.current;
-    if (!group) return;
-    group.setAttribute('transform', buildSvgWorldTransformString(cameraRef.current, viewCenter));
-  }, [camera, viewCenter, cameraRef]);
+    const worldTransformGroup = worldTransformGroupRef.current;
+    if (!worldTransformGroup) return;
+    const cameraSnapshot = cameraSnapshotRef.current;
+    worldTransformGroup.setAttribute(
+      'transform',
+      `translate(${viewCenter.x}, ${viewCenter.y}) rotate(${radiansToDegrees(cameraSnapshot.rotation)}) scale(${cameraSnapshot.zoom}) translate(${cameraSnapshot.position.x}, ${cameraSnapshot.position.y})`
+    );
+  }, [camera, viewCenter, cameraSnapshotRef]);
 
   useLayoutEffect(() => {
     let rafId = 0;
-    let prevDir = 0;
+    let previousDirection = 0;
 
     const loop = () => {
-      const dir = getRotationDirectionRef.current();
-      const group = worldGroupRef.current;
+      const direction = getRotationDirectionRef.current();
+      const worldTransformGroup = worldTransformGroupRef.current;
 
-      if (dir !== 0 && Number.isFinite(dir) && group) {
-        cameraRef.current = rotateCameraSnapshotBy(
-          cameraRef.current,
-          radians(dir * SVG_CAMERA_KEYBOARD_ROTATION_RADIANS_PER_FRAME)
-        );
-        group.setAttribute(
-          'transform',
-          buildSvgWorldTransformString(cameraRef.current, viewCenterRef.current)
-        );
-      }
-
-      if (prevDir !== 0 && dir === 0) {
+      if (previousDirection !== 0 && direction === 0) {
         syncCameraToReactRef.current();
       }
 
-      prevDir = dir;
+      if (direction === 0 || worldTransformGroup == null) {
+        previousDirection = direction;
+        rafId = requestAnimationFrame(loop);
+        return;
+      }
+
+      cameraSnapshotRef.current = rotateCameraSnapshotBy(
+        cameraSnapshotRef.current,
+        radians(direction * SVG_CAMERA_KEYBOARD_ROTATION_RADIANS_PER_FRAME)
+      );
+      const cameraSnapshot = cameraSnapshotRef.current;
+      const currentViewCenter = viewCenterRef.current;
+      worldTransformGroup.setAttribute(
+        'transform',
+        `translate(${currentViewCenter.x}, ${currentViewCenter.y}) rotate(${radiansToDegrees(cameraSnapshot.rotation)}) scale(${cameraSnapshot.zoom}) translate(${cameraSnapshot.position.x}, ${cameraSnapshot.position.y})`
+      );
+
+      previousDirection = direction;
       rafId = requestAnimationFrame(loop);
     };
 
     rafId = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafId);
-  }, [cameraRef]);
+  }, [cameraSnapshotRef]);
 
-  return <SvgBoard ref={worldGroupRef} board={board} />;
+  return <SvgBoard ref={worldTransformGroupRef} board={board} />;
 };

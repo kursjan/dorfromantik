@@ -8,15 +8,12 @@ const SVG_HEX_HALF_HEIGHT = (Math.sqrt(3) * SVG_HEX_RADIUS) / 2;
 const SVG_HEX_LAYOUT_WIDTH = SVG_HEX_RADIUS * 2;
 const SVG_HEX_LAYOUT_HEIGHT = SVG_HEX_HALF_HEIGHT * 2;
 
+export const SVG_BOARD_WORLD_TRANSFORM_GROUP = 'data-world-transform-group';
+
 export interface SvgBoardProps {
   board: Board;
 }
 
-/**
- * Renders hex tiles in SVG space. The world `<g>` has **no** `transform` in React — only
- * {@link SvgBoardCameraShell} (or an equivalent parent) may set it via `setAttribute` so Q/E and
- * pointer camera stay in sync without React overwriting the DOM.
- */
 export const SvgBoard = forwardRef<SVGGElement, SvgBoardProps>(function SvgBoard({ board }, ref) {
   // TODO(#73): Per-row memoization or virtualize for large boards.
   const renderedTiles = useMemo(() => {
@@ -25,7 +22,6 @@ export const SvgBoard = forwardRef<SVGGElement, SvgBoardProps>(function SvgBoard
 
       return (
         <g key={id} transform={`translate(${x}, ${y})`}>
-          {/* Nested <svg> needs explicit size or it fills the parent canvas; x/y keep hex center on (x,y). */}
           <HexTile
             tile={tile}
             neighborEdgeTerrainTypes={{}}
@@ -48,7 +44,9 @@ export const SvgBoard = forwardRef<SVGGElement, SvgBoardProps>(function SvgBoard
         touchAction: 'none',
       }}
     >
-      <g ref={ref}>{renderedTiles}</g>
+      <g ref={ref} {...{ [SVG_BOARD_WORLD_TRANSFORM_GROUP]: '' }}>
+        {renderedTiles}
+      </g>
     </svg>
   );
 });

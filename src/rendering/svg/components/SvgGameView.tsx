@@ -6,7 +6,6 @@ import { ResetViewButton } from '../../shell/ResetViewButton';
 import { useSvgBoardInteraction } from '../hooks/useSvgBoardInteraction';
 import { useSvgBoardPointerCamera } from '../hooks/useSvgBoardPointerCamera';
 import { useSvgGameViewLayout } from '../hooks/useSvgGameViewLayout';
-import { useSvgWindowInput } from '../hooks/useSvgWindowInput';
 import { useGameSnapshotBridge } from '../../common/bridge/useGameSnapshotBridge';
 import { ContainerPoint } from '../../common/ContainerPoint';
 
@@ -25,12 +24,6 @@ export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame })
   );
 
   const { viewSize, measureContainer } = useSvgGameViewLayout(containerRef);
-
-  const { getRotationDirection } = useSvgWindowInput({
-    onRotateClockwise: cameraPointerCallbacks.onRotateClockwise,
-    onRotateCounterClockwise: cameraPointerCallbacks.onRotateCounterClockwise,
-    onResize: measureContainer,
-  });
 
   const { camera, cameraRef, syncCameraToReact, resetCamera, containerToWorld } =
     useSvgBoardPointerCamera(containerRef, cameraPointerCallbacks);
@@ -59,9 +52,13 @@ export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame })
         board={activeGame.board}
         camera={camera}
         viewCenter={viewCenter}
-        cameraRef={cameraRef}
+        cameraSnapshotRef={cameraRef}
         syncCameraToReact={syncCameraToReact}
-        getRotationDirection={getRotationDirection}
+        windowInputCallbacks={{
+          onRotateClockwise: cameraPointerCallbacks.onRotateClockwise,
+          onRotateCounterClockwise: cameraPointerCallbacks.onRotateCounterClockwise,
+          onResize: measureContainer,
+        }}
       />
     </div>
   );

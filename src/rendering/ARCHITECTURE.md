@@ -37,9 +37,9 @@ Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** 
 
 ## Hooks (SVG)
 
-- **`useSvgBoardPointerCamera`**: keeps **`CameraSnapshot`** in a ref, returns **`camera`** (React state copy), **`cameraRef`**, **`syncCameraToReact`**, **`resetCamera`**, and **`containerToWorld`** (`ContainerToWorldFn`: `ContainerPoint` → `WorldPoint`). **`SvgGameView`** passes these into **`SvgBoardCameraShell`** with **`getRotationDirection`** from **`useSvgWindowInput`**.
-- **`useSvgWindowInput`**: window **`keydown` / `keyup` / `resize`** parity with canvas **`InputManager`** (Q/E/R/F/F3).
-- **`SvgBoardCameraShell`**: applies world `<g>` **`transform`** via **`buildSvgWorldTransformString`**; continuous Q/E rotation in **`requestAnimationFrame`** (mutates **`cameraRef`**, updates DOM **`transform`**, **`syncCameraToReact`** when keys release). Wraps **`SvgBoard`** (hex tiles only; shell owns camera **`transform`**). Storybook and **`SvgGameView`** both use this shell; omit **`cameraRef`** to sync an internal ref from **`camera`**.
+- **`useSvgBoardPointerCamera`**: keeps **`CameraSnapshot`** in a ref, returns **`camera`** (React state copy), **`cameraRef`**, **`syncCameraToReact`**, **`resetCamera`**, and **`containerToWorld`** (`ContainerToWorldFn`: `ContainerPoint` → `WorldPoint`). **`SvgGameView`** passes **`cameraRef`**, **`syncCameraToReact`**, and **`windowInputCallbacks`** into **`SvgBoardCameraShell`**.
+- **`useSvgWindowInput`**: window **`keydown` / `keyup` / `resize`** aligned with canvas **`InputManager`**. Always registers listeners while **`SvgBoardCameraShell`** is mounted; **`windowInputCallbacks`** supplies R/F / resize / overlay hooks while Q/E drive camera rotation via **`getRotationDirection`**.
+- **`SvgBoardCameraShell`**: world `<g>` **`transform`** (same order as canvas: center → rotation → zoom → pan); **`requestAnimationFrame`** for continuous camera rotation from **`getRotationDirection`** without per-frame **`setState`**; **`useSvgWindowInput(windowInputCallbacks)`**. Wraps **`SvgBoard`**. Callers (including Storybook) pass a **`cameraRef`** owned outside the shell so keyboard rotation and pointer camera share one mutable snapshot.
 - **`useSvgGameViewLayout`**: **`ResizeObserver`** + **`viewSize`** / **`measureContainer`** for **`viewCenter`**.
 - **`useSvgBoardInteraction`**: game actions from pointer; holds **`containerToWorldRef`** so hover can map **`ContainerPoint`** → world before **`closestHexByWorldDistance`**.
 

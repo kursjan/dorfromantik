@@ -1,5 +1,5 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-import type { MutableRefObject, RefObject } from 'react';
+import type { RefObject } from 'react';
 import type { ContainerDelta, ContainerPoint } from '../../common/ContainerPoint';
 import { WORLD_ORIGIN, type WorldPoint } from '../../common/WorldPoint';
 import { DEFAULT_CAMERA_SNAPSHOT, type CameraSnapshot } from '../../common/camera/CameraSnapshot';
@@ -26,7 +26,7 @@ export function useSvgBoardPointerCamera(
   callbacks: SvgBoardPointerCameraCallbacks
 ): {
   camera: CameraSnapshot;
-  cameraRef: MutableRefObject<CameraSnapshot>;
+  cameraRef: RefObject<CameraSnapshot>;
   syncCameraToReact: () => void;
   resetCamera: () => void;
   containerToWorld: ContainerToWorldFn;

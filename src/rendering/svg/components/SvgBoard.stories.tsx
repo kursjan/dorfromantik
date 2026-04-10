@@ -5,6 +5,7 @@ import { ContainerPoint } from '../../common/ContainerPoint';
 import { WorldPoint } from '../../common/WorldPoint';
 import { DEFAULT_CAMERA_SNAPSHOT, type CameraSnapshot } from '../../common/camera/CameraSnapshot';
 import { SvgBoardCameraShell } from './SvgBoardCameraShell';
+import type { SvgWindowInputCallbacks } from '../hooks/useSvgWindowInput';
 import { HexCoordinate } from '../../../models/HexCoordinate';
 import {
   north,
@@ -42,6 +43,12 @@ const meta: Meta<typeof SvgBoardCameraShell> = {
 
 export default meta;
 type Story = StoryObj<typeof SvgBoardCameraShell>;
+
+const storyNoopWindowInput: SvgWindowInputCallbacks = {
+  onRotateClockwise: () => {},
+  onRotateCounterClockwise: () => {},
+  onResize: () => {},
+};
 
 // Helper to create a basic tile
 const createTile = (terrains: Terrain[]): Tile => {
@@ -191,7 +198,12 @@ function SvgBoardMeasuredView({
   camera?: CameraSnapshot;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
+  const cameraRef = useRef(camera);
   const [viewCenter, setViewCenter] = useState(() => ContainerPoint.xy(400, 300));
+
+  useLayoutEffect(() => {
+    cameraRef.current = { ...camera };
+  }, [camera]);
 
   useLayoutEffect(() => {
     const el = wrapRef.current;
@@ -209,7 +221,14 @@ function SvgBoardMeasuredView({
 
   return (
     <div ref={wrapRef} style={{ width: '100%', height: '100%' }}>
-      <SvgBoardCameraShell board={board} camera={camera} viewCenter={viewCenter} />
+      <SvgBoardCameraShell
+        board={board}
+        camera={camera}
+        viewCenter={viewCenter}
+        cameraSnapshotRef={cameraRef}
+        syncCameraToReact={() => {}}
+        windowInputCallbacks={storyNoopWindowInput}
+      />
     </div>
   );
 }
@@ -234,8 +253,13 @@ const InteractiveBoard = () => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [viewCenter, setViewCenter] = useState(() => ContainerPoint.xy(400, 300));
   const [camera, setCamera] = useState<CameraSnapshot>(() => ({ ...DEFAULT_CAMERA_SNAPSHOT }));
+  const cameraRef = useRef(camera);
   const [isDragging, setIsDragging] = useState(false);
   const lastMouse = useRef({ x: 0, y: 0 });
+
+  useLayoutEffect(() => {
+    cameraRef.current = { ...camera };
+  }, [camera]);
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -312,7 +336,14 @@ const InteractiveBoard = () => {
       onPointerUp={handlePointerUp}
       onWheel={handleWheel}
     >
-      <SvgBoardCameraShell board={scatteredBoard} camera={camera} viewCenter={viewCenter} />
+      <SvgBoardCameraShell
+        board={scatteredBoard}
+        camera={camera}
+        viewCenter={viewCenter}
+        cameraSnapshotRef={cameraRef}
+        syncCameraToReact={() => setCamera({ ...cameraRef.current })}
+        windowInputCallbacks={storyNoopWindowInput}
+      />
       <div
         style={{
           position: 'absolute',
@@ -372,6 +403,7 @@ const PerspectiveRotationBoard = () => {
   }, []);
 
   const boardCamera: CameraSnapshot = DEFAULT_CAMERA_SNAPSHOT;
+  const cameraRef = useRef<CameraSnapshot>({ ...DEFAULT_CAMERA_SNAPSHOT });
 
   return (
     <div
@@ -408,6 +440,9 @@ const PerspectiveRotationBoard = () => {
             board={scatteredBoard}
             camera={boardCamera}
             viewCenter={viewCenter}
+            cameraSnapshotRef={cameraRef}
+            syncCameraToReact={() => {}}
+            windowInputCallbacks={storyNoopWindowInput}
           />
         </div>
       </div>

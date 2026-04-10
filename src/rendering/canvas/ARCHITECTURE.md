@@ -84,7 +84,7 @@ Pure view math shared with the SVG board path (**`cameraTransforms.ts`**, **`cam
 - **Canvas state:** **`CanvasController`** holds **`cameraSnapshot: CameraSnapshot`** and replaces it on each pan / zoom / wheel / rotate / reset.
 - **Updates:** **`panCameraSnapshotBy`**, **`zoomCameraSnapshotBy`**, **`rotateCameraSnapshotBy`**; wheel zoom via **`applyWheelDeltaYToCamera(snapshot, deltaY)`** → new snapshot; reset uses **`{ ...DEFAULT_CAMERA_SNAPSHOT }`**.
 - **Hit testing:** **`cameraContainerToWorld(snapshot, point, w, h)`** — container-local pixel → **`WorldPoint`** (same idea as SVG **`useSvgBoardPointerCamera` → `containerToWorld`**).
-- **Canvas draw path:** center translate → **`cameraSnapshot.rotation`** / **`zoom`** / **`position`** on **`Context2D`** (matches SVG **`buildSvgWorldTransformString`** / **`SvgBoardCameraShell`** order).
+- **Canvas draw path:** center translate → **`cameraSnapshot.rotation`** / **`zoom`** / **`position`** on **`Context2D`** (matches SVG **`SvgBoardCameraShell`** world `<g>` **`transform`** order).
 
 ### InputManager (`engine/InputManager.ts`)
 

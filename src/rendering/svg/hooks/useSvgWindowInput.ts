@@ -1,9 +1,6 @@
 import { useCallback, useLayoutEffect, useRef } from 'react';
 
-/**
- * Window-level keyboard and resize handling aligned with {@link InputManager}
- * (Q/E held-state, R/F rotation, F3 + preventDefault, window resize).
- */
+/** Parity with canvas {@link InputManager} for `window` keyboard and resize. */
 export interface SvgWindowInputCallbacks {
   onRotateClockwise: () => void;
   onRotateCounterClockwise: () => void;
