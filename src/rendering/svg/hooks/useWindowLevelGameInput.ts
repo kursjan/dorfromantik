@@ -33,7 +33,8 @@ export function useWindowLevelGameInput(callbacks: WindowLevelGameInputCallbacks
 
       if (e.key === 'r' || e.key === 'R') {
         callbacksRef.current.onRotateClockwise();
-      } else if (e.key === 'f' || e.key === 'F') {
+      }
+      if (e.key === 'f' || e.key === 'F') {
         callbacksRef.current.onRotateCounterClockwise();
       }
     };
