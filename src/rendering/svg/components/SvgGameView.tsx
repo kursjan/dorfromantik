@@ -1,15 +1,19 @@
 import { type FC, useLayoutEffect, useRef } from 'react';
+import { radians } from '../../../utils/Angle';
 import { ContainerPoint } from '../../common/ContainerPoint';
+import { rotateCameraSnapshotBy } from '../../common/camera/cameraTransforms';
 import { SvgBoard } from './SvgBoard';
 import { Game } from '../../../models/Game';
 import { GameHUD } from '../../shell/GameHUD';
 import { ResetViewButton } from '../../shell/ResetViewButton';
 import { useSvgBoardInteraction } from '../hooks/useSvgBoardInteraction';
 import { useSvgBoardPointerCamera } from '../hooks/useSvgBoardPointerCamera';
-import { useSvgCameraRotationRaf } from '../hooks/useSvgCameraRotationRaf';
 import { useSvgGameViewLayout } from '../hooks/useSvgGameViewLayout';
 import { useSvgWindowInput } from '../hooks/useSvgWindowInput';
-import { applySvgWorldTransformToGroup } from '../svgBoardWorldTransform';
+import {
+  SVG_CAMERA_KEYBOARD_ROTATION_RADIANS_PER_FRAME,
+  applySvgWorldTransformToGroup,
+} from '../svgBoardWorldTransform';
 import { useGameSnapshotBridge } from '../../common/bridge/useGameSnapshotBridge';
 
 interface SvgGameViewProps {
@@ -34,8 +38,18 @@ export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame })
     onResize: measureContainer,
   });
 
+  const getRotationDirectionRef = useRef(getRotationDirection);
+  useLayoutEffect(() => {
+    getRotationDirectionRef.current = getRotationDirection;
+  }, [getRotationDirection]);
+
   const { camera, cameraRef, syncCameraToReact, resetCamera, containerToWorld } =
     useSvgBoardPointerCamera(containerRef, cameraPointerCallbacks);
+
+  const syncCameraToReactRef = useRef(syncCameraToReact);
+  useLayoutEffect(() => {
+    syncCameraToReactRef.current = syncCameraToReact;
+  }, [syncCameraToReact]);
 
   useLayoutEffect(() => {
     containerToWorldRef.current = containerToWorld;
@@ -54,13 +68,33 @@ export const SvgGameView: FC<SvgGameViewProps> = ({ activeGame, setActiveGame })
     applySvgWorldTransformToGroup(worldGroupRef.current, cameraRef.current, viewCenter);
   }, [camera, viewCenter, cameraRef]);
 
-  useSvgCameraRotationRaf({
-    worldGroupRef,
-    cameraRef,
-    viewCenterRef,
-    getRotationDirection,
-    syncCameraToReact,
-  });
+  useLayoutEffect(() => {
+    let rafId = 0;
+    let prevDir = 0;
+
+    const loop = () => {
+      const dir = getRotationDirectionRef.current();
+      const group = worldGroupRef.current;
+
+      if (dir !== 0 && Number.isFinite(dir) && group) {
+        cameraRef.current = rotateCameraSnapshotBy(
+          cameraRef.current,
+          radians(dir * SVG_CAMERA_KEYBOARD_ROTATION_RADIANS_PER_FRAME)
+        );
+        applySvgWorldTransformToGroup(group, cameraRef.current, viewCenterRef.current);
+      }
+
+      if (prevDir !== 0 && dir === 0) {
+        syncCameraToReactRef.current();
+      }
+
+      prevDir = dir;
+      rafId = requestAnimationFrame(loop);
+    };
+
+    rafId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafId);
+  }, [cameraRef, worldGroupRef, viewCenterRef]);
 
   return (
     <div

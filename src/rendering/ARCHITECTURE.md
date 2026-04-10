@@ -2,11 +2,11 @@
 
 Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** (DOM game surface), and **common** math/types. Game chrome (HUD, reset, save status) lives in **`src/rendering/shell/`**.
 
-| Area          | Role                                                                                                                                                                                    |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`canvas/`** | `CanvasController` game loop, `InputManager`, `Context2D` renderers. See **`canvas/ARCHITECTURE.md`**.                                                                                  |
-| **`svg/`**    | `SvgGameView` composition, `SvgBoard`, `HexTile`, hooks (`useSvgBoardPointerCamera`, `useSvgWindowInput`, `useSvgCameraRotationRaf`, `useSvgGameViewLayout`, `useSvgBoardInteraction`). |
-| **`common/`** | `CameraSnapshot`, `cameraTransforms`, `cameraInteraction`, hex layout (`HexUtils`, `hexLayout`), `useGameSnapshotBridge`, point types.                                                  |
+| Area          | Role                                                                                                                                                         |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`canvas/`** | `CanvasController` game loop, `InputManager`, `Context2D` renderers. See **`canvas/ARCHITECTURE.md`**.                                                       |
+| **`svg/`**    | `SvgGameView` composition, `SvgBoard`, `HexTile`, hooks (`useSvgBoardPointerCamera`, `useSvgWindowInput`, `useSvgGameViewLayout`, `useSvgBoardInteraction`). |
+| **`common/`** | `CameraSnapshot`, `cameraTransforms`, `cameraInteraction`, hex layout (`HexUtils`, `hexLayout`), `useGameSnapshotBridge`, point types.                       |
 
 ## Coordinate types (`common/*.ts`)
 
@@ -39,7 +39,7 @@ Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** 
 
 - **`useSvgBoardPointerCamera`**: keeps **`CameraSnapshot`** in a ref, returns **`camera`** (React state copy), **`cameraRef`**, **`syncCameraToReact`**, **`resetCamera`**, and **`containerToWorld`** (`ContainerToWorldFn`: `ContainerPoint` → `WorldPoint`). **`SvgGameView`** passes that snapshot into **`SvgBoard`** as the **`camera`** prop (with **`deferWorldTransformToParent`** for keyboard rotation).
 - **`useSvgWindowInput`**: window **`keydown` / `keyup` / `resize`** parity with canvas **`InputManager`** (Q/E/R/F/F3).
-- **`useSvgCameraRotationRaf`**: continuous Q/E rotation via DOM **`transform`** on the world `<g>`, **`syncCameraToReact`** on key release.
+- **`SvgGameView`**: continuous Q/E camera rotation via a **`requestAnimationFrame`** loop that mutates the world `<g>` **`transform`** and calls **`syncCameraToReact`** when rotation keys release (no `setState` in the hot path).
 - **`useSvgGameViewLayout`**: **`ResizeObserver`** + **`viewSize`** / **`measureContainer`** for **`viewCenter`**.
 - **`useSvgBoardInteraction`**: game actions from pointer; holds **`containerToWorldRef`** so hover can map **`ContainerPoint`** → world before **`closestHexByWorldDistance`**.
 
