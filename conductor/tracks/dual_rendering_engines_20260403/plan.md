@@ -31,7 +31,7 @@ The canvas path implements board interaction through `InputManager` + `CanvasCon
 
 - [x] Perform a rigorous file-by-file review of all changes in this branch against `main` using **quick-review** skill.
 - [x] Triage in-the-middle adversarial review findings using **task-conductor** skill (no persistent `REVIEW_FEEDBACK.md` in repo).
-- [ ] **Phase Gate**: Final verification of the in-the-middle code review changes using **project-orchestrator** skill.
+- [x] **Phase Gate**: Final verification of the in-the-middle code review changes using **project-orchestrator** skill. _(Closed by maintainer LGTM; `npm run test:ci` / `npm run test:e2e:ci` not re-run — known failures.)_
 
 ## Phase 4: SVG Input Parity (Keyboard & Window)
 
