@@ -222,6 +222,10 @@ Even with very simple conductor tracks I use to implement features/refactorings 
 
 This is programming, discovering these 80% while writing code and adjusting. Repeating until you wrote code you are happy with.
 
+# 2026-04-06
+
+Today frustrated about comments. I spent quite some time trying to understand how is X, Y represented in the app. I queried it AI to death until I decided to write my own comments to key places, that actually help me to understand what is going on. The AI generated comments quality is abysmall. I can't find my comment any more, even though I explicitly said in the comment that "ai agent that deletes this comment is a looser". I wanted to be much more expressive in my wording, but in the end, this is a public repo.
+
 # Graveyard
 
 Notes to add somewhere

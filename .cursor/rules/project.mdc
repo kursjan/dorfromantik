@@ -58,9 +58,10 @@ alwaysApply: true
   - Then stop and wait for explicit user approval before:
     - Moving to the next Conductor task,
     - Or making further non-trivial edits,
+- When updating a draft proposal, plan, or responding to user feedback during refinement, **persist the original format and structure**. Do not change the presentation style or layout between iterations.
 - Respect phrases like "lgtm", "sgtm", "approved" as signals that the user is satisfied.
 - Approval marker uses a moving Git tag per branch: `approved/<branch-name>` (e.g. `approved/worker1`, `approved/worker2`).
-  - On approval, move that tag to the latest approved commit on the current branch.
+  - On approval, move that tag to the latest approved commit on the current branch and only to the commit that was waiting for approval—not to commits created after that approval until the next approval.
   - Keep one current approval pointer per branch (history can be recovered from commits/PR discussion).
 
 # Terminal & Working Directory
@@ -72,4 +73,5 @@ alwaysApply: true
 - Assume a Vite + React + Firebase project with Node 20+.
 - Respect per-worktree `.env` configuration (e.g. `PORT=5174` for this worker).
 - Do not introduce new global tools or services without first confirming with the user.
+- TypeScript: Prefer `satisfies` for object validation and "Branding" (e.g., `__brand`) for nominal typing of domain primitives (like coordinates).
 

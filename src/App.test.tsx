@@ -29,16 +29,16 @@ describe('App', () => {
     const user = userEvent.setup();
     await user.click(startButton);
 
-    // After click we navigate to /game; wait for game route content (canvas or placeholder)
+    // After click we navigate to /game; wait for game route content (SVG board shell)
     await waitFor(
       () => {
-        const canvas = screen.queryByTestId('game-canvas');
-        expect(canvas).toBeInTheDocument();
+        const board = screen.queryByTestId('game-svg');
+        expect(board).toBeInTheDocument();
       },
       { timeout: 2000 }
     );
-    const canvasElement = screen.getByTestId('game-canvas');
-    expect(canvasElement).toHaveAttribute('role', 'img');
-    expect(canvasElement).toHaveAttribute('aria-label', 'Game Board');
+    const boardElement = screen.getByTestId('game-svg');
+    expect(boardElement).toHaveAttribute('role', 'img');
+    expect(boardElement).toHaveAttribute('aria-label', 'Game Board');
   });
 });

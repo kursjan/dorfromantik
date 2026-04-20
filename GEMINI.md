@@ -65,6 +65,9 @@ Ad hoc task can be implement in main.
   - **Phase Completion:** Once a phase is completed, the **project-orchestrator** will perform a final verification and create a **Phase Checkpoint** commit if necessary.
     - push will happen at the end of the track
   - **Approval Tracking:** Use a moving tag `approved/<branch-name>` (e.g. `approved/worker1`, `approved/worker2`) as the pointer to the last user-approved commit on that branch. After each new approval, move the tag for that branch to the newly approved commit.
+    - Mark approved task as `[X]`, with capital `x` to mark task as done and approved
+    - Move `approved/<branch>` only when the user approves, and only to the commit that was waiting for approval, typically marked `[x].
+    - If user approves latest commit, all previous commits are also approved.
 
 ### **GitHub Integration:**
 
@@ -115,6 +118,7 @@ The AI's workflow is iterative, transparent, and responsive to user input.
 
 - **Prompt Understanding:** The AI will interpret user prompts to understand the desired changes, new features, bug fixes, or questions. It will ask clarifying questions if the prompt is ambiguous.
 - **Track Generation & Plan Management:** Each time the user requests a significant change or feature, the AI will propose a new **Track** or update an existing one using **planning-architect** skill.
+  - During refinement of a draft proposal or a plan based on user feedback, the AI must strictly persist the original format and structure. Do not change the presentation style or layout between iterations.
 - **Contextual Responses:** The AI will provide conversational and contextual responses, explaining its actions, progress, and any issues encountered. It will summarize changes made.
 - **Error Checking Flow:**
   1.  **Code Change:** AI applies a code modification.
@@ -199,6 +203,7 @@ The AI is empowered to modify the React codebase and manage its dependencies aut
   - Effective use of functional components and hooks.
   - Appropriate state management solutions (e.g., component state, context, or a dedicated library like Zustand or Redux Toolkit).
   - Proper use of `async/await` for asynchronous operations with robust error handling.
+  - TypeScript: Prefer `satisfies` for complex object validation and "Branding" for nominal typing (e.g., coordinates, IDs).
 
 ## **Automated Error Detection & Remediation**
 

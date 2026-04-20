@@ -1,4 +1,4 @@
-import type { CanvasController } from '../canvas/engine/CanvasController';
+import type { CanvasController } from '../rendering/canvas/engine/CanvasController';
 
 declare global {
   interface Window {

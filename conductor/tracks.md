@@ -50,3 +50,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: SVG HexTile Prototype (#19)**
       _Link: [./archive/svg_hex_tile_prototype_20260401/index.md](./archive/svg_hex_tile_prototype_20260401/index.md)_
+      \n- [ ] **Track: Dual Rendering Engines (Canvas & SVG) (#75)**\n _Link: [./tracks/dual_rendering_engines_20260403/plan.md](./tracks/dual_rendering_engines_20260403/plan.md)_
