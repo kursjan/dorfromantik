@@ -23,7 +23,8 @@ describe('useSvgBoardPointerCamera', () => {
     document.body.appendChild(container);
     const ref = { current: container };
 
-    const { result } = renderHook(() => useSvgBoardPointerCamera(ref, stubCallbacks));
+    const callbacksRef = { current: stubCallbacks };
+    const { result } = renderHook(() => useSvgBoardPointerCamera(ref, callbacksRef));
 
     expect(result.current.camera.zoom).toBe(1);
 
@@ -43,7 +44,8 @@ describe('useSvgBoardPointerCamera', () => {
     document.body.appendChild(container);
     const ref = { current: container };
 
-    const { result } = renderHook(() => useSvgBoardPointerCamera(ref, stubCallbacks));
+    const callbacksRef = { current: stubCallbacks };
+    const { result } = renderHook(() => useSvgBoardPointerCamera(ref, callbacksRef));
 
     act(() => {
       container.dispatchEvent(
@@ -68,7 +70,8 @@ describe('useSvgBoardPointerCamera', () => {
     document.body.appendChild(container);
     const ref = { current: container };
 
-    const { result } = renderHook(() => useSvgBoardPointerCamera(ref, stubCallbacks));
+    const callbacksRef = { current: stubCallbacks };
+    const { result } = renderHook(() => useSvgBoardPointerCamera(ref, callbacksRef));
 
     act(() => {
       container.dispatchEvent(

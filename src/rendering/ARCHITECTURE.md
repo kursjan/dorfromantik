@@ -41,7 +41,7 @@ Shared visuals and input for the board: **canvas** (rAF + `Context2D`), **SVG** 
 - **`useSvgWindowInput`**: window **`keydown` / `keyup` / `resize`** aligned with canvas **`InputManager`**. Always registers listeners while **`SvgBoardCameraShell`** is mounted; **`windowInputCallbacks`** supplies R/F / resize / overlay hooks while Q/E drive camera rotation via **`getRotationDirection`**.
 - **`SvgBoardCameraShell`**: world `<g>` **`transform`** (same order as canvas: center → rotation → zoom → pan); **`requestAnimationFrame`** for continuous camera rotation from **`getRotationDirection`** without per-frame **`setState`**; **`useSvgWindowInput(windowInputCallbacks)`**. Wraps **`SvgBoard`**. Callers (including Storybook) pass a **`cameraRef`** owned outside the shell so keyboard rotation and pointer camera share one mutable snapshot.
 - **`useSvgGameViewLayout`**: **`ResizeObserver`** + **`viewSize`** / **`measureContainer`** for **`viewCenter`**.
-- **`useSvgBoardInteraction`**: game actions from pointer; holds **`containerToWorldRef`** so hover can map **`ContainerPoint`** → world before **`closestHexByWorldDistance`**.
+- **`useSvgBoardInteraction`**: game actions from pointer; **`onHover(point, containerToWorld)`** maps **`ContainerPoint`** → world before **`closestHexByWorldDistance`**.
 
 ## Debug stats (canvas)
 

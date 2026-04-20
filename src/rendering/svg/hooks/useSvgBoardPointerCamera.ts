@@ -14,7 +14,7 @@ import { cameraContainerToWorld, panCameraSnapshotBy } from '../../common/camera
 export type ContainerToWorldFn = (point: ContainerPoint) => WorldPoint;
 
 export interface SvgBoardPointerCameraCallbacks {
-  onHover: (point: ContainerPoint) => void;
+  onHover: (point: ContainerPoint, containerToWorld: ContainerToWorldFn) => void;
   onClick: (point: ContainerPoint) => void;
   onRotateClockwise: () => void;
   onRotateCounterClockwise: () => void;
@@ -23,7 +23,7 @@ export interface SvgBoardPointerCameraCallbacks {
 
 export function useSvgBoardPointerCamera(
   containerRef: RefObject<HTMLElement | null>,
-  callbacks: SvgBoardPointerCameraCallbacks
+  callbacksRef: RefObject<SvgBoardPointerCameraCallbacks>
 ): {
   camera: CameraSnapshot;
   cameraRef: RefObject<CameraSnapshot>;
@@ -35,14 +35,19 @@ export function useSvgBoardPointerCamera(
   const panPointerRef = useRef(new PointerPanZoomSession());
   const [camera, setCamera] = useState<CameraSnapshot>({ ...DEFAULT_CAMERA_SNAPSHOT });
 
-  const callbacksRef = useRef(callbacks);
-  useLayoutEffect(() => {
-    callbacksRef.current = callbacks;
-  }, [callbacks]);
-
   const sync = useCallback(() => {
     setCamera({ ...cameraRef.current });
   }, []);
+
+  const containerToWorld = useCallback(
+    (point: ContainerPoint) => {
+      const container = containerRef.current;
+      if (!container) return WORLD_ORIGIN;
+      const rect = container.getBoundingClientRect();
+      return cameraContainerToWorld(cameraRef.current, point, rect.width, rect.height);
+    },
+    [containerRef]
+  ) satisfies ContainerToWorldFn;
 
   useLayoutEffect(() => {
     const container = containerRef.current;
@@ -58,7 +63,8 @@ export function useSvgBoardPointerCamera(
         cameraRef.current = applyWheelDeltaYToCamera(cameraRef.current, deltaY);
         sync();
       },
-      onHover: (point) => callbacksRef.current.onHover(point),
+      // TODO: not sure if we want onHover(point) or onHover(point, containerToWorld)
+      onHover: (point) => callbacksRef.current.onHover(point, containerToWorld),
       onClick: (point) => callbacksRef.current.onClick(point),
       onRotateClockwise: () => callbacksRef.current.onRotateClockwise(),
       onRotateCounterClockwise: () => callbacksRef.current.onRotateCounterClockwise(),
@@ -68,22 +74,12 @@ export function useSvgBoardPointerCamera(
     const cleanup = bindPointerInteraction(container, pointerCallbacks, panPointer);
 
     return cleanup;
-  }, [containerRef, sync]);
+  }, [callbacksRef, containerRef, containerToWorld, sync]);
 
   const resetCamera = useCallback(() => {
     cameraRef.current = { ...DEFAULT_CAMERA_SNAPSHOT };
     sync();
   }, [sync]);
-
-  const containerToWorld = useCallback(
-    (point: ContainerPoint) => {
-      const container = containerRef.current;
-      if (!container) return WORLD_ORIGIN;
-      const rect = container.getBoundingClientRect();
-      return cameraContainerToWorld(cameraRef.current, point, rect.width, rect.height);
-    },
-    [containerRef]
-  ) satisfies ContainerToWorldFn;
 
   return { camera, cameraRef, syncCameraToReact: sync, resetCamera, containerToWorld };
 }

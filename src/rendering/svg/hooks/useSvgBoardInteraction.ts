@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, type RefObject } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import type { Game } from '../../../models/Game';
 import type { HexCoordinate } from '../../../models/HexCoordinate';
 import type { ContainerPoint } from '../../common/ContainerPoint';
@@ -18,10 +18,7 @@ export function useSvgBoardInteraction(
   setGameSnapshot: (game: Game) => void
 ): {
   cameraPointerCallbacks: SvgBoardPointerCameraCallbacks;
-  containerToWorldRef: RefObject<ContainerToWorldFn | undefined>;
 } {
-  const containerToWorldRef = useRef<ContainerToWorldFn | undefined>(undefined);
-
   const getSnapshotRef = useRef(getGameSnapshot);
   const setSnapshotRef = useRef(setGameSnapshot);
   useLayoutEffect(() => {
@@ -31,10 +28,8 @@ export function useSvgBoardInteraction(
 
   const hoveredHexRef = useRef<HexCoordinate | null>(null);
 
-  const onHover = useCallback((point: ContainerPoint) => {
-    const toWorld = containerToWorldRef.current;
-    if (!toWorld) return;
-    const worldPos = toWorld(point);
+  const onHover = useCallback((point: ContainerPoint, containerToWorld: ContainerToWorldFn) => {
+    const worldPos = containerToWorld(point);
     const validCoords = getSnapshotRef.current().hints.validPlacements;
     if (validCoords.length === 0) {
       hoveredHexRef.current = null;
@@ -79,5 +74,5 @@ export function useSvgBoardInteraction(
     [onClick, onHover, onLeave, onRotateClockwise, onRotateCounterClockwise]
   );
 
-  return { cameraPointerCallbacks, containerToWorldRef };
+  return { cameraPointerCallbacks };
 }
