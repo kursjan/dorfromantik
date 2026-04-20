@@ -65,8 +65,13 @@ export function rotateCameraSnapshotBy(
   snapshot: CameraSnapshot,
   deltaRadians: Radians
 ): CameraSnapshot {
+  const cos = Math.cos(-deltaRadians);
+  const sin = Math.sin(-deltaRadians);
+  const px = snapshot.position.x;
+  const py = snapshot.position.y;
   return {
     ...snapshot,
     rotation: radians(snapshot.rotation + deltaRadians),
+    position: WorldPoint.xy(px * cos - py * sin, px * sin + py * cos),
   } satisfies CameraSnapshot;
 }
