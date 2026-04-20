@@ -56,10 +56,13 @@ Use this skill for any **coding or implementation task** defined in a Conductor 
 
 7. **Mark as Done & `approved/<branch>` tag**
    - Once the user approves, consider **that** task complete.
-   - **Move `approved/<branch>` only here**, in response to their approval, and only to the commit they are approving:
-     - Run `git tag -f approved/<branch>` when **`HEAD` is still the commit** for the task that was waiting on `STATUS: WAITING_FOR_APPROVAL` (the tip **before** you start the next task or create new commits).
-   - **Do not** move the tag onto a **new** commit you create **after** approval until the user approves **that** work in a later message.
-   - If the user says e.g. **“lgtm, do next”** in one line: (1) move the tag to current `HEAD` (the just-approved task), (2) **then** implement the next task; the new task’s commit must **not** receive the tag until the next approval.
+   - Mark the task `[X]` (with capital X) to mark task as complete by AI and approved by user.
+     - if not explicitly stated, LGTM approves the latest task marked as `[x]`
+   - **Move `approved/<branch>`**, in response to their approval, and only to the commit they are approving:
+     - Run `git tag -f approved/<branch>`
+   - If the user says e.g. **“lgtm, do next”** in one line:
+     - (1) move the tag to the current `[x]`, change to `[X]` (the just-approved task),
+     - (2) **then** implement the next unfinished task.
    - Only after moving the tag (when applicable) may you proceed to the next uncompleted task.
 
 ## Iteration Protocol
